@@ -1,0 +1,82 @@
+<dtml-comment>
+  !!! Not used. Reserved for future use for edit tasks in popup window.
+</dtml-comment>
+
+<head>
+<link rel="stylesheet" type="text/css" href="&dtml-portal_url;/styles.css">
+
+<dtml-var dynamic_stylesheet>
+</head>
+
+<dtml-let task_id="REQUEST.get('task_id', None)"
+          task="getTask(task_id)"
+          user="portal_membership.getAuthenticatedMember()"
+          user_name="user.getUserName()"
+          
+>
+
+<form action="add_task" method="POST" name="add_task_form">  
+  <table cellpadding="2" cellspacing="0" border="0">
+    <tr>  
+      <td align="center"  colspan="3">
+          <font color="#6F91D8"><b>
+              <dtml-msg "Change task">
+            </b></font>
+    <tr>
+      <td align="left"><b><dtml-msg "Task title"></b>
+      <td align="left" colspan="2"><input type="text" name="title" size="57" value="<dtml-var "task.title()">">
+    <tr>
+      <td align="left"><b><dtml-msg "Task description"></b>
+      <td align="left" colspan="2"><textarea name="text" rows="5" cols="57"><dtml-var "task.getTaskText()"></textarea>
+    <tr>
+      <td align="left"><b><dtml-msg "Plan date"></b>
+      <td align="left" valign="middle">
+         <dtml-var "datetime_form( this()
+                    , prefix='plan_date'
+                    , date_only = True
+                    , date=task.getTaskPlanDate()
+                             )"
+         >
+           
+    <tr>
+      <td align="left"><b><dtml-msg "Priority">:</b>
+      <td align="left" colspan="2">
+        <select name="priority">
+          <option value="1" <dtml-var "task.priority()=='1'" fmt="selected">><dtml-msg "Small" ></option>
+          <option value="2" <dtml-var "task.priority()=='2'" fmt="selected">><dtml-msg "Normal"></option>
+          <option value="3" <dtml-var "task.priority()=='3'" fmt="selected">><dtml-msg "High"></option>
+        </select>
+    <tr>
+      <td align="left"><b><dtml-msg "State">:</b>
+      <td align="left">
+        <select name="state" onChange="stateChanged(this)">
+          <dtml-in "listCalendarTaskStates()">
+          <option value="&dtml-sequence-item;"
+                  <dtml-var "task.state()==_['sequence-item']" fmt="selected">
+          >&dtml-sequence-item;</option>
+          </dtml-in>
+        </select>
+      <td>
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr><td rowspan="2"><b><dtml-msg "Ready">:</b>&nbsp;
+              <td rowspan="2">
+                <input type="text" name="ready_proc:int" id="ready_proc" value="<dtml-var "task.ready_proc()">" size="3" onKeyUp="procChanged(this)" onBlur="return fieldEditHandler.int_check(this)">%
+              <td align="center"><a href="javascript:incProc();" onClick="eval(href); return false" class="navigate">  + </a>
+          <tr><td align="center"><a href="javascript:decProc();" onClick="eval(href); return false" class="navigate">  - </a>
+        </table>
+    <tr>
+      <td align="left"><b><dtml-msg "Public"></b>
+      <td align="left" valign="middle" colspan=2>
+        <dtml-let checked="task.isPublic()"
+        >
+        <input type="checkbox" name="is_public" value="1"  <dtml-var "checked" fmt="checked"> />
+        </dtml-let>
+    <tr>
+      <td colspan="3">    
+        <input name="save_button" type="submit" value="<dtml-msg "Ñhange">"
+  </table>
+  <input type="hidden" value="<dtml-var "task.getId()">" name="id">
+</form>
+
+</dtml-let>
+

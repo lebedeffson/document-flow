@@ -1,0 +1,25 @@
+<dtml-if "lang=='en'">
+  In the topic "<dtml-var folder_title>":
+<dtml-in doc_props prefix="p">
+    Document "<dtml-var "p_item['title']">"
+<dtml-if "p_item['summary']">
+      Description: 
+        <dtml-var "p_item['summary']">.
+</dtml-if>
+
+      Document location: 
+        <dtml-var "p_item[use_url]">
+</dtml-in>
+<dtml-else>
+  В теме "<dtml-var folder_title>":
+<dtml-in doc_props prefix="p">
+    Документ "<dtml-var "p_item['title']">"
+<dtml-if "p_item['summary']">
+      Описание: 
+        <dtml-var "p_item['summary']">.
+</dtml-if>
+
+      Адрес документа: 
+        <dtml-var "p_item[use_url]">
+</dtml-in>
+</dtml-if>

@@ -1,0 +1,44 @@
+<dtml-with portal_properties>
+<dtml-if "REQUEST.get('lang', '')=='en'">
+To: <dtml-var email>
+From: "&dtml-email_from_name;" <&dtml-email_from_address;>
+Subject: Membership Information
+
+You have been registered as a member of <dtml-var title>.
+
+This describes the purpose of the portal:
+<dtml-var description>
+
+Visit us at &dtml-portal_url;
+
+Your login id and password are:
+
+Login ID: <dtml-var username>
+Password: <dtml-var password>
+
+You can use this URL to log on:
+
+&dtml.url-logged_in;?__ac_name=&dtml.url_quote-username;&__ac_password=&dtml.url_quote-password;
+
+Be aware that this URL might wrap over two lines. If your browser shows an error 
+message when you try to access the URL please make sure that you put in the 
+complete string.
+
+Portal Admin
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+From: "&dtml-email_from_name;" <&dtml-email_from_address;>
+To: <dtml-var email>
+Subject: Вы зарегистрированы в системе "<dtml-var title>"
+
+Адрес портала "<dtml-var title>": &dtml-portal_url;
+
+Ваши реквизиты:
+    Имя: <dtml-var username>
+ Пароль: <dtml-var password>
+
+URL для немедленного входа в систему:
+&dtml.url-logged_in;?__ac_name=&dtml.url_quote-username;&__ac_password=&dtml.url_quote-password;
+
+</dtml-if>
+</dtml-with>

@@ -1,0 +1,173 @@
+<dtml-comment>
+
+$Id: explorer_directory_contents.dtml,v 1.15 2006/05/17 13:59:06 oevsegneev Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.15 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-var simple_html_header>
+
+<dtml-let item="_.has_key('item') and item or None"
+          Explorer=explorer_init>
+<dtml-with "Explorer.content_index(item)" mapping>
+
+<dtml-let session="REQUEST.SESSION"
+          data="session[('explorer',explorer_id)]"
+          callback_function="data.get('callback_function')"
+          pages_list_params="'&item=%s&explorer_id=%s&search_enable:boolean=%s'%(item or '',explorer_id, REQUEST.get('search_enable',False))">
+
+<dtml-if results>
+
+<script type="text/javascript">
+<!--
+
+function SaveAndReturn(item_input, subitem_input)
+{
+    var option = getCheckedRadioButton(item_input);
+
+    if (!option){
+        alert('<dtml-msg "Please, select object">');
+        return false;
+    }
+
+    var result = option.value;
+    var title = option.title;
+
+    option = getCheckedRadioButton(subitem_input);
+    var subitem = option ? option.value : '';
+
+    parent.opener.&dtml-callback_function;( '<dtml-var "data.get('callback_form')" null fmt=jscript html_quote>', result,
+                                            title || '<dtml-msg "Object selected">', subitem,
+                                            '<dtml-var "data.get('uid_field')" null fmt=jscript html_quote>',
+                                            '<dtml-var "data.get('title_field')" null fmt=jscript html_quote>');
+
+    parent.opener.focus();
+    parent.close();
+}
+//-->
+</script>
+
+</dtml-if>
+
+<table height="100%" width="100%" cellspacing="0" cellpadding="0">
+  <tr valign="top">
+    <td style="border-right:1px solid;" width="33%">
+      <dtml-var "explorer_tree(None, _, item='')">
+    </td>
+    <td>
+<dtml-var directory_search_form>
+<dtml-if search_enable>
+  <h2><dtml-msg "Search results"> </h2>
+</dtml-if>
+
+<form>
+<table width="100%" border="0">
+
+<dtml-comment>
+<tr>
+  <td>
+    <dtml-var "directory_trail( node, _, action='explorer_index?item=?????', target='contents' )">
+  </td>
+</tr>
+</dtml-comment>
+
+<tr>
+  <td valign="top">
+    <h1>
+      <dtml-var root fmt=content>
+    </h1>
+  </td>
+</tr>
+
+<tr>
+  <td colspan="2">
+    <table cellspacing="1" cellpadding="0" width="100%" border="0">
+    <dtml-if "results_count > batch_size">
+      <tr>
+        <td>
+          <dtml-var "table_pages_list( None, _, disable_controls=1, params=pages_list_params )">
+        </td>
+      </tr>
+    </dtml-if>
+      <tr>
+        <td>
+          <dtml-in results>
+          <dtml-if sequence-start>
+            <table class="SearchFormLayout" border="0" cellspacing="5" cellpadding="0" width="100%">
+              <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th><dtml-msg "Code"></th>
+                <th><dtml-msg "Title"></th>
+              </tr>
+          </dtml-if>
+            <dtml-let item="_['sequence-key'][0]"
+                      result="_['sequence-key'][1]">
+
+              <tr valign="top">
+                <td>
+                   <input type="radio" name="target_item" value="&dtml-result;" title="&dtml-title;" />
+                </td>
+                <td valign="top">
+                  <img src="&dtml-portal_url;/&dtml-getIcon;" />
+                </td>
+                <td valign="top">
+                  <a href="&dtml-relative_url;/directory_view" target="_blank">
+                    <dtml-var "code() or '(%s)' % msg('no code')" html_quote></a>
+                </td>
+                <td>
+                  <a href="&dtml-relative_url;/directory_view" target="_blank">
+                    <dtml-var "title() or '(%s)' % msg('no name')" html_quote></a>
+                </td>
+              </tr>
+
+            </dtml-let>
+          <dtml-if sequence-end>
+            </table>
+          </dtml-if>
+          <dtml-else>
+            <dtml-if search_enable>
+               <h4><dtml-msg "No entries found."></h4>
+            <dtml-else>
+               <h4><dtml-msg "No entries in this node."></h4>
+            </dtml-if>
+          </dtml-in>
+        </td>
+      </tr>
+    <dtml-if "results_count > batch_size">
+    <tr>
+      <td>
+          <dtml-var "table_pages_list( None, _, disable_controls=1, params=pages_list_params )">
+      </td>
+    </tr>
+    </dtml-if>
+    </table>
+  </td>
+</tr>
+</table>
+
+<p align="left">
+<dtml-if results>
+  <input type="button"
+         name="select"
+         value="<dtml-msg "Select entry">"
+         onClick="return SaveAndReturn( this.form.target_item, this.form.target_subitem );">
+</dtml-if>
+  <input type="button"
+         name="close"
+         value="<dtml-msg "Close">"
+         onClick="return parent.close();">
+</p>
+</form>
+</td></tr></table>
+
+</dtml-let>
+
+</dtml-with>
+
+</dtml-let>
+
+
+<dtml-var simple_html_footer>

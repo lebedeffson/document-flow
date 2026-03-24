@@ -1,0 +1,162 @@
+<dtml-comment>
+Viewer for one week in table mode
+$Editor: spinagin $
+$Id: calendar_table_week_view.dtml,v 1.2 2007/07/03 12:18:54 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-if "skin_version=='1.0'">
+
+<table cellpadding="2" cellspacing="2" border="0" width="100%">
+  <tr class="row_odd">
+      <dtml-in "week_info">
+
+        <td noWrap <dtml-if "(dow()==6 or dow()==0) and show_holidays_together">
+                     width="5%"
+                   <dtml-elif "dow()<>0">
+                      width="15%"
+                   </dtml-if>
+                   >
+          <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "day()">&month=<dtml-var "month()">&year=<dtml-var "year()">" class="navigate">
+            <dtml-if "selected_month==month()"><b></dtml-if>
+            <dtml-if "dow()==6 and show_holidays_together"><dtml-msg "Saturday.short">
+            <dtml-elif "dow()==0 and show_holidays_together"><dtml-msg "Sunday.short">
+            <dtml-else><dtml-msg expr="Day()">
+            </dtml-if>            
+            <br>
+            <dtml-var "day()"> <dtml-msg expr="Month().capitalize()">
+          </a>
+        </td>
+      </dtml-in>
+  </tr>
+  <tr class="row_even" valign="top">
+    <dtml-in "week_info">
+    <dtml-if "dow()==6 and show_holidays_together">
+    <td colspan="2">
+    <dtml-elif "dow()==0 and show_holidays_together">
+    <dtml-else>
+    <td>
+    </dtml-if>
+      <table  cellpadding="0" cellspacing="0" border="0" width="100%">
+        <dtml-in "listNotesForDate(year(), month(), day(), filter_topic)" mapping>
+        <tr>
+          <td title="<dtml-var "text[:300]">">
+          <dtml-if title><b>&dtml-title;</b>  <br></dtml-if>
+          <dtml-if "not week_table_mode_only_title">
+              <dtml-if "_.len(text)<len_of_text">
+                  &dtml-text; 
+              <dtml-else>
+                  <dtml-var "text[:len_of_text]"> ...
+              </dtml-if>
+          <dtml-elif "not title">
+              <dtml-var "text[:15]">...
+          </dtml-if>
+        <dtml-else>
+          <dtml-if "dow()!=0 or not show_holidays_together">&nbsp;</dtml-if>
+        </dtml-in>
+      </table>
+    <dtml-if "not (dow()==6 and show_holidays_together)">
+    </td>
+    </dtml-if>
+    </dtml-in>
+  </tr>
+
+</table>
+
+<dtml-else>
+
+<dtml-comment>=======     table view mode =============</dtml-comment>
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+  <td>
+   <dtml-var ramka_header>
+    <table cellpadding="2" cellspacing="0" border="0" width="100%">
+    <dtml-comment>=======     show notes =============</dtml-comment>
+    <tr valign="top">
+      <dtml-in "week_info">
+        <td nowrap="1" <dtml-if "(dow()==6 or dow()==0) and show_holidays_together">
+                         width="5%"
+                       <dtml-elif "show_holidays_together">
+                         width="18%"
+                       <dtml-elif "dow()<>0">
+                         width="15%"
+                       </dtml-if>    >
+          <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "day()">&month=<dtml-var "month()">&year=<dtml-var "year()">" class="navigate">
+           <dtml-if "selected_month==month()"><font color="#3366CC"><b></dtml-if>
+            <dtml-if "dow()==6 and show_holidays_together">бс
+            <dtml-elif "dow()==0">Тё
+            <dtml-else><dtml-msg expr="Day()">
+            </dtml-if></b></font>
+            <br>
+             <dtml-var "day()"> <dtml-msg expr="Month().capitalize()">
+          </a>
+        <dtml-comment>if today</dtml-comment>
+        <dtml-if "isCurrentDay()">
+          <hr width="90%" align="center" size="1" color="blue"></td>
+        <dtml-else>
+          <hr width="90%" align="center" size="1"></td>
+        </dtml-if>
+        </td>
+      </dtml-in>
+    </tr>
+
+    <tr valign="top">
+      <dtml-in "week_info">
+       <td>
+        <table  cellpadding="0" cellspacing="0" border="0" width="100%">
+          <dtml-in "listNotesForDate(year(), month(), day(), filter_topic)" mapping>
+          <tr>
+            <td title="<dtml-var "text[:300]">">
+            <dtml-if title><b>&dtml-title;</b>  <br></dtml-if>
+            <dtml-if "not week_table_mode_only_title">
+                <dtml-if "_.len(text)<len_of_text">
+                    &dtml-text; 
+                <dtml-else>
+                    <dtml-var "text[:len_of_text]"> ...
+                </dtml-if>
+            <dtml-elif "not title">
+                <dtml-var "text[:15]">...
+            </dtml-if>
+            
+          <tr><td height="2"><img src="&dtml-portal_url;/spacer.gif" height="2"></td></tr>
+          </dtml-in>
+        </table>
+       </td>
+      </dtml-in>
+    </tr>
+    <dtml-comment>=======     show tasks =============</dtml-comment>
+    <dtml-in "listTasksForWeek(selected_year,selected_month,selected_week)">
+      <tr>
+        <dtml-let task_days="_['sequence-item']['task_days']"
+                  task="_['sequence-item']['task']"
+        >
+        <dtml-in "_.range(_.round(task_days[0]-week_info[0]))">
+            <td>&nbsp;</td>
+        </dtml-in>
+
+            <td colspan="<dtml-var "_.len(task_days)">" >
+              <table  cellpadding="0" cellspacing="0" border="1" width="100%"
+               <dtml-if "now>=task['expires'] and not task['isFinalized']">
+                 bgcolor="#FFEDEC" bordercolor="red"
+               <dtml-else>
+                 bgcolor="#E3EAF2"  bordercolor="#3366CC"
+               </dtml-if>
+              >
+                <tr><td align="center">
+                  <a href="<dtml-var "task.getObject().absolute_url()">" target="blank" class="Navigate"><b><dtml-var "task['Title']"></b></a><br>
+              </table>
+            </td>
+
+        <dtml-in "_.range(_.round(week_info[-1]-task_days[-1]))">
+            <td>&nbsp;</td>
+        </dtml-in>
+
+        </dtml-let>
+      </tr>
+    </dtml-in>
+
+    </table>
+   <dtml-var ramka_footer>
+</table>
+
+</dtml-if>

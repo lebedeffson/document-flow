@@ -1,0 +1,96 @@
+<dtml-comment>
+Portal users management form.
+
+$Editor: vpastukhov $
+$Id: manage_users_form.dtml,v 1.16 2006/03/24 13:38:45 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.16 $>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+
+function findMember() {
+  var url = window.portalRootURL + '/search_onpage_form';
+  openModal( url, '<dtml-msg "Search dialog">', 300, 130);
+}
+
+//-->
+</script>
+
+<div class="Desktop">
+  <h1> <dtml-msg "Portal users"> </h1>
+
+<form action="" method="POST">
+  <table border="0" cellpadding="1" cellspacing="1" width="100%">
+    <tr>
+      <td align="right">
+        <input type="button" onClick="findMember();" value="<dtml-msg "Search">"><br/>
+      </td>
+    </tr>
+  </table>
+  <dtml-in "portal_membership.listSortedUserNames( portal_membership.listMemberIds( all=True ) )" mapping>
+    <dtml-if sequence-start>
+      <table border="0" cellpadding="1" cellspacing="1" width="100%" class="List">
+        <tr class="row_title">
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td align=center> <dtml-msg "User"> </td>
+          <td align=center> <dtml-msg "E-mail address"> </td>
+          <td align=center> <dtml-msg "Company"> </td>
+          <td align=center> <dtml-msg "Position"> </td>
+          <td align=center> <dtml-msg "Phone"> </td>
+          <td align=center> <dtml-msg "Last login time"> </td>
+        </tr>
+    </dtml-if>
+    <dtml-with "portal_membership.getMemberById(user_id)">
+    <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+      <td width="10">
+        <input type="checkbox" name="userids:list" value="&dtml-user_id;"
+          <dtml-if "portal_membership.getAuthenticatedMember().getUserName()==user_id">disabled
+          </dtml-if>
+        />
+      </td>
+      <td width="15">
+        <dtml-if "has_role('Orphaned')">
+          <img src="&dtml-portal_url;/delete.gif" title="<dtml-msg "Dismissed">" />
+        <dtml-elif "has_role('Locked')">
+          <img src="&dtml-portal_url;/lock_attach.gif" title="<dtml-msg "Locked">" />
+        <dtml-else>&nbsp;
+        </dtml-if>
+      </td>
+      <td valign="middle">
+        <a href="personalize_form?userid=&dtml-user_id;"><dtml-var user_name></a>
+      </td>
+      <td valign="middle">
+        <dtml-if email>
+          <a href="mailto:&dtml-email;">&dtml-email;</a>
+        </dtml-if>
+      </td>
+      <td valign="middle"> &dtml-company; </td>
+      <td valign="middle"> <dtml-in listPositions><dtml-var sequence-item> </dtml-in> </td>
+      <td valign="middle"> &dtml-phone; </td>
+      <td valign="middle"> <dtml-var "_.str(login_time)[0:16]" > </td>
+    </tr>
+    </dtml-with>
+    <dtml-if sequence-end>
+      </table>
+      <br />
+      <input type="submit" name="manage_lockUsers:method" value="<dtml-msg "Lock">" />
+      <input type="submit" name="manage_unlockUsers:method" value="<dtml-msg "Unlock">" />
+      <input type="submit" name="confirm_delete_users:method" value="<dtml-msg "Remove">" />
+      <input type="submit" name="confirm_send_users_password:method" value="<dtml-msg "Send password">" />
+      <br />
+      <br />
+    </dtml-if>
+  <dtml-else>
+    <p><dtml-msg "There are no registered users"></p>
+  </dtml-in>
+  <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;/join_form'" value="<dtml-msg "Add user">">
+  <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;/manage_groups_form'" value="<dtml-msg "Manage groups">">
+</form>
+</div>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,120 @@
+<dtml-comment>
+FileSystem Folder factory form.
+
+$Id: fs_folder_factory_form.dtml,v 1.7 2004/04/28 10:43:01 kfirsov Exp $
+$Editor: kfirsov $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.7 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<dtml-if message>
+ <p>&dtml-message;</p>
+ <hr>
+</dtml-if>
+
+<div class="Metadata">
+
+<h2><dtml-msg "New object metadata"></h2>
+
+<dtml-let id="_.has_key('use_default_values') and id or ''"
+	  title="_.has_key('use_default_values') and title or ''"
+	  description="_.has_key('use_default_values') and description or ''" >
+
+<form name="filefolder_factory_form" 
+      action="fs_folder_add" 
+      method="POST" 
+      onsubmit="javascript: return Validate(this);">
+
+<script type="text/javascript">
+<!--
+
+function Validate( frm )
+{
+    if ( !validateIdentifier(frm.elements['id'], '<dtml-msg "Object id is invalid">', true) )
+        return false;
+
+    if ( !frm.title.value ){ 
+         alert('<dtml-msg "Specify the folder title">');
+         frm.title.focus()
+         return false;
+    }
+    if ( !frm.folder_path.value ){
+         alert('<dtml-msg "Specify the folder path">');
+         frm.folder_path.focus()
+         return false;
+    }
+
+    return true;
+}
+
+//-->
+</script>
+
+<table class="FormLayout">
+<tr valign="top">
+  <th align="right"> <dtml-msg "URL"> </th>
+  <td colspan="2"> <dtml-var Identifier> </td>
+</tr>
+<tr valign="top">
+  <th align="right"> <dtml-msg "Object type"> </th>
+  <td colspan="2"> <dtml-msg "File System Folder"> </td>
+</tr>
+<tr valign="top">
+  <th align="right"> <dtml-msg "Id"> </th>
+  <td colspan="3">
+    <input type="text"
+           name="id"
+           value="&dtml-id;"
+           size="35">
+  </td>
+</tr>
+<tr valign="top">
+  <th align="right"> <dtml-msg "Title"> </th>
+  <td colspan="3">
+    <input type="text"
+           name="title"
+           value="&dtml-title;"
+           size="35">
+  </td>
+</tr>
+<tr valign="top">
+  <th align="right"> <dtml-msg "Description"> </th>
+  <td colspan="3"> 
+    <textarea name="description" rows="5" 
+              cols="65">&dtml-description;</textarea>
+  </td>
+</tr>
+<tr valign="top">
+  <th align="right"> <dtml-msg "Folder path"> </th>
+  <td colspan="3"> 
+    <input type="text"
+           name="folder_path"
+           value=""
+           size="35">
+  </td>
+</tr>
+<tr valign="top">
+  <td><br></td>
+  <td align="left">
+  <br> <input type="submit"
+              name="create"
+              value=" <dtml-msg "Apply"> ">
+       <input type="button"
+              value=" <dtml-msg "Cancel"> "
+              onClick="JavaScript:location.href='&dtml.html_quote-absolute_url;';" >
+  </td>
+</tr>
+</table>
+
+</form>
+
+</dtml-let>
+
+</div>
+</div>
+
+<dtml-var simple_html_footer>

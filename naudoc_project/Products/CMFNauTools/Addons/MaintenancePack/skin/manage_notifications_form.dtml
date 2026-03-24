@@ -1,0 +1,40 @@
+<dtml-comment>
+$Id: manage_notifications_form.dtml,v 1.1 2009/02/17 15:04:22 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1><dtml-var "msg('Manage Notifications')"></h1>
+
+<div id="cfg_body">
+
+<form name="portal_notifications" action="&dtml.url-manage_notifications;" method="POST">
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2">
+<dtml-in "portal_notifications.listNotifications()" prefix="s">
+  <tr>
+    <th width="1%">&nbsp;</th>
+    <th style="text-align:left;"><dtml-msg expr="s_item"></th>
+  </tr>
+  <tr>
+    <td><input type="checkbox" name="&dtml-s_item;_active:int" value="1" <dtml-var "portal_notifications.isActive(s_item)" fmt=checked>></td>
+    <td>
+      <span style="color: #808080;"><dtml-msg "Default subject">: <dtml-msg expr="'%s.subject' % s_item"></span><br/>
+      <input type="text" name="&dtml-s_item;" value="<dtml-var "portal_notifications.getSubject(s_item)" html_quote>" size="80">
+      <dtml-msg expr="portal_notifications.isActive(s_item) and 'active' or 'inactive'">
+    </td>
+  </tr>
+</dtml-in>
+  <tr>
+   <td colspan="2"><input type="Submit" name="submit" value="<dtml-var "msg('Apply')">"></td>
+  </tr>
+</table>
+
+</form>
+
+</div>
+</div>
+
+<dtml-var simple_html_footer>

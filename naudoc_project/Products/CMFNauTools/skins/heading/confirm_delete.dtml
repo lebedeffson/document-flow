@@ -1,0 +1,127 @@
+<dtml-comment>
+Confirmation form for deletion of objects from folder.
+
+'ids' -- list of object ID strings
+
+$Editor: vpastukhov $
+$Id: confirm_delete.dtml,v 1.23 2005/02/03 10:31:36 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.23 $>
+
+<dtml-if "implements(['isTaskItem', 'isTaskContainer'])">
+  <dtml-with "implements('isTaskItem') and this() or getTask(ids[0])">
+    <dtml-return task_delete_confirmation>
+  </dtml-with>
+</dtml-if>
+
+<dtml-unless ids>
+  <dtml-return "this().redirect( action='folder', message='Please select one or more items first', REQUEST=REQUEST )">
+</dtml-unless>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+<form name="confirm_delete_form" action="&dtml-absolute_url;" method="POST">
+
+<dtml-let rids="[]">
+
+<p class="DesktopStatusBar">
+<dtml-msg "Do you really want to delete these objects?">
+</p>
+
+<dtml-in ids>
+<dtml-let object="this()[ _['sequence-item'] ]"
+          links_from="portal_links.searchLinks( source=object, source_inclusive=1, internal=0 )"
+          links_to="  portal_links.searchLinks( target=object, target_inclusive=1, internal=0 )"
+          isLockedByRemoteLinks="[]" >
+<p>
+<b><dtml-var expr="object" fmt=object> (<dtml-var "object.getId()" html_quote>)</b>
+
+<dtml-if "object.implements('isPrincipiaFolderish') and object.objectIds()">
+  <b><dtml-msg "Folder is not empty!"></b>
+</dtml-if>
+
+<dtml-if "_.len(ids)==1 and object.implements('isHTMLDocument') and not object.isContentEmpty()">
+  <iframe src="<dtml-var "object.absolute_url( action='CookedBody' )">"
+          width="100%" height="300" scrolling="auto"
+          frameborder="0"
+  ></iframe>
+</dtml-if>
+
+</p>
+
+<dtml-in links_from prefix="link">
+
+  <dtml-if link_start>
+    <p><dtml-msg "These links will be removed">: <small>(<dtml-msg "Links from this object">)</small>
+    <ul>
+  </dtml-if>
+
+  <dtml-let link=getObject
+            relation_title="link.getRelationInfo('title')" >
+    <li>
+    <dtml-var link fmt=link.target>
+    (<dtml-msg expr=relation_title>)
+    </li>
+  </dtml-let>
+
+  <dtml-if link_end>
+    </ul></p>
+  </dtml-if>
+
+</dtml-in>
+
+<dtml-in links_to prefix="link">
+
+
+  <dtml-if link_start>
+    <p><dtml-msg "These links will be broken">: <small>(<dtml-msg "Links to this object">)</small>
+    <ul>
+  </dtml-if >
+
+  <dtml-let link=getObject
+            relation_title="link.getRelationInfo('title')" >
+
+    <dtml-if "link.isTargetLocked()">
+      <dtml-call "isLockedByRemoteLinks.append(1)">
+    </dtml-if>
+
+    <li>
+    <dtml-var link fmt=link.source>
+    (<dtml-msg expr=relation_title>)
+    </li>
+  </dtml-let>
+
+  <dtml-if link_end>
+    </ul></p>
+  </dtml-if>
+
+</dtml-in>
+
+<dtml-if "isLockedByRemoteLinks">
+<br />
+<p class="DesktopStatusBar">
+  <dtml-msg "Object cannot be deleted because dependent objects found.">
+</p>
+<dtml-else>
+  <dtml-call "rids.append( _['sequence-item'] )">
+</dtml-if>
+
+</dtml-let>
+</dtml-in>
+
+<input type="hidden" name="ids:tokens" value="<dtml-var "' '.join( rids )">" />
+
+
+<br />
+<input type="submit" name="folder_delete:method" value="<dtml-msg "Remove">" <dtml-var "rids and ' ' or 'disabled' "> />
+&nbsp;
+<input type="submit" name="folder_contents:method" value="<dtml-msg "Cancel">" />
+
+</dtml-let>
+
+</form>
+</div>
+
+<dtml-var simple_html_footer>

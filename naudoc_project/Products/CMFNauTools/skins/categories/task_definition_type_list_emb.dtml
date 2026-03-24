@@ -1,0 +1,8 @@
+<select onChange="location.href='<dtml-var from_page>?&task_definition_type='+this[this.selectedIndex].value">
+  <dtml-in "taskDefinitionFactory.listActionTemplateTypes()" sort="title/msg" mapping>
+    <option value="<dtml-var id>"
+            <dtml-var "id==task_definition_type" fmt=selected> >
+      <dtml-msg expr=title>
+    </option>
+  </dtml-in>
+</select>

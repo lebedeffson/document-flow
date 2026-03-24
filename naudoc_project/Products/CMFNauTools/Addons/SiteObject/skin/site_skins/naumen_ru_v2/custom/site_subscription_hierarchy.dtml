@@ -1,0 +1,14 @@
+<table border=0>
+	<dtml-in "subscriptableFolders(parent_path=parent_path)" prefix="loop" mapping>
+  <tr>
+    <td width="20">&nbsp;</td>
+    <td>
+    <input type="checkbox" name="folders_to_subscribe:list" value="<dtml-var uid>"
+    <dtml-var "uid in user.get('subscribed_folders', []) and 'checked' or ''">
+    >
+	    <dtml-var title_or_id> <dtml-var "Description and '(' + Description + ')' or ''">
+	    <dtml-var "site_subscription_hierarchy(this(), parent_path=absolute_url, user=user)">
+    </td>
+  </tr>
+	</dtml-in>
+</table>

@@ -1,0 +1,268 @@
+<dtml-comment>
+Field edit template.
+
+Template parameters:
+
+  'type' -- field type, valid values are 'boolean', 'int', 'float',
+            'currency', 'string', 'text', 'date', 'lines', 'list',
+            'file' and 'link';
+
+  'name' -- field name;
+
+  'form_elem_name' -- optional value for 'name' attribute of the input control,
+                      if it isn't set, field's name is used.
+
+  'value' -- current value of the field, for no value use 'None'
+             or empty list (depending on 'multiple' argument below);
+             must be object moniker if the type is 'link';
+
+  'multiple' -- whether the field contains a list of values (supported
+                for 'lines' type only so far), false by default;
+
+  'mandatory' -- whether for field is mandatory (must not be empty),
+                 false by default;
+
+  'options' -- list of available choices ('lines' and 'list' types);
+
+  'field_size' -- number of rows for the input control ('lines', 'list' and
+                  'text' types);
+
+  'field_title' -- optional title displayed as a tooltip, also used
+                   by the form validation code;
+
+  'comment' -- optional comment text to display below the input control;
+
+  'message' -- optional message, used in form validation when entered
+               value is not valid;
+
+  'edit_options' -- whether to edit choice options ('lines' type only),
+                    false by default;
+
+  'form_name' -- name of the current HTML form.
+
+$Editor: vpastukhov $
+$Id: entry_field_edit.dtml,v 1.76 2006/08/15 09:11:48 ypetrov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.76 $>
+<dtml-with "_.has_key('descriptor') and descriptor or {'view':True,'modify':True}" mapping>
+
+<dtml-if modify>
+
+<dtml-let name="_.has_key('form_elem_name') and _.getitem('form_elem_name','') or _['name']"
+          value="( _.has_key('value') and [_.getitem('value',0)] or [None] )[0]"
+          multiple="_.has_key('multiple') and multiple"
+          value="_.test( multiple and value is None, [], _.getitem('value',0) )"
+          properties="_.get('properties',_)"
+          options="_.has_key('options') and _.getitem('options') or []"
+          link="( _.has_key('link') and [_.getitem('link',0)] or ['object'] )[0]"
+          rows="_.get('field_size') or None"
+          mandatory="_.get('mandatory') or False"
+          title="_.get('field_title') or ''"
+          message="_.get('message') or ''"
+          str_data="(_.has_key('str_data') and str_data or '') +
+                    (mandatory and ' mandatory=\0421\042' or '') +
+                    (title and (' title=\042%s\042' % _.html_quote(title)) or '') +
+                    (message and (' validation_message=\042%s\042' % _.html_quote(message)) or '')"
+          flags="{}" >
+
+<dtml-unless "REQUEST.get( '_entry_field_edit.common' )">
+<dtml-call "REQUEST.set( '_entry_field_edit.common', True )">
+<script type="text/javascript" src="&dtml-portal_url;/entry_field_scripts.js"></script>
+
+</dtml-unless>
+
+<dtml-if "type == 'string'">
+
+  <input type="text" name="&dtml-name;:&dtml-type;" value="&dtml.null.html_quote-value;"
+         size="<dtml-var "properties.get('input_length') or 65">" <dtml-var str_data> />
+
+<dtml-elif "type == 'int'">
+
+  <input type="text" name="&dtml-name;:&dtml-type;:ignore_empty" value="&dtml.null-value;"
+         size="12" onBlur="return fieldEditHandler.int_check(this)" <dtml-var str_data> />
+  <input type="hidden" name="&dtml-name;:none:default" value="" />
+
+<dtml-elif "type == 'float'">
+
+  <input type="text" name="&dtml-name;:&dtml-type;" value="&dtml.null-value;"
+         size="12" onBlur="return fieldEditHandler.float_check(this)" <dtml-var str_data> />
+
+<dtml-elif "type == 'currency'">
+
+  <input type="text" name="&dtml-name;:&dtml-type;" value="&dtml.null-value;"
+         size="12" onBlur="return fieldEditHandler.currency_check(this)" <dtml-var str_data> />
+
+<dtml-elif "type == 'boolean'">
+
+  <input type="checkbox" name="&dtml-name;:boolean" value="1"
+         <dtml-var value fmt=checked> <dtml-var str_data> />
+  <input type="hidden" name="&dtml-name;:boolean:default" value="" />
+
+<dtml-elif "type == 'text'">
+
+  <textarea name="&dtml-name;:text"
+      cols="<dtml-var "properties.get('input_columns') or 65">"
+      rows="<dtml-var "rows or properties.get('input_rows') or 6">"
+      <dtml-var str_data>
+  >&dtml.null-value;</textarea>
+
+<dtml-elif "type == 'date'">
+
+  <dtml-var "datetime_form( None, _
+                          , prefix=name
+                          , date=value
+                          , date_only=not properties.get('show_time', False) )">
+
+<dtml-elif "type == 'time_period'">
+
+  <dtml-var "dateperiod_form( None, _
+                            , prefix=name
+                            , period=value is None and 86400 or value
+                            )">
+
+<dtml-elif "type == 'lines'">
+
+  <dtml-let options="properties.get('options',[])"
+            rows="rows or properties.get('input_rows') or 6">
+
+  <dtml-if "_.has_key('edit_options') and edit_options">
+
+    <textarea name="&dtml-name;:lines:ignore_empty" rows="&dtml-rows;" cols="65"
+              <dtml-var str_data> ><dtml-var "options and '\n'.join(options) or ''" html_quote></textarea>
+    <input type="hidden" name="&dtml-name;:tokens:default" value="" />
+
+  <dtml-elif multiple>
+
+    <select name="&dtml-name;:list" size="&dtml-rows;" multiple="1" &dtml.-str_data;>
+      <dtml-in options>
+	<option value="&dtml-sequence-item;"
+	        <dtml-var "_['sequence-item'] in value" fmt=selected> >
+	  <dtml-msg expr=sequence-item></option>
+      </dtml-in>
+    </select>
+    <input type="hidden" name="&dtml-name;:tokens:default" value="" />
+
+    <dtml-if "_.len(options) > rows">
+    <br />
+    <dtml-msg "Fast search">: <input type="text" value=""
+	      onKeyUp="SearchStrInSelect( this.value, this.form.elements['<dtml-var name fmt=jscript>:list'] )" />
+    </dtml-if>
+
+  <dtml-else>
+
+    <select name="&dtml-name;:string:ignore_empty">
+      <dtml-in options>
+        <option value="&dtml-sequence-item;"
+                <dtml-var "_['sequence-item'] == value and flags.setdefault('found',1)" fmt=selected> >
+	  &dtml-sequence-item;</option>
+      </dtml-in>
+      <option value="" <dtml-var "not flags.get('found')" fmt=selected> >(<dtml-msg "not selected">)</option>
+    </select>
+    <input type="hidden" name="&dtml-name;:none:default" value="" />
+
+  </dtml-if>
+
+  </dtml-let>
+
+<dtml-elif "type == 'list'">
+
+    <dtml-var selectbox>
+
+<dtml-elif "type == 'file'">
+
+  <div>
+    <dtml-if "value">
+      <nobr>
+        <a href="&dtml-absolute_url;/&dtml-value;" target="_blank">
+          <img src="&dtml-portal_url;/file.gif"></a>
+        <input type="text" name="&dtml-name;.filename:record"
+               value="&dtml.null-value;" size="25" readonly="1" />
+        <button field_name="&dtml-name;" class="toolbar-button"
+                onClick="javascript: fieldEditHandler.file_clear(this, '<dtml-var name fmt=jscript html_quote>'); return false">
+          <img src="&dtml-portal_url;/delete.gif" alt="<dtml-msg "Remove this file">" width="16" height="16" /></button>
+      </nobr><br>
+    <dtml-else>
+      <input type="hidden" name="&dtml-name;.filename:record" value="">
+    </dtml-if>
+      <input type="file" name="&dtml-name;.file:record">
+  </div>
+
+<dtml-elif "type == 'userlist'">
+
+  <dtml-var user_list>
+
+<dtml-elif "type == 'advanced_userlist'">
+
+  <dtml-var "advanced_user_list(None, _, values = value and value.getSelection(this()) or {})">
+
+<dtml-elif "type == 'link' and link != 'folder'">
+
+  <dtml-let items_realm="properties and properties.get('scope')"
+            allowed_features="properties and properties.get('allowed_features') or []"
+            allowed_types="properties and properties.get('allowed_types') or []"
+            allowed_categories="properties and properties.get('allowed_categories') or []"
+  >
+  <div>
+    <dtml-if "value"><dtml-var "value" fmt=object><br /></dtml-if>
+    <nobr>
+      <input type="hidden" name="&dtml-name;:uid" value="<dtml-var "value" fmt=uid null html_quote>"
+             field_features="<dtml-var "','.join(allowed_features)" html_quote>"
+             field_types="<dtml-var "','.join(allowed_types)" html_quote>"
+             field_categories="<dtml-var "','.join(allowed_categories)" html_quote>"
+             <dtml-var str_data> />
+      <input type="text" value="<dtml-var "value and value.title()" null html_quote>" size="20" readonly="on" />
+      <input type="button" field_name="&dtml-name;" value="<dtml-msg "Browse...">"
+             onClick="javascript: return fieldEditHandler.link_select(this, '<dtml-var items_realm fmt=jscript null html_quote>')">
+      <button field_name="&dtml-name;" class="toolbar-button"
+              onClick="javascript: fieldEditHandler.link_clear(this); return false"
+        ><img src="&dtml-portal_url;/delete.gif" alt="<dtml-msg "Remove this document">" width="16" height="16" border="0" /></button>
+    </nobr>
+  </div>
+
+  </dtml-let>
+
+<dtml-elif "type == 'link' and link == 'folder'">
+
+  <dtml-let field_id="'objectField_'+name"
+            value_link="value and portal_links[ value ]"
+            value_uid="_.get('value_uid', value_link and value_link.getTargetUid())"
+            value_title="(value_link and [value_link.getTargetMetadata('Title')] or [value_uid and value_uid.deref(this()).Title()])[0]" >
+
+  <input type="hidden" id="&dtml-field_id;_uid" name="&dtml-name;:uid" value="&dtml.null-value_uid;" />
+  <input type="text" id="&dtml-field_id;_title" size="30" value="&dtml.null-value_title;" readonly="1" />
+  <input type="button" value="<dtml-msg "Browse...">" onClick="javascript: fieldEditHandler.folder_select('&dtml-field_id;'); return false" />
+
+<script type="text/javascript">
+<!--
+
+var field_id = '';
+window[ '&dtml-field_id;_link' ] = '<dtml-var "relative_url( action='task_reportwizard_folders' )">';
+
+// -->
+</script>
+
+</dtml-let>
+
+</dtml-if>
+
+<dtml-if comment>
+
+<br />
+<dtml-msg expr=comment>
+
+</dtml-if>
+
+</dtml-let>
+
+<dtml-elif view>
+
+  <dtml-return entry_field_view>
+
+<dtml-else>
+
+  (<dtml-msg "value is inaccessible">)
+
+</dtml-if>
+</dtml-with>
+

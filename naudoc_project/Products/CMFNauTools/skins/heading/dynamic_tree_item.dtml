@@ -1,0 +1,12 @@
+<dtml-comment>
+$Id: dynamic_tree_item.dtml,v 1.12 2005/09/18 12:41:11 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-jungle expr="portal_catalog.getObjectByUid(dynamic_item)"
+             dynamic_item
+>
+    <dtml-let view_url="getURL(1)+'/inFrame?link=view'"
+              meta_info="Title or id">
+      <dtml-var jungle_item>
+    </dtml-let>
+</dtml-jungle>

@@ -1,0 +1,25 @@
+TABLE.FCK__ShowTableBorders, TABLE.FCK__ShowTableBorders TD
+{
+	border: #d3d3d3 1px solid ;
+}
+
+FORM
+{
+	border: 1px dotted #FF0000;
+	padding: 2px ;
+}
+
+.category-attribute {
+    display: -moz-inline-box;
+    background: gainsboro;
+    padding: 0.25em;
+    margin: 0.25em;
+    cursor: default;
+}
+* HTML .category-attribute {
+    display: inline-block;
+}
+* HTML .category-attribute {
+    /* XXX this rule is voodoo magic which makes IE render inline-block */
+    display: inline;
+}

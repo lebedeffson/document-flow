@@ -1,0 +1,12 @@
+0.7
+
+  Support for CMF Catalog Tool.
+
+0.6
+
+  First public release.
+  Groups are now a in separate class.
+
+0.5
+
+  First working version.

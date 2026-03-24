@@ -1,0 +1,19 @@
+<dtml-comment>
+   Subscription box
+</dtml-comment>
+
+<dtml-if "REQUEST.has_key('traverse_subpath') and traverse_subpath and meta_type == 'Publisher Entry Point'">
+<form action="&dtml-absolute_url;" method="POST">
+  <table>
+    <tr>
+      <td align="center"><input name="email" type="text"/></td>
+    </tr>
+    <tr>
+     <td align="center">
+       <input name="subscription:method" type="submit" value="Подписаться"/></td>
+       <input name="subpath" type="hidden" value="<dtml-var "_.string.join(traverse_subpath, '/')">"/>
+     </td>     
+    </tr>
+  </table>
+</form>
+</dtml-if>

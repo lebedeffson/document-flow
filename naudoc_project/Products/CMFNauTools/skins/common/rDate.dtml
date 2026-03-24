@@ -1,0 +1,10 @@
+<dtml-comment>
+
+  'time' - DateTime instance. required
+
+$Editor: ikuleshov $
+$Id: rDate.dtml,v 1.9 2006/04/04 09:59:52 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-var time fmt=rdate>

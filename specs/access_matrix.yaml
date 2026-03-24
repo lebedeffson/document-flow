@@ -1,0 +1,72 @@
+roles:
+  admin:
+    group_id: 0
+    label: "Администратор"
+    purpose: "Полное сопровождение системы"
+  manager:
+    group_id: 4
+    label: "Руководитель / преподаватель"
+    purpose: "Согласование, утверждение и контроль"
+  employee:
+    group_id: 5
+    label: "Исполнитель / сотрудник"
+    purpose: "Ежедневная работа и исполнение"
+  requester:
+    group_id: 6
+    label: "Заявитель / пользователь"
+    purpose: "Подача и отслеживание собственных обращений"
+  office:
+    group_id: 7
+    label: "Канцелярия / делопроизводитель"
+    purpose: "Регистрация, маршруты и архив"
+
+entities:
+  projects:
+    entity_id: 21
+    rights:
+      manager: [view, create, update, delete, reports]
+      employee: [view, create, update, reports]
+      requester: [view_assigned]
+      office: [view, reports]
+  tasks:
+    entity_id: 22
+    rights:
+      manager: [view, create, update, delete, reports]
+      employee: [view, create, update, reports]
+      requester: [view_assigned, update]
+      office: [view, reports]
+  service_requests:
+    entity_id: 23
+    rights:
+      manager: [view, create, update, delete, reports]
+      employee: [view, create, update, reports]
+      requester: [view_assigned, create, update, reports]
+      office: [view, reports]
+  discussions:
+    entity_id: 24
+    rights:
+      manager: [view, create, update, delete, reports]
+      employee: [view_assigned, create, update, delete, reports]
+      requester: []
+      office: []
+  document_cards:
+    entity_id: 25
+    rights:
+      manager: [view, create, update, delete, reports]
+      employee: [view, create, update, reports]
+      requester: [view_assigned, create]
+      office: [view, create, update, reports]
+  document_base:
+    entity_id: 26
+    rights:
+      manager: [view, create, update, delete, reports]
+      employee: [view, create, update, reports]
+      requester: [view, reports]
+      office: [view, create, update, reports]
+  mts_requests:
+    entity_id: 27
+    rights:
+      manager: [view, create, update, delete, reports]
+      employee: [view, create, update, reports]
+      requester: [create, view_assigned, update, reports]
+      office: [view, reports]

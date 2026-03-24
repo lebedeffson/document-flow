@@ -1,0 +1,6 @@
+
+Just unpack the product in the Products directory.
+
+Python 2.1 or later is required.
+
+Zope 2.3.2 or later is required.

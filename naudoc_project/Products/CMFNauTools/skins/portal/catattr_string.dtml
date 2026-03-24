@@ -1,0 +1,22 @@
+<h4><dtml-msg expr="attr.Title()"><br></h4>
+<input type="text" 
+       id="&dtml-name;" 
+       value="<dtml-var "value and value[0] or ''">" 
+       size="30">
+<br />
+<script type="text/javascript">
+<!--
+
+function Return()
+{
+    opener.&dtml-callback_function;( '&dtml-callback_form;', 
+                                     '&dtml-cat_id;', 
+                                     '&dtml-attr_id;', 
+                                     '&dtml-type;', 
+                                     document.getElementById('&dtml-name;').value+'\n', 
+                                     document.getElementById('child').checked
+                                   );
+}
+
+//-->
+</script>

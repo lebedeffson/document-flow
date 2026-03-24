@@ -1,0 +1,142 @@
+<dtml-comment>
+Field edit template for questionnaire.
+
+$Editor: oevsegneev $
+$Id: entry_field_external_edit.dtml,v 1.2 2008/06/09 12:35:44 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+<dtml-with "_.has_key('descriptor') and descriptor or {'view':True,'modify':True}" mapping>
+
+<dtml-let name="_.has_key('form_elem_name') and _.getitem('form_elem_name','') or _['name']"
+          value="REQUEST.get(name, '')"
+          multiple="_.has_key('multiple') and multiple"
+          value="_.test( multiple and value is None, [], _.getitem('value',0) )"
+          properties="_.get('properties',_)"
+          options="_.has_key('options') and _.getitem('options') or []"
+          link="( _.has_key('link') and [_.getitem('link',0)] or ['object'] )[0]"
+          rows="_.get('field_size') or None"
+          mandatory="_.get('mandatory') or False"
+          title="_.get('field_title') or ''"
+          message="_.get('message') or ''"
+          str_data="(_.has_key('str_data') and str_data or '') +
+                    (mandatory and ' mandatory=\0421\042' or '') +
+                    (title and (' title=\042%s\042' % _.html_quote(title)) or '') +
+                    (message and (' validation_message=\042%s\042' % _.html_quote(message)) or '')"
+          flags="{}" >
+
+<dtml-if "type in ('string')">
+
+  <input type="text" name="&dtml-name;" value="&dtml.null-value;"
+         size="<dtml-var "properties.get('input_length') or 65">" <dtml-var str_data> />
+
+<dtml-elif "type in ('int','float','currency')">
+
+  <input type="text" name="&dtml-name;" value="&dtml.null-value;"
+         size="12" <dtml-var str_data> />
+
+<dtml-elif "type == 'boolean'">
+
+  <input type="checkbox" name="&dtml-name;" value="1"
+         <dtml-var str_data> />
+
+<dtml-elif "type == 'text'">
+
+  <textarea name="&dtml-name;:text"
+      cols="<dtml-var "properties.get('input_columns') or 65">"
+      rows="<dtml-var "rows or properties.get('input_rows') or 6">"
+      <dtml-var str_data>
+  ></textarea>
+
+<dtml-elif "type == 'date'">
+
+  <span style="white-space: nowrap;">
+  <select name="&dtml-name;_day" title="day">
+    <option value="">&mdash;&mdash;
+    <dtml-in "_.range(1,32)">
+      <option value="<dtml-var sequence-item>"><dtml-var sequence-item>
+    </dtml-in>
+  </select>
+
+  <select name="&dtml-name;_month" title="month">
+    <option value="">&mdash;&mdash;
+    <dtml-in "_.range(1,13)">
+      <option value="<dtml-var sequence-item>"><dtml-var sequence-item>
+    </dtml-in>
+  </select>
+
+  <select name="&dtml-name;_year" title="year">
+    <option value="">&mdash;&mdash;
+    <dtml-in "_.range(2005,2016)">
+      <option value="<dtml-var sequence-item>"><dtml-var sequence-item>
+    </dtml-in>
+  </select>
+
+  <dtml-if "properties.get('show_time', False)">
+  <select name="&dtml-name;_hours" title="days">
+    <option value="">&mdash;&mdash;
+    <dtml-in "_.range(0,24)">
+      <option value="<dtml-var sequence-item>"><dtml-var sequence-item>
+    </dtml-in>
+  </select>
+
+  <select name="&dtml-name;_minutes" title="minutes">
+    <option value="">&mdash;&mdash;
+    <dtml-in "_.range(0,60)">
+      <option value="<dtml-var sequence-item>"><dtml-var sequence-item>
+    </dtml-in>
+  </select>
+  <dtml-msg "minutes">
+  </dtml-if>
+
+  </span>
+
+<dtml-elif "type == 'time_period'">
+
+  <dtml-var "dateperiod_form( None, _
+                            , prefix=name
+                            , period=value is None and 86400 or value
+                            )">
+
+<dtml-elif "type == 'lines'">
+
+  <dtml-let options="properties.get('options',[])"
+            rows="rows or properties.get('input_rows') or 6">
+
+  <dtml-if multiple>
+
+    <select name="&dtml-name;:list" size="&dtml-rows;" multiple="1" &dtml.-str_data;>
+      <dtml-in options>
+	<option value="&dtml-sequence-item;"><dtml-msg expr=sequence-item>
+      </dtml-in>
+    </select>
+    <input type="hidden" name="&dtml-name;:tokens:default" value="" />
+
+  <dtml-else>
+
+    <select name="&dtml-name;:string:ignore_empty">
+      <dtml-in options>
+        <option value="&dtml-sequence-item;">&dtml-sequence-item;
+      </dtml-in>
+      <option value="" <dtml-var "not flags.get('found')" fmt=selected> >(<dtml-msg "not selected">)
+    </select>
+    <input type="hidden" name="&dtml-name;:none:default" value="" />
+
+  </dtml-if>
+
+  </dtml-let>
+
+<dtml-elif "type == 'list'">
+
+    <dtml-var selectbox>
+
+<dtml-elif "type == 'file'">
+
+  <input type="file" name="&dtml-name;.file:record">
+
+</dtml-if>
+
+</dtml-let>
+
+</dtml-with>
+

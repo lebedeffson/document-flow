@@ -1,0 +1,17 @@
+<dtml-comment>
+$Editor: kfirsov$
+$Id: printPreview.dtml,v 1.9 2004/04/29 13:54:42 mbernatski Exp $
+</dtml-comment>
+<dtml-if "implements('isHTMLDocument')">
+  <dtml-if "getAssociatedAttachment() and getAssociatedAttachment().useActiveView()">
+    <dtml-return document_word_preview_form>
+  <dtml-else>
+    <dtml-var FormattedBody>
+  </dtml-if>
+<dtml-elif "implements('isDocument')">
+  <dtml-var __str__>
+<dtml-elif "implements('isRegistry')">
+  <dtml-var registry_print_preview>
+<dtml-elif "implements('isScript')">
+  <dtml-var FormattedBody>
+</dtml-if>

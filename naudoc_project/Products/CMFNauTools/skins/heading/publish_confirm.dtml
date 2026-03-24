@@ -1,0 +1,80 @@
+<dtml-comment>
+Batch document publishing form.
+
+$Editor: vpastukhov $
+$Id: publish_confirm.dtml,v 1.11 2004/04/22 07:02:35 spinagin Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-unless ids>
+  <dtml-return "folder( this(), REQUEST, portal_status_message='Please select one or more items first.' )">
+</dtml-unless>
+
+<dtml-var simple_html_header>
+
+<form method="POST" action="&dtml-relative_url;" target="workfield">
+
+<dtml-let results="portal_catalog.searchResults( parent_path=physical_path(), id=ids )"
+	  publication="portal_metadata.getCategoryById('Publication')"
+	  ids="[]" items="[]">
+
+<dtml-in results>
+  <dtml-if "publication.isTypeAllowed( portal_type ) and state != 'published'">
+    <dtml-call "ids.append( id )">
+    <dtml-call "items.append( _['sequence-item'] )">
+  </dtml-if>
+</dtml-in>
+
+<dtml-if items>
+
+<h3><dtml-msg "Publish documents"></h3>
+
+<table class="Publish">
+  <tr>
+    <th>&nbsp;</th>
+    <th><dtml-msg "ID"></th>
+    <th><dtml-msg "Category"></th>
+    <th><dtml-msg "State"></th>
+    <th><dtml-msg "Title"></th>
+  </tr>
+
+<dtml-in items>
+  <tr>
+    <td><a href="&dtml-getURL;" target="_blank"><img src="&dtml-portal_url;/&dtml-getIcon;" alt="" title="<dtml-var "msg(Type)">" border="0"></a>
+    <td>[&dtml-id;]</td>
+    <td><dtml-msg expr=category></td>
+    <td><dtml-msg expr=state></td>
+    <td><b>&dtml-Title;</b></td>
+  </tr>
+</dtml-in>
+
+</table>
+
+<strong><dtml-msg "Comment"></strong><br>
+<textarea name="comment" cols="60" rows="5" wrap="soft" style="width: 100%"></textarea>
+
+<p>
+  <dtml-msg "Do you want to proceed?">
+</p>
+
+<input type="hidden" name="ids:tokens" value="<dtml-var "' '.join( ids )">">
+
+<p>
+  <input type="submit" name="publish_items:method" value="<dtml-msg "Publish">">
+  &nbsp;&nbsp;
+  <input type="submit" name="folder:method" value="<dtml-msg "Cancel">">
+</p>
+
+<dtml-else>
+
+<p><dtml-msg "No publishable objects selected."></p>
+
+<p><input type="submit" name="folder:method" value="<dtml-msg "Cancel">"></p>
+
+</dtml-if>
+</dtml-let>
+
+</form>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,20 @@
+<dtml-let relative_to_content="1">
+<dtml-var site_html_header>
+</dtml-let>
+
+<div class="Desktop">
+<h2>&dtml-title_or_id;</h2>
+<p>
+ [<dtml-var "date(this(), REQUEST).strip()">] 
+</p>
+ <table cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <td valign="top">
+     <dtml-var CookedBody>
+  </td>
+ </tr>
+ </table>
+
+</div>
+
+<dtml-var site_html_footer>

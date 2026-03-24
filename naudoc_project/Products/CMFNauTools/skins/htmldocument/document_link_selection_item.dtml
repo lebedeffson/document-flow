@@ -1,0 +1,56 @@
+<dtml-comment>
+$Id: document_link_selection_item.dtml,v 1.8 2005/03/26 17:38:54 vsafronovich Exp $
+
+TODO: rename this and move someelse of here
+</dtml-comment>
+<dtml-revision $Revision: 1.8 $>
+<tr>
+  <td>
+     <input type="radio" name="target_uid"
+            value="&dtml-nd_uid;"
+            title="&dtml-Title;"
+            <dtml-if check_first_item><dtml-if sequence-start>checked</dtml-if></dtml-if>
+            <dtml-if "'isVersionable' in implements">
+            onClick="javascript:hideVersionsBox(this.form); showVersionsBox(this.value)"
+            <dtml-else>
+            onClick="javascript:hideVersionsBox(this.form)"
+            </dtml-if>
+     >
+  </td>
+  <td>
+     <dtml-var "content_icon(None, _, target = '_blank')">
+  </td>
+  <td>
+    <a href="&dtml-view_url;"
+       target="_blank"
+    ><dtml-var "Title or id" size="75" html_quote></a>
+  </td>
+  <td>
+    <dtml-msg expr=Type>
+  </td>
+  <td>
+    <dtml-var "rDate(None, _, time=_.DateTime(Date))">
+  </td>
+</tr>
+<tr>
+  <td width="1">&nbsp;</td>
+  <td colspan="4"><em>
+    <dtml-if name="Description">
+      <dtml-var name="Description" size="100" html_quote>
+    <dtml-else>
+      (<dtml-msg "No description">)
+    </dtml-if></em>
+  </td>
+</tr>
+<dtml-if "'isVersionable' in implements">
+<tr>
+  <td>&nbsp;</td>
+  <td colspan="4">
+     <div id="<dtml-var "'%s_versions_block' % nd_uid">" style="display: none">
+       <dtml-let object=getObject>
+         <dtml-var "document_versions_embedded( object, selection_mode=1, id_prefix=nd_uid )">
+       </dtml-let>
+     </div>
+  </td>
+</tr>
+</dtml-if>

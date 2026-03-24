@@ -1,0 +1,235 @@
+<dtml-comment>
+$Id: task_view.dtml,v 1.3 2008/06/18 10:06:32 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-if "portal_membership.checkPermission('View', this().getBase())">
+<dtml-let
+  versionable_base="this().getBase().implements('isVersionable')"
+  document_version="versionable_base and this().getBase().getVersion().getId() or None"
+  task_version="this().version_id">
+  <dtml-if "task_version and document_version!=task_version">
+    <dtml-let url_to_doc="versionable_base and this().getBase().absolute_url()+'/version/'+task_version+'/followup/'+getId() or ''">
+    <dtml-comment>redirect to task's version of document context</dtml-comment>
+    <dtml-call "REQUEST['RESPONSE'].redirect( url_to_doc )">
+    </dtml-let>
+  </dtml-if>
+</dtml-let>
+</dtml-if>
+
+<dtml-var simple_html_header>
+
+<dtml-let container="portal_membership.checkPermission('View', getBase()) and getBase() or None"
+          task_id="getId()"
+          is_signable="isSignable()"
+          signatures="is_signable and container.getSignatures( task_id=task_id )"
+          member="portal_membership.getAuthenticatedMember()"
+          cert="is_signable and member.getProperty('ds_certificate')"
+          auto_verify="is_signable and portal_membership.getInterfacePreferences('ds_auto_verify')"
+          csp_name="is_signable and portal_signature.getProperty('csp_name')"
+          key_length="is_signable and portal_signature.getProperty('key_length')">
+
+<dtml-if is_signable>
+  <dtml-var signer_script>
+
+<script language="javascript">
+<!--
+
+function init() {
+  if( !IsCAPICOMInstalled() ) 
+    alert('<dtml-msg "ds.error.capicom_not_found">');
+
+  // Show current certificate
+  <dtml-if "signatures and auto_verify">
+    if( validateCert( '&dtml-cert;' )) verifySelected();
+  </dtml-if>
+}
+
+function verifySelected(){
+  var content = getContent( include_attachments );
+
+  for( s=0; s<sign_certs.length; s++ ){
+    var status_cont = document.getElementById('verify_status_'+sign_certs[s]);
+    if( verify( s, document.getElementById( 'sign_cont_'+sign_certs[s] ).value, content )){
+      status_cont.innerHTML = '<dtml-msg "ds.valid">';
+      status_cont.className = 'ds_valid';
+//      document.getElementById('cert_link_'+sign_certs[s]).innerHTML = '<img src="&dtml-portal_url;/certificate.gif" alt="<dtml-msg "Certificate">" title="<dtml-msg "Certificate">" border="0" onMouseOver="this.style.cursor = \'hand\'" onClick="displayCert('+s+',1)"/>';
+    } else{
+      status_cont.innerHTML = '<dtml-msg "ds.not_valid">';
+      status_cont.className = 'ds_not_valid';
+    }
+  }
+}
+
+//-->
+</script>
+
+<style>
+
+.ds_not_verified{
+    color: #000000;
+}
+
+.ds_valid{
+    font-weight: bold;
+    color: #008000;
+}
+
+.ds_not_valid{
+    font-weight: bold;
+    color: #FF0000;
+}
+
+</style>
+
+</dtml-if>
+
+<div class="Desktop">
+
+<h1>
+  <img src="&dtml-portal_url;/task_icon.gif" alt="" />
+  &nbsp;<dtml-var "aboveInThread(top_action='document_follow_up_form')">
+</h1>
+
+<dtml-if isInvolved>
+  <dtml-msg "You are assigned to participate in this task.">
+</dtml-if> 
+
+<dtml-comment>
+<dtml-if is_signable>
+<div id="bad_cert_text">
+  <dtml-msg "ds.error.bad_certificate">
+</tr>
+</dtml-if>
+</dtml-comment>
+
+<dtml-var task_info>
+
+<dtml-var task_controls>
+
+<dtml-if isFinalized>
+  <dtml-let result="getResultById(ResultCode())"
+            result_title="result and result.get('title') or ''"
+  >
+      <p>
+        <b><dtml-msg "Finalized task"></b>
+        <dtml-if result><br><dtml-msg "Task result">: <dtml-msg expr=result_title></dtml-if>
+      </p>
+  </dtml-let>
+</dtml-if>
+
+<dtml-if isEnabled>
+  <h3><dtml-msg "Progress report"></h3>
+<dtml-else>
+  <dtml-comment>
+    <p><b><dtml-msg "Not effective"></b></p>
+  </dtml-comment>
+</dtml-if>
+
+<dtml-var task_progress>
+
+<dtml-var viewTasksTree>
+
+<dtml-in getHistory mapping reverse>
+ <dtml-if sequence-start>
+  <table cellspacing="3">
+   <tr>
+    <td class="smallHeader"><dtml-msg "Notifications log"></td>
+   </tr>
+ </dtml-if>
+  <tr>
+   <td class="small">
+     <dtml-var date fmt="%Y-%m-%d %H:%M">
+      <b><dtml-var actor fmt=member.brief></b>
+      <br>
+      <dtml-msg "Sent to users">:
+      <b><dtml-in rcpt><dtml-var sequence-item fmt=member.brief><dtml-unless sequence-end>, </dtml-unless></dtml-in></b>
+      <br>
+      <em><dtml-var text></em>
+   </td>
+ <dtml-if sequence-end>
+  </table>
+ </dtml-if>
+</dtml-in>
+
+<dtml-if "container and container.implements('isDocument')">
+<form name="metadata_edit_form" action="&dtml-absolute_url;/metadata_edit" method="POST" onsubmit="return validateForm(this, 1, 1);">
+<table width="100%">
+<tr class="task_title">
+  <td class="smallHeader"><dtml-msg "Document text"></td>
+</tr>
+<tr>
+  <td style="padding: 10px"><dtml-var "container.CookedBody(view=1)"></td>
+</tr>
+<dtml-let attributes="container.listCategoryAttributes( monikers=True )"
+          category_object="container.getCategory()"
+          attr_perm="container.implements('isCategorial') and category_object and [not not container.checkAttributePermissionModify(x) for x in category_object.listAttributeDefinitions()] or []"
+          amodify="attr_perm.sort() or (attr_perm and attr_perm[-1] or 0)"
+>
+<dtml-if attributes>
+  <tr class="task_title">
+    <td class="smallHeader"><dtml-msg "Document attributes"></td>
+  </tr>
+  <tr><td><dtml-var "attribute_fields_embedded(None, _, document = container)"></td></tr>
+<dtml-if "amodify">
+  <tr><td><input type="submit" name="metadata" value=" <dtml-msg "Apply"> "></td></tr>
+</dtml-if>  
+</dtml-if>
+</dtml-let>
+  <tr>
+    <td>
+      <dtml-var "document_links_embedded(container, _)">
+    </td>
+  </tr>
+</table>
+</form>
+
+<dtml-in "container.listAttachments()">
+ <dtml-if sequence-start>
+    <table width="400" border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
+     <tr>
+      <td>
+        <table border="0" cellpadding="2" cellspacing="0" width="100%" class="List">
+        <tr class="row_title">
+          <td colspan="4">&nbsp;
+            <b><dtml-msg "Attached files"></b>
+         </td>
+        </tr>
+  </dtml-if>
+        <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+         <td>        
+           <a href="&dtml-relative_url;" target="_blank">
+             <dtml-if icon>
+              <img src="&dtml-portal_url;/&dtml-icon;" alt="&dtml-meta_type;"
+                     title="&dtml-meta_type;" border="0"/>
+             <dtml-else>&nbsp;</dtml-if>
+             &dtml-title_or_id;</a> (<dtml-var "'%.1f' % (get_size() / 1024.0)"> Kb)
+         </td>
+         <td align=right valign=middle nowrap>
+          <dtml-if isLocked>
+            <span class="resolution"><dtml-msg "Editing by">&nbsp;<dtml-var getLockCreator fmt=member></span>
+          <dtml-else>
+            <dtml-var external_edit_link>
+          </dtml-if>
+         </td>
+        </tr>
+ <dtml-if sequence-end>
+        </table>
+      </td></tr>
+      </table>
+ </dtml-if>
+</dtml-in>
+</dtml-if>
+
+</div>
+
+<dtml-if is_signable>
+<script type="text/javascript">
+<!--
+  init();
+// -->
+</script>
+</dtml-if>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

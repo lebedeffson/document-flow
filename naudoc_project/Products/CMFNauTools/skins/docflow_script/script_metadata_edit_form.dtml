@@ -1,0 +1,129 @@
+<dtml-comment>
+$Id: script_metadata_edit_form.dtml,v 1.13 2005/12/04 14:16:25 vsafronovich Exp $
+$Editor: mbernatski $
+</dtml-comment>
+<dtml-revision $Revision: 1.13 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<div class="File">
+
+<form name="script_metadata_edit_common"
+      action="&dtml-absolute_url;/script_metadata_edit" method="POST"
+      onsubmit="selectAll(type_names); return validateForm(this);" >
+
+<script type="text/javascript">
+<!--
+window.onload = function()
+{
+    focusForm( document.forms['script_metadata_edit_common'] );
+}
+
+//-->
+</script>
+<h3><dtml-msg "Configure object"></h3>
+<table class="FormLayout" border="0">
+
+ <tr valign="top">
+   <th align="left" width="30%"><dtml-msg "Id">
+   </th>
+   <td>
+    <input type="text" 
+           name="id:id_" 
+           value="<dtml-var id>"
+           validation_message="<dtml-msg "Object id is invalid">"
+           size="30" />
+   </td>
+ </tr>
+ <tr valign="top">
+   <th align="left" width="30%"> <dtml-msg "Title">
+   </th>
+   <td>
+    <input type="text"
+           name="title:required"
+           value="&dtml-title;"
+           validation_message="<dtml-msg "Please, specify the title">"
+           size="65" />
+   </td>
+ </tr>
+</table>
+<br />
+<table class="FormLayout" border="0">
+ <tr class="row_title">
+   <td>
+     <dtml-msg "Select content types on which context is allowed to call script">
+   </td>
+ </tr>
+ <tr class="row_even">
+   <td colspan="2">
+   <table class="FormLayout" border="0">
+    <tr align="center">
+    <dtml-let 
+      allowed=listAllowedTypes
+      left_options="[ (type.getId(), type.title_or_id() ) for type
+                      in storage.allowedContentTypes()]"
+      right_options="[ type for type in left_options if type[0] in allowed ]"
+    >
+      <dtml-var "dual_selectbox_template( None, _
+                                        , left_name='allowed_types'
+                                        , right_name='type_names'
+                                        , left_options=left_options
+                                        , right_options=right_options
+                                        , size=20
+                                        , multiple=True
+                                        )"> 
+    </dtml-let>
+    </tr>
+   </table>
+   </td>
+ </tr>
+ <tr class="row_title">
+   <td>
+     <dtml-msg "Type of the return value">
+   </td>
+ </tr>
+ <tr>
+   <td>
+     <select name="result_type">
+        <option value="" <dtml-var "not getResultType()" fmt=selected> >
+                (<dtml-msg "not selected">)</option>
+       <dtml-in "portal_types.listValueTypes()" prefix="type">
+        <option value="&dtml-type_item;" 
+                <dtml-var "getResultType() == type_item" fmt=selected> >
+                <dtml-msg expr="'valuetype.%s' % type_item"></option>
+       </dtml-in>
+     </select>
+   </td>
+ </tr>
+ <tr class="row_title">
+   <td>
+     <dtml-msg "Registered namespaces">
+   </td>
+ </tr>
+ <tr>
+   <td>
+     <select name="namespace_type">
+     <dtml-in listAllowedNamespacesTypes>
+        <option <dtml-var "getNamespaceFactoryType() == _['sequence-item']" fmt=selected>
+                value="<dtml-var sequence-item>">
+           <dtml-var sequence-item>
+        </option>
+     </dtml-in>
+     </select>
+   </td>
+  </tr>
+ <tr>
+   <td>
+    <input type="submit" name="saveTypes" value=" <dtml-msg "Save"> " />
+   </td>
+ </tr>
+</table>
+</form>
+
+</div>
+
+</div>
+
+<dtml-var simple_html_footer>

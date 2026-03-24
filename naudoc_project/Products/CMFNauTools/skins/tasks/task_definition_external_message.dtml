@@ -1,0 +1,73 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: task_definition_external_message.dtml,v 1.5 2004/09/15 13:39:53 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-let action=taskDefinitionArray>
+
+<tr class="row_even">
+  <td><dtml-msg "Messaging service">:</td>
+  <td>
+    <select name="message_service:none">
+    <option value="" <dtml-var "not action['message_service']" fmt=selected> >(<dtml-msg "not selected">)</option>
+    <dtml-in "portal_connector.listServices( feature='isMessagingService' )" prefix="service">
+    <option value="&dtml-getResourceUid;" <dtml-var "service_item == action['message_service']" fmt=selected> >&dtml-Title;</option>
+    </dtml-in>
+    </select>
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td><dtml-msg "Message type">:</td>
+  <td>
+    <select name="message_type:none">
+    <option value="" <dtml-var "not action['message_type']" fmt=selected> >(<dtml-msg "none">)</option>
+    <dtml-in "action['message_types']" mapping>
+    <option value="&dtml-id;" <dtml-var "id == action['message_type']" fmt=selected> >
+            <dtml-msg expr=title></option>
+    </dtml-in>
+    </select>
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td><dtml-msg "Message subject">:</td>
+  <td>
+    <input type="text" name="message_title:none" value="<dtml-var "action['message_title']" null>" />
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td><dtml-msg "Message template">:</td>
+  <td>
+    <dtml-var "entry_field_edit( None, _,
+                                 type='link',
+                                 name='message_template',
+                                 value=action['message_template'],
+                                 properties={'allowed_features':['isTemplate']},
+                               )">
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td><dtml-msg "Recipient type">:</td>
+  <td>
+    <select name="recipient_type:required">
+    <dtml-in "action['recipient_types']" mapping>
+    <option value="&dtml-id;" <dtml-var "id == action['recipient_type']" fmt=selected> >
+            <dtml-msg expr=title></option>
+    </dtml-in>
+    </select>
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td><dtml-msg "Recipient name">:</td>
+  <td>
+    <input type="text" name="recipient_id:none" value="<dtml-var "action['recipient_id']" null>" />
+  </td>
+</tr>
+
+</dtml-let>

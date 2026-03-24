@@ -1,0 +1,21 @@
+<dtml-comment>
+column_id     -   column id
+column_title  -   column title
+</dtml-comment>
+
+<a href="<dtml-var "this().absolute_url( action='calendar_view',
+                                         params={'sort_on': column_id
+                                               , 'sort_ord': sort_on == column_id and 
+                                                  not sort_ord and 'reverse' or ''
+                                               , 'show_tasks':1
+                                                }
+                                        )">"
+               class="navigate"
+            >
+              <dtml-msg expr="column_title">
+              <dtml-if "sort_on == column_id">
+                <dtml-if sort_ord><img src="&dtml-portal_url;/sort_down.gif" align="absmiddle">
+                <dtml-else><img src="&dtml-portal_url;/sort_up.gif" align="absmiddle">
+                </dtml-if>
+              </dtml-if>
+            </a>

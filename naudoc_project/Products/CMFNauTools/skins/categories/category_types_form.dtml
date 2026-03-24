@@ -1,0 +1,43 @@
+<dtml-comment>
+$Id: category_types_form.dtml,v 1.7 2005/08/21 12:53:07 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.7 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Select content types allowed to switch into this category"></h2>
+
+<form action="category_types" method="post"  onSubmit="selectAll(type_names);">
+<table width="90%">
+ <tr class="row_title" align="center">
+    <td class="small" width="40%"><dtml-msg "Allowed content types"></td>
+    <td> &nbsp;</td>
+    <td class="small" width="40%"><dtml-msg "Selected content types"></td>
+ </tr>
+ <tr class="row_even" align="center">
+ <dtml-let 
+   allowed=listAllowedTypes
+   left_options="[ (type.getId(), type.title_or_id() ) for type in storage.allowedContentTypes()]"
+   right_options="[ type for type in left_options if type[0] in allowed ]"
+ >
+ <dtml-var "dual_selectbox_template( None, _
+                                   , left_name='allowed_types'
+                                   , right_name='type_names'
+                                   , left_options=left_options
+                                   , right_options=right_options
+                                   , size=20
+                                   , multiple=True
+                                   )"> 
+ </dtml-let>
+ </tr>
+ <tr>
+   <td><input type="submit" value="<dtml-msg "Apply">">
+       <input type="submit" name="cancel" value="<dtml-msg "Cancel">">
+   </td>
+ </tr>
+</table>
+
+
+</form>
+
+<dtml-var simple_html_footer>

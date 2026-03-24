@@ -1,0 +1,21 @@
+<dtml-comment>
+$Id: subscribed_users_list.dtml,v 1.5 2005/07/29 04:19:14 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-in "portal_membership.listSortedUserNames(listSubscribedUsers())" mapping>
+  <dtml-if sequence-start>
+    <h1><dtml-var "msg('The following users are subscribed for document changes notifications')">:</h1>
+    <table cellspacing="1" cellpadding="3" width="100%">
+      <tr>
+        <td class="col_even">
+  </dtml-if>
+          <dtml-var user_id fmt=member><br />
+  <dtml-if sequence-end>
+        </td>
+      </tr>
+    </table>
+  </dtml-if>
+<dtml-else>
+  <h1><dtml-var "msg('There are no users subscribed for document changes notifications')"></h1>
+</dtml-in>

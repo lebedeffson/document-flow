@@ -1,0 +1,117 @@
+<dtml-comment>
+Mail object properties.
+
+$Editor: vpastukhov $
+$Id: manageMailServer.dtml,v 1.4 2004/04/21 13:52:19 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<form action="manage_makeChanges" method="post">
+<table cellspacing="0" cellpadding="2" border="0">
+
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Id
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <div class="form-text">
+    <dtml-var id>
+    </div>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-optional">
+    Title
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="title" size="40"
+     value="<dtml-var title html_quote>"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Host
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="host" size="40"
+     value="<dtml-var host html_quote>"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Port
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="port:int" size="4"
+     value="<dtml-var port html_quote>"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    </td>
+    <td align="left" valign="top">
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit"
+     value="Save Changes" />
+    </div>
+    </td>
+  </tr>
+
+</table>
+</form>
+
+<form action="manage_deleteAccounts" method="post">
+<table cellspacing="0" cellpadding="2" border="0">
+
+  <tr>
+    <th align="left" valign="top" colspan="3">
+    <div class="form-label">
+    Registered Mail Accounts
+    </div>
+    </th>
+  </tr>
+
+<dtml-in listAccounts>
+  <tr>
+    <td align="left" valign="top">
+      <input class="form-element" type="checkbox" name="items:tuple" value="&dtml-sequence-key;">
+    </td>
+    <td align="left" valign="top">
+      &dtml-sequence-key;
+    </td>
+    <td align="left" valign="top">
+      <div class="form-text">
+        <dtml-if sequence-item>
+          <a href="&dtml-getURL;" target="_blank">&dtml-Title;</a>
+        <dtml-else>
+          (not found)
+        </dtml-if>
+      </div>
+    </td>
+  </tr>
+</dtml-in>
+
+  <tr>
+    <td align="left" valign="top" colspan="2">
+    <div class="form-element">
+    <input class="form-element" type="submit" name="delete" value="Delete" />
+    </div>
+    </td>
+  </tr>
+
+</table>
+</form>
+
+<dtml-var manage_page_footer>

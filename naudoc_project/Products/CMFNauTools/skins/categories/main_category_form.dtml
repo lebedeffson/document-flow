@@ -1,0 +1,239 @@
+<dtml-comment>
+$Id: main_category_form.dtml,v 1.50 2005/12/07 15:46:48 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.50 $>
+
+<dtml-var simple_html_header>
+
+<span class="Navigation">
+<table width="90%" cellspacing="2" cellpadding="2">
+ <tr class="row_title">
+    <td colspan="2"><dtml-msg "Base categories"></td>
+ </tr>
+ <tr class="row_even">
+    <td>
+      <dtml-in listBases>
+         <dtml-var sequence-item fmt=content><dtml-unless sequence-end>,</dtml-unless>
+      <dtml-else>
+         <dtml-msg "n/a">
+      </dtml-in>
+     </td>
+    <td width="7%" align="center"><a href="category_bases_form"><dtml-msg "edit"></a></td>
+ </tr>
+</table>
+
+<br />
+
+<table width="90%" cellspacing="2" cellpadding="2">
+ <tr class="row_title">
+    <td colspan="2"><dtml-msg "Primary category"></td>
+ </tr>
+ <tr class="row_even">
+    <td>
+      <dtml-if getPrimaryCategory>
+        <dtml-var "portal_metadata.getCategoryById(getPrimaryCategory)" fmt=content>
+      <dtml-else>
+        <dtml-msg "n/a">
+      </dtml-if>
+     </td>
+    <td width="7%" align="center"><a href="primary_category_select_form"><dtml-msg "edit"></a></td>
+ </tr>
+</table>
+
+<br />
+
+<table width="90%" cellspacing="2" cellpadding="2">
+ <tr class="row_title">
+    <td colspan="2"><dtml-msg "Allowed content types"></td>
+ </tr>
+ <tr class="row_even">
+    <td>
+      <dtml-in listAllowedTypes>
+         <dtml-msg expr=sequence-item><dtml-unless sequence-end>,</dtml-unless>
+      <dtml-else>
+          <dtml-msg "n/a">
+      </dtml-in>
+     </td>
+    <td width="7%" align="center"><a href="category_types_form"><dtml-msg "edit"></a></td>
+ </tr>
+</table>
+
+<br>
+
+<table width="90%" cellspacing="2" cellpadding="2">
+  <tr class="row_title">
+    <td colspan="2"><dtml-msg "Category attributes"></td>
+  </tr>
+  <tr class="row_even">
+    <td>
+      <dtml-in listAttributeDefinitions>
+        <dtml-var sequence-item fmt=attribute> (<dtml-msg expr="'valuetype.%s' % Type()">) <br>
+      <dtml-else>
+        <dtml-msg "n/a">
+      </dtml-in>
+    </td>
+    <td width="7%" align="center">
+      <a href="category_metadata_form">
+        <dtml-msg "edit">
+      </a>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<dtml-let wf=getWorkflow
+          category=this>
+<dtml-if wf>
+
+<table width="90%" cellspacing="2" cellpadding="2">
+ <tr class="row_title">
+    <td colspan="3"><dtml-msg "Document workflow"></td>
+ </tr>
+ <tr class="row_even">
+    <td><strong><dtml-msg "States"></strong></td>
+    <td>
+      <dtml-in "wf.states.values()" sort=title_or_id>
+        <dtml-var sequence-item fmt=workflow_state>
+        <br />
+      <dtml-else>
+        <dtml-msg "n/a">
+      </dtml-in>
+    </td>
+    <td align="center">
+      <a href="workflow_states"><dtml-msg "edit"></a>
+    </td>
+ </tr>
+ <tr class="row_even">
+    <td><strong><dtml-msg "Transitions"></strong></td>
+    <td>
+      <dtml-in "wf.transitions.values()" sort=title_or_id>
+        <a href="<dtml-var "category.relative_url( action='transition_properties'
+                                                 , params={'transition': getId()}
+                                                 )">" >
+          &dtml-title_or_id;
+        </a>
+        <br />
+      <dtml-else>
+        <dtml-msg "n/a">
+      </dtml-in>
+    </td>
+    <td width="7%" align="center"><a href="workflow_transitions"><dtml-msg "edit"></a></td>
+ </tr>
+ <tr class="row_even">
+    <td><strong><dtml-msg "Permissions"></strong></td>
+    <td>
+      <dtml-in "wf.permissions">
+        <dtml-msg expr=sequence-item><br>
+      <dtml-else>
+        <dtml-msg "n/a">
+      </dtml-in>
+    </td>
+    <td width="7%" align="center"><a href="workflow_permissions"><dtml-msg "edit"></a></td>
+ </tr>
+ <tr class="row_even">
+    <td><strong><dtml-msg "Actions templates"></strong></td>
+    <td>
+      <dtml-in "this().taskTemplateContainerAdapter.getTaskTemplatesAsArray( getId() )" mapping>
+        <a href="task_template_task_definition_info?template_id=&dtml-template_id;&id_task_definition=1">
+          <dtml-msg expr=template_title>
+        </a><br />
+      <dtml-else>
+        <dtml-msg "n/a">
+      </dtml-in>
+    </td>
+    <td width="7%" align="center">
+      <a href="task_template_list"><dtml-msg "edit"></a>
+    </td>
+ </tr>
+
+ <tr class="row_even">
+    <td colspan="2"><strong><dtml-msg "Configure documents routing"></strong></td>
+    </td>
+    <td width="7%" align="center">
+      <a href="task_template_summary">
+      <dtml-msg "edit">
+      </a>
+    </td>
+ </tr>
+</table>
+</dtml-if>
+</dtml-let>
+</span>
+
+<form action="category_edit" method="POST" id="template_edit" onsubmit="return validateForm(this);">
+
+<script type="text/javascript">
+<!--
+
+messageCatalog['None'] = '<dtml-msg "None">';
+messageCatalog['alert'] = '<dtml-msg "category templates not selected">'; 
+
+var templatesFolderUid_scope = '<dtml-var "portal_properties.getProperty('templates_folder').getUid()">';
+
+function browseForTemplate( form ) {
+    OpenDocumentSelectionWnd( form.id, 'callbackFunctionTemplate',
+	                      templatesFolderUid_scope);
+}
+
+function callbackFunctionTemplate( formId, uid, title, version_id ) {
+    document.forms[formId]['template_uid'].value = uid;
+    document.forms[formId]['template_title'].value = title;
+    document.forms[formId]['template_version'].value = version_id;
+}
+
+function clearTemplate( form ) {
+    form.template_title.value = messageCatalog['None'];
+    form.template_uid.value = '';
+    form.template_version.value = '';
+}
+
+//-->
+</script>
+
+<table>
+  <tr>
+    <td align="right" valign="top"><strong><dtml-msg "Templates for the documents"></strong>:</td>
+    <td>
+      <dtml-in listTemplates>
+      <dtml-if sequence-start>
+      <table border="0" sellspading="2">
+      </dtml-if>
+        <tr>
+          <td width="1%">
+            <input type="checkbox" name="selected_templates:list" value="<dtml-var getId>">
+          </td>
+          <td>
+            <dtml-if "getId() == getWorkTemplateId()"><font color="#0000FF">*</font></dtml-if>
+            <dtml-var sequence-item fmt=link.target>
+          </td>
+        </tr>
+      <dtml-if sequence-end>
+        <tr>
+          <td colspan="2"> 
+            <input type="submit" name="delete_templates" value="<dtml-msg "Delete">" 
+                   onclick="return checkEmptiesCheckboxes( this.form, 'selected_templates', messageCatalog.alert );" />
+            <input type="submit" name="set_work_template" value="<dtml-msg "Set work template">" 
+                   onclick="return checkEmptiesCheckboxes( this.form, 'selected_templates', messageCatalog.alert );" />
+          </td>
+        </tr>
+      </table>
+      </dtml-if>
+      </dtml-in>
+        <br/>
+        <input type="text" size="30" name="template_title"
+               value="" readonly="1" />
+        <input type="hidden" name="template_uid" value="" />
+        <input type="hidden" name="template_version" value="" />
+        <input type="button" value="<dtml-msg "Browse...">" onClick="browseForTemplate( this.form );" />
+        <input type="button" value="<dtml-msg "Clear">" onClick="clearTemplate( this.form );" />
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2" align="right"><input type="submit" name="save_changes" value="<dtml-msg "Save changes">"></td>
+  </tr>
+</table>
+</form>
+
+<dtml-var simple_html_footer>

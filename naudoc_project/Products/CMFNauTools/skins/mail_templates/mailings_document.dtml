@@ -1,0 +1,31 @@
+<dtml-var doc_text>
+
+<dtml-if "lang=='en'">
+<dtml-if "text_type=='html'">
+<P align="left">You may change subscription details by visiting the following link:
+<A href="<dtml-var edit_props_url>"><dtml-var edit_props_url></A></P>
+
+<P align="left">You may cancel your subscription by visiting the following link:
+<A href="<dtml-var unsubscription_url>"><dtml-var unsubscription_url></A></P>
+<dtml-else>
+You may change subscription details by visiting the following link:
+<dtml-var edit_props_url>
+
+You may cancel your subscription by visiting the following link:
+<dtml-var unsubscription_url>
+</dtml-if>
+<dtml-else>
+<dtml-if "text_type=='html'">
+<P align="left">Изменить настройки рассылки Вы можете, посетив страницу по адресу:
+<A href="<dtml-var edit_props_url>"><dtml-var edit_props_url></A></P>
+
+<P align="left">В любой момент Вы можете отказаться от подписки, открыв страницу по адресу:
+<A href="<dtml-var unsubscription_url>"><dtml-var unsubscription_url></A></P>
+<dtml-else>
+Изменить настройки рассылки Вы можете, посетив страницу по адресу:
+<dtml-var edit_props_url>
+
+В любой момент Вы можете отказаться от подписки, открыв страницу по адресу:
+<dtml-var unsubscription_url>
+</dtml-if>
+</dtml-if>

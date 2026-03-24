@@ -1,0 +1,42 @@
+<dtml-let traverse_subpath="REQUEST.get('traverse_subpath', [])"
+          traverse_len="_.len(traverse_subpath)"
+
+          currentId="traverse_len == 1 and traverse_subpath[0] or None"
+          openedId="traverse_len and traverse_subpath[0] or None"
+>
+
+<dtml-in "go.listSubFolders(subpath='')" mapping>
+  <dtml-if sequence-start>
+  <table cellspacing=0 cellpadding=0 width="100%" border="0">
+    <tr>
+      <td bgcolor="#FFFFFF" align="left" valign="top"><img src="&dtml-portal_url;/null.gif" width="10" height="2"></td>
+    </tr>
+  </dtml-if>
+    <tr><td>
+    <table width="100%" border="0" cellspacing="1" cellpadding="0" bgcolor="#333333">
+      <tr><td>
+      <table width="100%" border="0" cellspacing="2" cellpadding="0" bgcolor="#C8D8D0">
+        <tr> 
+          <td align="center" nowrap>
+            &nbsp;&nbsp;<b><dtml-if "id == currentId">&dtml-title;
+                           <dtml-else><a href="&dtml-absolute_url;">&dtml-title;</a>
+                           </dtml-if></b>&nbsp;&nbsp;
+          </td>
+        </tr>
+      </table>
+      </td></tr>
+    </table>
+    <dtml-if "id == openedId">
+      <dtml-var "folders_list(this(), REQUEST, subpath=[id])">
+      <dtml-var "documents_list(this(), REQUEST, subpath=[id])">
+    </dtml-if>
+    </td></tr>
+    <tr>
+      <td bgcolor="#FFFFFF" align="left" valign="top"><img src="&dtml-portal_url;/null.gif" width="10" height="2"></td>
+    </tr>
+  <dtml-if sequence-end>
+  </table>
+  </dtml-if>
+</dtml-in>
+
+</dtml-let>

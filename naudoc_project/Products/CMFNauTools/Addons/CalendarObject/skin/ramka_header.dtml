@@ -1,0 +1,19 @@
+<dtml-if "skin_version=='1.0'">
+
+  <table border="0" width="100%" height="100%" cellspacing="1" cellpadding="5">
+  <tr class="row_even">
+    <td valign="top">
+
+<dtml-else>
+
+<table border="0" width="100%" height="100%" cellspacing="0" cellpadding="0"   bgcolor="#EfEfEf">
+  <tr>
+    <td width="8"><img src="&dtml-portal_url;/ugol_lu_gray.jpg" border="0"></td>
+    <td align="top" background="&dtml-portal_url;/line_hr_gray.jpg" height="8"></td>
+    <td width="8"><img src="&dtml-portal_url;/ugol_ru_gray.jpg" border="0"></td>
+  </tr>
+  <tr>
+    <td height="100%"><img src="&dtml-portal_url;/line_vr_gray.jpg" border="0" height="100%" width="8"></td>
+    <td valign="top">
+
+</dtml-if>

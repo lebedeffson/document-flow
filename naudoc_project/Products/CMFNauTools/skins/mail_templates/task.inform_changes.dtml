@@ -1,0 +1,46 @@
+<dtml-comment>
+$Id: task.inform_changes.dtml,v 1.6 2005/02/01 11:06:17 mbernatski Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+<dtml-let actor="portal_membership.getAuthenticatedMember().getMemberName()"
+          getName="portal_membership.getMemberBriefName"
+>
+<dtml-if "lang=='en'">
+Subject: Changed parameters of the task "<dtml-var task_title>"
+
+ Task "&dtml-task_title;" has been changed by &dtml-actor;
+ URL: &dtml-task_url;
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Изменены параметры задания "<dtml-var task_title>"
+
+ <dtml-var actor> внес изменения в параметры задания "<dtml-var task_title>"
+
+<dtml-if task_expiration_date>
+- Время окончания задания перенесено на <dtml-var task_expiration_date fmt="%Y-%m-%d %H:%M">.
+</dtml-if>
+<dtml-if task_effective_date>
+- Время начала задания перенесено на <dtml-var task_effective_date fmt="%Y-%m-%d %H:%M">.
+</dtml-if>
+<dtml-if task_te>
+- Изменены параметры повтора задания.
+</dtml-if>
+<dtml-if task_description>
+- Изменен текст задания:
+  <dtml-var task_description>
+</dtml-if>
+<dtml-if task_supervisor>
+- Назначен новый контролер - <dtml-var "portal_membership.getMemberName(task_supervisor)">
+</dtml-if>
+<dtml-if task_included_users>
+- Добавлены ответственные пользователи: <dtml-in task_included_users><dtml-var "getName(_['sequence-item'])"><dtml-unless sequence-end>, </dtml-unless></dtml-in>
+
+</dtml-if>
+<dtml-if task_excluded_users>
+- Из задания искючены пользователи: <dtml-in task_excluded_users><dtml-var "getName(_['sequence-item'])"><dtml-unless sequence-end>, </dtml-unless></dtml-in>
+
+</dtml-if>
+
+URL: &dtml-task_url;
+</dtml-if>
+</dtml-let>

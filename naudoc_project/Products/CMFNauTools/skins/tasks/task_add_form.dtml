@@ -1,0 +1,4 @@
+<dtml-comment>
+$Id: task_add_form.dtml,v 1.6 2004/10/05 12:39:08 vsafronovich Exp $
+</dtml-comment>
+<dtml-var "task_edit_form( None, _, action='add')">

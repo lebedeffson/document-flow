@@ -1,0 +1,24 @@
+<dtml-if "lang=='en'">
+Subject: You subscription has been successfully confirmed
+
+Now you will receive information about all updates under the topic
+"<dtml-var heading_title>"
+
+<dtml-if subscription_url>
+You may cancel your subscription by visiting the following link:
+<dtml-var subscription_url>
+</dtml-if>
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Подписка подтверждена
+
+Теперь в Ваш почтовый ящик будут поступать уведомления обо всех обновлениях
+темы "<dtml-var heading_title>"
+
+<dtml-if subscription_url>
+В любой момент Вы можете отказаться от подписки, открыв страницу по адресу:
+<dtml-var subscription_url>
+</dtml-if>
+
+</dtml-if>

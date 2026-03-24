@@ -1,0 +1,125 @@
+<dtml-comment>
+$Id: workflow_attributes_permissions.dtml,v 1.11 2005/07/17 13:55:21 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-var simple_html_header>
+
+<p>
+ <strong><a href="&dtml-absolute_url;/state_properties?state=&dtml-state;">
+    &lt;&lt; <dtml-msg "State properties">
+ </a></strong>
+</p>
+
+<h3><dtml-msg "State properties"></h3>
+<dtml-let wf=Workflow
+          wf_def=getWorkflow
+          statedef="wf_def.states[state]"
+          attr_def="getAttributeDefinition(attr)"
+          category=this
+>
+
+<dtml-var statedef fmt=workflow_state>
+
+<form action="workflows" method="POST">
+
+<br />
+<h3><dtml-msg "Attribute properties"></h3>
+
+<table>
+<tr>
+  <td align="left" colspan="2"><dtml-var attr_def fmt=attribute></td>
+</tr>
+<tr>
+  <td align="left"><dtml-msg "Mandatory in this state"></td>
+  <td><dtml-var "entry_field_edit( None, _,
+                                   name='mandatory',
+                                   type='boolean',
+                                   multiple=False,
+                                   mandatory=False,
+                                   value=statedef.isAttributeMandatory(attr)
+                                 )"
+     >
+  </td>
+</tr>
+
+</table>
+
+<br />
+
+<h3><dtml-msg "Attribute permissions"></h3>
+
+<table width="100%" cellspacing="0" cellpadding="2" border="0" nowrap>
+<tr class="list-header">
+  <td>&nbsp;</td>
+  <td align="left" valign="top">
+    <div class="form-label">
+      <strong><dtml-msg "Permission"></strong>
+    </div>
+  </td>
+  <td align="left" colspan="<dtml-var expr="_.len(portal_metadata.getManagedRoles_())">">
+    <div class="form-label">
+      <strong><dtml-msg "Roles"></strong>
+    </div>
+  </td>
+</tr>
+
+<tr class="row_title">
+  <td align="left" valign="top">
+    <div class="form-label">
+      <strong>
+        <dtml-msg "Use permission settings from parents">
+      </strong>
+    </div>
+  </td>
+  <td></td>
+  <dtml-in "portal_metadata.getManagedRoles_()" sort>
+    <td align="left">
+      <div class="list-item">
+        <dtml-msg expr=sequence-item>
+      </div>
+    </td>
+  </dtml-in>
+</tr>
+
+<dtml-in "('View attributes', 'Modify attributes')" sort>
+  <dtml-let permission=sequence-item>
+    <dtml-with expr="wf_def.getAttributePermissionInfo(state, attr, permission)" mapping>
+      <dtml-if sequence-odd>
+        <tr class="row_odd">
+      <dtml-else>
+        <tr class="row-even">
+      </dtml-if>
+      <td align="left" valign="top">
+        <dtml-let checked="acquired and 'checked' or ' '">
+          <input type="checkbox" name="acquire_&dtml-permission;" &dtml-checked; />
+        </dtml-let>
+      </td>
+      <td align="left" nowrap>
+        <div class="list-item">
+          <dtml-msg expr=permission>
+        </div>
+      </td>
+  <dtml-in "portal_metadata.getManagedRoles_()" sort>
+  <td align="center">
+  <dtml-let checked="_['sequence-item'] in roles and 'checked' or ' '">
+   <input type="checkbox" name="&dtml-permission;|&dtml-sequence-item;" &dtml-checked; />
+
+  </dtml-let>
+  </td>
+  </dtml-in>
+</tr>
+</dtml-with>
+</dtml-let>
+</dtml-in>
+
+   </table>
+     <br />
+     <input type="submit" name="set_attr_properties" value="<dtml-msg "Apply">" />
+     <input type="hidden" name="state" value="&dtml-state;">
+     <input type="hidden" name="attribute_id" value="&dtml-attr;">
+   </form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

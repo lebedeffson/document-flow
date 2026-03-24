@@ -1,0 +1,26 @@
+services:
+  middleware:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: naudoc_bridge_test
+    environment:
+      TZ: Europe/Moscow
+      BRIDGE_DB_PATH: /data/bridge.db
+      NAUDOC_BASE_URL: http://host.docker.internal:18080/docs
+      NAUDOC_PUBLIC_URL: https://localhost:18443/docs
+      NAUDOC_USERNAME: admin
+      NAUDOC_PASSWORD: admin
+      RUKOVODITEL_BASE_URL: http://host.docker.internal:18081
+      RUKOVODITEL_PUBLIC_URL: https://localhost:18443
+      BRIDGE_REQUEST_TIMEOUT: "8"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "18082:8000"
+    volumes:
+      - bridge_data:/data
+    restart: unless-stopped
+
+volumes:
+  bridge_data:

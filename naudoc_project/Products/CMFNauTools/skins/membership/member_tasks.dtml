@@ -1,0 +1,53 @@
+<dtml-comment>
+$Id: member_tasks.dtml,v 1.4 2007/05/11 12:21:04 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-unless home_call>
+  <dtml-var simple_html_header>
+</dtml-unless home_call>
+
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+  <tr class="row_title">
+    <td>
+      <strong><dtml-msg "Category"></strong>
+    </td>
+    <td>
+      <strong><dtml-msg "New"></strong>
+    </td>
+    <td>
+      <strong><dtml-msg "Total"></strong>
+    </td>
+  </tr>
+  <dtml-in "( ('Incoming', {'action':'followup_in','params':{'showTaskMode':'showNew'}, 'modes':('showNew', 'showSeenNew', 'incoming_tasks' )})
+            , ('Outgoing', {'action':'followup_in','params':{'showTaskMode':'showNew_out'}, 'modes':('showNew_out', 'showSeenNew_out', 'outgoing_tasks' )})
+            , ('Supervised', {'action':'followup_in','params':{'showTaskMode':'supervised_tasks'}, 'modes':('showNew_supervised', 'showSeenNew_supervised', 'supervised_tasks' )}) 
+            )" mapping>
+  <dtml-let new="_.len(portal_followup.executeQuery(None, modes[0]))"
+            seen="_.len(portal_followup.executeQuery(None, modes[1]))"
+            not_seen="new-seen"
+            total="_.len(portal_followup.executeQuery(None, modes[2]))"
+            cell_class="not_seen and 'smallHeader' or 'small'"
+  >
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td class="&dtml-cell_class;">
+      <a class="navigate"
+         href="<dtml-var "portal_url( action=action, frame='inFrame', params=params)" html_quote>"
+         target="workspace"
+      ><dtml-msg expr="_['sequence-key']+' tasks'"></a>
+    </td>
+    <td>
+      <dtml-var new>
+    </td>
+    <td>
+      <dtml-var total>
+    </td>
+  </tr>
+  </dtml-let>
+  </dtml-in>
+</table>
+
+
+<dtml-unless home_call>
+  <dtml-var simple_html_footer>
+</dtml-unless home_call>

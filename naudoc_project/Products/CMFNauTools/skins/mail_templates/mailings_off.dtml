@@ -1,0 +1,16 @@
+<dtml-if "lang=='en'">
+Subject: You have been successfuly unsubscribed
+
+Your subscription has been canceled.
+
+You may renew your subscription by visiting the following link:
+<dtml-var edit_props_url>
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Подписка прекращена
+
+Ваша подписка прекращена.
+
+Восстановить подписку на рассылку Вы можете, посетив страницу по адресу: 
+<dtml-var edit_props_url>
+</dtml-if>

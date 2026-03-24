@@ -1,0 +1,496 @@
+msgid ""
+msgstr "Project-Id-Version: Messages\n"
+"POT-Creation-Date: 2004-05-12 14:05+YEKT\n"
+"PO-Revision-Date: 2004-05-12 14:05+YEKT\n"
+"Last-Translator:  <>\n"
+"Language-Team: en <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+msgid ""
+msgstr ""
+
+msgid "#"
+msgstr "#"
+
+msgid "DTMLDocument"
+msgstr "DTML Document"
+
+msgid "Effective date normative"
+msgstr "Effective date"
+
+msgid "HTMLDocument"
+msgstr "HTML Document"
+
+msgid "Heading"
+msgstr "Topic"
+
+msgid "Pending for confirmation"
+msgstr "Pending for <br> confirmation"
+
+msgid "StaffList.directory_name"
+msgstr "Staff list directory"
+
+msgid "StaffList.division"
+msgstr "Division"
+
+msgid "StaffList.position"
+msgstr "Position"
+
+msgid "StaffList.employee"
+msgstr "Employee"
+
+msgid "StaffList.deputy"
+msgstr "Deputy"
+
+msgid "accusative.Fr"
+msgstr "Friday"
+
+msgid "accusative.Mo"
+msgstr "Monday"
+
+msgid "accusative.Sa"
+msgstr "Saturday"
+
+msgid "accusative.Su"
+msgstr "Sunday"
+
+msgid "accusative.Th"
+msgstr "Thursday"
+
+msgid "accusative.Tu"
+msgstr "Tuesday"
+
+msgid "accusative.We"
+msgstr "Wednesday"
+
+msgid "action.external_message.assigned_user"
+msgstr "Assigned user in the external system"
+
+msgid "action.external_message.external_username"
+msgstr "Username in the external system"
+
+msgid "action.external_message.folder_editor"
+msgstr "Folder editor"
+
+msgid "action.external_message.incoming_mail"
+msgstr "New mail notification"
+
+msgid "action.external_message.object_owner"
+msgstr "Object owner"
+
+msgid "action.external_message.title"
+msgstr "Send message to a user in the external system"
+
+msgid "action.external_message.unknown_recipient"
+msgstr "Message recipient "%(name)s" is not known to the system."
+
+msgid "adapters.status.active"
+msgstr "Active"
+
+msgid "adapters.status.inaccessible"
+msgstr "Inaccessible"
+
+msgid "adapters.status.inactive"
+msgstr "Disabled"
+
+msgid "addons.status.active"
+msgstr "Active"
+
+msgid "addons.status.broken"
+msgstr "Broken"
+
+msgid "addons.status.disabled"
+msgstr "Disabled"
+
+msgid "addons.status.inactive"
+msgstr "Disabled"
+
+msgid "addons.used_by_objects"
+msgstr "The add-on %(name)s is used by %(count)s objects and thus cannot by deactivated."
+
+msgid "auto_any_user"
+msgstr "report is required from any user"
+
+msgid "awaiting_publication"
+msgstr "Pending for publication"
+
+msgid "beforeexpiration"
+msgstr "Task will expire soon!"
+
+msgid "categories.category_disallowed"
+msgstr "Setting of category %(category)s is not allowed."
+
+msgid "categories.empty_attribute_type"
+msgstr "The attribute type must be selected."
+
+msgid "categories.invalid_attribute_id"
+msgstr "The attribute identifier is not valid."
+
+msgid "categories.invalid_attribute_title"
+msgstr "The attribute title cannot be empty."
+
+msgid "categories.transition_actions"
+msgstr "Selected actions will be invoked after transition is executed. Please be concious of the actions order in the queue."
+
+msgid "common.copy_title_prefix"
+msgstr "Copy"
+
+msgid "day.plural"
+msgstr "days"
+
+msgid "document_not_signed"
+msgstr "document was not signed"
+
+msgid "document_signed"
+msgstr "document signed"
+
+msgid "editable"
+msgstr "Editable"
+
+msgid "evolutive"
+msgstr "Evolutive"
+
+msgid "fixed"
+msgstr "Fixed"
+
+msgid "fixed_reviewed"
+msgstr "Reviewed"
+
+msgid "frozen"
+msgstr "Frozen"
+
+msgid "group"
+msgstr "Group"
+
+msgid "hour.plural"
+msgstr "hours"
+
+msgid "join.active_user"
+msgstr "User is active. Number of active users can not be greater then the maximum users allowed by your current NauDoc license."
+
+msgid "licensing.header"
+msgstr "Please specify users able to login. Your licensing policy allows you to specify up to %(max_active_users)s active users. There are already %(active_users_cont)s active users."
+
+msgid "links.cannot_remove_target"
+msgstr "Object %(target)s is pointed to by links that cannot be removed."
+
+msgid "mail.duplicate_account"
+msgstr "Mail account "%(name)s" is already used in "%(folder)s" folder (editor %(folder.getEditor)s)."
+
+msgid "mail.filter_action.copy"
+msgstr "Copy"
+
+msgid "mail.filter_action.default"
+msgstr "None"
+
+msgid "mail.filter_action.delete"
+msgstr "Delete"
+
+msgid "mail.filter_action.move"
+msgstr "Move"
+
+msgid "mail.filter_action_to"
+msgstr "to"
+
+msgid "mail.filter_operation.+"
+msgstr "contains"
+
+msgid "mail.filter_operation.-"
+msgstr "does not contain"
+
+msgid "mail.filter_type.header"
+msgstr "Header"
+
+msgid "mail.filter_type.message"
+msgstr "Message"
+
+msgid "mail.filter_type.recipient"
+msgstr "Recipient"
+
+msgid "mail.filter_type.sender"
+msgstr "Sender"
+
+msgid "mail.filter_type.subject"
+msgstr "Subject"
+
+msgid "mail.filter_type.text"
+msgstr "Text"
+
+msgid "mail.incoming_category_not_allowed"
+msgstr "Selected category of the received mail %(category)s is not allowed in folder %(folder)s."
+
+msgid "mail.invalid_folder_name"
+msgstr "Invalid mail folder name - "%(name)s"."
+
+msgid "mail.pop_cannot_login"
+msgstr "Error logging in to the POP server as "%(login)s" (server response: "%(response)s")."
+
+msgid "mail.server_not_configured"
+msgstr "Mail server is not configured."
+
+msgid "mail.smtp_cannot_login"
+msgstr "Error logging in to the SMTP server as "%(login)s" (server response: "%(response)s")."
+
+msgid "mail.smtp_delivery_error"
+msgstr "SMTP server error during e-mail message delivery (server response: "%(response)s")."
+
+msgid "mail.smtp_recipients_refused"
+msgstr "Recipient addresses were refused by the SMTP server: %(recipients)s."
+
+msgid "mail.smtp_sender_refused"
+msgstr "Sender address "%(sender)s" was refused by the SMTP server (server response: "%(response)s")."
+
+msgid "manual_creator"
+msgstr "manually by task creator"
+
+msgid "minute.plural"
+msgstr "minutes"
+
+msgid "pending"
+msgstr "Pending for review"
+
+msgid "prepositional.Jan"
+msgstr "January"
+
+msgid "prepositional.Feb"
+msgstr "February"
+
+msgid "prepositional.Mar"
+msgstr "March"
+
+msgid "prepositional.Apr"
+msgstr "April"
+
+msgid "prepositional.May"
+msgstr "May"
+
+msgid "prepositional.Jun"
+msgstr "June"
+
+msgid "prepositional.Jul"
+msgstr "July"
+
+msgid "prepositional.Aug"
+msgstr "August"
+
+msgid "prepositional.Sep"
+msgstr "September"
+
+msgid "prepositional.Oct"
+msgstr "October"
+
+msgid "prepositional.Nov"
+msgstr "November"
+
+msgid "prepositional.Dec"
+msgstr "December"
+
+msgid "private"
+msgstr "Private"
+
+msgid "private_rejected"
+msgstr "Rejected"
+
+msgid "published"
+msgstr "Published"
+
+msgid "registration_book.recency_disabled"
+msgstr "disabled"
+
+msgid "request_confirmed"
+msgstr "request confirmed"
+
+msgid "request_rejected"
+msgstr "request rejected"
+
+msgid "scheduler.daemon"
+msgstr "Daemon"
+
+msgid "scheduler.daemon.autostart"
+msgstr "Daemon autostart"
+
+msgid "scheduler.daemon.autostart_disable"
+msgstr "Disable autostart"
+
+msgid "scheduler.daemon.autostart_disabled"
+msgstr "disabled"
+
+msgid "scheduler.daemon.autostart_enable"
+msgstr "Enable autostart"
+
+msgid "scheduler.daemon.autostart_enabled"
+msgstr "enabled"
+
+msgid "scheduler.daemon.explain"
+msgstr "Daemon thread is responsible for starting scheduled tasks in time. Every scheduler instance has it's own daemon thread. You can either start or stop the daemon."
+
+msgid "scheduler.daemon.explain_autostart"
+msgstr "It is important to ensure whether scheduler instance is registered within the global schedulers list. Schedulers list keeps references to every registered scheduler and automatically starts their daemon threads upon the Zope startup."
+
+msgid "scheduler.daemon.restart"
+msgstr "Restart"
+
+msgid "scheduler.daemon.start"
+msgstr "Start"
+
+msgid "scheduler.daemon.started"
+msgstr "started"
+
+msgid "scheduler.daemon.status"
+msgstr "Daemon status"
+
+msgid "scheduler.daemon.stop"
+msgstr "Stop"
+
+msgid "scheduler.daemon.stopped"
+msgstr "stopped"
+
+msgid "scheduler.queue"
+msgstr "Queue"
+
+msgid "scheduler.queue.expiration_time"
+msgstr "Queue expiration time"
+
+msgid "scheduler.queue.explain"
+msgstr "Scheduler queries each schedule element for upcoming tasks and generates a queue of events that should be executed within a short period of time. After the period has been expired or new schedule event was added/removed, events queue is being automatically refreshed. Thus, scheduler scans schedule element objects and accesses storage only when the queue refresh is required."
+
+msgid "scheduler.queue.items"
+msgstr "There are %(count)s item(s) in the queue."
+
+msgid "scheduler.queue.refresh"
+msgstr "Refresh now"
+
+msgid "scheduler.queue.refresh_interval"
+msgstr "Queue refresh interval"
+
+msgid "scheduler.queue.start_time"
+msgstr "Start date"
+
+msgid "scheduler.queue.system_time"
+msgstr "Current system time"
+
+msgid "scheduler.schedule"
+msgstr "Schedule"
+
+msgid "scheduler.schedule.empty"
+msgstr "Schedule is empty"
+
+msgid "scheduler.schedule.next_occurence"
+msgstr "Next occurence"
+
+msgid "scheduler.schedule.remove"
+msgstr "Remove"
+
+msgid "scheduler.schedule.resume"
+msgstr "Resume"
+
+msgid "scheduler.schedule.state"
+msgstr "State"
+
+msgid "scheduler.schedule.suspend"
+msgstr "Suspend"
+
+msgid "scheduler.schedule.temporal_expression"
+msgstr "Temporal expression"
+
+msgid "search.syntax_tip"
+msgstr "Multiple words may be found by combining them with AND, OR, ANDNOT, '*', '?', '(', ')'.\nAsterisk matches any number of characters (0 or more).\nQuestion-mark matches one character.\nYou should use parenthesis to grope expressions and to distribution of priorities."
+
+msgid "task_cancelled"
+msgstr "task cancelled"
+
+msgid "task_failed"
+msgstr "task failed"
+
+msgid "task.request_ordered"
+msgstr "queue"
+
+msgid "task_success"
+msgstr "task success"
+
+msgid "tasks.tabs.closed"
+msgstr "With closed report"
+
+msgid "tasks.tabs.current"
+msgstr "Current"
+
+msgid "tasks.tabs.current_and_closed"
+msgstr "Current and with closed report"
+
+msgid "tasks.tabs.finalized"
+msgstr "Finalized"
+
+msgid "tasks.tabs.new"
+msgstr "New"
+
+msgid "time_left"
+msgstr "left"
+
+msgid "user_committed"
+msgstr "committed"
+
+msgid "user_pending"
+msgstr "pending"
+
+msgid "user_rejected"
+msgstr "rejected"
+
+msgid "valuetype.computed"
+msgstr "computed"
+
+msgid "valuetype.currency"
+msgstr "currency"
+
+msgid "valuetype.boolean"
+msgstr "yes/no"
+
+msgid "valuetype.date"
+msgstr "date"
+
+msgid "valuetype.derived"
+msgstr "derived"
+
+msgid "valuetype.float"
+msgstr "number"
+
+msgid "valuetype.int"
+msgstr "integer"
+
+msgid "valuetype.lines"
+msgstr "list"
+
+msgid "valuetype.link"
+msgstr "link"
+
+msgid "valuetype.object"
+msgstr "object"
+
+msgid "valuetype.splitter"
+msgstr "splitter"
+
+msgid "valuetype.string"
+msgstr "string"
+
+msgid "valuetype.subordinate"
+msgstr "subordinate"
+
+msgid "valuetype.time_period"
+msgstr "time period"
+
+msgid "valuetype.text"
+msgstr "text"
+
+msgid "valuetype.userlist"
+msgstr "user"
+
+msgid "vdocument_entry_disabled"
+msgstr "entry is no longer inprogress"
+
+msgid "vdocument_entry_enabled"
+msgstr "entry is in progress"
+
+msgid "year.plural"
+msgstr "years"

@@ -1,0 +1,62 @@
+<table>
+  <tr bgcolor="#cccccc">
+    <td align="center" colspan="<dtml-var "_.len(model( c_id, 'getTemplateIds', 'have_result_codes' ))">">
+      <b><dtml-msg "Action templates"></b>
+    </td>
+    <td align="center"><b><dtml-msg Conditions></b></td>
+    <td align="center"><b><dtml-msg States></b></td>
+  </tr>
+  <tr bgcolor="#cccccc">
+    <!-- action templates -->  
+    <dtml-in "model( c_id, 'getTemplateIds', 'have_result_codes' )">
+    <td align="center">
+    <b><dtml-var "model( c_id, 'getTemplateTitleById', _['sequence-item'] )"> (<dtml-var "_['sequence-item']">)</b>
+    <br>
+    <dtml-let id_template_cur="_['sequence-item']">
+      <select name="resultcode_&dtml-id_template_cur;" size="1">
+        <option value="__notexists__">[<dtml-msg None>]</option>
+        <option value="__running__">[<dtml-msg Running>]</option>
+        <dtml-in "model( c_id, 'getResultCodesOfTemplate', id_template_cur )" mapping>
+          <option value="&dtml-id;"><dtml-msg expr="title"></option>
+        </dtml-in>
+      </select>
+      [<a href="javascript:addResultCode( '<dtml-var mode>', '&dtml-id_template_cur;')">+</a>]
+    </dtml-let>
+    </td>
+    </dtml-in>
+    <!-- /action templates -->  
+    <!-- conditions -->  
+    <td align="center">
+      [<a href="javascript:insertText( '<dtml-var mode>', 'and ')">and</a>]
+      <br>
+      [<a href="javascript:insertText( '<dtml-var mode>', 'or ')">or</a>]
+      <br>
+      <nobr>
+        [<a href="javascript:insertText( '<dtml-var mode>', '( ')">(</a>]
+        [<a href="javascript:insertText( '<dtml-var mode>', ') ')">)</a>]
+      </nobr>
+    </td>
+    <!-- /conditions -->  
+    <!-- states -->  
+    <td align="center">
+      <select name="state_id" size="1">
+        <dtml-in states>
+           <option value="<dtml-var "_['sequence-item'].id">">
+             <dtml-msg expr="_['sequence-item'].title or _['sequence-item'].id">
+           </option>
+        </dtml-in>
+      </select>
+      [<a href="javascript:addState( '<dtml-var mode>' )">+</a>]
+    </td>
+    <!-- /states -->  
+  </tr>
+  <tr>
+    <td colspan="<dtml-var "_.len(model( c_id, 'getTemplateIds', 'have_result_codes' ))+2">">
+      <textarea name="python_script" cols="60" rows="5"
+         ONSELECT="storeCaret(this);"
+         ONCLICK="storeCaret(this);"
+         ONKEYUP="storeCaret(this);"
+      ><dtml-if "mode=='script2transition_change'"><dtml-var "variant['python_script']"></dtml-if></textarea>
+    </td>
+  </tr>
+</table>

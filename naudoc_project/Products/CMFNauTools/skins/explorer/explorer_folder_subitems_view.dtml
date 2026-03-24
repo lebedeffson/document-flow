@@ -1,0 +1,64 @@
+<dtml-comment>
+table for choose version to work with.
+
+$Id: explorer_folder_subitems_view.dtml,v 1.5 2006/07/05 10:53:43 ypetrov Exp $
+$Editor: vsafronovich$
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<tr>
+  <td>&nbsp;</td>
+  <td colspan="4">
+    <div id="<dtml-var "'subitems_block_%s' % result">" style="display: none">      
+
+<dtml-let document_principal_version=getPrincipalVersionId>
+<dtml-in "portal_catalog.searchResults( sort_on='created'
+                                      , sort_order='reverse'
+                                      , path=getPath()
+                                      , implements='isVersion')">
+
+<dtml-if sequence-start>
+  <table border="0" cellpadding="2" cellspacing="0" width="100%">
+  <tr class="row_title">
+    <td width="0">&nbsp;</td>
+    <td><dtml-msg "Version"></td>
+    <td><dtml-msg "Title"></td>
+    <td><dtml-msg "Status"></td>
+    <td><dtml-msg "Owner"></td>
+    <td><dtml-msg "Creation date"></td>
+    <td><dtml-msg "Modification date"></td>
+  </tr>
+</dtml-if>
+
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td>
+      <input type="radio" 
+             name="target_subitem" 
+             value="<dtml-if "Explorer.has_key('getPath')">&dtml-getPath;<dtml-else>&dtml-nd_uid;</dtml-if>"
+      />
+    </td>
+    <td>
+      <a href="<dtml-var "'%s/%s'%(getURL(1),'view')">" target="_blank"><dtml-msg "Version">&nbsp;&dtml-id;</a>
+      <dtml-if "id == document_principal_version">
+        <br /><strong class="marked"><dtml-msg "Principal"></strong>
+      </dtml-if>
+    </td>
+    <td>&dtml-Title;</td>
+    <td><dtml-msg expr=state></td>
+    <td><dtml-var Creator fmt=member></td>
+    <td><dtml-var "rDate(None, _, time=_.DateTime(CreationDate))"></td>
+    <td><dtml-var "rDate(None, _, time=_.DateTime(ModificationDate))"></td>
+  </tr>
+
+<dtml-if sequence-end>
+  </table>
+</dtml-if>
+
+<dtml-else>
+  <dtml-msg "There are no available versions.">
+</dtml-in>
+</dtml-let>
+
+    </div>
+  </td>
+</tr>

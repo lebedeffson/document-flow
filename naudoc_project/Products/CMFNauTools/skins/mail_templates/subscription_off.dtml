@@ -1,0 +1,14 @@
+<dtml-if "lang=='en'">
+Subject: You have been successfuly unsubscribed
+
+You will no longer receive information about updates under the topic
+"<dtml-var heading_title>"
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Подписка отменена
+
+Вы больше не будете получать информацию о последних обновлениях в теме
+"<dtml-var heading_title>"
+
+</dtml-if>

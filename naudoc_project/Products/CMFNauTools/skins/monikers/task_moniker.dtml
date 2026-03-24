@@ -1,0 +1,73 @@
+<dtml-comment>
+Moniker view of the task object.
+
+$Editor: oevsegneev $
+$Id: task_moniker.dtml,v 1.2 2005/10/31 09:47:42 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-if "moniker_object">
+
+<dtml-with "moniker_object">
+  <dtml-let 
+      alarm_date="expires() - ( expires() - effective() ) / 10"
+      task_state="isFinalized() and 'finalized' or
+                  expires().isPast() and 'expired' or
+                  alarm_date < _.DateTime() and 'beforeexpiration' or 'inprogress'"
+      icon_name="'task_%s.gif' % task_state">
+
+  <dtml-if "_.has_key('moniker_instruct')">
+    <table>
+      <tr valign="top">
+        <td>
+          <dtml-if validate>
+            <a href="&dtml-absolute_url;"><img border="0" width="16" height="16" src="&dtml-icon_name;" alt="<dtml-msg expr=task_state>"></a>
+          <dtml-else>
+            <img border="0" width="16" height="16" src="&dtml-icon_name;" alt="<dtml-msg expr=task_state>">
+          </dtml-if>      
+        </td>
+        <td class="small">
+           <dtml-if validate>
+             <a href="&dtml-absolute_url;">&dtml-Title;</a>,
+           <dtml-else>
+             &dtml-Title;
+           </dtml-if>
+           <br />(<dtml-msg expr=task_state>)
+        </td>
+      </tr>
+    </table>
+
+  <dtml-elif "moniker_simple">
+    <table>
+      <tr valign="top">
+        <td>
+          <dtml-if validate>
+            <a href="&dtml-absolute_url;"><img border="0" width="16" height="16" src="&dtml-icon_name;" alt="<dtml-msg expr=task_state>"></a>
+          <dtml-else>
+            <img border="0" width="16" height="16" src="&dtml-icon_name;" alt="<dtml-msg expr=task_state>">
+          </dtml-if>      
+        </td>
+        <td class="small"/>
+           <dtml-if validate>
+             <a href="&dtml-absolute_url;">&dtml-Title;</a>,
+           <dtml-else>
+             &dtml-Title;
+           </dtml-if>      
+           <dtml-var Creator fmt=member>
+           <dtml-if expiration_date>
+             (<dtml-msg "expires"> <dtml-var expiration_date fmt="%d.%m.%Y %H:%M">)
+           </dtml-if>
+           <dtml-if isFinalized>
+             <b><dtml-msg "Finalized"></b>
+           <dtml-elif "expiration_date and _.DateTime() > expiration_date">
+             <b><dtml-msg "Expired"></b>
+           </dtml-if>
+        </td>
+      </tr>
+    </table>
+  </dtml-if>
+  </dtml-let>
+</dtml-with>
+
+</dtml-if>

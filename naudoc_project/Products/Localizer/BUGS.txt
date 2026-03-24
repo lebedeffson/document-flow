@@ -1,0 +1,45 @@
+Here is a list of the known bugs:
+
+  * Seems that there's some encoding problem:
+
+      Trouble with character encoding on his Mac on the localizer ZMI. It
+      seems that including <meta http-equiv="Content-Type" content="text/html;
+      charset=iso-8859-1"> is mandatory.
+
+
+  * Francois Meehan has reported some problems with the import/export
+    feature:
+
+    "Also found that using the import/export function in Localizer/zope
+     can bring corruption to the po file, a problem with the accents it
+     seems."
+
+
+  * Localizer can't be refreshed with Zope 2.4.1b1 and later versions.
+
+    The way products are refreshed changed in Zope 2.4.1b1, it could
+    be a bug in Zope. Look at if other products that patch Zope have
+    the same problem.
+
+  * It seems that a Localizer inside another Localizer don't behaves
+    properly. Probably what is needed is a way to easily change the
+    __call__ method of Localizer. BTW: __call__ should call a Python
+    Script in the database.
+
+  * If using local folders it's possible to use url's like
+    "/path/<lang>/.." to select a language, but this only works
+    if using LFs.
+
+    Should it also work when no using LFs? If yes then we'd have
+    to use always access rules (as with Localizer < 0.6).
+
+  * changeLanguage could not do the desired thing sometimes because
+    of putting the cookie in the wrong path. The obvious solution is
+    to write a custom script in these situations, but perhaps it can
+    be done something..
+
+  * what to do with languages not included in "languages.txt"?
+
+  * Do Localizer instances play nice with FTP?
+
+Perhaps some of this "bugs" should be in the TODO list instead.

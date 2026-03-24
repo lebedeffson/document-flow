@@ -1,0 +1,209 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: category_attr_edit.dtml,v 1.15 2006/03/06 16:15:47 ypetrov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.15 $>
+
+<dtml-var simple_html_header>
+
+<dtml-call "REQUEST.set( '_entry_field_edit.common', True )">
+<script type="text/javascript" src="&dtml-portal_url;/entry_field_scripts.js"></script>
+
+<dtml-let construction="_.get( 'construction', False )"
+          category=this
+          attribute="(not construction) and category.getAttributeDefinition( REQUEST.get('id') or id )"
+          params="{}" title="None" is_derived="False"
+          form_name="'category_attr_form'" >
+
+<dtml-unless construction>
+<dtml-call "
+_.set( 'id', attribute.getId() ),
+_.set( 'type', attribute.Type() ),
+_.set( 'handler', attribute.getHandlerId() ),
+_.set( 'title', attribute.Title() ),
+_.set( 'is_multiple', attribute.isMultiple() ),
+_.set( 'is_mandatory', attribute.isMandatory() ),
+_.set( 'is_read_only', attribute.isReadOnly() ),
+_.set( 'is_derived', attribute.isDerived() ),
+_.set( 'params', {
+       'id' : attribute.getId(),
+       'type' : attribute.getHandlerId(),
+       'multiple' : attribute.isMultiple(),
+       'properties' : attribute.getProperties( default=None, uids=True ),
+       'default' : attribute.getDefaultValue( moniker=True ),
+     } )
+">
+</dtml-unless>
+
+<p>
+<strong><a href="<dtml-var "relative_url( action='category_metadata_form' )" html_quote>">&lt;&lt;
+<dtml-msgtext>Attributes of "%(category)s" category
+<dtml-msgparam category><dtml-msg expr="category.Title()">
+</dtml-msgtext>
+</a></strong>
+</p>
+
+<h2>
+<dtml-if construction>
+<dtml-msg "Add new attribute">
+<dtml-else>
+<dtml-msg "Attribute properties">
+</dtml-if>
+</h2>
+
+<form name="&dtml-form_name;" action="category_metadata" method="post"
+      onSubmit="return validateAttributeForm( this )">
+
+<input type="hidden" name="construction:boolean" value="&dtml-construction;" />
+
+<script type="text/javascript">
+<!--
+
+messageCatalog['categories.invalid_attribute_id']    = '<dtml-msg categories.invalid_attribute_id jscript>';
+messageCatalog['categories.invalid_attribute_title'] = '<dtml-msg categories.invalid_attribute_title jscript>';
+messageCatalog['categories.empty_attribute_type']    = '<dtml-msg categories.empty_attribute_type jscript>';
+
+function validateAttributeForm( form )
+{
+    if (form.elements['cancel'].clicked)
+        return cancelForm( form );
+
+    if (! validateForm( form, true ))
+        return false;
+
+    var pframe = this.frames['properties_frame'];
+    var pvalidate = pframe.validateProperties;
+    if (pvalidate && ! pvalidate( form ))
+        return false;
+
+    disableForm( form );
+    pframe.formSubmit = true;
+
+    return true;
+}
+
+function changeValueType( field )
+{
+    var type = field.form.elements['type:required:string'].value;
+    if (type != 'lines' && type != 'userlist') {
+        // TODO support multivalued for all types
+        field.form.elements['multiple:boolean'].checked = false;
+        if (field.name == 'multiple:boolean')
+            return;
+    }
+    var multiple = field.form.elements['multiple:boolean'].checked;
+    return this.frames['properties_frame'].changeValueType( type, multiple, type != 'splitter' );
+}
+
+function updatePropertiesForm( field )
+{
+    return this.frames['properties_frame'].updateValueProperties( field.form );
+}
+
+//-->
+</script>
+
+<table id="category_attr_table" width="100%" border="0" cellspacing="2" cellpadding="2">
+
+  <col width="0%">
+  <col width="100%">
+
+  <tr>
+    <td nowrap="1"><dtml-msg "Identifier"></td>
+    <td>
+      <dtml-if construction>
+        <input type="text" name="id:idstrong_" validation_message="categories.invalid_attribute_id" />
+      <dtml-else>
+        <input type="hidden" name="id:string" value="&dtml-id;" />
+        &dtml-id;
+      </dtml-if>
+    </td>
+  </tr>
+
+  <tr>
+    <td nowrap="1"><dtml-msg "Data type"></td>
+    <td>
+      <dtml-if construction>
+        <select name="type:required:string" onChange="changeValueType(this)" validation_message="categories.empty_attribute_type">
+          <option value="">(<dtml-msg "not selected">)</option>
+          <dtml-in "portal_metadata.listAttributeTypes( construction=True )" sort="isDerived,getId">
+            <option value="&dtml-id;"><dtml-msg expr="'valuetype.%s' % id"></option>
+          </dtml-in>
+        </select>
+      <dtml-else>
+        <dtml-msg expr="'valuetype.%s' % type">
+        <dtml-if is_derived>
+          (<dtml-msg expr="'valuetype.%s' % handler">)
+        </dtml-if>
+      </dtml-if>
+    </td>
+  </tr>
+
+  <tr>
+    <td nowrap="1"><dtml-msg "Collection of values"></td>
+    <td>
+      <dtml-if construction>
+        <input type="checkbox" name="multiple:boolean" onClick="changeValueType(this)" />
+        <i>(<dtml-msg "for 'list' and 'user' types">)</i>
+      <dtml-else>
+        <dtml-msg expr="is_multiple and 'yes' or 'no'">
+      </dtml-if>
+    </td>
+  </tr>
+
+  <tr>
+    <td nowrap="1"><dtml-msg "Title"></td>
+    <td>
+      <input type="text" name="title:required:string" value="&dtml.null-title;" validation_message="categories.invalid_attribute_title" />
+    </td>
+  </tr>
+
+<dtml-unless is_derived>
+
+  <tr>
+    <td nowrap="1"><dtml-msg "Mandatory"></td>
+    <td>
+      <input type="checkbox" name="mandatory:boolean" <dtml-var is_mandatory missing fmt=checked> />
+      <input type="hidden" name="mandatory:boolean:default" value="" />
+    </td>
+  </tr>
+
+  <tr>
+    <td nowrap="1"><dtml-msg "Read only"></td>
+    <td>
+      <input type="checkbox" name="read_only:boolean" <dtml-var is_read_only missing fmt=checked> />
+      <input type="hidden" name="read_only:boolean:default" value="" />
+    </td>
+  </tr>
+
+</dtml-unless>
+
+  <tr>
+    <td>&nbsp;</td>
+    <td colspan="2">
+      <br />
+      <dtml-if construction>
+        <input type="submit" name="add" value=" <dtml-msg "Add"> " />
+      <dtml-else>
+        <input type="submit" name="save" value=" <dtml-msg "Save"> " />
+      </dtml-if>
+      &nbsp;&nbsp;
+      <input type="submit" name="cancel" value=" <dtml-msg "Cancel"> " onClick="this.clicked=true" />
+    </td>
+  </tr>
+
+</table>
+
+<iframe name="properties_frame"
+        src="<dtml-var "relative_url( action='attr_properties', params={'construction':construction, 'id':params.get('id',None)} )" html_quote>"
+        properties_table_id="category_attr_table"
+        properties_table_row="<dtml-var "is_derived and 4 or 6">"
+        scrolling="no" height="0" width="0"
+        marginwidth="0" frameborder="0"></iframe>
+
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

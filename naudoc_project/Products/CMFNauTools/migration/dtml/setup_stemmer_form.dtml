@@ -1,0 +1,28 @@
+<dtml-var migration_html_header>
+
+<h2>Portal stemmer setup</h2>
+
+<dtml-with getMigrationContext>
+
+<form method="POST" onsubmit="disableForm(this);">
+
+<p>Please specify which stemmer to use for the full-text search.</p>
+
+<dtml-let script_init="script_init[now_configuring]"
+          all_stemmers="script_init.get('all_stemmers')"
+>
+<select name="stemmer:string:empty">
+  <option value="">None</option>
+  <dtml-in all_stemmers>
+  <option value="&dtml-sequence-item;">&dtml-sequence-item;</option>
+  </dtml-in>
+</select>
+</dtml-let>
+
+<input type="submit" name="configure_next" value=" Ok ">
+
+</form>
+
+</dtml-with>
+
+<dtml-var migration_html_footer>

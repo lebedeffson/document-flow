@@ -1,0 +1,48 @@
+<dtml-var migration_html_header>
+
+<dtml-with getMigrationContext>
+<p>The following actions will be performed in order to update the portal:</p>
+
+<form method="POST" onsubmit="disableForm(this);">
+<dtml-in "objects_count.items()">
+  <dtml-if sequence-start>
+    <table>
+    <tr>
+      <th>
+        Action
+      </th>
+      <th>
+        Outdated objects
+      </th>
+    </tr>
+  </dtml-if>
+
+  <dtml-let script="all_scripts.get(_['sequence-key'])"
+            outdated_count=sequence-item
+  >
+    <tr>
+      <td>
+        <dtml-var "script.title" html_quote>
+      </td>
+      <td align="right">
+        <dtml-var "'%s' % outdated_count">
+      </td>
+    </tr>
+     
+  </dtml-let>
+
+  <dtml-if sequence-end>
+    </tr>
+    </table>
+    <br>
+    <input type="submit" name="next" value="Specify migration options &gt;&gt; ">
+  </dtml-if>
+<dtml-else>
+  Portal is up to date, no migration required.
+</dtml-in>
+</form>
+
+</dtml-with>
+
+
+<dtml-var migration_html_footer>

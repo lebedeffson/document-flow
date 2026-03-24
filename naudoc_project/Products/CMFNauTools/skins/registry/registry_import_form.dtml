@@ -1,0 +1,88 @@
+<dtml-comment>
+$Editor: kfirsov$
+$Id: registry_import_form.dtml,v 1.8 2004/03/18 13:36:06 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.8 $>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+    function swapRegNum( state ){
+        var destList  = window.document.forms['csv']['csv_columns'];
+        var len = destList.options.length;
+        if (state)
+          addOptionTo(destList, "<dtml-msg expr="getColumnById('ID').Title()"> (<dtml-msg expr="getColumnById('ID').Type()">)", "ID")
+        else
+            for(var i = (len-1); i >= 0; i--)
+                 if ((destList.options[i] != null) && (destList.options[i].value == 'ID')) {                     destList.options[i] = null;
+                     break;                 }
+    }
+
+//-->
+</script>
+
+<div class="Desktop">
+<h2><dtml-var registry_icon.gif>&nbsp;&dtml-title_or_id; </h2>
+
+<p>&dtml-description;</p>
+
+<p><h1><dtml-var "msg('Import entries from CSV file')">:</h1>
+
+<form name="csv" method="post" action="&dtml-absolute_url;" enctype="multipart/form-data" onSubmit="selectAll(window.document.forms['csv']['csv_columns']);return true;">
+<p>
+<dtml-msg "Note: number of columns and their order should correspond with number and order of columns in an imported file.">
+<dtml-msg "Data types in corresponding columns must coincide too."><br>
+<dtml-msg "For boolean type you should use only values 0 and 1.">
+<p>
+<table>
+  <tr>
+    <td>
+  <select id="csv_columns"
+          name="csv_columns:list"
+          size="15"
+          width="14"
+          multiple
+  >
+            <dtml-in listColumns prefix="clmn">
+              <dtml-with clmn_item>
+              <dtml-if allowsInput>
+              <option value="&dtml-getId;"><dtml-msg expr=Title> (<dtml-msg expr=Type>)</option>
+              </dtml-if>
+              </dtml-with>
+            </dtml-in>
+  </select>
+    </td>
+    <td>
+      <input type=checkbox 
+         <dtml-if "getColumnById('ID').allowsInput()">
+           onClick="swapRegNum(!this.checked);"
+         <dtml-else>
+           checked disabled
+         </dtml-if>
+           value="1" name="use_internal_reg_numbers" 
+      ><dtml-msg "Generate registration number automatically."><br>
+  <input type="button"          onClick="upSelectionInList( csv_columns );"          value="<dtml-msg "Move up">"><br>  <input type="button" 
+         onClick="downSelectionInList( csv_columns );" 
+         value="<dtml-msg "Move down">">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <input type="checkbox" name="ignore_titles" value="1">
+      <dtml-msg "First row contains titles.">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <dtml-msg "File">
+      <input type="file" name="csv_file" size="35">
+    </td>
+  </tr>
+</table>
+
+
+
+<p><input type="submit" name="importFromCSV:method" value="<dtml-msg "Insert file">">
+</form>
+<dtml-var simple_html_footer>

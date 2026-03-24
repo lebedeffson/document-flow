@@ -1,0 +1,195 @@
+<dtml-comment>
+$Id: registration_book_excel.dtml,v 1.9 2005/09/07 08:35:21 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.9 $>
+
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+  <head>
+  <meta http-equiv=Content-Type content="text/html;<dtml-if "msg.default_language('ru')">charset=windows-1251</dtml-if>">
+  <meta name=ProgId content=Excel.Sheet>
+  <meta name=Generator content="NauDoc &dtml-productVersion;">
+  <dtml-let c_name="Creator()"
+            u_name="portal_membership.getAuthenticatedMember()"
+            >
+    <!--[if gte mso 9]><xml>
+      <o:DocumentProperties>
+        <o:Author><dtml-var c_name html_quote></o:Author>
+        <o:LastAuthor><dtml-var u_name html_quote></o:LastAuthor>
+        <o:Created><dtml-var "_.DateTime().ISO()" html_quote></o:Created>
+        <o:LastSaved><dtml-var "_.DateTime().ISO()" html_quote></o:LastSaved>
+      </o:DocumentProperties>
+    </xml><![endif]-->
+    </dtml-let>
+    <!--[if gte mso 9]><xml>
+      <x:ExcelWorkbook>
+        <x:ExcelWorksheets>
+          <x:ExcelWorksheet>
+            <x:Name><dtml-msg Sheet>1</x:Name>
+            <x:WorksheetOptions>
+            <x:Selected/>
+            <x:ProtectContents>True</x:ProtectContents>
+            <x:ProtectObjects>False</x:ProtectObjects>
+            <x:ProtectScenarios>False</x:ProtectScenarios>
+            </x:WorksheetOptions>
+          </x:ExcelWorksheet>
+        </x:ExcelWorksheets>
+        <x:ProtectStructure>True</x:ProtectStructure>
+        <x:ProtectWindows>False</x:ProtectWindows>
+      </x:ExcelWorkbook>
+    </xml><![endif]-->
+    <style>
+      .xl24 {
+        mso-style-parent:style0;
+        mso-number-format:General;
+        white-space:normal;
+        }
+      .xl25 {
+        mso-style-parent:style0;
+        mso-number-format:"General Date";
+        white-space:normal;
+        }
+      .xl26 {
+        mso-style-parent:style0;
+        mso-number-format:"Yes\/No";
+        white-space:normal;
+        }
+      .xl27 {
+        mso-style-parent:style0;
+        mso-number-format:Standard;
+        white-space:normal;
+        }
+    </style>
+  </head>
+  <body>
+
+  <dtml-let container=this
+            columns=listColumns
+            membership=portal_membership
+            session="REQUEST['SESSION']"
+            uid=getUid
+            recency_period="getRecencyPeriod()"
+            disable_recency_filter="recency_period
+                                    and (not REQUEST.has_key('disable_recency_filter')
+                                    and session.get('%s_disable_recency_filter' % uid, 0)
+                                    or REQUEST.get('disable_recency_filter'))
+                                    or 0"
+            sort_on="REQUEST.get( 'sort_on', session.get( '%s_sort_params' % uid, {} ).get( 'sort_on' ) )"
+            sort_attr="REQUEST.get( 'sort_attr', session.get( '%s_sort_params' % uid, {} ).get( 'sort_attr' ) )"
+            sort_order="REQUEST.get( 'sort_order', session.get( '%s_sort_order' % uid ) )"
+            table_columns=getFilterColumns
+            default_filter="{ 'conditions': _.has_key('conditions') and conditions or [],
+                              'query': _.has_key('query') and query or {},
+                              'query_id': _.has_key('query_id') and query_id or '',
+                              'profile_id': _.has_key('profile_id') and profile_id or '',
+                              'columns': table_columns
+                            }"
+            filter="session.get('%s_filter' % uid, default_filter)"
+            query="create_query( filter ).filter_query"
+            results="searchEntries( REQUEST=REQUEST,
+                                    sort_on=sort_on,
+                                    sort_attr=sort_attr,
+                                    sort_order=sort_order,
+                                    disable_recency_filter=disable_recency_filter,
+                                    **query)"
+            >
+  <dtml-in results prefix="c">
+    <dtml-if sequence-start>
+      <table>
+      <tr>
+        <td class="x124" x:str>
+          <strong><dtml-msg Document></strong>
+        </td>
+        <dtml-unless hide_version>
+        <td class="x124" x:str>
+          <strong><dtml-msg Version></strong>
+        </td>
+        </dtml-unless>
+        <dtml-unless hide_registration_date>
+        <td class="x124" x:str>
+          <strong><dtml-msg "Registration date"></strong>
+        </td>
+        </dtml-unless>
+        <dtml-unless hide_creator>
+        <td class="x124" x:str>
+          <strong><dtml-msg User></strong>
+        </td>
+        </dtml-unless>
+        <dtml-in columns>
+        <td>
+          <strong><dtml-var "Title()"></strong>
+        </td>
+        </dtml-in>
+      </tr>
+    </dtml-if>
+      <tr>
+    <dtml-let link_brains="c_item.get('link')"
+              target_brains="c_item.get('target')"
+              target="target_brains and target_brains.getObject()"
+              >
+        <dtml-if "target and _.SecurityCheckPermission('View', target)">
+        <td class="x124" x:str>
+          <dtml-var "target.Title()">
+        </td>
+        <dtml-unless hide_version>
+        <td class="x124" x:str>
+          <dtml-if "target.implements( ['isVersionable', 'isVersion'] )">
+            <dtml-var "target.getVersion().getVersionNumber()">
+          </dtml-if>
+        </td>
+        </dtml-unless>
+        <dtml-unless hide_registration_date>
+        <td class="x125" x:date>
+          <dtml-var "link_brains.created" fmt="%Y-%m-%d %H:%M">
+        </td>
+        </dtml-unless>
+        <dtml-unless hide_creator>
+        <td class="x124" x:str>
+          <dtml-var "membership.getMemberName(link_brains.Creator)">
+        </td>
+        </dtml-unless>
+        <dtml-in columns>
+        <td class="x124" x:str>
+          <dtml-if "column_type=='user'">
+            <dtml-var "render(_, target, default='', plain=True)">
+          <dtml-else>
+            <dtml-var "render(_, target, default='')">
+          </dtml-if>
+        </td>
+        </dtml-in>
+      </tr>
+      <dtml-else>
+        <td>
+          <dtml-var "link_brains.getObject().getTargetMetadata('Title')">
+        </td>
+        <td>
+          <dtml-try>
+            <dtml-var "link_brains.target_uid.get('ver_id').split('_')[1]">
+          <dtml-except>
+          </dtml-try>
+        </td>
+        <dtml-unless hide_registration_date>
+        <td class="x125" x:date>
+          <dtml-var "link_brains.created" fmt="%Y-%m-%d %H:%M">
+        </td>
+        </dtml-unless>
+        <dtml-unless hide_creator>
+        <td class="x124" x:str>
+          <dtml-var "membership.getMemberName(link_brains.Creator)">
+        </td>
+        </dtml-unless>
+        <td colspan="<dtml-var columns fmt=collection-length>"
+            align="center">
+            <dtml-msg "Object is inaccessible.">
+        </td>
+      </dtml-if>
+      </dtml-let>
+    <dtml-if sequence-end>
+      </table>
+    </dtml-if>
+  </dtml-in>
+  </dtml-let>
+  </body>
+</html>

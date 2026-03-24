@@ -1,0 +1,113 @@
+<dtml-comment>
+Calendar
+$Editor: spinagin $
+$Id: calendar_table.dtml,v 1.2 2007/07/03 12:18:54 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<script type="text/javascript">
+<!--                    
+function onSelectMonthYear(){
+    sb_month = document.getElementById('month').value;
+    //sb_year = document.getElementById('year').value;
+document.location.replace('&dtml-absolute_url;/calendar_view?year='+&dtml-selected_year;+'&month='+sb_month);
+}
+-->
+</script>
+
+<dtml-with "getSetting()" mapping>
+<dtml-let months="['', 'january','february','march','april','may','june','july','august', 'september', 'october', 'november', 'december']"
+          days="{'Sunday':7,'Monday':1,'Tuesday':2,'Wednesday':3,'Thursday':4,'Friday':5,'Saturday':6}"
+          first_day_of_month="firstDayOfMonth( selected_year, selected_month)"
+          last_day_of_month="lastDayOfMonth( selected_year, selected_month )"
+>
+<dtml-comment>    select boxes with MONTH and YEAR select   </dtml-comment>
+<table width="200" cellspacing="0" cellpadding="2" border="0" height="15">
+  <tr>
+    <dtml-if "view_month_select">
+      <td align="center" height="15">
+      <select style="width:100" name="month" id="month" OnChange="onSelectMonthYear();">
+       <dtml-in "months[1:]">
+         <option value="<dtml-var "months.index(_['sequence-item'])">"
+        <dtml-var "months_map[selected_month]==_['sequence-item']" fmt=selected> ><dtml-var "msg(_['sequence-item'].capitalize())"></option>
+       </dtml-in>
+      </select>
+      </td>
+    </dtml-if>
+</table>
+<dtml-comment>    CALENDAR   </dtml-comment>
+<table cellspacing="0" cellpadding="3" border="0" bordercolor="#F4F4F2" >
+<tr>
+ <td>
+  <table cellspacing="0" cellpadding="3" border="1" bordercolor="#F4F4F2" align="center">
+   <tr bgcolor="#898989" align="center">
+    <td>&nbsp;</td>
+    <td class="d2">пн</td>
+    <td class="d2">вт</td>
+    <td class="d2">ср</td>
+    <td class="d2">чт</td>
+    <td class="d2">пт</td>
+    <td class="d2">сб</td>
+    <td class="d2">вс</td>
+   </tr>
+  <tr  bgcolor="#D2D2D2" align="center" height="5">
+   <td nowrap="1">
+     <a href="&dtml-absolute_url;/calendar_view?week=1&month=<dtml-var selected_month>&year=<dtml-var selected_year>" class="navigate">
+       <dtml-if "selected_week==1"><b></dtml-if> 1 <dtml-msg "week.short"><dtml-if "selected_week==1"></b></dtml-if>
+     </a>
+   </td>
+   <dtml-in " _.range(-days[first_day_of_month]+2, monthLength(selected_year,selected_month)+1)">
+     <dtml-if "_['sequence-item']<1" ><td><img src="&dtml-portal_url;/spacer.gif" width="1" height="1" border="0"></td>
+     <dtml-else>
+       <td align="center" height="5"
+         <dtml-if "_.DateTime(selected_year, selected_month, _['sequence-item']).isCurrentDay()">
+           bordercolor="red"
+         </dtml-if>
+       >
+         <a href="&dtml-absolute_url;/calendar_view?day=&dtml-sequence-item;&month=<dtml-var selected_month>&year=<dtml-var selected_year>"
+           <dtml-if "_['sequence-item']<>selected_day"> class="navigate" </dtml-if>
+         >
+           <font size="1" <dtml-if "_['sequence-item'] in day_with_notes">color='blue'</dtml-if>>
+             <dtml-if "_['sequence-item']==selected_day"> <b></dtml-if>
+             &dtml-sequence-item;
+           </font>
+         </a>
+       </td>
+
+   <dtml-if "_['sequence-number']/7.0==_['sequence-number']/7">
+     <tr  bgcolor="#D2D2D2" align="center">
+       <dtml-if "_['sequence-item'] != monthLength(selected_year,selected_month)">
+          <td nowrap="1">
+            <a href="&dtml-absolute_url;/calendar_view?week=<dtml-var "_['sequence-number']/7+1">&month=<dtml-var selected_month>&year=<dtml-var selected_year>" class="navigate">
+             <dtml-if "selected_week==_['sequence-number']/7+1"><b></dtml-if>
+               <dtml-var "_['sequence-number']/7+1"> <dtml-msg "week.short">
+            </a>
+          </td>
+       </dtml-if>
+   </dtml-if>
+
+   </dtml-if>
+   </dtml-in>
+   <dtml-in "_.range(days[last_day_of_month],7)">
+    <td><img src="&dtml-portal_url;/spacer.gif" width="1" height="1" border="0"></td>
+   </dtml-in>
+
+  </table>
+    <dtml-if "view_month_list">
+      <td bgcolor="#EfEfEf" align="right" valign="top">
+        <dtml-in "months[1:]">
+        <dtml-if "months_map[selected_month]==_['sequence-item']"> <b></dtml-if>
+        <a href="&dtml-absolute_url;/calendar_view?month=<dtml-var "months.index(_['sequence-item'])">&year=<dtml-var selected_year>" class="navigate"><font size="1"><dtml-var "msg(_['sequence-item'].capitalize())"></a></font><br>
+        <dtml-if "months_map[selected_month]==_['sequence-item']"> </b></dtml-if>
+        </dtml-in>
+      </td>
+    </dtml-if>
+ </table>
+<a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "now.day()">&month=<dtml-var now_month>&year=<dtml-var "now.year()">" class="navigate">
+    <dtml-msg "today"> (<dtml-var "now.day()"> <dtml-msg expr="months_map[now_month].capitalize()"> <dtml-var "now.year()">)
+</a>
+
+
+
+</dtml-let>
+</dtml-with>

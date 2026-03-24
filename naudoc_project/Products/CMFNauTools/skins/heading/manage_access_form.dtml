@@ -1,0 +1,178 @@
+<dtml-var simple_html_header>
+
+<dtml-if "not portal_membership.checkPermission('Change permissions', this())">
+ <dtml-call "RESPONSE.redirect(absolute_url())">
+</dtml-if>
+
+<script type="text/javascript"><!--
+
+  function Validate( frm ){
+    return validateUserForm(frm);
+  }
+
+  function loadAllowedUsers(){
+    var td = document.getElementById('allowed_users');
+    try {
+      td.innerHTML = userAgent.downloadURL('&dtml-absolute_url;/allowed_users?<dtml-var "implements('isCategoryDefinition') and 'category=%s' % getId() or 'uid=%s' % getUid()">');
+    } catch (error) {
+      td.innerHTML = '<dtml-msg "Error">';
+    }
+  }
+
+//--></script>
+
+
+<h2>
+  <a class="navigate" href="&dtml-absolute_url;">
+    <img src="&dtml-portal_url;/groups_icon.gif" alt="" />
+    &dtml-title_or_id;
+  </a>
+</h2>
+<dtml-let obj=this
+          portal="portal_url.getPortalObject()"
+>
+<form method="POST" action="manage_permissions">
+ <dtml-in "portal_membership.listGroups()">
+   <dtml-if sequence-start>
+   <table width="100%">
+     <tr><td>
+   <table class="List" width="80%" cellpadding="2">
+          <tr class="row_title">
+          <td width="15%">
+        <dtml-msg Group>
+    </td>
+          <td>
+        <dtml-msg Description>
+    </td>
+    <dtml-in "obj.managed_roles">
+          <td align=center>
+                  <dtml-msg expr=sequence-item>
+                  <dtml-if "_['sequence-item'] in ['Author', 'Writer', ]">
+                    <dtml-var "asterisk(obj, None)">
+                  </dtml-if>
+    </td>
+    </dtml-in>
+    </tr>
+   </dtml-if>
+          <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+                <td nowrap>
+        <a class="navigate" href="<dtml-var "portal.relative_url( action='group_edit_form', params={'group_id':getId()}, frame='inFrame', popup=0)" html_quote>" target="_blank">&dtml-getId;</a>
+    </td>
+    <td>&dtml-Title;</td>
+
+    <dtml-in "obj.managed_roles" prefix="role">
+    <td align=center>
+      <input type="checkbox" name="&dtml-getId;:list" value="&dtml-role_item;"
+          <dtml-if "portal_membership.isGroupInheritsRole( obj, getId(), role_item ) or role_item == 'Editor'">disabled</dtml-if>
+          <dtml-var "portal_membership.isGroupInRole( obj, getId(), role_item )" fmt=checked> />
+    </td>
+    </dtml-in>
+
+    </tr>
+  <dtml-if sequence-end>
+   </table>
+    </td></tr>
+    <tr><td>
+  <input type="submit" name="submit" value="<dtml-msg Save>">
+    </td></tr>
+   </table>
+  </dtml-if>
+ <dtml-else>
+    <dtml-msg "There are no groups yet">
+ </dtml-in>
+</form>
+
+
+<dtml-if "REQUEST.get('note', 0)">
+<p><sup>*</sup> <dtml-msg "Marked roles are not active for the current state"></p>
+</dtml-if>
+
+
+<p><dtml-msg "You can grant personalized access to this object by assigning the local roles to the users."></p>
+
+<dtml-in getLocalRoles>
+<dtml-if sequence-start>
+<form action="delLocalRoles" method="POST">
+<table cellspacing="0" cellpadding="2" border="0">
+</dtml-if>
+<tr>
+  <td align="left">
+  <input type="checkbox" name="userids:list"
+         value="<dtml-var sequence-key html_quote>"
+   <dtml-if "'__inherited' in _['sequence-item']">
+      disabled
+   </dtml-if>
+  />
+  </td>
+  <td align="left" class="small">
+    <dtml-var sequence-key fmt=member>
+    (<dtml-in sequence-item>    <dtml-if "_['sequence-item'] != '__inherited'">
+    <dtml-msg expr=sequence-item><dtml-unless sequence-end>, </dtml-unless></dtml-if></dtml-in> )
+  </td>
+</tr>
+<dtml-if sequence-end>
+<tr>
+  <td align="left" valign="top">
+  </td>
+  <td align="left" valign="top">
+  <div class="form-element">
+  <input class="form-element" type="submit" name="submit" value="<dtml-msg Remove>" />
+  </div>
+  </td>
+</tr>
+</table>
+</form>
+</dtml-if>
+</dtml-in>
+
+
+<form method="POST" action="setLocalRoles" onSubmit="return Validate(this);">
+
+  <table>
+  <tr class="row_title">
+    <td><dtml-msg "Local roles"></td>
+  </tr>
+  <tr class="row_even">
+    <td>
+        <dtml-let suppress_roles="True"
+                  suppress_groups="True"
+                  name="'userids'"
+                  mode="'permissions'"
+        >
+          <dtml-var users_selection>
+        </dtml-let>
+
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+        <dtml-msg "Assign the following roles to selected users:"><br>
+        <select name="roles:list" size="4" multiple>
+          <dtml-in "managed_roles">
+            <option value="&dtml-sequence-item;">
+              <dtml-msg expr=sequence-item>
+            </option>
+          </dtml-in>
+        </select>
+
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+        <input type="submit" name="submit" value="<dtml-msg "Add local role">">
+    </td>
+  </tr>
+  </table>
+
+</form>
+</dtml-let>
+
+<table border="0">
+  <tr>
+    <td id="allowed_users" colspan="2">
+      <a href="#" onClick="loadAllowedUsers()"><dtml-msg "Show users which allowed to access this object"></a>
+    </td>
+  </tr>
+</table>
+
+<dtml-var simple_html_footer>

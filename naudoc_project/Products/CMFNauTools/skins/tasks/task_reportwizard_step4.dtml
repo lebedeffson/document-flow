@@ -1,0 +1,34 @@
+<dtml-comment>
+$Id: task_reportwizard_step4.dtml,v 1.4 2004/05/07 05:49:17 vsafronovich Exp $
+</dtml-comment>
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+<dtml-if folder_uid>
+<h1> <dtml-var aboveInThread> </h1>
+<h1> <dtml-msg "Report created"></h1>
+<dtml-let report_url="portal_followup.saveReport(this(), task_title, task_description, _.getitem(template), REQUEST)"
+>
+<p>
+   <dtml-msg "Your report has been saved with name"> 
+   <a href="&dtml-report_url;/view">&dtml-task_title;</a>. 
+</p>
+
+<form name="report" method="POST" action="&dtml-absolute_url;">
+    <input type="button" 
+           onClick="location.href='&dtml-absolute_url;/document_follow_up_form';" 
+           value=" <dtml-msg "OK"> "
+    />
+</form>
+</dtml-let>
+
+<dtml-else>
+<p><i><dtml-msg "You have to specify the folder"></i></p>
+<form name="go_back">
+<input type="button" value=" <dtml-msg "Back"> " Onclick="return history.back();">
+</form>
+</dtml-if>
+
+</div>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,29 @@
+<dtml-comment>
+$Editor: ypetrov $
+$Id: voting_poll_form.dtml,v 1.3 2004/03/18 07:09:32 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+<dtml-var simple_html_header>
+
+<h1><dtml-msgtext>&dtml-meta_type;</dtml-msgtext></h1>
+
+<h2>&dtml-title_or_id;</h2>
+
+<dtml-in listChoices prefix="c" mapping>
+  <dtml-if c_start>
+    <form action="&dtml-absolute_url;/processVote" method="post" onsubmit="return getCheckedRadioButton(this.elements['responses:int'])!=null">
+  </dtml-if>
+  <input type="radio" id="resp&dtml-c_index;" name="responses:int" value="&dtml-c_index;">
+  <label for="resp&dtml-c_index;">&dtml-title;</label><br>
+  <dtml-if c_end>
+    <br><input type="SUBMIT" value="<dtml-msg "Vote">">
+    </form>
+  </dtml-if>
+<dtml-else>
+  <dtml-msgtext>
+    No choices to vote, please <a href="&dtml-relative_url;/voting_edit_form">configure this poll</a>.
+  </dtml-msgtext>
+</dtml-in>
+
+<dtml-var simple_html_footer>

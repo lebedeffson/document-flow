@@ -1,0 +1,102 @@
+<dtml-comment>
+$Id: task_definition_set_category_attribute.dtml,v 1.17 2007/11/16 13:37:10 oevsegneev Exp $
+
+</dtml-comment>
+<dtml-let
+  parent_template="taskDefinitionArray.has_key('_parent_id') and this().taskTemplateContainer.getTaskTemplate(taskDefinitionArray['_template_id']).getTaskDefinitionArrayById(taskDefinitionArray['_parent_id']) or ''"
+  category_="parent_template and _.hasattr( parent_template, 'dest_category') and portal_metadata.getCategoryById(parent_template['dest_category']) or this()"
+  var_postfix="'var'"
+  vars="taskDefinitionArray['vars']"
+>
+
+<dtml-in "category_.listAttributeDefinitions()">
+
+<dtml-if sequence-start>
+  <tr>
+     <td colspan="2"><h3><dtml-msg "Category attributes"></h3></td>
+  </tr>
+  <tr>
+   <td>
+     <table border="0" cellpadding="2" width="100%" >
+       <tr class="row_title">
+         <td width="20">&nbsp;</td>
+         <td>
+           <dtml-msg "Id">
+         </td>
+         <td>
+           <dtml-msg "Title">
+         </td>
+         <td>
+           <dtml-msg "Type">
+         </td>
+         <td>
+           <dtml-msg "Attribute value">
+         </td>
+       </tr>
+</dtml-if>
+
+<dtml-unless isDerived>
+
+       <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+         <td valign="top">
+           <input type="radio" name="attribute_name" value="&dtml-getId;"
+                  <dtml-var "getId()==taskDefinitionArray['attribute_name']" fmt=checked> 
+           />
+         </td>
+         <td valign="top">
+           &dtml-getId;
+         </td>
+         <td valign="top">
+           <dtml-msg expr=Title>
+         </td>
+         <td valign="top">
+           <dtml-msg expr="'valuetype.%s' % Type()"><dtml-if isMultiple>,
+           <br /><dtml-msg "multivalued"></dtml-if>
+         </td>
+         <td>
+           <dtml-var "entry_field_edit( None, _,
+                                        descriptor=getFieldDescriptor(
+                                        name='value_%s' % getId(),
+                                        type=Type(),
+                                        edit=1 ),
+                                        value=(getId()==taskDefinitionArray['attribute_name']) and taskDefinitionArray['attribute_value'] or None,
+                                      )">
+         </td>
+       </tr>
+  
+</dtml-unless>
+
+<dtml-if sequence-end>
+     </table>
+    </td>
+  </tr>
+  <tr>
+     <td>
+       <input type="checkbox"
+              name="_allow_edit:list"
+              value="attribute_value"
+              <dtml-var "'attribute_value' in taskDefinitionArray['_allow_edit']" fmt=checked>
+       />
+       <dtml-msg "editable during state change">
+      </td>
+  </tr> 
+  <tr>
+     <td>
+       <h3>
+         <dtml-msg "Output parameters">
+       </h3>
+     </td>
+  </tr>
+  <tr class="row_even"> 
+    <td>
+    <dtml-msg "New attribute's value">:&nbsp;
+    <input name="attribute_value_&dtml-var_postfix;" size="25"
+           value="<dtml-var "vars.get('attribute_value')" null>"
+    />
+    </td> 
+  </tr>
+</dtml-if>
+
+</dtml-in>
+
+</dtml-let>

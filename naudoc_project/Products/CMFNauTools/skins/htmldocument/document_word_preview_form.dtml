@@ -1,0 +1,68 @@
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-var simple_html_header>
+
+<script>
+function applyMSWordTemplate()
+{
+  /*@cc_on @*/
+  /*@if (@_jscript_version>4) 
+  
+  try {
+    //create activex object
+    var word = new ActiveXObject("Word.Application");
+    word.Visible = true;
+  }
+  catch (err) {
+    alert(err.description);
+    alert('<dtml-msg "You need to add this site in list of trusted sites in InternetExplorer.">')
+    return false;
+  }
+
+  
+  try {
+    word.Documents.Open('<dtml-var "absolute_url( action=associated_with_attach )" fmt=jscript>');
+  }
+  catch (err) {
+    if ( parseInt(word.Version) > 10 )
+      alert( 'Sorry, word with version ' + word.Version + ' is not supported' );
+    else
+      alert( err.description + '\n' + word.Version );
+    word.Quit()
+    return false;
+  } 
+  //do something
+  <dtml-in "listCategoryAttributes()" prefix="data">
+  try {
+    <dtml-if "data_key.Type() in ['lines','userlist','link']">
+    //not worked yet
+    <dtml-else>
+      word.Application.ActiveDocument.Variables.Add("<dtml-var "data_key.getId()" fmt=jscript>").Value = "<dtml-var "data_item" fmt=jscript html_quote>";
+    </dtml-if>
+      
+  }
+  catch (err) {
+    //alert('<dtml-var "data_key.getId()">: ' + err.description);
+  }
+  </dtml-in>
+
+
+  try {
+    word.Application.ActiveDocument.Fields.Update();
+  }
+  catch (err) {
+    alert(err.description);
+  }
+
+  word = null;
+  @end @*/
+  alert('<dtml-msg "New window with Microsoft Word"> (&dtml-Title;) <dtml-msg "appears. Report has been placed there.">');
+}
+
+document.body.onload= function() {
+    applyMSWordTemplate();
+    window.close();
+    }
+
+</script>
+
+<dtml-var simple_html_footer>

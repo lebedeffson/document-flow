@@ -1,0 +1,189 @@
+<dtml-comment>
+Calendar tasks viewer
+$Editor: spinagin $
+$Id: calendar_tasks_list.dtml,v 1.2 2007/07/03 12:18:55 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+
+
+<dtml-let user="portal_membership.getAuthenticatedMember()"
+          user_name="user.getUserName()"
+          show_button="False"
+
+          session="REQUEST['SESSION']"
+          sort_on="REQUEST.get( 'sort_on', session.get( '%s_sort_params' % id, {} ).get( 'sort_on' ) )"
+          sort_ord="REQUEST.get( 'sort_ord', session.get( '%s_sort_order' % id ) )"
+          sort_params="{ 'sort_on': sort_on }"
+          priorities="{ '1': 'Small', '2': 'Normal', '3': 'High' }"
+>
+  <dtml-call "session.set('%s_sort_params' % id, sort_params)">
+  <dtml-call "session.set('%s_sort_order' % id, sort_ord)">
+
+<form action="manage_tasks_handler" method="POST">
+
+<dtml-if "skin_version=='1.0'">
+<h3><dtml-msg "Tasks"></h3>
+<dtml-in "listCalendarTasks(sort_on=sort_on)" reverse_expr=sort_ord> 
+
+  <dtml-if sequence-start>
+  <table width="100%" cellpadding="2" border="0">
+  <tr class="row_title" align="center" height="10">
+    <td>&nbsp;</td>
+    <td noWrap>
+      <dtml-var "title_sort_link(None, _ , column_id='title', column_title='Title')">
+    </td>
+    <td width="100%" noWrap>
+      <dtml-msg "Description">
+    </td> 
+    <td noWrap>
+      <dtml-var "title_sort_link(None, _ , column_id='state', column_title='State')">
+    </td>
+    <td noWrap>
+      <dtml-var "title_sort_link(None, _ , column_id='date', column_title='Plan date')">
+    </td>
+    <td noWrap>
+      <dtml-var "title_sort_link(None, _ , column_id='priority', column_title='Priority')">
+    </td>
+    <td noWrap>
+      <dtml-var "title_sort_link(None, _ , column_id='ready_proc', column_title='Ready proc')">
+    </td>
+    <td noWrap>
+      <dtml-var "title_sort_link(None, _ , column_id='isPublic', column_title='Public')">
+    </td>
+  </tr>
+  </dtml-if>
+
+  <dtml-let task="getObject()" style_class="task.state()=='Finished' and 'gray' or ''">
+  <tr class="row_even" align="center" valign="middle"
+    <dtml-if "allow_edit and user_name==task.creator()">
+      onDblClick="document.location.replace('&dtml-absolute_url;/calendar_view?show_tasks=1&changed_task_id=&dtml-id;');"
+    </dtml-if>
+  >
+    <td>
+       <dtml-if "allow_edit and (user_name==creator or user.has_role('Manager'))">
+         <dtml-call "_.set('show_button',1)">
+           <input type="checkbox" name="ids:list" value="&dtml-id;" />
+         </dtml-if>
+    </td>
+    <td class="&dtml-style_class;" align="left">
+      <a href="#" title="<dtml-msg "Change">" onClick= "document.location.replace('&dtml-absolute_url;/calendar_view?show_tasks=1&changed_task_id=&dtml-id;');">
+        <p><b>&dtml-title;</b></p>
+      </a>
+    </td>
+    <td class="&dtml-style_class;" align="left">
+      <dtml-var "task.getTaskText()">
+    </td>
+    <td class="&dtml-style_class;" noWrap>
+      <dtml-msg expr="task.state()">
+    </td>
+    <td class="&dtml-style_class;" noWrap>
+        <dtml-let plan_date="task.getTaskPlanDate()">
+            <dtml-var "plan_date.day()"> <dtml-msg expr="plan_date.Month()"> <dtml-var "plan_date.year()">
+        </dtml-let>
+    </td>
+    <td class="&dtml-style_class;">
+      <dtml-msg expr="priorities[task.priority()]">
+    </td>
+    <td class="&dtml-style_class;">
+      <dtml-var "task.ready_proc()"> %
+    </td>
+    <td align="center"
+       <dtml-if "creator<>user_name">
+         class="blue"
+       <dtml-else>
+         class="red"
+       </dtml-if>
+    >
+      <dtml-if isPublic><b>*</b></dtml-if>
+    </td>
+  </tr>
+  </dtml-let>
+ 
+  <dtml-if sequence-end>
+  <dtml-if "allow_edit and show_button">
+    <tr>
+      <td align="right" colspan="8">
+        <input type="submit" name="delete_notes" value="<dtml-msg "Delete">"
+             onClick="return confirm( '<dtml-msg "Are you shure?">' )" />
+      </td>
+    </tr>
+  </dtml-if>
+  </table>
+  </dtml-if>
+<dtml-else>
+ <p>&nbsp;<dtml-msg "No tasks">.</p>
+</dtml-in>
+
+<dtml-else>
+<table class="CalendarTaskList" width="100%" cellpadding="2" border="1">
+  <tr align="center" height="10" class="Title">
+    <td>&nbsp;
+    <td>&nbsp;
+
+    <td align="center" nowrap="1">
+      <dtml-var "title_sort_link(None, _ , column_id='title', column_title='Title')">
+
+    <td><dtml-msg "Description">
+
+    <td align="center" nowrap="1">
+      <dtml-var "title_sort_link(None, _ , column_id='state', column_title='State')">
+
+    <td align="center" nowrap="1">
+      <dtml-var "title_sort_link(None, _ , column_id='date', column_title='Plan date')">
+
+    <td width="1%" nowrap="1">
+       <dtml-var "title_sort_link(None, _ , column_id='ready_proc', column_title='Ready proc')">
+
+    <td>&nbsp;
+
+<dtml-in "listCalendarTasks(sort_on=sort_on)"
+          reverse_expr=sort_ord
+> 
+  <dtml-let task="getObject()"
+            style_class="task.state()=='Finished' and 'gray' or ''"
+  >
+    
+  <tr
+    <dtml-if "allow_edit and user_name==task.creator()">
+      onDblClick="document.location.replace('&dtml-absolute_url;/calendar_view?show_tasks=1&changed_task_id=&dtml-id;');"
+    </dtml-if>
+  >
+    <td width="10" align="center" <dtml-if "creator<>user_name">class="blue"<dtml-else>class="red"</dtml-if> >
+       <dtml-if isPublic><b>*</b></dtml-if>
+
+    <td width="17"><img src="&dtml-portal_url;/priority_<dtml-var "task.priority()">.jpg">
+    <td class="&dtml-style_class;">&dtml-title;
+    <td width="50%" class="&dtml-style_class;"><dtml-var "task.getTaskText()">
+
+    <td class="&dtml-style_class;"><dtml-msg expr="task.state()">
+
+    <td class="&dtml-style_class;">
+        <dtml-let plan_date="task.getTaskPlanDate()">
+            <dtml-var "plan_date.day()"> <dtml-msg expr="plan_date.Month()"> <dtml-var "plan_date.year()">
+        </dtml-let>
+    <td class="&dtml-style_class;"><dtml-var "task.ready_proc()">
+    <td>
+       <dtml-if "allow_edit and (user_name==creator or user.has_role('Manager'))">
+         <dtml-call "_.set('show_button',1)">
+           <input type="checkbox" name="ids:list" value="&dtml-id;" />
+         </dtml-if>
+
+  </dtml-let>
+</dtml-in>
+</table>
+
+<dtml-if "allow_edit and show_button">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="right">
+        <input type="submit" name="delete_notes" value="<dtml-msg "Delete">"
+               onClick="return confirm( '<dtml-msg "Are you shure?">' )" />
+      </td>
+    </tr>
+  </table>
+</dtml-if>
+</dtml-if>
+
+</form>
+</dtml-let>

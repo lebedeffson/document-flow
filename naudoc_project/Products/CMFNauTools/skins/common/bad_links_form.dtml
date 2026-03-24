@@ -1,0 +1,33 @@
+<dtml-var standard_html_header>
+
+<table width="100%">
+  <tr class="row_title">
+    <td align=center class="smallHeader" colspan=2><dtml-var "msg('List of bad links')"></td>
+  </tr>
+  <tr class="row_title">
+    <td align=center class="smallHeader"><dtml-var "msg('Document title')"></td>
+    <td align=center class="smallHeader"><dtml-var "msg('Bad Links')"></td>
+  </tr>
+    <dtml-in getBadLinks>
+      <dtml-let curr="_.getitem('sequence-item')">
+        <tr class="row_even">
+          <td rowspan="<dtml-var "curr[1]">" class="smallHeader">  
+	     <a href="<dtml-var "curr[0].absolute_url()">"><dtml-var "curr[0].title"></a>
+	  </td>
+         <td class="smallHeader">
+            <dtml-var "curr[2][0]">
+         </td>
+	</tr>
+        <dtml-in "curr[2]">
+	  <dtml-if "_.getitem('sequence-index')>0">
+            <tr class="row_even">
+	      <td class="smallHeader"><dtml-var sequence-item></td>
+	    </tr>
+          </dtml-if>
+	</dtml-in>
+     </dtml-let>
+  </dtml-in>
+  
+</table>
+
+<dtml-var standard_html_footer>

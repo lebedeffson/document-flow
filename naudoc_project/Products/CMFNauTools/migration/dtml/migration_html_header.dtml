@@ -1,0 +1,39 @@
+<html>
+<head>
+<title>NauDoc version migration tool</title>
+<style type="text/css">
+body {
+    color: black;
+}
+body, table {
+    font-size: 14px;
+}
+table.thin {
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+}
+
+td.thin {
+    font-size: small;
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+}
+</style>
+<script type="text/javascript">
+<!--
+
+function disableForm( form )
+{
+    form.onsubmit = function(){ return false; }
+    return true;
+}
+
+if (window != window.top) {
+    window.top.location.replace( window.location.href );
+}
+
+//-->
+</script>
+
+</head>
+<body>

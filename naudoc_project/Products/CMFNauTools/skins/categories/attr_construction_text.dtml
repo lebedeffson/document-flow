@@ -1,0 +1,32 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: attr_construction_text.dtml,v 1.6 2004/09/08 09:40:15 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.6 $>
+
+<tr>
+  <td><dtml-msg "Input field width"></td>
+  <td nowrap="1">
+    <dtml-var "entry_field_edit( None, _,
+                                 type='int',
+                                 name='properties.input_columns:record',
+                                 value=properties.get('input_columns'),
+                                 properties={},
+                               )">
+    <i>(<dtml-msg "number of characters">)</i>
+  </td>
+</tr>
+
+<tr>
+  <td><dtml-msg "Input field height"></td>
+  <td nowrap="1">
+    <dtml-var "entry_field_edit( None, _,
+                                 type='int',
+                                 name='properties.input_rows:record',
+                                 value=properties.get('input_rows'),
+                                 properties={},
+                               )">
+    <i>(<dtml-msg "number of lines">)</i>
+  </td>
+</tr>

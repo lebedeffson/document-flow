@@ -1,0 +1,46 @@
+<dtml-var manage_page_header>
+
+<dtml-var "manage_form_title(this(), _, form_title=gettext('Add Localizer'),
+                             help_product='Localizer',
+                             help_topic='Localizer_add.stx')">
+
+
+<p class="form-help">
+  <dtml-gettext>
+    A Localizer object provides <em>locale folders</em>, each one associated
+    with a language. It transparently adds a locale folder to the path so
+    objects for that language will be used.  It's useful to localize special
+    objects like images, or specific logic (to format dates for example).
+  </dtml-gettext>
+</p>
+
+
+<form action="manage_addLocalizer" method="post">
+<table>
+ <tr>
+  <th align="right"><dtml-var "gettext('Id')"></th>
+  <td>Localizer</td>
+ </tr>
+ <tr>
+  <th align="right"><em><dtml-var "gettext('Title')"></em></th>
+  <td><input type="text" name="title"></td>
+ </tr>
+ <tr>
+  <th align="right"><dtml-var "gettext('Languages')"></th>
+  <td><input type="text" name="languages:tokens" value="en"></td>
+ </tr>
+ <tr>
+  <th></th>
+  <td>
+    <input type="checkbox" name="locale_folders" checked>
+    <label><dtml-var "gettext('Locale folders')"></label>
+  </td>
+ </tr>
+ <tr>
+  <td></td>
+  <td><input type="submit" value=" <dtml-var "gettext('Add')"> "></td>
+ </tr>
+</table>
+</form>
+
+<dtml-var manage_page_footer>

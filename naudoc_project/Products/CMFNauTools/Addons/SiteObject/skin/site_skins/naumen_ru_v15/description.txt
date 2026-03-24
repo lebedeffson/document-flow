@@ -1,0 +1,4 @@
+title = 'Naumen.ru v1.5 skin'
+category = 'defaults'
+description
+This is first version of Naumen.ru site skin (July - September 2002) modified for NauSite 2.0 usage

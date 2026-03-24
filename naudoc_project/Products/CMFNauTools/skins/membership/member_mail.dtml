@@ -1,0 +1,72 @@
+<dtml-comment>
+$Id: member_mail.dtml,v 1.1 2005/09/17 10:40:13 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-unless home_call>
+  <dtml-var simple_html_header>
+</dtml-unless home_call>
+
+<dtml-let uname="portal_membership.getAuthenticatedMember().getUserName()"
+          home_folder="portal_membership.getPersonalFolder()" 
+          mail_folders="portal_catalog.searchResults( Creator=uname
+                                                    , implements='isMailFolder'
+                                                    , sort_on='meta_type'
+                                                    , sort_limit=20
+                                                    )">
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+  <dtml-in mail_folders>
+  <dtml-let view_url="getURL()+'/inFrame?link=view'">
+  <dtml-if sequence-start>
+  <tr class="row_title">
+   <td>
+    <strong><dtml-msg "Mail folders"></strong>
+   </td>
+   <td>
+    <strong><dtml-msg "Total"></strong>
+   </td>
+  </tr>  </dtml-if>
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+   <td>
+    <a class="navigate"
+       title="<dtml-msg expr="meta_type">"
+       target="workspace"
+       href="&dtml-view_url;">&dtml-Title;
+    </a>
+   </td>
+   <td nowrap>
+       <dtml-let category="'isIncomingMailFolder' in implements and 'IncomingMail' or 'OutgoingMail'">
+         <dtml-var "portal_catalog.searchResults( Creator=uname
+                                                , category=category
+                                                , implements={'query':['isHTMLDocument', 'isPortalContent'], 'operator':'and'}
+                                                , path=getPath()
+                                                )" fmt=collection-length> 
+       </dtml-let>
+   </td>
+  </tr>
+  </dtml-let>
+  <dtml-else>
+  <tr>
+    <td>
+        <dtml-msg "No personal mail folders were found"><br />
+        <dtml-if "home_folder">
+         <span class="Navigation">
+         <a target="workspace"
+            href="<dtml-var "home_folder.relative_url( frame='inFrame'
+                                                     , action='invoke_factory_form'
+                                                     , params={'type_name':'Incoming Mail Folder'} )" html_quote>"
+            ><dtml-msg "create"> &gt;&gt;</a>
+         </span>
+        </dtml-if>
+    </td>
+  </tr>
+  </dtml-in>
+</table>
+</td>
+</tr>
+</dtml-let>
+
+<dtml-unless home_call>
+  <dtml-var simple_html_footer>
+</dtml-unless home_call>
+

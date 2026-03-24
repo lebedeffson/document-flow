@@ -1,0 +1,30 @@
+<dtml-if "lang=='en'">
+Subject: You subscription has been successfully confirmed
+
+Now you will receive posts under these topics:
+<dtml-in headings_titles prefix="loop">
+  - <dtml-var loop_key> (<dtml-var loop_item>)<dtml-var "loop_end and '.' or ';'">
+</dtml-in>
+
+You may change subscription details by visiting the following link:
+<dtml-var edit_props_url>
+
+You may cancel your subscription by visiting the following link:
+<dtml-var subscription_url>
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Подписка подтверждена
+
+Теперь в Ваш почтовый ящик будет поступать рассылки по следующим темам:
+<dtml-in headings_titles prefix="loop">
+  - <dtml-var loop_key> <dtml-var "loop_item and '(' + loop_item + ')' or ''"><dtml-var "loop_end and '.' or ';'">
+</dtml-in>
+
+Изменить настройки рассылки Вы можете, посетив страницу по адресу: 
+<dtml-var edit_props_url>
+
+В любой момент Вы можете отказаться от подписки, открыв страницу по адресу:
+<dtml-var subscription_url>
+
+
+</dtml-if>

@@ -1,0 +1,105 @@
+<dtml-comment>
+$Id: task_definition_create_subordinate.dtml,v 1.10 2005/09/19 08:45:56 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.10 $>
+
+<script>
+function open_folders_wnd(){
+  window.open('<dtml-var absolute_url>/task_reportwizard_folders', 'wnd_popup_menu', 'toolbar=no,scrollbars=yes,width=300,height=400,resizable=yes');
+}
+
+function setFolderUrl (folder_uid, title)
+{
+    document.forms[0].dest_folder_title.value = title;
+    document.forms[0].folder_title.value = title;
+    document.forms[0].dest_folder_uid.value = folder_uid;
+}
+</script>
+
+<dtml-let dest_folder_uid="taskDefinitionArray.get('dest_folder_uid', '')"
+          dest_folder_title="taskDefinitionArray.get('dest_folder_title', '')"
+          dest_folder_template="taskDefinitionArray.get('dest_folder_template', '')"
+          dest_folder_type="taskDefinitionArray.get('dest_folder_type', 'path')"
+          dest_category="taskDefinitionArray.get('dest_category', None)"
+          object_title_template="taskDefinitionArray.get('object_title_template', None)"
+          from_page="_.has_key('from_page') and from_page or REQUEST['URL1']+'/task_template_list'"
+          >
+
+<dtml-if "_.len(listSubordinateCategories()) ">
+
+<tr class="row_even">
+  <td>
+    <dtml-var "msg('Category of subordinate document')">
+  </td>
+  <td>
+    <dtml-in "listSubordinateCategories()">
+      <dtml-if sequence-start>
+        <select name="dest_category" size="1">
+      </dtml-if>
+
+      <option value="<dtml-var "_['sequence-item'].getId()">"
+      <dtml-var "(_['sequence-item'].getId() == dest_category) and 'selected' or ''">
+      >
+        <dtml-msg expr="_['sequence-item'].Title()">
+      </option>
+
+      <dtml-if sequence-end>
+        </select>
+      </dtml-if>
+    </dtml-in>
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td>
+    <dtml-msg "Title template">
+  </td>
+  <td>
+    <input type="text" size=50 name="object_title_template" value="<dtml-var "object_title_template or ''">"><br/>
+    (<a href="javascript:showHint('title')"><dtml-msg "help"></a>)
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td>
+    <dtml-msg "Place document to">
+  </td>
+  <td></td>
+</tr>
+
+<tr class="row_even">
+  <td>
+    <input type="radio" name="dest_folder_type" value="path" <dtml-var "dest_folder_type=='path' and 'checked' or ' '"> >
+    <label for="folder"><dtml-msg "selected folder"></label>
+  </td>
+  <td>
+    <input type="text" disabled size=50 id="folder_title" value="<dtml-var dest_folder_title>">
+    <input type="hidden" name="dest_folder_title" value="<dtml-var dest_folder_title>" >
+    <input type="hidden" name="dest_folder_uid" value="<dtml-var dest_folder_uid>" >
+    <input type="button" value="<dtml-msg "Browse...">" onClick="return open_folders_wnd();">
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td>
+    <input type="radio" name="dest_folder_type" value="template" <dtml-var "dest_folder_type!='path' and 'checked' or ' '"> >
+    <label for="folder"><dtml-msg "folder template"></label>
+  </td>
+  <td>
+    <input type="text" size=50 name="dest_folder_template" value="<dtml-var "dest_folder_template or ''">"><br/>
+    (<a href="javascript:showHint(fmt='title')"><dtml-msg "help"></a>)
+  </td>
+</tr>
+
+<dtml-else>
+
+<script type="text/javascript">
+  <!-- 
+    alert('<dtml-msg "Sorry, you can not create subordinate document, because no subordinate category">'); 
+    location.href='<dtml-var from_page> ';
+  //-->
+</script>
+
+</dtml-if>
+</dtml-let>

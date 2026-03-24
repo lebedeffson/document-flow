@@ -1,0 +1,143 @@
+<dtml-comment>
+Adapters and services management form.
+
+$Editor: vpastukhov $
+$Id: manage_adapters_form.dtml,v 1.5 2005/09/13 05:10:24 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Manage external adapters"></h2>
+
+<form name="manage_adapters_form" method="post"
+      action="<dtml-var "relative_url( action='manage_adapters_handler' )" html_quote>">
+
+<dtml-in "portal_connector.listAdapters()">
+
+<dtml-if sequence-start>
+
+<table width="100%" cellpadding="2" cellspacing="2" border="0">
+
+  <tr class="row_title">
+    <td>&nbsp;</td>
+    <td width="16%"><dtml-msg "Status"></td>
+    <td width="42%"><dtml-msg "Title"></td>
+    <td width="42%"><dtml-msg "Location"></td>
+  </tr>
+
+</dtml-if>
+
+  <tr class="row_even">
+    <td>
+      <input type="checkbox" name="adapter_ids:list" value="&dtml-getId;" />
+    </td>
+    <td width="16%">
+      <dtml-if "not isActive()"><dtml-msg "adapters.status.inactive">
+      <dtml-elif "not testConnection()"><dtml-msg "adapters.status.inaccessible">
+      <dtml-else><dtml-msg "adapters.status.active">
+      </dtml-if>
+    </td>
+    <td width="42%">
+      <a href="<dtml-var "relative_url( action='edit_adapter_form' )" html_quote>">&dtml-Title;</a>
+    </td>
+    <td width="42%">
+      &dtml-location;
+    </td>
+  </tr>
+
+<dtml-if sequence-end>
+
+  <tr>
+    <td colspan="4">
+      <br />
+      <input type="submit" name="delete_adapters" value="<dtml-msg "Delete">" />
+      <input type="submit" name="enable_adapters" value="<dtml-msg "Activate">" />
+      <input type="submit" name="disable_adapters" value="<dtml-msg "Deactivate">" />
+    </td>
+  </tr>
+
+</table>
+
+</dtml-if>
+
+<dtml-else>
+
+<p><dtml-msg "No adapters available."></p>
+
+</dtml-in>
+
+<dtml-in "portal_connector.listAvailableAdapters()">
+
+<dtml-if sequence-start>
+
+<br />
+<h2><dtml-msg "Add new adapter"></h2>
+
+<p>
+<dtml-msg "Adapter type">:
+<select name="adapter_id">
+
+</dtml-if>
+
+  <option value="&dtml-id;">&dtml-title;</option>
+
+<dtml-if sequence-end>
+
+</select>
+&nbsp;
+<input type="submit" name="add_adapter" value="<dtml-msg "Add">" />
+</p>
+
+</dtml-if>
+
+</dtml-in>
+
+<dtml-in "portal_connector.listServices()">
+
+<dtml-if sequence-start>
+
+<br />
+<h2><dtml-msg "Configured services"></h2>
+
+<table width="100%" cellpadding="2" cellspacing="2" border="0">
+
+  <tr class="row_title">
+    <td>&nbsp;</td>
+    <td width="33%"><dtml-msg "Title"></td>
+    <td width="33%"><dtml-msg "Adapter"></td>
+    <td width="33%"><dtml-msg "Type"></td>
+  </tr>
+
+</dtml-if>
+
+<dtml-let adapter=getAdapter>
+
+  <tr class="row_even">
+    <td><input type="checkbox" name="service_ids:list" value="&dtml-getId;" /></td>
+    <td><a href="<dtml-var "relative_url( action='edit_service_form' )" html_quote>">&dtml-Title;</a></td>
+    <td><dtml-var "adapter.Title()" html_quote></td>
+    <td><dtml-var "getInfo('title','')" html_quote></td>
+  </tr>
+
+</dtml-let>
+
+<dtml-if sequence-end>
+
+  <tr>
+    <td colspan="4">
+      <br />
+      <input type="submit" name="delete_services" value="<dtml-msg "Delete">" />
+    </td>
+  </tr>
+
+</table>
+
+</dtml-if>
+
+</dtml-in>
+
+</form>
+
+<dtml-var simple_html_footer>

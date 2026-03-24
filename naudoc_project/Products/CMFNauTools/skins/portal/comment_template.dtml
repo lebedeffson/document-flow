@@ -1,0 +1,238 @@
+<dtml-comment>
+Inline resolution input widget displaying textarea field and templates.
+
+$Editor: vpastukhov $
+$Id: comment_template.dtml,v 1.6 2004/03/09 15:16:10 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.6 $>
+
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr>
+
+<dtml-let comments="portal_comments.listComments( context )">
+<dtml-if comments>
+
+  <td valign="top" align="left">
+    <span style="float:right">
+    <a class="navigate" href="javascript: expandCommentsList(this.form.&dtml-field;_list); this.form.&dtml-field;.focus()"><dtml-msg "Templates">&nbsp;&gt;&gt;</a>
+    </span>
+    <br />
+    <textarea name="&dtml-field;" cols="60" rows="5" wrap="soft"
+              style="width: 100%">&dtml.missing.null-value;</textarea>
+  </td>
+
+  <td valign=top height="100%" width="30%" align="right">
+
+<style type="text/css">
+<!--
+
+.comment_tip {
+    display:none;
+    position:absolute;
+    z-index:1;
+    top:100%;
+    left:-100%;
+    min-width:200%;
+    text-align:left;
+    border: 2px solid;
+    padding: 5px;
+    background-color: #F2F2F2;
+}
+
+.comment_tip span {
+    display:none;
+}
+
+-->
+</style>
+
+<div style="position:relative;height:100%">
+
+<select name="&dtml-field;_list" size="5" style="height:100%;width:100%">
+<dtml-in comments>
+<option><dtml-var text html_quote size="40"></option>
+</dtml-in>
+</select><div class="comment_tip"><span style="width:100%;display:inline"></span></div>
+
+</div>
+
+<script type="text/javascript">
+<!--
+
+var commentTexts = {};
+var commentForm  = '&dtml-form;';
+var commentField = '&dtml-field;';
+var form = document.forms[commentForm];
+
+commentTexts[ '&dtml-field;_list' ] = [
+<dtml-in comments>
+'<dtml-var text fmt="jscript">'
+<dtml-unless sequence-end>,</dtml-unless>
+</dtml-in>
+];
+
+function expandCommentsList( list, display )
+{
+    var cell = list.parentNode.parentNode;
+    if (display == null) {
+	display = getStyleProp(cell, 'display');
+	display = display && display != 'block';
+    }
+
+    if (! display)
+	displayCommentTip(list, false);
+
+    cell.style.display = display ? 'block' : 'none';
+}
+
+function insertCommentText( list, target )
+{
+    var value = commentTexts[ list.name ][ list.selectedIndex ] ||
+	        list.options[ list.selectedIndex ].text;
+
+    if (target.type == 'textarea') {
+	var re = new RegExp( '[ \t]+$' );
+	var text = target.value.replace( re, '' );
+	if (text.length && text.substr(text.length-1) != '\n') text += '\n';
+	target.value = text + value + '\n';
+
+    } else {
+	target.value = value;
+    }
+
+    expandCommentsList(list, 0);
+    target.typedString = '';
+    target.focus();
+
+    return true;
+}
+
+function displayCommentTip( list, display )
+{
+    var tip = list.nextSibling;
+    if (tip.className != 'comment_tip')
+    	return;
+
+    var cell = list.parentNode.parentNode;
+    if (getStyleProp(cell, 'display') == 'none')
+    	display = false;
+
+    if (display != null) {
+	tip.style.display = display ? 'block' : 'none';
+	if (userAgent.hasCoveredBug)
+	    hideCoveredElements(tip, display);
+	return;
+    }
+
+    var text = commentTexts[ list.name ][ list.selectedIndex ];
+    if (text) {
+	tip.style.display = 'none'; // Mozilla bug
+	tip.firstChild.innerHTML = escapeHTML(text, true);
+	display = true;
+    } else {
+	display = false;
+    }
+
+    tip.style.display = display ? 'block' : 'none';
+    if (userAgent.hasCoveredBug)
+	hideCoveredElements(tip, display);
+}
+
+function onEditComment( event )
+{
+    var text = getEventTarget(event);
+    var list = text.form[ text.name+'_list' ];
+    event = event || window.event;
+
+    var key  = event.keyCode || event.which;
+    var code = (event.which != null) ? event.which : event.keyCode;
+    var symbol = code ? String.fromCharCode( code ) : null;
+
+    if (key == 27) {
+	expandCommentsList(list, 0);
+	return;
+    }
+
+    if (event.ctrlKey && (key == 10 || key == 13)) {
+	insertCommentText(list, text);
+	return;
+    }
+
+    if (symbol == null)
+        return;
+
+    if (! isAlnum(symbol)) {
+	displayCommentTip(list, false);
+	text.typedString = '';
+	return;
+    }
+
+    if (text.typedString == null)
+	text.typedString = '';
+    text.typedString += symbol;
+
+    var matched = SearchStrInSelect( text.typedString, list );
+    if (matched == text.typedString.length)
+	displayCommentTip(list);
+    else
+	displayCommentTip(list, false);
+}
+
+function onSelectItem( event )
+{
+    var list = getEventTarget(event);
+    var name = list.name.substr(0, list.name.length-5);
+    insertCommentText(list, list.form[ name ]);
+}
+
+function onSelectTip( event )
+{
+    var list = getEventTarget(event).previousSibling;
+    var name = list.name.substr(0, list.name.length-5);
+    insertCommentText(list, list.form[ name ]);
+}
+
+function onDisplayItem( event )
+{
+    displayCommentTip( getEventTarget(event) );
+}
+
+function onBlurList( event )
+{
+    var list = getEventTarget(event);
+    var tip  = list.nextSibling;
+
+    if (tip.className == 'comment_tip' && isElementEventTarget(event, tip)) {
+	var name = list.name.substr(0, list.name.length-5);
+	insertCommentText(list, list.form[ name ]);
+	return;
+    }
+
+    displayCommentTip( list, false );
+}
+
+
+form[commentField].onkeypress         = onEditComment;
+form[commentField+'_list'].onclick    = onDisplayItem;
+form[commentField+'_list'].ondblclick = onSelectItem;
+form[commentField+'_list'].onblur     = onBlurList;
+form[commentField+'_list'].nextSibling.onclick = onSelectTip;
+
+//-->
+</script>
+
+   </td>
+
+<dtml-else>
+
+   <td colspan="2" valign=top align=left width="100%" height="100%">
+    <textarea name="&dtml-field;" cols="60" rows="5" wrap="soft"
+     style="width: 100%"><dtml-if value>&dtml-value;</dtml-if></textarea>
+   </td>
+
+</dtml-if>
+</dtml-let>
+
+</tr>
+</table>

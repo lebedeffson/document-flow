@@ -1,0 +1,126 @@
+<dtml-comment>
+$Id: manage_subscription_form.dtml,v 1.2 2004/06/17 12:33:40 kfirsov Exp $
+
+$Editor: kfirsov $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-call "REQUEST.set( 'noCache', 1 )">
+
+<dtml-var simple_html_header>
+
+<h3><dtml-msg "Subscribed users"></h3>
+<br>
+
+<form method="POST" action="&dtml-absolute_url;" target="workfield">
+
+
+<dtml-let sort_field="_.has_key('sort_field') and sort_field or ''"
+          context="this()"
+          table_columns="[ { 'id'     : '',
+                             'title'  : '',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'email',
+                             'title'  : 'Email',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'lname',
+                             'title'  : 'Last name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'fname',
+                             'title'  : 'First name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'mname',
+                             'title'  : 'Middle name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'company_name',
+                             'title'  : 'Company',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'company_business_activity',
+                             'title'  : 'Company business activity',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'account_manager',
+                             'title'  : 'Account manager',
+                             'type'   : 'string',
+                           },
+                         ]">
+
+
+<table> <!--  class="List" -->
+  <tr class="row_title">
+
+    <dtml-in table_columns prefix="hdr" mapping>
+    
+    <td>
+      <a href="&dtml-absolute_url;/&dtml-document_id;?sort_field=&dtml-id;">
+          <dtml-var "sort_field==id and '<strong>' or ''">
+          	<dtml-msg expr="title">
+          <dtml-var "sort_field==id and '</strong>' or ''">
+      </a>
+    </td>
+    
+    </dtml-in>
+  </tr>
+
+<dtml-in "listSubscribedUsers()" prefix="su"  mapping sort_expr="sort_field">
+
+  <tr class="<dtml-if su_odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td align="center">
+     
+      <dtml-if "_.SecurityCheckPermission('Subscribe users', context) and not aborted">
+       <dtml-if "context.implements('isSubscriptionRoot')">
+    	<input type="checkbox" name="remove_users:list" value="<dtml-var "email">">
+       <dtml-else>
+        <input type="checkbox" name="folder_users:list" value="<dtml-var "su_item.get('email')">"
+             <dtml-var "getUser(email).isSubscribedToFolder(context) and 'checked' or ''">    >
+       </dtml-if>
+      <dtml-elif "aborted">
+        <font color="red" >--</font>
+      </dtml-if>
+    </td>
+    <td>
+      <dtml-if "_.SecurityCheckPermission('Subscribe users', context)">
+        <a href="<dtml-var "relative_url( 
+                action=context.getTypeInfo().getActionById( 'edit_user' ), 
+                params={'email' : email})">">
+          &dtml-email;
+        </a>
+      <dtml-else>
+        &dtml-email;
+      </dtml-if>
+    </td>
+
+    <dtml-in "table_columns[2:]" mapping>
+    <td><dtml-var "su_item.get(id, '&nbsp;') or '&nbsp;'"></td>
+    </dtml-in>
+  </tr>
+
+</dtml-in>
+
+</table>
+
+<dtml-if "context.implements('isSubscriptionRoot')">
+  <input type="submit" name="unsubscribe_users:method" value="<dtml-msg "Remove">">
+<dtml-else>
+  <input type="submit" name="addSubscriptionForUsers:method" value="<dtml-msg "Subscribe selected users for this topic">">
+</dtml-if>
+<br>
+
+<dtml-if "context.implements('isSubscriptionRoot')">
+<a href="<dtml-var "relative_url( 
+    action=context.getTypeInfo().getActionById( 'subscribe_user' ))">">
+    <dtml-msg "Subscribe user">
+</a>
+</dtml-if>
+
+</dtml-let>
+
+</form>
+
+<dtml-var simple_html_footer>

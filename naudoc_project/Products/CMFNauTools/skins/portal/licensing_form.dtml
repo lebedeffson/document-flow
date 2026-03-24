@@ -1,0 +1,61 @@
+<dtml-comment>
+
+$Editor: ikulehsov $
+$Id: licensing_form.dtml,v 1.5 2007/10/01 08:46:12 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+
+<dtml-msg licensing.header max_active_users="portal_licensing.getMaxActiveUsers()", active_users_cont="portal_licensing.getActiveUsersCount()">
+
+<form name="licensing_edit_form" method="POST"
+      action="<dtml-var "relative_url( action='licensing_handler' )" html_quote>"
+      onSubmit="selectAll( active_users )">
+
+
+<table cellpadding=3 border="0">
+<tr>
+ <td class="smallHeader">
+  <dtml-msg "All users">
+ </td>
+ <td>&nbsp;</td>
+ <td class="smallHeader">
+  <dtml-msg "Active users">
+ </td>
+</tr>
+<tr>
+ <td align=left valign="top">
+  <div class="form-element">
+    <dtml-var "user_list(this(), name='all_users', list_size=15, multiple=1, on_dbl_click='javascript:addSelectionToList(all_users, active_users);')">
+  </div>
+
+ </td>
+ <td align=center>
+   <input type=button onClick="javascript:addSelectionToList( all_users, active_users );" value=" >> "> <br><br>
+   <input type=button onClick="javascript:deleteSelectionFromList( active_users );" value=" << ">
+ </td>
+ <td align=left valign="top">
+  <div class="form-element">
+    <select id="active_users" name="active_users:list" size="8" multiple onDblClick="javascript:deleteSelectionFromList(active_users);">
+      <dtml-in "portal_membership.listSortedUserNames( portal_licensing.listActiveUsers() )" mapping>
+      <option value="&dtml-user_id;">
+        <dtml-var user_id fmt=member>
+      </option>
+      </dtml-in>
+    </select>
+  </div>
+
+ </td>
+</tr>
+<tr>
+ <td colspan=3>
+   <input type="submit"  value=" <dtml-msg Apply> ">
+   <input type="submit"  name="cancel" value=" <dtml-msg Cancel> ">
+ </tr>
+</tr>
+</table>
+</form>
+
+<dtml-var simple_html_footer>

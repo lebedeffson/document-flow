@@ -1,0 +1,186 @@
+<dtml-comment>
+$Id: task_structure_form.dtml,v 1.3 2008/04/08 10:51:34 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-unless "_.has_key('base')">
+  <dtml-call "REQUEST.set('OpenInFrame', '')">
+  <dtml-var simple_html_header>
+</dtml-unless>
+<dtml-let 
+    is_history="_.has_key('base')"
+    table_columns="[ { 'id'     : 'title',
+                       'title'  : 'Title',
+                       'type'   : 'string',
+                     },
+                     { 'id'     : 'creator',
+                       'title'  : 'Assigned by',
+                       'type'   : 'userlist',
+                     },
+                     { 'id'     : 'supervisor',
+                       'title'  : 'Supervisor',
+                       'type'   : 'userlist',
+                     },
+                     { 'id'     : 'created',
+                       'title'  : 'Creation date',
+                       'type'   : 'date',
+                     },
+                     { 'id'     : 'expires',
+                       'title'  : 'Expires',
+                       'type'   : 'date',
+                     },
+                     { 'id'     : 'involved_users',
+                       'title'  : 'Involved Users',
+                       'type'   : 'userlist',
+                     },
+                     { 'id'     : 'comments',
+                       'title'  : 'Comments',
+                       'type'   : 'string',
+                     },
+                   ]"
+
+    default_columns="['title', 'creator', 'involved_users', 'comments']"
+    url="REQUEST['URL']"
+    now="_.DateTime()"
+    task_id="is_history and container.implements('isTaskItem') and container.getId() or not is_history and getId() or 0"
+    tasks="followup.getLeveledTaskTree(root=1)"
+    selected_columns="is_history and selected_columns or REQUEST.get('selected_columns', REQUEST['SESSION'].get('task_structure_selected_columns', default_columns))"
+>
+
+<dtml-unless is_history>
+<dtml-call "REQUEST['SESSION'].set('task_structure_selected_columns', selected_columns)">
+<h1><dtml-msg "Task structure"></h1>
+<form name="objectItems" method="POST">
+
+</dtml-unless>
+
+<dtml-in tasks skip_unauthorized prefix="t">
+  <dtml-let expires=expires
+            effective=effective
+            involved_users="listInvolvedUsers()"
+            with_comments="'comments' in selected_columns"
+            joined_rows="_.len(involved_users) or '1'">
+
+  <dtml-if "_['sequence-start'] and not is_history">
+    <table cellspacing="1" cellpadding="3" width="100%" border="0">
+      <tr class="row_title">
+          <dtml-in table_columns mapping>
+            <dtml-if "not selected_columns[0] or id in selected_columns">
+              <td class="small" valign="middle" align="center">
+                <dtml-if "id not in ['Description', 'SupervisorMark', 'ExecutionTime']">
+                  <a class="navigate"
+                     href="&dtml-url;><dtml-if member_id>&member_id=&dtml-member_id;</dtml-if>">
+                    <dtml-msg expr=title>
+                  </a>
+                <dtml-else>
+                  <a class="navigate"
+                    href="&dtml-url;">
+                    <dtml-msg expr=title>
+                  </a>
+                </dtml-if>
+              </td>
+            </dtml-if>
+          </dtml-in>
+      </tr>
+  </dtml-if>
+
+  <dtml-in involved_users sort="id" prefix="u">
+    <dtml-if sequence-start>
+      <tr class="<dtml-var "t_item.getId() == task_id and task_id and 'row_selected' or 'row_even'">">
+        <dtml-in "table_columns[:-2]" mapping>
+          <dtml-if "not selected_columns[0] or id in selected_columns">
+            <dtml-if "id=='title'">
+              <td class="small" rowspan="&dtml-joined_rows;">
+                <div style="margin-left: <dtml-var "getLevel()*10">pt">
+                  <dtml-var "t_item" fmt=task.instruct>
+                </div>
+              </td>
+            <dtml-elif "id=='creator'">
+              <td class="small" rowspan="&dtml-joined_rows;">
+                <dtml-var Creator fmt=member.brief>
+              </td>
+            <dtml-elif "id=='supervisor'">
+              <td class="small" rowspan="&dtml-joined_rows;">
+                <dtml-if Supervisor>
+                   <dtml-var Supervisor fmt=member.brief>
+                <dtml-else>
+                   <dtml-msg "n/a">
+                </dtml-if>
+              </td>
+            <dtml-elif "id=='created'">
+              <td class="small" rowspan="&dtml-joined_rows;">
+                <dtml-var "rDate( None, _, time=created() )">
+              </td>
+            <dtml-elif "id=='expires'">
+              <td class="small" rowspan="&dtml-joined_rows;">
+                <dtml-let now=ZopeTime
+                          time_remaining="expires - now"
+                          perc_remaining="effective < now < expires and (expires - now) / (expires - effective)"
+                >
+                  <dtml-var "rDate( None, _, time=expires )">
+                  <dtml-if "time_remaining > 0">,<br>
+                    <dtml-var "dateperiod(time_remaining * 86400, short=1)">
+                    (<dtml-var perc_remaining fmt=percent>) <dtml-msg "time_left">
+                  </dtml-if>
+                </dtml-let>
+              </td>
+            </dtml-if>
+          </dtml-if>
+        </dtml-in>
+    </dtml-if sequence-start>
+    <dtml-if "_['sequence-index']"><tr class="<dtml-var "t_item.getId()==task_id and task_id and 'row_selected' or 'row_even'">"></dtml-if>
+    <dtml-in "table_columns[-2:]" mapping>
+      <dtml-if "not selected_columns[0] or id in selected_columns">
+        <dtml-if "id=='involved_users'">
+          <td class="small">
+            <dtml-var u_item fmt=member>
+          </td>
+        <dtml-elif "id=='comments'">
+          <td class="small">
+          <dtml-in "t_item.searchResponses(member=u_item)" mapping>
+            <span style="white-space: nowrap;"><dtml-msg expr=status>:</span> &dtml-text;<br/>
+          </dtml-in>
+          </td>
+        </dtml-if>
+      </dtml-if>
+    </dtml-in>
+    </tr>
+  </dtml-in>
+  <dtml-if "_['sequence-end'] and not is_history">
+    </table>
+  </dtml-if>
+  </dtml-let>
+</dtml-in>
+
+<dtml-unless is_history>
+  <table width="100%">
+    <tr>
+      <td>
+        <b><dtml-msg "Task properties to display">:</b>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <select name="selected_columns:list" size="6" multiple>
+          <dtml-in table_columns mapping>
+            <option value="&dtml-id;"
+                    <dtml-var "(not selected_columns[0] or id in selected_columns) and 'selected' or ''">
+                    /><dtml-msg expr=title></option>
+          </dtml-in>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="submit" name="apply_filter" value="<dtml-msg Apply>">
+      </td>
+    </tr>
+  </table>
+</form>
+<center><a href="javascript:window.close()"><dtml-msg "Close"></a></center>
+<dtml-var simple_html_footer>
+</dtml-unless>
+</dtml-let>

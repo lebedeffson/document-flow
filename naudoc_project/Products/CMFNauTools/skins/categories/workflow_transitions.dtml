@@ -1,0 +1,79 @@
+<dtml-comment>
+$Id: workflow_transitions.dtml,v 1.14 2006/02/22 10:31:39 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.14 $>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+
+messageCatalog.alert = "<dtml-msg "No transitions selected" jscript>";
+
+// -->
+</script>
+
+<h3><dtml-msg "Document category transitions"></h3>
+
+<dtml-let wf=Workflow>
+
+<dtml-in "portal_workflow[wf].transitions.values()" sort=title_or_id>
+
+<dtml-if sequence-start>
+<form action="workflows" method="POST" onsubmit="return checkEmptiesCheckboxes( this, 'ids', messageCatalog.alert );">
+  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+</dtml-if>
+
+  <dtml-let local="isPrivateItem(_['sequence-item'])">
+    <tr class="row_title">
+      <td align="left" colspan="2">
+        <input type="checkbox" 
+               name="ids:list"
+               value="&dtml-id;" 
+               <dtml-var "not local" fmt=disabled>
+        />
+        <dtml-if expr="id == initial_transition">*</dtml-if>
+        <a href="transition_properties?transition=&dtml-id;">&dtml-title_or_id;</a>
+        <dtml-unless local>(<dtml-msg acquired>)</dtml-unless>
+        &nbsp;
+      </td>
+    </tr>
+    <tr>
+      <td width="10%"></td>
+      <td>
+       <dtml-msg "Destination state">: <dtml-if new_state_id><dtml-var "'%s:%s'%(wf, new_state_id )" fmt=workflow_state><dtml-else>(<dtml-msg "Remain in state">)</dtml-if><br />
+      </td>
+    </tr>
+  </dtml-let>
+
+<dtml-if sequence-end>
+  </table>
+
+  <input type="submit" name="deleteTransitions" value="<dtml-msg "Delete">"
+         onclick="return checkEmptiesCheckboxes( this.form, 'ids', messageCatalog.alert );" />
+  <input type="submit" name="setInitialTransition" value="<dtml-msg "setInitialTransition">"
+         onclick="return checkEmptiesCheckboxes( this.form, 'ids', messageCatalog.alert );" />
+  <input type="submit" name="unsetInitialTransition" value="<dtml-msg "unsetInitialTransition">"
+         <dtml-var "not initial_transition" fmt=disabled> />
+</form>
+</dtml-if>
+
+<dtml-else>
+  <em><dtml-msg "No transitions defined">.</em>
+</dtml-in>
+
+</dtml-let>
+
+<form action="workflows" method="POST" onsubmit="return ValidateForm(this);">
+
+  <h3><dtml-msg "Add a transition"></h3>
+  <p>
+    <dtml-msg "Id">: <input type="text" name="trans_id:id_" value="" />
+    <input type="submit" 
+           name="addTransition" 
+           value="<dtml-msg "Add">" 
+    />
+  </p>
+</form>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,487 @@
+msgid ""
+msgstr "Project-Id-Version: Messages\n"
+"POT-Creation-Date: 2003-10-29 09:10+YEKT\n"
+"PO-Revision-Date: 2003-10-29 09:10+YEKT\n"
+"Last-Translator:  <>\n"
+"Language-Team: ru <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CP1251\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+# generated from xml
+
+
+msgid "category.CorrespondDocument.title"
+msgstr "Переписка"
+
+msgid "category.CorrespondDocument.metadata.RefIndoc"
+msgstr "Ссылка на номер и дату поступившего документа"
+
+msgid "category.CorrespondDocument.metadata.Addressee"
+msgstr "Адресат"
+
+msgid "category.CorrespondDocument.metadata.HeaderDoc"
+msgstr "Заголовок к тексту"
+
+msgid "category.CorrespondDocument.metadata.IspMarkDoc"
+msgstr "Отметка об исполнителе"
+
+msgid "category.CorrespondDocument.state.archive"
+msgstr "В архиве"
+
+msgid "category.CorrespondDocument.state.plan"
+msgstr "Проект документа"
+
+msgid "category.CorrespondDocument.state.approved"
+msgstr "Утвержден"
+
+msgid "category.CorrespondDocument.state.confirmation"
+msgstr "На утверждении"
+
+msgid "category.CorrespondDocument.state.agreement"
+msgstr "На согласовании"
+
+msgid "category.CorrespondDocument.transition.revise"
+msgstr "На доработку"
+
+msgid "category.CorrespondDocument.transition.ToArchive"
+msgstr "В 'Архив'"
+
+msgid "category.CorrespondDocument.transition.ToApprove"
+msgstr "На утверждение"
+
+msgid "category.CorrespondDocument.transition.ToAgreement"
+msgstr "На согласование"
+
+msgid "category.CorrespondDocument.transition.ToApproved"
+msgstr "Утвердить"
+
+msgid "category.FBDocument.title"
+msgstr "Финансово-бухгалтерский документ"
+
+msgid "category.FBDocument.metadata.HeaderDoc"
+msgstr "Заголовок к тексту"
+
+msgid "category.InDocument.title"
+msgstr "Входящий документ"
+
+msgid "category.InDocument.metadata.RefIndoc"
+msgstr "Номер и дата присвоенные отправителем"
+
+msgid "category.InDocument.metadata.FromDoc"
+msgstr "От кого поступил документ"
+
+msgid "category.InDocument.metadata.ShortTitle"
+msgstr "Краткое содержание"
+
+msgid "category.InDocument.metadata.ListBE"
+msgstr "Листов Осн/Прил"
+
+msgid "category.InDocument.metadata.ResolDoc"
+msgstr "Резолюция по документу"
+
+msgid "category.InDocument.metadata.NumAnsDoc"
+msgstr "Каким номером исполнен"
+
+msgid "category.InDocument.metadata.AnsDateDoc"
+msgstr "Срок ответа"
+
+msgid "category.InDocument.state.receip"
+msgstr "Получен"
+
+msgid "category.InDocument.state.archive"
+msgstr "В архиве"
+
+msgid "category.InDocument.state.resolution"
+msgstr "На внесении резолюции"
+
+msgid "category.InDocument.state.execution"
+msgstr "На исполнении"
+
+msgid "category.InDocument.state.consideration"
+msgstr "На рассмотрении"
+
+msgid "category.InDocument.state.registration"
+msgstr "На регистрации"
+
+msgid "category.InDocument.state.realized"
+msgstr "Исполнен"
+
+msgid "category.InDocument.state.notrealized"
+msgstr "Не исполнен"
+
+msgid "category.InDocument.transition.ToRegistration"
+msgstr "На регистрацию"
+
+msgid "category.InDocument.transition.ToRealized"
+msgstr "В 'Исполнен'"
+
+msgid "category.InDocument.transition.ToConsideration"
+msgstr "На рассмотрение"
+
+msgid "category.InDocument.transition.ToResolution"
+msgstr "На внесение резолюции"
+
+msgid "category.InDocument.transition.ToArchive"
+msgstr "В 'Архив'"
+
+msgid "category.InDocument.transition.ToNotRealized"
+msgstr "В 'Не исполнен'"
+
+msgid "category.InDocument.transition.ToExecution"
+msgstr "На исполнение"
+
+msgid "category.ISDocument.title"
+msgstr "Информационно-справочный документ"
+
+msgid "category.ISDocument.metadata.NaimDoc"
+msgstr "Наименование вида документа"
+
+msgid "category.ISDocument.metadata.HeaderDoc"
+msgstr "Заголовок к тексту"
+
+msgid "category.ISDocument.metadata.NaimStrPodr"
+msgstr "Наименование структурного подразделения"
+
+msgid "category.ISDocument.metadata.Addressee"
+msgstr "Адресат"
+
+msgid "category.ISDocument.state.archive"
+msgstr "В архиве"
+
+msgid "category.ISDocument.state.plan"
+msgstr "Проект документа"
+
+msgid "category.ISDocument.state.approved"
+msgstr "Утвержден"
+
+msgid "category.ISDocument.state.confirmation"
+msgstr "На утверждении"
+
+msgid "category.ISDocument.state.agreement"
+msgstr "На согласовании"
+
+msgid "category.ISDocument.transition.revise"
+msgstr "На доработку"
+
+msgid "category.ISDocument.transition.ToArchive"
+msgstr "В 'Архив'"
+
+msgid "category.ISDocument.transition.ToApprove"
+msgstr "На утверждение"
+
+msgid "category.ISDocument.transition.ToAgreement"
+msgstr "На согласование"
+
+msgid "category.ISDocument.transition.ToApproved"
+msgstr "Утвердить"
+
+msgid "category.NormativeDocument.title"
+msgstr "Нормативный документ"
+
+msgid "category.NormativeDocument.metadata.dv"
+msgstr "дата ввода в действие"
+
+msgid "category.NormativeDocument.metadata.sd_from"
+msgstr "срок действия с"
+
+msgid "category.NormativeDocument.metadata.ds"
+msgstr "срок действия по"
+
+msgid "category.NormativeDocument.metadata.dp"
+msgstr "дата пересмотра"
+
+msgid "category.NormativeDocument.metadata.sd"
+msgstr "Срок действия, мес."
+
+msgid "category.NormativeDocument.metadata.NaimTextDoc"
+msgstr "Наименование документа"
+
+msgid "category.NormativeDocument.metadata.MotiveAnnDoc"
+msgstr "Причина аннулирования"
+
+msgid "category.NormativeDocument.metadata.DetachItDoc"
+msgstr "заменяемый документ"
+
+msgid "category.NormativeDocument.metadata.ItDetachDoc"
+msgstr "заменяющий документ"
+
+msgid "category.NormativeDocument.metadata.ImplementationDocNo"
+msgstr "номер распорядительного документа о вводе в действие"
+
+msgid "category.NormativeDocument.metadata.ImplementationDocDate"
+msgstr "дата распорядительного документа о вводе в действие"
+
+msgid "category.NormativeDocument.metadata.RevokeDocNo"
+msgstr "номер распорядительного документа об отмене действия"
+
+msgid "category.NormativeDocument.metadata.RevokeDocDate"
+msgstr "дата распорядительного документа об отмене действия"
+
+msgid "category.NormativeDocument.metadata.CodeDoc"
+msgstr "код из государственного справочника"
+
+msgid "category.NormativeDocument.metadata.FuncDocSystem"
+msgstr "принадлежность к функциональной системе"
+
+msgid "category.NormativeDocument.metadata.KategoryDoc"
+msgstr "категория документа"
+
+msgid "category.NormativeDocument.metadata.TypeDoc"
+msgstr "тип документа"
+
+msgid "category.NormativeDocument.metadata.DocInPlan"
+msgstr "внесен в план пересмотра"
+
+msgid "category.NormativeDocument.metadata.ResponsAuthor"
+msgstr "автор документа"
+
+msgid "category.NormativeDocument.metadata.OriginalHolder"
+msgstr "держатель подлинника"
+
+msgid "category.NormativeDocument.metadata.ResponsDivision"
+msgstr "подразделение, ответственное за разработку"
+
+msgid "category.NormativeDocument.metadata.OriginalHolderDivision"
+msgstr "подразделение - держатель подлинника"
+
+msgid "category.NormativeDocument.metadata.Added2PlanByAudit"
+msgstr "подлежит пересмотру по результатам аудита"
+
+msgid "category.NormativeDocument.metadata.countOfChanges"
+msgstr "число изменений"
+
+msgid "category.NormativeDocument.metadata.notes"
+msgstr "Примечания"
+
+msgid "category.NormativeDocument.state.annulment"
+msgstr "Аннулирование"
+
+msgid "category.NormativeDocument.state.archive"
+msgstr "Архив"
+
+msgid "category.NormativeDocument.state.agreement"
+msgstr "На согласовании"
+
+msgid "category.NormativeDocument.state.effective"
+msgstr "Введен в действие"
+
+msgid "category.NormativeDocument.state.plan"
+msgstr "Проект документа"
+
+msgid "category.NormativeDocument.state.confirmation"
+msgstr "На утверждении"
+
+msgid "category.NormativeDocument.state.ReeditionPrepare"
+msgstr "Подготовка переиздания"
+
+msgid "category.NormativeDocument.transition.annulment"
+msgstr "Аннулировать"
+
+msgid "category.NormativeDocument.transition.revise"
+msgstr "На доработку"
+
+msgid "category.NormativeDocument.transition.agreement"
+msgstr "На согласование"
+
+msgid "category.NormativeDocument.transition.effective"
+msgstr "Ввести в действие"
+
+msgid "category.NormativeDocument.transition.reconsideration"
+msgstr "Пересмотр документа"
+
+msgid "category.NormativeDocument.transition.confirmation"
+msgstr "На утверждение"
+
+msgid "category.NormativeDocument.transition.archive"
+msgstr "В архив"
+
+msgid "category.NormativeDocument.transition.CreateChild"
+msgstr "Создать изменение"
+
+msgid "category.NormativeDocument.transition.RePublish"
+msgstr "Переиздать"
+
+msgid "category.NormativeDocument.transition.Revision"
+msgstr "Пересмотреть"
+
+msgid "category.ExternalNormativeDocument.title"
+msgstr "Внешний нормативный документ"
+
+msgid "category.ExternalNormativeDocumentEdit.title"
+msgstr "Изменение внешнего нормативного документа"
+
+msgid "category.ExternalNormativeDocumentEdit.state.PrepareChange"
+msgstr "Подготовка изменения"
+
+msgid "category.OPDocument.title"
+msgstr "Организационно-правовой документ"
+
+msgid "category.OPDocument.metadata.OrgAvtor"
+msgstr "Организация-автор документа"
+
+msgid "category.OPDocument.metadata.NaimDoc"
+msgstr "Наименование вида документа"
+
+msgid "category.OPDocument.metadata.ResolDoc"
+msgstr "Резолюция по документу"
+
+msgid "category.OPDocument.metadata.HeaderDoc"
+msgstr "Заголовок к тексту"
+
+msgid "category.OPDocument.state.annulment"
+msgstr "Аннулирован"
+
+msgid "category.OPDocument.state.archive"
+msgstr "В архиве"
+
+msgid "category.OPDocument.state.agreement"
+msgstr "На согласовании"
+
+msgid "category.OPDocument.state.approved"
+msgstr "Утвержден"
+
+msgid "category.OPDocument.state.effective"
+msgstr "Введен в действие"
+
+msgid "category.OPDocument.state.plan"
+msgstr "Проект документа"
+
+msgid "category.OPDocument.state.confirmation"
+msgstr "На утверждении"
+
+msgid "category.OPDocument.transition.revise"
+msgstr "На доработку"
+
+msgid "category.OPDocument.transition.ToAnnulment"
+msgstr "Аннулировать"
+
+msgid "category.OPDocument.transition.ToEffective"
+msgstr "Ввести в действие"
+
+msgid "category.OPDocument.transition.ToAgreement"
+msgstr "На согласование"
+
+msgid "category.OPDocument.transition.ToApprove"
+msgstr "На утверждение"
+
+msgid "category.OPDocument.transition.ToArchive"
+msgstr "В 'Архив'"
+
+msgid "category.OPDocument.transition.ToApproved"
+msgstr "Утвердить"
+
+msgid "category.PrikazBasic.title"
+msgstr "Приказ по основной деятельности"
+
+msgid "category.PrikazBasic.state.plan"
+msgstr "Проект документа"
+
+msgid "category.RDocument.title"
+msgstr "Распорядительный документ"
+
+msgid "category.RDocument.metadata.OrgAvtor"
+msgstr "Организация-автор документа"
+
+msgid "category.RDocument.metadata.NaimDoc"
+msgstr "Наименование вида документа"
+
+msgid "category.RDocument.metadata.ResolDoc"
+msgstr "Резолюция по документу"
+
+msgid "category.RDocument.metadata.IspMarkDoc"
+msgstr "Отметка об исполнителе"
+
+msgid "category.RDocument.metadata.IspedMarkDok"
+msgstr "Отметка об исполнении документа"
+
+msgid "category.RDocument.state.notrealized"
+msgstr "Не исполнен"
+
+msgid "category.RDocument.state.archive"
+msgstr "В архиве"
+
+msgid "category.RDocument.state.execution"
+msgstr "На исполнении"
+
+msgid "category.RDocument.state.agreement"
+msgstr "На согласовании"
+
+msgid "category.RDocument.state.plan"
+msgstr "Проект документа"
+
+msgid "category.RDocument.state.confirmation"
+msgstr "На утверждении"
+
+msgid "category.RDocument.state.realized"
+msgstr "Исполнен"
+
+msgid "category.RDocument.transition.revise"
+msgstr "На доработку"
+
+msgid "category.RDocument.transition.ToRealized"
+msgstr "В 'Исполнен'"
+
+msgid "category.RDocument.transition.ToArchive"
+msgstr "В 'Архив'"
+
+msgid "category.RDocument.transition.ToApprove"
+msgstr "На утверждение"
+
+msgid "category.RDocument.transition.ToAgreement"
+msgstr "На согласование"
+
+msgid "category.RDocument.transition.ToNotRealized"
+msgstr "В 'Не исполнен'"
+
+msgid "category.RDocument.transition.ToExecution"
+msgstr "На исполнение"
+
+msgid "category.SimpleDocs.title"
+msgstr "Базовый Документ"
+
+msgid "category.SimpleDocs.metadata.DocDate"
+msgstr "Дата документа"
+
+msgid "category.SimpleDocs.metadata.RegNo"
+msgstr "Регистрационный номер"
+
+msgid "category.UPDocument.title"
+msgstr "Юридически-правовой документ"
+
+msgid "category.UPDocument.metadata.HeaderDoc"
+msgstr "Заголовок к тексту"
+
+msgid "category.UPDocument.state.archive"
+msgstr "В архиве"
+
+msgid "category.UPDocument.state.plan"
+msgstr "Проект документа"
+
+msgid "category.UPDocument.state.approved"
+msgstr "Утвержден"
+
+msgid "category.UPDocument.state.confirmation"
+msgstr "На утверждении"
+
+msgid "category.UPDocument.state.agreement"
+msgstr "На согласовании"
+
+msgid "category.UPDocument.transition.revise"
+msgstr "На доработку"
+
+msgid "category.UPDocument.transition.ToArchive"
+msgstr "В 'Архив'"
+
+msgid "category.UPDocument.transition.ToApprove"
+msgstr "На утверждение"
+
+msgid "category.UPDocument.transition.ToAgreement"
+msgstr "На согласование"
+
+msgid "category.UPDocument.transition.ToApproved"
+msgstr "Утвердить"
+
+msgid "category.NormativeDocumentEdit.title"
+msgstr "Изменение нормативного документа"

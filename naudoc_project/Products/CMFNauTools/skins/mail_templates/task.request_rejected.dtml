@@ -1,0 +1,20 @@
+<dtml-comment>
+$Id: task.request_rejected.dtml,v 1.5 2007/05/29 09:57:25 ynovokreschenov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+<dtml-let membername="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='en'">
+Subject: Request "<dtml-var task_title>" rejected
+
+Your request "<dtml-var task_title>" has been rejected by <dtml-var membername>.
+URL: &dtml-task_url;
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Запрос "<dtml-var task_title>" отклонен
+
+<dtml-var membername> отклонил запрос "<dtml-var task_title>".
+URL: &dtml-task_url;
+
+</dtml-if>
+</dtml-let>

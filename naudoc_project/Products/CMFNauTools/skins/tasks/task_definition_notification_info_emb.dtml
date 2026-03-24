@@ -1,0 +1,6 @@
+<dtml-comment>
+$Id: task_definition_notification_info_emb.dtml,v 1.2 2004/01/16 16:46:25 vpastukhov Exp $
+
+showing action template 'notification', in info mode
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>

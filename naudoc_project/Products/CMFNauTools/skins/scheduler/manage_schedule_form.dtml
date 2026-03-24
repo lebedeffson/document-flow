@@ -1,0 +1,55 @@
+<dtml-comment>
+$Id: manage_schedule_form.dtml,v 1.4 2004/09/08 09:40:16 vpastukhov Exp $
+</dtml-comment>
+<dtml-var scheduler_html_header>
+<dtml-with portal_scheduler>
+
+<dtml-with getSchedule>
+
+<form action="manage_schedule" method="post">
+  <input type="submit" value="<dtml-msg "Update this page">">
+  <br><hr>
+
+<dtml-in objectItems>
+<dtml-if sequence-start>
+  <table cellspacing="2" cellpadding="2" border="0">
+  <tr align="center">
+    <td></td>
+    <td class="form-label"><dtml-msg scheduler.schedule.state></td>
+    <td class="form-label"><dtml-msg scheduler.schedule.next_occurence></td>
+    <td class="form-label"><dtml-msg Id></td>
+    <td class="form-label"><dtml-msg Title></td>
+    <td class="form-label"><dtml-msg scheduler.schedule.temporal_expression></td>
+  </tr>
+</dtml-if>
+  <dtml-let next=getNextOccurenceDate>
+  <tr>
+    <td class="form-element">
+      <input type="checkbox" name="ids:list" value="<dtml-var getId>">
+    </td>
+    <td class="form-element"><dtml-msg expr=getState></td>
+    <td class="form-element">
+       <dtml-if next><dtml-var "next.strftime('%x %X')">
+       <dtml-else><dtml-msg never></dtml-if>
+    </td>
+    <td class="form-element"><dtml-var getId></td>
+    <td class="form-element"><dtml-var title></td>
+    <td class="form-element"><dtml-var getTemporalExpression></td>
+  </tr>
+  </dtml-let>
+<dtml-if sequence-end>
+  </tr>
+  </table>
+  <input type="submit" name="resume" value="<dtml-msg scheduler.schedule.resume>">
+  <input type="submit" name="suspend" value="<dtml-msg scheduler.schedule.suspend>">
+  <input type="submit" name="remove" value="<dtml-msg scheduler.schedule.remove>">
+</dtml-if>
+<dtml-else>
+  <span class="form-text"><dtml-msg scheduler.schedule.empty></span>
+</dtml-in>
+</form>
+
+</dtml-with>
+
+</dtml-with>
+<dtml-var simple_html_footer>

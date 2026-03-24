@@ -1,0 +1,30 @@
+<dtml-comment>
+$Editor: ikuleshov$
+$Id: tray_agent_main.dtml,v 1.2 2005/03/29 15:34:59 ikuleshov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-call "REQUEST.set('SuppressFrames', 1)">
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-let last_accessed="REQUEST.get('last_accessed')">
+  <dtml-if last_accessed>
+    <dtml-call "REQUEST.set('created', _.DateTime( last_accessed ))">
+    <dtml-call "REQUEST.set('created_usage', 'range:min')">
+  </dtml-if>
+</dtml-let>
+<dtml-var simple_html_header>
+
+<h1><dtml-msg "New tasks"></h1>
+<form>
+  <input type="submit" name="refresh" value="<dtml-msg Refresh>">
+</form>
+
+<dtml-var "task_list_embedded( None, _,
+                               mode_name='showNew',
+                               showTabs='incoming',
+                               target='_blank',
+                             )"
+>
+
+<dtml-var simple_html_footer>

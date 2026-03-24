@@ -1,0 +1,25 @@
+<dtml-comment>
+$Id: task_definition_create_document.dtml,v 1.3 2004/03/05 12:31:38 spinagin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+<dtml-let dest_category="taskDefinitionArray.get('dest_category', None)">
+
+<tr class="row_even">
+  <td><dtml-var "msg('Category of document')">:</td>
+  <td>
+    <dtml-in "portal_metadata.listCategories()">
+      <dtml-if sequence-start>
+        <select name="dest_category" size="1">
+      </dtml-if>
+      <option value="<dtml-var "_['sequence-item'].getId()">" <dtml-var "(_['sequence-item'].getId() == dest_category) and 'selected' or ''"> >
+        <dtml-msg expr="_['sequence-item'].Title()">
+      </option>
+      <dtml-if sequence-end>
+        </select>
+      </dtml-if>
+    </dtml-in>
+  </td>
+</tr>
+
+</dtml-let>

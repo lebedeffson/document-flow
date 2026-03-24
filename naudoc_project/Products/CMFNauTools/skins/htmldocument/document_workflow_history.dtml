@@ -1,0 +1,69 @@
+<dtml-comment>
+$Id: document_workflow_history.dtml,v 1.5 2006/04/06 16:05:04 ishabalin Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-call "REQUEST.get('noframe') and REQUEST.set('OpenInFrame', '')">
+
+<dtml-var simple_html_header>
+
+<h3><dtml-msg "Workflow history chart"></h3>
+
+<dtml-let   doc="this()"
+            subordinates="listSubordinateDocuments( recursive=1 )"
+            documents_list="[doc] + [portal_catalog.getObjectByUid(x)
+                            for x in subordinates]"
+            documents_list="[x for x in documents_list if x is not None]"
+            workflow_history="getWorkflowHistory( include_subordinates=1 )">
+
+    <table cellpadding="2" cellspacing="1" border="0">
+      <tr class="row_title">
+        <td rowspan="2" align="center">
+          <dtml-msg Date>
+        </td>
+      <dtml-in documents_list>
+        <td align="center" colspan="2">
+          <a class="navigate" href="<dtml-var absolute_url>">
+          <dtml-var Title html_quote>
+          </a>
+        </td>
+      </dtml-in>
+      </tr>
+      <tr class="row_title">
+      <dtml-in documents_list>
+        <td align="center">
+          <dtml-msg State>
+        </td>
+        <td align="center">
+          <dtml-msg Version>
+        </td>
+      </dtml-in>
+      </tr>
+
+  <dtml-in workflow_history prefix="history">
+    <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+      <td align="center">
+        <dtml-var "history_item['action_date']" fmt=datetime>
+      </td>
+    <dtml-in documents_list prefix="docs">
+      <dtml-if "history_item['object'].getVersionable() is docs_item">
+        <td align="center">
+          <dtml-msg expr="history_item['state']">
+        </td>
+        <td align="center">
+          <dtml-var "history_item['object'].getVersionNumber()">
+        </td>
+      <dtml-else>
+        <td align="center"></td><td align="center"></td>
+      </dtml-if>
+    </dtml-in>
+    </tr>
+  </dtml-in>
+
+    </table>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

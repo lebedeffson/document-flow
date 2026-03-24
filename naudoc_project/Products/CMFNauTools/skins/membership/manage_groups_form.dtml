@@ -1,0 +1,78 @@
+<dtml-comment>
+Portal groups management form.
+
+$Editor: vpastukhov $
+$Id: manage_groups_form.dtml,v 1.11 2005/09/02 14:51:47 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-var simple_html_header>
+
+<dtml-if "not portal_membership.checkPermission('Manage portal', this())">
+  <dtml-call "RESPONSE.redirect(absolute_url())">
+</dtml-if>
+
+<h2>
+  <a class="navigate" href="&dtml-portal_url;/manage_groups_form">
+    <img src="&dtml-portal_url;/groups_icon.gif"> <dtml-msg "User groups">
+  </a>
+</h2>
+
+<dtml-let context=this
+          all_groups="portal_membership.listGroups()"
+          writable_groups="[ g for g in all_groups if not g.isReadOnly() ]">
+
+<form action="manage_groups" method="post">
+<dtml-in all_groups sort="Title">
+  <dtml-if sequence-start>
+    <table class="List" width="80%" cellpadding="2">
+      <tr class="row_title">
+        <td width="1%"></td>
+        <td width="15%">
+	  <dtml-msg "Identifier">
+        </td>
+        <td>
+	  <dtml-msg "Description">
+        </td>
+      </tr>
+  </dtml-if>
+  <tr style="cursor:hand" class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>" onDblClick="JavaScript:followInnerLink(this)">
+    <td>
+      <dtml-if "_['sequence-item'] in writable_groups">
+        <input type="checkbox" name="groups:list" 
+               value="<dtml-var getId>" title="&dtml-Title;" />
+      </dtml-if>
+    </td>
+    <td>
+      <a class="navigate" href="<dtml-var "context.relative_url( action='group_edit_form', params={'group_id':getId()} )" html_quote>">&dtml-getId;</a>
+    </td>
+    <td>&dtml-Title;</td>
+  </tr>
+  <dtml-if sequence-end>
+    </table>
+    <div class="form-element">
+      <input class="form-element" type="submit" 
+             name="delGroup" value="<dtml-msg "Remove group">" />
+    </div>
+  </dtml-if>
+<dtml-else>
+  <dtml-msg "There are no groups yet">
+</dtml-in>
+  <table cellpadding="2">
+    <tr>
+      <td align="left" valign="top">
+        <input type="text" name="group" size="16" value="" />
+      </td>
+      <td align="left" valign="top">
+        <div class="form-element">
+          <input class="form-element" type="submit" name="addGroup" value="<dtml-msg "Add group">" />
+        </div>
+      </td>
+    </tr>
+  </table>
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

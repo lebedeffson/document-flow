@@ -1,0 +1,12 @@
+services:
+  naudoc_legacy:
+    build:
+      context: .
+      dockerfile: docker-legacy/Dockerfile
+    container_name: naudoc34_legacy
+    ports:
+      - "18080:8080"
+    user: "1000:1000"
+    volumes:
+      - ./naudoc_project:/mnt/naudoc:ro
+    restart: unless-stopped

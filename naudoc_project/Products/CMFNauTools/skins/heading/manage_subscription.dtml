@@ -1,0 +1,42 @@
+
+<dtml-call "REQUEST.set( 'noCache', 1 )">
+
+<dtml-var simple_html_header>
+<div class="Desktop">
+
+<form method="POST" action="&dtml-absolute_url;" target="workfield">
+
+<h3><dtml-var "msg('Subscription to %s updates' % (this().implements('isHTMLDocument') and 'document' or 'folder',))"></h3>
+
+<dtml-if isSubscribed>
+
+<p>
+<dtml-var "msg('You will no longer receive notifications by e-mail.')">
+<br>
+<dtml-var "msg('Do you want to proceed?')">
+</p>
+
+<p>
+<input type="submit" name="unsubscribe:method" value="<dtml-var "msg('Unsubscribe')">">
+
+<dtml-else>
+
+<p>
+<dtml-var "msg('You will receive notifications about this %s updates by e-mail.' % (this().implements('isHTMLDocument') and 'document' or 'folder',))">
+<br>
+<dtml-var "msg('Do you want to proceed?')">
+</p>
+
+<p>
+<input type="submit" name="subscribe:method" value="<dtml-var "msg('Subscribe')">">
+
+</dtml-if>
+
+&nbsp;&nbsp;
+<input type="submit" value="<dtml-var "msg('Cancel')">">
+</p>
+
+</form>
+
+</div>
+<dtml-var simple_html_footer>

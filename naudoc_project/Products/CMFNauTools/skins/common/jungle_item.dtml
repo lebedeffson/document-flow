@@ -1,0 +1,44 @@
+<dtml-comment>
+Jungle inside code.
+
+Template parameters:
+
+    'view_url' -- url of the tree node. required.
+ 
+    'meta_info' -- text of the tree node. required.
+
+    'frame' -- target frame, 'workspace' by default
+
+$Id: jungle_item.dtml,v 1.7 2007/11/08 14:42:35 oevsegneev Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+<dtml-revision $Revision: 1.7 $>
+
+<a class="tree" 
+   href="&dtml-view_url;" 
+   target="<dtml-var frame missing="workspace" html_quote>">
+<dtml-let img="(_.get('tree-level') or _.has_key('tree-dynamic-item') ) and 
+                   ('isFSFolder' in implements and 
+                      (_['tree-item-expanded'] and 'fs_folder_opened.gif') or 
+                    'isPrincipiaFolderish' in implements and
+                      (_['tree-item-expanded'] and 'folder_opened.gif')
+                         or getIcon) or 'gray_of.gif'">
+
+<img style="float:left;"
+     src="<dtml-var "portal_url(1, action=img)" html_quote>" 
+     width="16" height="16" />
+
+<span style="float:left; cursor:hand;
+      <dtml-unless "_.get('tree-level') or _.has_key('tree-dynamic-item')">font-weight: bold;</dtml-unless>"
+      >
+  &dtml-meta_info;
+<dtml-if "Creator and Creator != 'No owner' and 'isPrincipiaFolderish' in implements">
+    <span style="color: #0000FF">
+      [<dtml-var "portal_membership.getUserInfo(Creator).get('lname') or Creator">]
+    </span>
+</dtml-if>
+</span>
+
+</dtml-let>
+</a>
+

@@ -1,0 +1,205 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_modifystep_form.dtml,v 1.16 2004/03/26 13:45:07 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.16 $>
+
+<dtml-var simple_html_header>
+
+<h1> &dtml-title_or_id; </h1>
+
+<dtml-with "getStepById(step_id)">
+
+   <form method="POST" 
+         action="<dtml-var "absolute_url(action='vdocument_modifystep')">" 
+         onSubmit="javascript:selectAll(allowed_members); 
+                              selectAll(allowed_groups);">
+
+   <table>
+   <tr class="row_title">
+     <td class="smallHeader" colspan="2">
+        <dtml-msg "Step"> &dtml-step_id;
+     </td>
+   </tr>
+   <tr class="row_even">
+     <td class="smallHeader">
+        <dtml-msg "Title">:
+     </td>
+     <td>
+        <input type="text" name="title" value="&dtml-Title;" size="30">
+     </td>
+   </tr>
+   <tr class="row_even">
+     <td class="smallHeader" valign="top">
+        <dtml-msg "Allowed members">:
+     </td>
+     <td>
+        <table>
+        <tr>
+           <td valign="top">
+              <table cellspacing="0" cellpadding="0">
+              <tr>
+                <td valign="top">
+                  <div class="form-element">
+                  <dtml-var "user_list(this(), name='all_users', multiple=1, on_dbl_click='javascript:addSelectionToList(all_users, allowed_members);')">
+                  </div>
+                </td>
+              </tr>
+              </table>
+
+           </td>
+           <td align=center>
+               <input type=button onClick="javascript:addSelectionToList(all_users, allowed_members);" value=" >> "><br><br>
+               <input type=button onClick="javascript:deleteSelectionFromList(allowed_members);" value=" << ">
+           </td>
+           <td align=center valign="top">
+              <div class="form-element">
+                 <select id="allowed_members" name="allowed_members:list" size="15" multiple onDblClick="javascript:deleteSelectionFromList(allowed_members);">
+                    <dtml-in allowed_members>
+                        <option value="&dtml-sequence-item;">
+                           <dtml-var "portal_membership.getMemberName(_['sequence-item'])">
+                        </option>
+                    </dtml-in>
+                 </select>
+              </div>
+           </td>
+        </tr>
+        </table>
+     </td>
+   </tr>
+   <tr class="row_even">
+     <td class="smallHeader" valign="top">
+        <dtml-msg "Allowed groups">:
+     </td>
+     <td>
+        <table>
+        <tr>
+           <td align=center>
+              <div class="form-element">
+                <select id="all_groups" name="all_groups:list" size="15" multiple onDblClick="javascript:addSelectionToList(all_groups, allowed_groups);">
+                  <dtml-in "portal_membership.listGroups()">
+                  <option value="&dtml-getId;">&dtml-Title;</option>
+                  </dtml-in>
+                </select>
+              </div>
+           </td>
+           <td align=center>
+               <input type="button" onClick="javascript:addSelectionToList(all_groups, allowed_groups);" value=" &gt;&gt; "> <br><br>
+               <input type="button" onClick="javascript:deleteSelectionFromList(allowed_groups);" value=" &lt;&lt; ">
+           </td>
+           <td align=center>
+              <div class="form-element">
+                 <select id="allowed_groups" name="allowed_groups:list" size="15" multiple onDblClick="javascript:deleteSelectionFromList(allowed_groups);">
+                    <dtml-in allowed_groups>
+		    <option value="&dtml-sequence-item;">
+		      <dtml-var "portal_membership.getGroup(_['sequence-item']).Title()" html_quote>
+		    </option>
+                    </dtml-in>
+                 </select>
+              </div>
+           </td>
+        </tr>
+        </table>
+     </td>
+   </tr>
+   <tr class="row_even">
+     <td class="smallHeader" valign="top">
+        <dtml-msg "Duration">:
+     </td>
+     <td>
+       <dtml-var "dateperiod_form( None, _
+                                 , prefix='duration'
+                                 , period=getDuration()
+                                 )"
+       >
+     </td>
+   </tr>
+   <tr class="row_even">
+     <td class="smallHeader" valign="top">
+        <dtml-msg "Permissions">:
+     </td>
+     <td>
+      <dtml-let columns=listColumns
+                readable_columns=listReadableColumnIds
+                writable_columns=listWritableColumnIds
+      >
+         <dtml-in columns>
+            <dtml-if sequence-start>
+              <table width="100%">
+              <tr class="row_title">
+                <td>&nbsp;</td>
+            </dtml-if>
+                <td class="small" align="center">
+                    &nbsp; &dtml-Title; &nbsp;
+                </td>
+            <dtml-if sequence-end>
+              </tr>
+            </dtml-if>
+         </dtml-in>
+              <tr>
+                <td class="small">
+                   <dtml-msg "Read">
+                </td>
+                <dtml-in columns>
+                <td class="small" align="center">
+                   <input type="checkbox" name="readable_columns:list" value="&dtml-getId;"
+                   <dtml-var "getId() in readable_columns" fmt=checked> />
+                </td>
+                </dtml-in>
+              </tr>
+              <tr>
+                <td class="small">
+                   <dtml-msg "Write">
+                </td>
+                <dtml-in columns>
+                <td class="small" align="center">
+                   <input type="checkbox" name="writable_columns:list" value="&dtml-getId;"
+                   <dtml-var "getId() in writable_columns" fmt=checked> />
+                </td>
+                </dtml-in>
+              </tr>
+          </table>
+     </dtml-let>
+     </td>
+   </tr>
+     </td>
+
+<dtml-let rollback_steps="listRollbackSteps()">
+
+<dtml-in "_.range(1, step_id)">
+<dtml-if sequence-start>
+   <tr class="row_even">
+     <td class="smallHeader" valign="top">
+        <dtml-msg "Possible rollback steps">:
+     </td>
+     <td>
+        <select name="rollback_steps:list" multiple>
+</dtml-if>
+      <dtml-let step_id=sequence-item
+                step="getStepById(step_id)"
+      >
+        <option value="&dtml-step_id;" <dtml-var "_.str(step_id) in rollback_steps" fmt=selected>/>
+          <dtml-var "step.Title()" html_quote>
+        </option>
+      </dtml-let>
+<dtml-if sequence-end>
+        </select>
+     </td>
+   </tr>
+</dtml-if>
+</dtml-in>
+</dtml-let>
+   </table>
+
+
+    <input type="hidden" name="step_id:int" value="&dtml-step_id;"/>
+    <input type="submit" value="<dtml-msg "Apply">"/>
+    <input type="button" 
+           onClick="JavaScript:location.href='<dtml-var "absolute_url(action='vdocument_options_form')" html_quote fmt=jscript>'" 
+           value="<dtml-msg "Cancel">"/>
+   </form>
+
+</dtml-with>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,30 @@
+<dtml-comment>
+$Id: selectstate.dtml,v 1.1 2004/02/14 11:40:45 vsafronovich Exp $
+$Editor: vsafronovich$
+
+'name' - required. select name
+'category_id' - required. category id, which Workflow states are displayed
+'state_id' - required. preselected option
+'use_any_state' - optional. trigger for use option with value='_all' and name='any state'
+'onchange' - optianal. jscript text for onchange event
+
+TODO: multiple(In example to filter with many states)
+</dtml-comment>
+
+<select name="&dtml-name;" <dtml-if "_.has_key('onchange') and onchange">
+                             onChange="javascript:&dtml-onchange;"
+                           </dtml-if> >
+  <dtml-if "_.has_key('use_any_state') and use_any_state">
+    <option value="_all">--<dtml-msg "any state">--
+  </dtml-if>
+  <dtml-if "category_id">
+    <dtml-let wf="portal_metadata.getCategoryById(category_id).getWorkflow()"
+              wf_id="wf.getId()"
+              state_id="_.has_key('state_id') and state_id or ''" >
+    <dtml-in "wf.states.keys()" >
+      <option value="<dtml-var sequence-item>" <dtml-var "_['sequence-item']==state_id" fmt=selected> >
+        <dtml-msg expr="portal_workflow.getStateTitle(wf_id , _['sequence-item'])">
+    </dtml-in>
+    </dtml-let>
+  </dtml-if>
+</select>

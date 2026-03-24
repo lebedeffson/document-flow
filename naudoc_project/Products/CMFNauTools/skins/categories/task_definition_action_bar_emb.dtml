@@ -1,0 +1,14 @@
+<form action="task_template_task_definition_add_form" method="post">
+  <dtml-var text_message>:
+  <select name="task_definition_type">
+    <dtml-in "taskDefinitionFactory.listActionTemplateTypes()" sort="title/msg" mapping>
+      <option value="<dtml-var id>">
+        <dtml-msg expr=title>
+      </option>
+    </dtml-in>
+  </select>
+
+<input type="hidden" name="template_id" value="&dtml-template_id;">
+<input type="hidden" name="parent_id" value="&dtml-id_parent;">
+<input type="submit" value="<dtml-msg "Add">">
+</form>

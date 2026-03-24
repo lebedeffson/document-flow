@@ -1,0 +1,110 @@
+//
+// $Editor: ypetrov $
+// $Id $
+// $Revision $
+//
+
+// Deleting old diff cookies
+cookies.remove('tree-e');
+cookies.remove('tree-c');
+
+function showError(error, where)
+{
+    var error_text = "ERROR: ",
+        error_element = document.createElement('SPAN');
+
+    error_text += error;
+
+    error_element.appendChild(document.createTextNode(error_text));
+    error_element.style.color = 'red';
+    error_element.style.fontWeight = 'bold';
+
+    while (where.hasChildNodes()) where.removeChild(where.firstChild);
+    where.appendChild(error_element);
+}
+
+function nodeAction(img, cookie_url, diff, dynamic_url)
+{
+    var cell = img.parentNode.parentNode.cells[1],
+        childs = cell.childNodes,
+        closed_div = childs[0],
+        opened_div = childs[1];
+
+    var src_len = img.src.length;
+    if (img.src.substring(src_len-10, src_len-4) == 'closed') {
+        // open tree branch
+        img.src = img.src.substring(0, src_len-10) + 'opened' + 
+                  img.src.substring(src_len-4, src_len);
+
+        var old_diffs = cookies.get('tree-c');
+        if (old_diffs && old_diffs.indexOf(',') > 0){
+            var parts = old_diffs.split(',');
+            var new_diffs = '';
+            for (var i=0; i<parts.length; i++){
+                if (parts[i] != diff){
+                    if (new_diffs) new_diffs += ',';
+                    new_diffs = new_diffs + parts[i];
+                }
+            }
+            cookies.set('tree-c', new_diffs);
+            cookies.set('tree-e', diff);
+        } else if (old_diffs==diff){
+            cookies.remove('tree-c');
+        } else {
+            cookies.set('tree-e', diff);
+        }
+
+        if (dynamic_url && !opened_div) {
+            // download and show contents of opened branch
+            opened_div = document.createElement('DIV');
+            opened_div.id = 'loading';
+            opened_div.appendChild(document.createTextNode("<dtml-msg "Loading...">"));
+            cell.appendChild(opened_div);
+
+            function afterDownload(html_text)
+            {
+                closed_div.style.display = 'none';
+                // XXX: This approach isn't compatible with DOM :(
+                opened_div.innerHTML = html_text;
+                cookies.remove('tree-c');
+            }
+
+            function onError(error)
+            {
+                if (error.name == 'DownloadError' && error.status == 500 &&
+                    error.text.indexOf('<!-- SESSION ARGS LOST -->') != -1) {
+                    // when session is lost we reload entire document and act
+                    // like in static mode
+                    document.location.reload(true);
+                }
+                else {
+                    showError(error, closed_div);
+                    opened_div.style.display = 'none';
+                }
+            }
+
+            userAgent.downloadURL(dynamic_url, afterDownload, onError);
+        }
+        else {
+            // only show contents of opened branch
+            closed_div.style.display = 'none';
+            opened_div.style.display = '';
+        }
+    }
+    else {
+        // close tree branch
+        img.src = img.src.substring(0, src_len-10) + 'closed' + 
+                  img.src.substring(src_len-4, src_len);
+
+        //redundant tree-e content is handled by JungleTag.loadState method
+        var old_diffs = cookies.get('tree-c');
+        if (old_diffs){
+            if (old_diffs) old_diffs += ',';
+            diff = old_diffs+diff;
+        }
+        cookies.set('tree-c', diff);
+  
+        closed_div.style.display = '';
+        opened_div.style.display = 'none';
+    }
+}

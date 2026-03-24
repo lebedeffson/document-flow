@@ -1,0 +1,65 @@
+<dtml-comment>
+$Id: task_definition_create_document_info_emb.dtml,v 1.6 2004/09/10 13:04:19 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.6 $>
+
+<table cellspacing="2" cellpadding="2">
+  <tr class="row_odd">
+    <td colspan="2" class="smallHeader">
+      <dtml-var "msg('Metadata')">:
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <dtml-var "msg('Id')">
+    </td>
+    <td><input type="text" name="id"></td>
+  </tr>
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <dtml-var "msg('Title')">
+    </td>
+    <td><input type="text" name="title"></td>
+  </tr>
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <dtml-var "msg('Description')">
+    </td>
+    <td><textarea name="description:text" rows="5" cols="65"></textarea></td>
+  </tr>
+
+<dtml-let category="portal_metadata.getCategoryById(task_definition['dest_category'])"
+          attributes="category is not None and category.listAttributeDefinitions()"
+          context=this
+>
+
+<dtml-in attributes>
+
+<dtml-if sequence-start>
+  <tr><td>&nbsp;</td></tr>
+  <tr class="row_odd">
+    <td colspan="2" class="smallHeader"><dtml-msg "Document attributes">:</td>
+  </tr>
+</dtml-if>
+
+<dtml-unless isReadOnly>
+
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <span <dtml-var "isMandatory() and 'mandatory'" fmt=class> ><dtml-msg expr=Title></span>
+    </td>
+    <td>
+      <dtml-var "entry_field_edit( None, _,
+                                   descriptor=getFieldDescriptor(),
+                                   value=getDefaultValue(moniker=1),
+                                 )">
+    </td>
+  </tr>
+
+</dtml-unless>
+</dtml-in>
+
+</dtml-let>
+
+</table>

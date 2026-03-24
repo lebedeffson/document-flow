@@ -1,0 +1,98 @@
+<dtml-var site_html_header>
+
+<div class="Desktop">
+
+<h1> <dtml-msg "Search results"> </h1>
+
+<dtml-let results="doFormSearch( REQUEST=REQUEST )"
+          container="this()"
+          SearchableText="REQUEST.get('SearchableText')"
+>
+
+<dtml-if expr="_.len(results)!=0">
+<p><dtml-msg "Items found">: <dtml-var expr="_.len(results)" thousands_commas>.
+
+<dtml-if SearchableText>
+   <dtml-msg "Query">: "&dtml-SearchableText;"</dtml-if></p>
+</dtml-if>
+
+
+<dtml-in results previous size=20 start="batch_start" skip_unauthorized>
+<a href="<dtml-var URL>?batch_start=<dtml-var previous-sequence-start-number>&SearchableText=&dtml-SearchableText;">
+[<dtml-msg "Previous"> <dtml-var previous-sequence-size> <dtml-msg "results">]</a>
+</dtml-in>
+<dtml-in results next size=20 start="batch_start" skip_unauthorized>
+<a href="<dtml-var URL>?batch_start=<dtml-var next-sequence-start-number>&SearchableText=&dtml-SearchableText;">
+[<dtml-msg "Next"> <dtml-var next-sequence-size> <dtml-msg "results">]</a>
+</dtml-in>
+
+
+<dtml-in results size="20" start="batch_start" skip_unauthorized>
+ <dtml-let objURL="getURL()"
+           external_url="container.external_url( _['sequence-item'] )">
+
+ <dtml-if sequence-start>
+<table class="SearchResults" border="0">
+ <tr>
+  <td width="16"><br></td>
+  <th> <dtml-msg "Title"> </th>
+  <th> <dtml-msg "Date"> </th>
+  </tr>
+ </dtml-if>
+
+ <tr>
+  <td>
+     &nbsp;
+  </td>
+
+  <td>
+   <a href="&dtml-external_url;"><dtml-if name="Title"><dtml-var name="Title" size="75" html_quote><dtml-else>&nbsp;</dtml-if></a>
+  </td>
+  <td>
+   &dtml-Date;
+  </td>
+ </tr>
+ <tr>
+  <td>&nbsp;</td>
+  <td colspan="1"><em>
+   <dtml-if name="Description"><dtml-var name="Description"
+   missing="(No description)" size="85" html_quote>
+   <dtml-else>&nbsp;</dtml-if></em></td>
+  <td>&nbsp;</td>
+ </tr>
+ <dtml-if sequence-end>
+  </table>
+ </dtml-if>
+ </dtml-let>
+<dtml-else>
+ <p> <dtml-msg "No items were found"> </p>
+</dtml-in>
+
+<dtml-comment>
+<dtml-in results size="25" start="batch_start" next>
+ <dtml-let url=URL
+           sqry=sequence-query
+           next=next-sequence-start-number
+           nextSize=next-sequence-size
+           nextURL="'%s%sbatch_start=%s' % (url,sqry,next)"
+ >
+  <p> <a href="&dtml-nextURL;"> <dtml-msg "Next page">  </a> </p>
+ </dtml-let>
+</dtml-in>
+</dtml-comment>
+
+<dtml-in results previous size=20 start="batch_start" skip_unauthorized>
+<a href="<dtml-var URL>?batch_start=<dtml-var previous-sequence-start-number>&SearchableText=&dtml-SearchableText;">
+[<dtml-msg "Previous"> <dtml-var previous-sequence-size> <dtml-msg "results">]</a>
+</dtml-in>
+<dtml-in results next size=20 start="batch_start" skip_unauthorized>
+<a href="<dtml-var URL>?batch_start=<dtml-var next-sequence-start-number>&SearchableText=&dtml-SearchableText;">
+[<dtml-msg "Next"> <dtml-var next-sequence-size> <dtml-msg "results">]</a>
+</dtml-in>
+
+
+</dtml-let>
+
+</div>
+
+<dtml-var site_html_footer>

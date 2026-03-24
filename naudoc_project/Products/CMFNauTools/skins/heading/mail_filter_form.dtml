@@ -1,0 +1,173 @@
+<dtml-comment>
+Mail filter settings editing form.
+
+$Editor: vpastukhov $
+$Id: mail_filter_form.dtml,v 1.5 2004/07/02 14:26:43 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let context=this
+          filter="getFilter( REQUEST.get('id') or id )"
+          action="filter.getAction()"
+          action_id="action and action.getActionId()"
+          form_name="'mail_filter_form'" >
+
+<p>
+<strong><a href="<dtml-var "context.relative_url( action='mail_filters_form' )">">&lt;&lt; <dtml-msg "Configuration of the incoming mail messages filtering"></a></strong>
+</p>
+
+<h2><dtml-msg "Mail message filter parameters"></h2>
+
+<form name="mail_filter_form" method="post"
+      action="<dtml-var "context.relative_url( action='mail_filter_handler' )">">
+
+<dtml-with filter>
+
+<input type="hidden" name="id" value="&dtml-getId;" />
+
+<table class="FormLayout" border="0">
+
+<tr>
+  <th colspan="2" align="right"><dtml-msg "Identifier"></th>
+  <td>&dtml-getId;</td>
+</tr>
+
+<tr valign="top">
+  <th colspan="2" align="right"><dtml-msg "Title"></th>
+  <td>
+    <input type="text" name="title" value="&dtml-Title;" size="65">
+  </td>
+</tr>
+
+<tr valign="top">
+  <th colspan="2" align="right"><dtml-msg "Action"></th>
+  <td>
+    <select name="action:string">
+      <dtml-in "context.listAvailableActions()">
+      <option value="&dtml-getId;" <dtml-var "getId() == action_id" fmt=selected>
+              ><dtml-msg expr=Title></option>
+      </dtml-in>
+    </select>
+    <dtml-var "entry_field_edit( None, _,
+                                 name='param/destination',
+                                 type='link',
+                                 allowed_types=['Heading'],
+                                 value=(action and action.getProperty('destination',moniker=1)),
+                               )">
+  </td>
+</tr>
+
+<tr valign="top">
+  <th colspan="2">&nbsp;</th>
+  <td>
+    <input type="submit" name="save_filter" value=" <dtml-msg "Save"> " />
+    &nbsp;
+    <input type="submit" name="cancel_form" value=" <dtml-msg "Cancel"> " />
+  </td>
+</tr>
+
+</dtml-with>
+
+<dtml-in filter>
+
+<dtml-if sequence-start>
+<tr>
+  <th colspan="3">&nbsp;</th>
+</tr>
+
+<tr valign="top">
+  <td colspan="3" class="small"><h3><dtml-msg "Filter conditions"></h3></th>
+</tr>
+</dtml-if>
+
+<tr valign="top">
+  <td class="small">
+    <input type="checkbox" name="selected:int:list" value="&dtml-sequence-index;" />
+  </td>
+
+  <td class="small">
+    <dtml-msg expr="'mail.filter_type.%s' % type"><br />
+    <dtml-msg expr="'mail.filter_operation.%s' % op">
+  </td>
+
+  <td class="small">
+    <dtml-if "type == 'header'">
+    <dtml-msg "Header name">: &dtml-header;
+    <br />
+    </dtml-if>
+    <textarea name="patternrec.&dtml-sequence-index;:record" rows="4"
+	style="width:100%"><dtml-var expr="'\n'.join(patterns)" html_quote></textarea>
+  </td>
+</tr>
+
+<dtml-if sequence-end>
+
+<tr valign="top">
+  <th colspan="2">&nbsp;</th>
+  <td>
+    <input type="submit" name="save_filter" value=" <dtml-msg "Save"> " />
+    &nbsp;
+    <input type="submit" name="delete_tests" value=" <dtml-msg "Delete"> " />
+  </td>
+</tr>
+
+</dtml-if>
+
+</dtml-in>
+
+<tr valign="top">
+  <th colspan="3">&nbsp;</th>
+</tr>
+
+<tr valign="top">
+  <td colspan="3" class="small"><h3><dtml-msg "Add new condition"><h3></th>
+</tr>
+
+<tr valign="top">
+  <th colspan="2" align="right"><dtml-msg "Test type"></th>
+  <td>
+    <select name="test">
+      <dtml-in "filter.listAvailableTests()" mapping>
+      <option value="&dtml-id;"><dtml-msg expr="'mail.filter_type.%s' % id">
+      </dtml-in>
+    </select>
+    <select name="operation">
+      <dtml-in "['+','-']">
+      <option value="&dtml-sequence-item;"><dtml-msg expr="'mail.filter_operation.%s' % _['sequence-item']">
+      </dtml-in>
+    </select>
+  </td>
+</tr>
+
+<tr valign="top">
+  <th colspan="2" align="right"><dtml-msg "Header name"></th>
+  <td>
+    <input type="text" name="header" value="" size="30" />
+    <i>(<dtml-msg "for header tests only">)</i>
+  </td>
+</tr>
+
+<tr valign="top">
+  <th colspan="2" align="right"><dtml-msg "Test patterns"></th>
+  <td>
+    <textarea name="patterns:tokens" rows="4" style="width:100%"></textarea>
+  </td>
+</tr>
+
+<tr valign="top">
+  <th colspan="2">&nbsp;</th>
+  <td>
+    <input type="submit" name="add_test" value=" <dtml-msg "Add"> " />
+  </td>
+</tr>
+
+</table>
+
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

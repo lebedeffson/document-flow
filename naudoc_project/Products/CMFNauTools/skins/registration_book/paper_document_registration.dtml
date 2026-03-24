@@ -1,0 +1,157 @@
+<dtml-comment>
+$Id: paper_document_registration.dtml,v 1.15 2008/08/13 10:29:32 oevsegneev Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.15 $>
+
+<dtml-var simple_html_header>
+
+<dtml-comment>--------[ Dynamic metadata loading hack ]--------</dtml-comment>
+<dtml-unless "REQUEST.get( '_datetime_form' )">
+<dtml-call "REQUEST.set( '_datetime_form', True )">
+
+<link id="calendar_css" rel="stylesheet" type="text/css" href="&dtml-portal_url;/calendar-win2k-cold-1.css" />
+
+<script type="text/javascript" src="&dtml-portal_url;/calendar.js"></script>
+<script type="text/javascript" src="&dtml-portal_url;/calendar-<dtml-var "msg.get_selected_language()">.js"></script>
+<script type="text/javascript" src="&dtml-portal_url;/calendar-setup.js"></script>
+
+<script type="text/javascript">
+<!--
+
+fieldEditHandler.calendar_params = new Array();
+
+// -->
+</script>
+</dtml-unless>
+<dtml-comment>--------[ /Dynamic metadata loading hack ]--------</dtml-comment>
+
+<dtml-let reg_cat_id=getRegisteredCategory
+          reg_cat="portal_metadata.getCategoryById(reg_cat_id)"
+          allowed_cats="reg_cat.listDependentCategories() + [reg_cat]"
+          id="_.has_key('use_default_values') and REQUEST.get('id', '') or ''"
+          title="_.has_key('use_default_values') and REQUEST.get('title', '') or ''"
+          description="_.has_key('use_default_values') and REQUEST.get('description', '') or ''"
+          >
+
+<form name="invoke_factory_form" action="registerPaperDocument" method="POST"
+      onSubmit="javasript: return Validate(this);">
+
+<script type="text/javascript">
+<!--
+
+window.onload = function()
+{
+    var form = document.forms['invoke_factory_form'];
+
+    focusForm(form);
+<dtml-if categories>
+    form.elements['category_id'].onchange();
+</dtml-if>
+}
+
+function Validate( frm )
+{
+    var form = document.forms['invoke_factory_form'];
+    //validate format of all data
+    if (! validateForm(form, 1, 1))
+        return false;
+
+    disableForm(form);
+    return true;
+}
+
+function loadMetadata( select ){
+    var cat_id = select.value;
+    var category_data = document.getElementById('category_data');
+
+    disableForm( select.form );
+    displayElements(['loading'], ['category_data']);
+
+    clearFormCallbacks( 'invoke_factory_form' );
+
+    category_data.innerHTML = userAgent.downloadURL('default_category_metadata?category_id='+escape(cat_id)+'&type_name=HTMLDocument');
+    fixScripts( category_data );
+
+    enableForm( select.form );
+    displayElements(['category_data'], ['loading']);
+    select.form.elements['id:id_'].parentNode.parentNode.style.display = document.forms[0].display_id.value;
+
+    registerFormCallback( 'invoke_factory_form', Validate, true );
+}
+
+//-->
+</script>
+
+<table class="FormLayout" border="0" cellpadding="2" cellspacing="2">
+  <tr>
+    <th class="small">
+      <dtml-msg Id>
+    </th>
+    <td>
+      <input type="text" name="id:id_" size="50" value="&dtml-id;">
+    </td>
+  </tr>
+  <tr>
+    <th class="small">
+      <dtml-msg Title>
+    </th>
+    <td>
+      <input type="text" 
+             name="title:required" 
+             validation_message="<dtml-msg "Specify the document title">"
+             size="50" value="&dtml-title;">
+    </td>
+  </tr>
+  <tr>
+    <th class="small">
+      <dtml-msg Description>
+    </th>
+    <td>
+      <textarea name="description:text" cols="50" rows="5">&dtml-description;</textarea>
+    </td>
+  </tr>
+
+<dtml-in allowed_cats>
+  <dtml-if sequence-start>
+  <tr>
+    <th class="small">
+      <dtml-msg Category>
+    </th>
+    <td>
+      <select name="category_id"
+              onChange="loadMetadata( this );">
+      >
+  </dtml-if>
+    <option value="<dtml-var getId>"
+            <dtml-var "(reg_cat_id == getId()) and 'selected' or ''">
+            >
+      <dtml-msg expr=Title>
+    </option>
+  <dtml-if sequence-end>
+    </select>
+    </td>
+  </tr>
+  </dtml-if>
+</dtml-in>
+
+  <tr>
+    <td>
+    </td>
+    <td>
+      <div id="loading">
+        <dtml-msg "Loading...">
+      </div>
+      <div id="category_data" style="display: none"></div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <input type="submit" name="apply" value="<dtml-msg Apply>">
+    </td>
+  </tr>
+</table>
+</form>
+</dtml-let>
+<dtml-var simple_html_footer>

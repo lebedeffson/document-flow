@@ -1,0 +1,168 @@
+<dtml-comment>
+$Id: excel_export_form.dtml,v 1.10 2005/03/26 17:38:54 vsafronovich Exp $
+$Editor: kfirsov$
+
+  TODO: fix charset=windows-1251"
+</dtml-comment>
+<dtml-revision $Revision: 1.10 $>
+
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1251">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="NauDoc &dtml-productVersion;">
+<dtml-let creator_info="portal_membership.getUserInfo(Creator())"
+          user_name="portal_membership.getAuthenticatedMember().getUserName()"
+          user_info="portal_membership.getUserInfo(user_name)"
+          c_name="creator_info and creator_info['lname']+' '+creator_info['fname']+' '+creator_info['mname'] or Creator()"
+          u_name="user_info and (user_info['lname']+' '+user_info['fname']+' '+user_info['mname']) or user_name">
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author><dtml-var c_name></o:Author>
+  <o:LastAuthor><dtml-var u_name></o:LastAuthor>
+  <o:Created><dtml-var "_.DateTime().ISO()"></o:Created>
+  <o:LastSaved><dtml-var "_.DateTime().ISO()"></o:LastSaved>
+ </o:DocumentProperties>
+</xml><![endif]-->
+</dtml-let>
+<style>
+@page
+    {margin:.98in .79in .98in .79in;
+    mso-header-margin:.51in;
+    mso-footer-margin:.51in;
+    <dtml-if "excel_landscape_view">
+      mso-page-orientation:landscape;
+    </dtml-if>
+    }
+.xl24
+    {mso-style-parent:style0;
+    mso-number-format:General;
+    white-space:normal;
+    }
+.xl25
+    {mso-style-parent:style0;
+    mso-number-format:"General Date";
+    white-space:normal;
+    text-align:center;
+    }
+.xl26
+    {mso-style-parent:style0;
+    mso-number-format:"Yes\/No";
+    white-space:normal;
+    }
+.xl27
+    {mso-style-parent:style0;
+    mso-number-format:Standard;
+    white-space:normal;
+    }
+</style>
+<!--[if gte mso 9]><xml>
+ <x:ExcelWorkbook>
+  <x:ExcelWorksheets>
+   <x:ExcelWorksheet>
+    <x:Name><dtml-msg "Sheet">1</x:Name>
+    <x:WorksheetOptions>
+     <x:Print>
+      <x:ValidPrinterInfo/>
+     </x:Print>
+     <x:Selected/>
+     <x:ProtectContents>True</x:ProtectContents>
+     <x:ProtectObjects>False</x:ProtectObjects>
+     <x:ProtectScenarios>False</x:ProtectScenarios>
+    </x:WorksheetOptions>
+   </x:ExcelWorksheet>
+  </x:ExcelWorksheets>
+  <x:ProtectStructure>True</x:ProtectStructure>
+  <x:ProtectWindows>False</x:ProtectWindows>
+ </x:ExcelWorkbook>
+</xml><![endif]-->
+</head>
+  <body>
+    <dtml-let uid=getUid
+              session="REQUEST['SESSION']"
+              table_columns="[ { 'id' : x.getId(),
+                                 'title' : x.Title(),
+                                 'type' : x.Type(),
+                               }
+                                 for x in listVisibleColumns()
+                             ]"
+              sort_order="REQUEST.get('sort_order', session.get('%s_sort_order' % uid, ''))"
+              pre_sort_on="REQUEST.get('sort_on', session.get('%s_sort_on' % uid, None))"
+              sort_on="getColumnById(pre_sort_on) is not None and pre_sort_on or table_columns[0]['id']"
+              sort_type="getColumnById(sort_on).Type() in ['string', 'text'] and 'cmp' or 'cmp'"
+              default_filter="{ 'conditions': _.has_key('conditions') and conditions or [],
+                                'query': _.has_key('query') and query or {},
+                                'query_id': _.has_key('query_id') and query_id or '',
+                                'profile_id': _.has_key('profile_id') and profile_id or '',
+                                'columns': table_columns
+                              }"
+              filter_id=uid
+              filter="REQUEST['SESSION'].get('%s_filter' % filter_id, default_filter)"
+              query="filter.get('query')"
+              results="searchEntries(sort_on=None, **query)"
+              entries="_.sequence.sort([x.getObject() for x in results], ((sort_on, sort_type),))">
+    <table border="1" style="font-size:<dtml-var excel_font_size>pt;">
+      <tr>
+        <dtml-in columns_ids prefix="clmn">
+        <th width="<dtml-var "widths[clmn_index]">" ><dtml-msg expr="getColumnById(clmn_item).Title()"></th>
+        </dtml-in>
+        <th><dtml-msg "Document"></th>
+        <dtml-if include_log>
+        <th><dtml-msg "Changes log"></th>
+        </dtml-if>
+        
+      </tr>
+      <dtml-in "entries" reverse_expr="sort_order" prefix="ent">
+      <tr align="right" valign="top">
+        <dtml-in columns_ids prefix="clmn">
+          <dtml-let data_type="getColumnById(clmn_item).Type()"
+                    value="ent_item.get(clmn_item)">
+            <td
+            <dtml-if "data_type=='int'">class="xl24" x:num
+            <dtml-elif "data_type=='float'">class="xl27" x:num="<dtml-var "value">"
+            <dtml-elif "data_type=='date'">class="xl25" x:str 
+            <dtml-elif "data_type=='boolean'">class="xl26" x:num="<dtml-var "value">"
+            <dtml-elif "data_type=='string'">class="xl24" x:str
+            <dtml-else>class="xl24"
+            </dtml-if>
+            >
+            <dtml-if "clmn_item=='Creator'">
+               <dtml-var "portal_membership.getMemberBriefName( value )">
+            <dtml-else>
+               <dtml-if "value or value==0">
+                  <dtml-if "data_type=='date'"><dtml-var value fmt="%Y-%m-%d %H:%M">
+                  <dtml-elif "data_type=='boolean'"><dtml-msg expr="value and 'Yes' or 'No'">
+                  <dtml-else><dtml-var value null=''>
+                  </dtml-if>
+               </dtml-if>
+            </dtml-if>
+            </td>
+          </dtml-let>
+        </dtml-in>
+          <td>
+          <dtml-let documents="portal_catalog.searchResults( registry_ids=ent_item.get('ID', ''), implements='isDocument' )">
+            <dtml-in documents>
+              <a target="_blank" href="<dtml-var getURL>"><dtml-var Title></a><br>
+            </dtml-in>
+          </dtml-let>
+          </td>
+          <dtml-if include_log>
+           <td>
+            <dtml-in "ent_item.getHistory()" mapping reverse>
+                 <dtml-var date fmt="%Y-%m-%d %H:%M">
+                  <b><dtml-var "portal_membership.getMemberBriefName(actor)"></b>
+                  <em><dtml-msg expr="action"></em> : 
+                  <em><dtml-var text></em>
+                <br>
+            </dtml-in>
+           </td>
+          </dtml-if>
+      </tr>
+      </dtml-in>
+    </table>
+    </dtml-let>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+TextIndexNG is designed and written by Andreas Jung and published under the
+Zope Public License ZPL (http://www.zope.org/Resources/ZPL)
+
+The following parts of TextIndexNG are not covered by the ZPL:
+
+  - The PyStemmer and PySimilarity extensions for Python are (C) by Andreas
+    Jung and published under the MIT Public License.
+
+  - Some converters are based on code from the DocumentLibrary published under
+    the Kaivo license (Thanks to Casey Duncan).
+
+  - The QueryParser is (C) by Sidnei da Silva and published under the GPL.
+
+  - The Snowball stemmer sources are (C) Dr. Martin Porter and published under
+    the MIT Public License.
+
+  - Matt Hamilton contributed code for compressed lists that uses header files
+    (C) by Neil Sherman and Alistair Moffat published under the GPL.
+
+  - TXNGSplitter uses parts of the "libdict" packages. The package is published
+    under the Berkely License.  Copyright (C) 2001 Farooq Mela. All rights reserved.
+

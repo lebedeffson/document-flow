@@ -1,0 +1,117 @@
+<dtml-comment>
+$Id: task_definition_distribute_document.dtml,v 1.2 2005/12/13 12:20:37 ikuleshov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+
+<script type="text/javascript">
+<!--
+
+  function validateConfirm( frm ){
+
+    if ( !validSelectionRequestedUsers( frm ) ){
+      alert('<dtml-var "msg('You have not selected user(s)')">');
+      return false;
+    }
+      
+    if ( !validSelectionLetterContent( frm ) ){
+      alert("<dtml-var "msg('You didn\'t specify what to include in the letter.')">");
+      return false;
+    }
+      
+    if ( selectedTransportableContent( frm ) && !userAgreeWithSendOverNonSecureConnection() ){
+      return false;
+    }
+    
+    requested_users = frm['requested_users:list'];
+    selectAll(requested_users);
+    return true;
+  }
+    
+  function validSelectionRequestedUsers( frm ){
+    requested_users = frm['requested_users:list'];
+    return ( requested_users.length > 0 || frm['other_user_emails'].value );
+  }
+    
+  function validSelectionLetterContent( frm ){
+    list = frm['letter_parts:list'];
+    return ( list[0].checked || list[1].checked || list[2].checked || list[3].checked);
+  }
+
+  function selectedTransportableContent( frm ){
+    list = frm['letter_parts:list'];
+    return ( list[0].checked || list[1].checked || list[2].checked);
+  }
+
+  function userAgreeWithSendOverNonSecureConnection(){
+    return confirm('<dtml-var "msg('Attention! The information will be sent over non-secure connection, continue?')">');
+  }
+
+//-->
+</script>
+
+ <table class="FormLayout" border="0">
+  <tr class="row_odd">
+    <td class="smallHeader">
+      <dtml-var "msg('Distribute the document to the following users')">
+    </td>
+  </tr>
+  <tr class="row_even">
+   <td align=left>
+
+     <dtml-let preselected_users="taskDefinitionArray['requested_users']"
+               name="'requested_users'"
+     >
+       <dtml-var users_selection>
+     </dtml-let>
+     <dtml-var "msg('Other addresses (use semicolon as separator)')">
+     <br><textarea name="other_user_emails" cols="40" rows="3"><dtml-var "taskDefinitionArray['other_user_emails']"></textarea>
+     
+     <br>
+     <dtml-let checked="'users' in taskDefinitionArray['_allow_edit'] and 'checked' or ''">
+       <input type="checkbox" name="_allow_edit:list" value="users" &dtml-checked;> <dtml-var "msg('editable during state change')">
+     </dtml-let>
+     
+   </td>
+  </tr>
+ </table>
+
+<dtml-let as_is="taskDefinitionArray['letter_type'] == 'as_is'">
+
+<input type="radio" name="letter_type" value="partial" onClick="toggleDiv( document.getElementById('content_selection_div'), true )" <dtml-var "not as_is" fmt="checked"> /> 
+<dtml-msg "Send partial document contents">
+
+<br>
+
+<input type="radio" name="letter_type" value="as_is" onClick="toggleDiv( document.getElementById('content_selection_div'), false )" <dtml-var "as_is" fmt="checked"> />
+<dtml-msg "Send document as is, without modifications"> 
+
+<div id="content_selection_div">
+
+ <table class="FormLayout" border="0">
+  <tr class="row_odd">
+    <td class="smallHeader">
+       <dtml-var "msg('Content of the letter')"><br>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-var "msg('Subject')">: <input type="text" name="subject" size="50" value="<dtml-var "taskDefinitionArray['subject']">">
+       <br>
+       <br><input type="checkbox" name="letter_parts:list" value="body" <dtml-if "'body' in taskDefinitionArray['letter_parts']">checked</dtml-if>> <dtml-var "msg('include document body')">
+       <br><input type="checkbox" name="letter_parts:list" value="attachment" <dtml-if "'attachment' in taskDefinitionArray['letter_parts']">checked</dtml-if>> <dtml-var "msg('include attachments')">
+       <br><input type="checkbox" name="letter_parts:list" value="metadata" <dtml-if "'metadata' in taskDefinitionArray['letter_parts']">checked</dtml-if>> <dtml-var "msg('include registration card')">
+       <br><input type="checkbox" name="letter_parts:list" value="link_to_doc" <dtml-if "'link_to_doc' in taskDefinitionArray['letter_parts']">checked</dtml-if>> <dtml-var "msg('include link to the document')">
+       <br>
+       <br><dtml-var "msg('Message text')">
+       <br><textarea name="comment" rows="5" cols="80"><dtml-var "taskDefinitionArray['comment']"></textarea>
+    </td>
+  </tr>
+ </table>
+</div>
+
+<script type="text/javascript">
+  toggleDiv( document.getElementById('content_selection_div'), <dtml-var "as_is and 'false' or 'true'"> );
+</script>
+
+</dtml-let>

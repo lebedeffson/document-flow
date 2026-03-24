@@ -1,0 +1,40 @@
+<dtml-comment>
+$Id: view_subscribed.dtml,v 1.4 2004/04/29 13:31:20 spinagin Exp $
+</dtml-comment>
+
+<dtml-let helpId="'ManageSite.html'">
+<dtml-var simple_html_header>
+</dtml-let>
+<dtml-call "REQUEST.set( 'noCache', 1 )">
+
+<div>
+<h3><dtml-var "msg('Subscribed users to folder updates')"></h3>
+<br>
+
+<dtml-in "listSubscribed()" prefix="su" >
+
+  <dtml-if su_start>
+<table class="List" width="100%">
+        <tr class="row_title">
+          <td><dtml-var "msg('Subscribed users')"></td>
+        </tr>
+   </dtml-if>
+	<tr class="<dtml-if su_odd>row_odd<dtml-else>row_even</dtml-if>">
+	  <td align="left">
+    	<dtml-var su_item>
+    	  </td>
+	</tr>
+
+    <dtml-if su_end>
+</table>
+    </dtml-if>
+<dtml-else>
+  <dtml-var "msg('There are no subscribed users to updates in this folder')">.
+</dtml-in>
+
+
+</div>
+
+
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,121 @@
+<dtml-comment>
+External site construction form.
+
+$Editor: vpastukhov $
+$Id: site_constructor_form.dtml,v 1.20 2004/07/27 06:30:43 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.20 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1><dtml-msg "Site constructor"></h1>
+
+<form name="site_constructor_form" action="&dtml-absolute_url;" method="POST" onsubmit="return validateForm(this,1);">
+
+<table width="100%" align="center">
+<tr>
+   <td align="right" class="smallHeader">
+      <dtml-msg "Id">:
+   </td>
+   <td align="left">
+      <input type="text" 
+             name="id:id_" 
+             value="<dtml-var "_.has_key('use_default_values') and id or ''">"
+             size="15">
+   </td>
+</tr>
+<tr>
+   <td align="right" class="smallHeader">
+      <dtml-msg "Site title">:
+   </td>
+   <td align="left">
+      <input type="text" 
+             id="title" 
+             name="title:string:required" 
+             value="<dtml-var "_.has_key('use_default_values') and title or ''">"
+             size="40">
+   </td>
+</tr>
+<tr>
+   <td align="right" class="smallHeader">
+      <dtml-msg "Repository">:
+   </td>
+   <td align="left">
+      <input type="text" 
+             name="repository_url:string:required" 
+             value="<dtml-var "_.has_key('use_default_values') and repository_url or portal_publisher.get_repository()">" 
+             size="40">
+   </td>
+</tr>
+<tr>
+   <td align="right" class="smallHeader">
+      <dtml-msg "Available skin folders">:
+   </td>
+   <td align="left">
+      <input type="text" 
+             name="skin_links:tokens" 
+             value="<dtml-var "' '.join( _.has_key('use_default_values') and skin_links
+                                         or portal_publisher.soft_links)">" 
+             size="40">
+   </td>
+</tr>
+<tr>
+   <td align="right" class="smallHeader">
+      <dtml-msg "Storage folder name">:
+   </td>
+   <td align="left">
+      <input type="text" 
+             name="storage_id:string" 
+             value="storage" 
+             size="40" 
+             disabled>
+   </td>
+</tr>
+<tr>
+   <td align="right" class="smallHeader">
+      <dtml-msg "Remote ZEO server address">:
+   </td>
+   <td align="left">
+      <input type="text" 
+             name="sync_addr:string" 
+             value="<dtml-var "_.has_key('use_default_values') and sync_addr or ''">"   
+             size="40">
+   </td>
+</tr>
+<tr>
+   <td align="right" class="smallHeader">
+      <dtml-msg "Path to external site on the server">:
+   </td>
+   <td align="left">
+      <input type="text" 
+             name="sync_path:string" 
+             value="<dtml-var "_.has_key('use_default_values') and sync_path or ''">"   
+             size="40">
+   </td>
+</tr>
+<tr>
+   <td align="right" class="smallHeader">
+     <dtml-msg "Skin">:
+   </td>
+   <td>
+     <input type="hidden" name="skin_id" value="&dtml-skin_id;">
+     <dtml-var "_.getattr(portal_site_skins, skin_id).title_or_id()">
+   </td>
+</tr>
+<tr>
+   <td colspan="2" align="right"><br>
+      <input type="submit" name="site_constructor:method" value="<dtml-msg "Create site">">
+      <input type="button" name="cancel" value="<dtml-msg "Cancel">" 
+             onClick="return location.replace('<dtml-var "absolute_url( action='folder_contents', 
+                                                                        message='Site construction aborted')">');">
+   </td>
+</tr>
+</table>
+
+</form>
+</div>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,7 @@
+<dtml-msg "Filter by">:
+    <select name="filter_topic" onChange="document.location.replace('calendar_view?day='+&dtml-selected_day;+'&month='+&dtml-selected_month;+'&year='+&dtml-selected_year;+'&filter_topic='+this.value)">
+      <option value="">&mdash;&mdash;</option>
+      <dtml-in "listTopics()">
+        <option value="&dtml-sequence-item;" <dtml-var "filter_topic==_['sequence-item']" fmt=selected>>&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>

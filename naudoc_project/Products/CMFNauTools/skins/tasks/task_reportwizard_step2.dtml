@@ -1,0 +1,114 @@
+<dtml-comment>
+$Id: task_reportwizard_step2.dtml,v 1.9 2004/09/03 13:25:40 oevsegneev Exp $
+$Editor: ikuleshov $
+</dtml-comment>
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1> <dtml-var aboveInThread> </h1>
+<h1> <dtml-msg "Report wizard">, <dtml-msg "step"> 2</h1>
+
+<p><dtml-msg "At this step you can edit the contents of the general report"></p>
+<form name="report" method="POST" action="&dtml-absolute_url;">
+<dtml-in selected_tasks>
+<dtml-let task_id=sequence-item>
+    <dtml-with "followup.getTask(task_id)">
+    <table>
+    <tr>
+      <td>&nbsp;</td>
+      <td>
+         <h4>&dtml-Title;</h4>
+
+<dtml-in listResponseTypes mapping>
+<dtml-if sequence-start>
+ <table cellpadding=2 width="100%">
+</dtml-if>
+ <tr class="task_title">
+   <td class="smallHeader"><dtml-msg expr=progresslist_title></td>
+ </tr>
+ <tr><td>
+  <dtml-in "searchResponses(status=id)" mapping>
+      <dtml-if sequence-start>
+        <dtml-call "REQUEST.set('flag', 1)">
+        <table>
+      </dtml-if>
+      <dtml-let implicit_id="'%s_%s' %( task_id, date.timeTime() )">
+          <tr>
+            <td>
+               <input type="checkbox"
+                      id="i_&dtml-task_id;_&dtml-status;_&dtml-member;"
+                      name="&dtml-task_id;_responses:list"
+                      value="&dtml-member;:<dtml-var "date.timeTime()">"
+                      onClick="setControlState( this.form
+                                              , 'r_&dtml-implicit_id;'
+                                              , this.checked);"
+                      checked
+               />
+            </td>
+            <td valign="middle" class="smallHeader">
+               <dtml-var member fmt=member>
+               &nbsp; [<dtml-var "rDate(None, _, time=date)">]
+            </td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td>
+              <textarea name="r_&dtml-implicit_id;"
+                        cols="70" 
+                        rows="10">&dtml-text;</textarea>
+            </td>
+           </tr>
+       </dtml-let>
+       <dtml-if sequence-end>
+        </table>
+       </dtml-if>
+  </dtml-in>
+ </td></tr>
+<dtml-if sequence-end>
+ </table>
+      <dtml-if flag>
+        <dtml-call "REQUEST.set('flag', 0)">
+        <input type="hidden" name="selected_tasks:list" value="&dtml-task_id;">
+      </dtml-if>
+
+</dtml-if>
+</dtml-in>
+    </table>
+    <br>
+    </dtml-with>
+</dtml-let>
+</dtml-in>
+      <input type="hidden"
+             name="inc_inf"
+             value="<dtml-var "REQUEST.get('inc_inf', '')">"
+      />
+
+      <input type="hidden"
+             name="template"
+             value="<dtml-var "REQUEST.get('template', '')">"
+      />
+
+      <input type="hidden" name="doc_view" value="">
+
+      <input type="button"
+             onClick="location.href='&dtml-absolute_url;/document_follow_up_form'"
+             value=" <dtml-msg "Cancel"> "
+      />
+
+      <input type="submit"
+             name="task_reportwizard_step1:method"
+             value=" &lt;&lt; <dtml-msg "Back"> "
+      />
+
+      <input type="submit"
+             name="task_reportwizard_step3:method"
+             value=" <dtml-msg "Next"> &gt;&gt; "
+      />
+</form>
+
+</div>
+
+<dtml-var simple_html_footer>

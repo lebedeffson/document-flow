@@ -1,0 +1,37 @@
+<dtml-comment>
+$Id: task_delete_confirmation.dtml,v 1.5 2005/11/09 07:35:46 vsafronovich Exp $
+$Editor: ikuleshov $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+<form method="POST" action="&dtml-absolute_url;" target="workspace">
+<dtml-let modeName="_.get('showTaskMode') or 'showCurrent'">
+<input type="hidden" name="showTaskMode" value="<dtml-var modeName>">
+
+<p class="DesktopStatusBar">
+<dtml-msg "Do you really want to delete this task?">
+</p>
+<dtml-if "REQUEST.get('from_task_list_embedded', None)">
+  <dtml-in "REQUEST.get('ids', [])">
+    <dtml-let task="portal_catalog.getObjectByUid( _['sequence-item'] )">
+        <dtml-var "task_info( task, editable=0, show_title=1 )">
+        <input type="hidden" name="ids:list" value="&dtml-sequence-item;">    
+    </dtml-let>
+  </dtml-in>
+  <input type="submit" name="task_delete:method" value="<dtml-msg Remove>">
+  <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;?showTaskMode=&dtml-modeName;'" value=" <dtml-msg Cancel> ">
+
+<dtml-else>
+<dtml-comment> ==== if delete tasks from task_view, give current task instance === </dtml-comment>
+  <dtml-var "task_info(this(), editable=0, show_title=1)">
+  <input type="submit" name="deleteObject:method" value="<dtml-msg Remove>">
+  <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;'" value=" <dtml-msg Cancel> ">
+</dtml-if>
+
+</dtml-let>
+</form>
+</div>
+
+<dtml-var simple_html_footer>

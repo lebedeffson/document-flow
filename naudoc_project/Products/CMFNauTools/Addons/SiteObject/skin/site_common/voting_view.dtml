@@ -1,0 +1,18 @@
+<dtml-comment> Voting view
+$Id: voting_view.dtml,v 1.1 2008/10/15 12:48:08 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-var site_html_header>
+
+<div class="Desktop">
+
+  <h2>&dtml-title_or_id;</h2>
+  
+  &dtml-description;
+  
+  <dtml-let current="1"><dtml-var voting_box></dtml-let>
+
+</div>
+
+<dtml-var site_html_footer>

@@ -1,0 +1,31 @@
+<dtml-unless prn>
+
+<dtml-let relative_to_content="1">
+<dtml-var site_html_header>
+</dtml-let>
+
+</dtml-unless>
+
+<dtml-if traverse_subpath>
+<dtml-unless isIndexDocument>
+<h1>&dtml-title_or_id;</h1>
+</dtml-unless>
+</dtml-if>
+
+ <table cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <td valign="top">
+   <dtml-var CookedBody>
+  </td>
+ </tr>
+ </table>
+
+<dtml-comment>
+<p align="right">
+ <dtml-var "date(this(), REQUEST).strip()"> 
+</p>
+</dtml-comment>
+
+<dtml-unless prn>
+<dtml-var site_html_footer>
+</dtml-unless>

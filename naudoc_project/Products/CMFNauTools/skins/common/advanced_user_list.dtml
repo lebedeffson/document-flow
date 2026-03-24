@@ -1,0 +1,91 @@
+<dtml-comment>
+$Id $
+
+'name'      - selectbox name
+'value'     - mapping in form {'tab id': ('value 1', ...), ...}
+'hide_tabs' - ids of tabs to hide
+
+</dtml-comment>
+
+<div class="users-list">
+
+<input type="hidden" name="&dtml-name;:tokens:default" value="">
+
+<div class="sources">
+<dtml-let tabs="portal_membership.listSourceIds()"
+          values="_.get('values', {})">
+
+<dtml-call "_.has_key('hide_tabs') and _.map(tabs.remove, hide_tabs)">
+
+<select id="&dtml-name;_sources" onChange="toggleSourcesTab(this)">
+<dtml-in tabs prefix="tab">
+  <option value="&dtml-tab_item;">
+    <dtml-msg expr="portal_membership.getSourceProperty(tab_item, 'title')">
+  </option>
+</dtml-in>
+</select>
+
+<dtml-in tabs prefix="tab">
+
+  <div id="&dtml-name;_&dtml-tab_item;" <dtml-unless tab_start>style="display: none"</dtml-unless>>
+  <dtml-let values="portal_membership.getSourceItems(tab_item)">
+  <dtml-if "tab_item == 'user'">
+
+    <dtml-let show_filter="_.len(values) > 5">
+    <select size="<dtml-var "5 - show_filter">" multiple
+            onDblClick="addMemberSources('&dtml-name;', this)">
+      <dtml-in values>
+        <option value="&dtml-sequence-key;">&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>
+    <dtml-if show_filter>
+      <input type="text" onKeyUp="filterSelect(this)">
+    </dtml-if>
+    </dtml-let>
+
+  <dtml-elif "tab_item in ('group', 'role')">
+
+    <select size="5" multiple
+            onDblClick="addMemberSources('&dtml-name;', this)">
+      <dtml-in values>
+        <option value="&dtml-sequence-key;">&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>
+
+  <dtml-else>
+
+    <dtml-var "portal_membership.getSourceTemplate(tab_item)(None, _)">
+
+  </dtml-if>
+  </dtml-let>
+  </div>
+
+</dtml-in>
+</div>
+
+<div class="buttons">
+  <input type="button" value=" &gt;&gt; " onClick="addMemberSources('&dtml-name;')"><br>
+  <input type="button" value=" &lt;&lt; " onClick="deleteMemberSources('&dtml-name;')">
+</div>
+
+<div class="values">
+<select id="&dtml-name;_items" size="6" multiple
+        onDblClick="deleteMemberSources(this)">
+  <dtml-in tabs prefix="tab">
+    <dtml-in "portal_membership.getSourceItems( tab_item, values.get(tab_item, ()) )">
+      <option value="&dtml-sequence-key;">
+        <dtml-msg expr="portal_membership.getSourceProperty(tab_item, 'title')">: &dtml-sequence-item;
+      </option>
+    </dtml-in>
+  </dtml-in>
+</select>
+</div>
+
+<dtml-in "values.items()" prefix="v">
+  <dtml-in "v_key in tabs and v_item or ()">
+    <input type="hidden" name="&dtml-name;:uid:list" value="&dtml-sequence-item;">
+  </dtml-in>
+</dtml-in>
+
+</dtml-let>
+</div>

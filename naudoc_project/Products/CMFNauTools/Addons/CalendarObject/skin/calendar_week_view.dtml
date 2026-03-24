@@ -1,0 +1,70 @@
+<dtml-comment>
+Viewer for one week
+$Editor: spinagin $
+$Id: calendar_week_view.dtml,v 1.2 2007/07/03 12:18:56 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-let setting="getSetting()"
+          default_mode="setting['week_mode']"
+          popup_full_text="setting['popup_full_text']"
+          week_table_mode_only_title="setting['week_table_mode_only_title']"
+          len_of_text="setting['len_of_text']"
+          show_holidays_together="setting['show_holidays_together']"
+
+          cur_mode="REQUEST.has_key('week_mode') and REQUEST['week_mode'] or default_mode"
+          week_info="getWeekInfo(selected_year,selected_month,selected_week)"
+
+>
+
+<dtml-if "skin_version=='1.0'">
+<table width="100%" border="0">
+  <tr>
+    <td align="left">
+      <font color="#3366CC" size="2"><b><dtml-msg "Notes">:</b></font>
+      <font size="2"><b>
+        <dtml-var "week_info[0].day()"> <dtml-msg expr="week_info[0].Month().capitalize()">
+        <dtml-if "week_info[0].year()<>week_info[-1].year()"><dtml-var "week_info[0].year()"></dtml-if>
+         - <dtml-var "week_info[-1].day()"> <dtml-msg expr="week_info[-1].Month().capitalize()"> <dtml-var "week_info[-1].year()">
+      </b></font>
+    </td>
+    <td align="right">
+      <dtml-msg "Filter">:
+        <select name="filter_topic" onChange="document.location.replace('calendar_view?week='+&dtml-selected_week;+'&month='+&dtml-selected_month;+'&year='+&dtml-selected_year;+'&filter_topic='+this.value)">
+          <option value=""></option>
+            <dtml-in "listTopics()">
+              <option value="&dtml-sequence-item;" <dtml-var "filter_topic==_['sequence-item']" fmt=selected>>&dtml-sequence-item;</option>
+            </dtml-in>
+        </select>
+    </td>
+  </tr>
+</table>
+
+<dtml-else>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+  <td><h3 align="center"><dtml-var "week_info[0].day()"> <dtml-msg expr="week_info[0].Month().capitalize()">
+        <dtml-if "week_info[0].year()<>week_info[-1].year()"><dtml-var "week_info[0].year()"></dtml-if>
+        - <dtml-var "week_info[-1].day()"> <dtml-msg expr="week_info[-1].Month().capitalize()"> <dtml-var "week_info[-1].year()"></h3>
+
+  <td align="right" width="5%" nowrap="1">
+    <dtml-msg "Filter">:
+    <select name="filter_topic" onChange="document.location.replace('calendar_view?week='+&dtml-selected_week;+'&month='+&dtml-selected_month;+'&year='+&dtml-selected_year;+'&filter_topic='+this.value)">
+      <option value=""></option>
+      <dtml-in "listTopics()">
+        <option value="&dtml-sequence-item;" <dtml-var "filter_topic==_['sequence-item']" fmt=selected>>&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>
+
+</table>
+</dtml-if>
+
+<dtml-if "cur_mode=='short'">
+    <dtml-var calendar_simple_week_view>
+<dtml-else>
+    <dtml-var calendar_table_week_view>
+</dtml-if>
+
+
+
+</dtml-let>

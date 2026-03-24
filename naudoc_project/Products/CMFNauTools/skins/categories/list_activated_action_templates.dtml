@@ -1,0 +1,52 @@
+<dtml-comment>
+$Id: list_activated_action_templates.dtml,v 1.4 2008/05/26 15:04:05 oevsegneev Exp $
+
+called from invoke_factory_form.dtml
+
+</dtml-comment>
+<dtml-revision $Revision: 1.4 $>
+
+<table id="templates_table" style="width: 270pt" border="0" cellpadding="3" cellspacing="2">
+<dtml-in "portal_metadata.taskTemplateContainerAdapter.getTaskTemplates( category_id, transition )">
+    <dtml-if sequence-start>
+    <tr>
+      <td class="smallHeader" colspan="2">
+        <dtml-msg "The following tasks will be assigned on initial transition">:
+      </td>
+    </tr>
+    </dtml-if>
+    <tr>
+      <td colspan="2">
+       &nbsp;
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#ffffff" class="smallHeader">
+        <dtml-let template_id="_['sequence-item']['template_id']"
+                  task_definition="portal_metadata.taskTemplateContainerAdapter.getTaskDefinitionById( category_id, template_id, '1' )">
+        <dtml-msg "Action type">:
+      </td>
+      <td bgcolor="#ffffff" class="smallHeader">
+        <dtml-msg expr="portal_metadata.taskDefinitionFactory.getTaskDefinitionTypeTitle(task_definition['type'])">
+      </td>
+     </tr>
+     <tr>
+       <td bgcolor="#ffffff" class="smallHeader">
+         <dtml-msg "Name">:
+       </td>
+       <td bgcolor="#ffffff" class="smallHeader">
+         <dtml-var "task_definition['name']">
+       </td>
+     </tr>
+     <tr>
+      <td bgcolor="#ffffff" colspan="2">
+        <dtml-let dtml_name="portal_metadata.taskDefinitionFactory.getDtmlNameForInfoByType(task_definition['type'])">
+        <dtml-if dtml_name>
+           <dtml-var "_.getitem(dtml_name)( None, _, template_id=template_id, task_definition=task_definition )">
+        </dtml-if>
+        </dtml-let>
+       </dtml-let>
+      </td>
+     </tr>
+</dtml-in>
+  </table>

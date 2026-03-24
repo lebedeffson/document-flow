@@ -1,0 +1,45 @@
+<dtml-comment>
+$Id: home.dtml,v 1.39 2005/09/17 10:40:13 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.39 $>
+
+<dtml-var simple_html_header>
+
+<dtml-call "REQUEST.set('home_call', 1)">
+
+<h1><dtml-msg "Home page of user"> <dtml-var "portal_membership.getAuthenticatedMember().getUserName()" fmt=member></h1>
+<br />
+
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+<tr>
+  <td valign="top" width="50%">
+    <H3><dtml-msg "My tasks"></H3>
+    <dtml-var member_tasks>
+  </td>
+  <td valign="top" width="50%">
+    <H3><dtml-msg "My mail"></H3>
+    <dtml-var member_mail>
+  </td>
+</tr>
+
+<tr>
+  <td valign="top">
+    <H3><dtml-msg "My documents"></H3>
+    <dtml-var member_documents>
+  </td>
+  <td valign="top">
+    <h3><dtml-msg "Accessible documents"></h3>
+    <dtml-var accessible_documents>
+  </td>
+</tr>
+
+<tr>
+  <td valign="top">
+    <H3><dtml-msg "My favorites"></H3>
+    <dtml-var member_favorites>
+  </td>
+</tr>
+
+</table>
+
+<dtml-var simple_html_footer>

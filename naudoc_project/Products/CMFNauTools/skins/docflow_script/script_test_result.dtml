@@ -1,0 +1,40 @@
+<dtml-comment>
+
+Params:
+
+  'errors' - List of runtime errors
+  
+$Id: script_test_result.dtml,v 1.2 2004/06/01 10:31:10 mbernatski Exp $
+$Editor: mbernatski $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h2><dtml-msg "Result">:</h2>
+<table class="FormLayout" border="0">
+  <dtml-in errors>
+  <dtml-if sequence-start>
+  <tr>
+     <td><h3><dtml-msg "Errors">:</h3></td>
+  </tr>
+  </dtml-if>
+  <tr>
+    <td>
+      <dtml-var sequence-item> 
+    </td>
+  </tr>  
+  <dtml-else>
+  <tr>
+    <td>
+      <dtml-msg "The script is tested successfully."> 
+    </td>
+  </tr>
+  </dtml-in>
+</table>
+
+</div>
+
+<dtml-var simple_html_footer>

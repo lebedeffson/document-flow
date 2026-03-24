@@ -1,0 +1,244 @@
+<dtml-comment>
+View/edit form for common object properties.
+
+$Editor: vpastukhov $
+$Id: metadata_edit_form.dtml,v 1.98 2008/03/26 14:59:34 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.98 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let context=this
+          locked="context.implements('isLockable') and context.isLocked()"
+          modify="not locked and _.SecurityCheckPermission('Modify portal content', context)"
+          vmodify="modify and not locked
+                   and (this().implements('isVersionable')
+                        and _.SecurityCheckPermission( 'Modify portal content', this().getVersion() )
+                        or not this().implements('isVersionable'))"
+          category_object="context.getCategory()"
+          attr_perm="implements('isCategorial') and category_object and [not not context.checkAttributePermissionModify(x) for x in category_object.listAttributeDefinitions()] or []"
+          amodify="attr_perm.sort() or (attr_perm and attr_perm[-1] or 0)"
+          rename="not locked and _.SecurityCheckPermission('Delete objects', this().parent())"
+          form_name="'metadata_edit_form'"
+>
+
+<dtml-if message>
+ <p>&dtml-message;</p>
+ <hr>
+</dtml-if>
+
+<h2><dtml-msg "Standard Resource Metadata"></h2>
+<dtml-msg "Each object i.e. HTML document or image has it's own title, description and extended metadata so one can easily find the necessary document.">
+<dtml-if "modify or vmodify or rename or amodify">
+  <form name="metadata_edit_form" action="metadata_edit" method="POST" onsubmit="return validateForm(this, 1, 1);">
+
+  <script type="text/javascript">
+  <!--
+
+  function callbackFunctionTemplate( formId, uid, title, version_id, uid_field, title_field ) {
+    document.forms[formId][uid_field].value = uid;
+    document.forms[formId][title_field].value = title;
+  }
+  
+  window.onload = function() {
+      focusForm( document.forms['metadata_edit_form'] )
+  }
+
+  function loadAllowedUsers() {
+    var td = document.getElementById('allowed_users');
+    try {
+      td.innerHTML = userAgent.downloadURL('&dtml-absolute_url;/allowed_users?<dtml-var "implements('isCategoryDefinition') and 'category=%s' % getId() or 'uid=%s' % getUid()">');
+    } catch (error) {
+      td.innerHTML = '<dtml-msg "Error">';
+    }
+  }
+
+  //-->
+  </script>
+</dtml-if>
+
+<table class="FormLayout" border="0">
+
+ <tr valign="top">
+  <th align="right"> <dtml-msg "URL"> </th>
+  <td> <dtml-var Identifier> </td>
+ </tr>
+
+<dtml-if "category_object.getProperty('show_id') and not implements('isCategoryDefinition')">
+ <tr>
+  <th align="right"> <dtml-msg "Id"> </th>
+  <td>
+    <dtml-if "rename and cb_isMoveable()">
+      <input type="text" name="id:id_" value="<dtml-var "context.getId()" html_quote>" size="30">
+    <dtml-else>
+      <dtml-var "context.getId()" html_quote>
+    </dtml-if>
+  </td>
+ </tr>
+</dtml-if>
+
+ <tr valign="top">
+  <th align="right"> <dtml-msg "Title"> </th>
+  <td>
+  <dtml-if vmodify>
+    <input type="text"
+           name="title:required:string"
+           value="&dtml-Title;"
+           validation_message="<dtml-msg "Specify the document title">"
+           size="65">
+  <dtml-else>
+     &dtml-Title;
+  </dtml-if>
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> <dtml-msg "Description"> </th>
+  <td>
+   <dtml-if vmodify>
+   <textarea name="description:text" rows="5"
+             cols="64">&dtml-Description;</textarea>
+   <dtml-else>
+    &dtml-Description;
+   </dtml-if>
+  </td>
+ </tr>
+
+  <dtml-in listEditableProperties mapping>
+  <tr valign="top">
+    <th align="right"><dtml-msg expr=title></th>
+    <td>
+      <dtml-if modify>
+        <dtml-var "entry_field_edit( None, _,
+                                     name='property/%s' % id,
+                                     type=type,
+                                     value=getProperty( id, moniker=True ),
+                                     options=(_.has_key('select_variable') and _.getitem(select_variable) or []),
+                                   )">
+      <dtml-else>
+        <dtml-var "entry_field_view( None, _,
+                                     name='property/%s' % id,
+                                     type=type,
+                                     value=getProperty( id, moniker=True ),
+                                   )">
+      </dtml-if>
+    </td>
+  </tr>
+  </dtml-in>
+
+  <dtml-if "implements('hasLanguage')">
+  <tr valign="top">
+
+   <th align="right"> <dtml-msg "Language"> </th>
+   <td>
+     <dtml-let language="language or Language()">
+     <dtml-if modify>
+       <select name="language">
+	 <dtml-in "msg.get_languages_map()" mapping>
+	 <option value="&dtml-id;" <dtml-var "id == language" fmt=selected> >
+	 <dtml-msg expr="title"></option>
+	 </dtml-in>
+       </select>
+     <dtml-else>
+       <dtml-msg expr="msg.get_language_name( language )">
+     </dtml-if>
+     </dtml-let>
+   </td>
+
+  </tr>
+  </dtml-if>
+
+
+<dtml-if "implements('isCategorial')">
+<dtml-let change_category="not locked
+                           and portal_properties.getConfig('AllowChangeCategory')
+                           and _.SecurityCheckPermission( 'Manage properties', context )">
+
+
+<dtml-comment>
+   Category metadata
+</dtml-comment>
+
+  <tr>
+    <th class="TextField"><dtml-msg "Category"></th>
+    <td class="TextField">
+      <dtml-if change_category>
+        <select name="category:string">
+          <dtml-in "parent().listAllowedCategories( this().getPortalTypeName(), append=category_object.getId() )">
+          <option value="&dtml-getId;" <dtml-var "getId() == category_object.getId()" fmt=selected>
+                  ><dtml-msg expr=Title></option>
+          </dtml-in>
+        </select>
+      <dtml-else>
+        <dtml-if "('Manager' in portal_membership.getAuthenticatedMember().getRoles())">
+          <dtml-var category_object fmt=content>
+        <dtml-else>
+          <dtml-msg expr="category_object.title">
+        </dtml-if>
+      </dtml-if>
+    </td>
+  </tr>
+
+  <dtml-let attributes="listCategoryAttributes( monikers=True )">
+  <dtml-if attributes>
+    <tr>
+      <th class="TextField"><dtml-msg "Document attributes"></th>
+      <td class="TextField"><dtml-var "attribute_fields_embedded(None, _, document = context)"></td>
+    </tr>
+  </dtml-if>
+  </dtml-let>
+
+</dtml-let>
+</dtml-if>
+
+<dtml-if "modify or vmodify or rename or amodify and not wl_isLocked()">
+ <tr valign="top">
+  <td><br>
+  </td>
+  <td align=left>
+  <br> <input type="submit" name="metadata" value=" <dtml-msg "Apply"> ">
+  </td>
+ </tr>
+<dtml-elif wl_isLocked>
+ <tr valign="top">
+  <td><br>
+  </td>
+  <td align=left>
+  <br><dtml-msg "This document has been locked because it is being edited by another user.">
+  </td>
+ </tr>
+</dtml-if>
+
+
+ <tr>
+  <td colspan="2">&nbsp;</td>
+ </tr>
+
+<dtml-if "portal_membership.checkPermission('Modify portal content', this()) and implements('isPortalContent')">
+ <tr>
+  <td id="allowed_users" colspan="2">
+    <a href="#" onClick="loadAllowedUsers()"><dtml-msg "Show users which allowed to access this object"></a>
+  </td>
+ </tr>
+ <tr>
+  <td colspan="2">&nbsp;</td>
+ </tr>
+</dtml-if>
+
+<dtml-if "implements('isHTMLDocument')">
+ <tr>
+  <td colspan="2">
+   <dtml-var subscribed_users_list>
+  </td>
+ </tr>
+</dtml-if>
+
+</table>
+<dtml-if "modify or vmodify or rename or amodify">
+  </form>
+</dtml-if>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

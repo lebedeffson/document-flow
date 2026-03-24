@@ -1,0 +1,32 @@
+<dtml-comment>
+$Id: pattern_help_form.dtml,v 1.2 2005/09/13 12:21:26 oevsegneev Exp $
+$Editor: oevsegneev $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+
+<dtml-var simple_html_header>
+<dtml-let expl="pattern_help(fmt=REQUEST.get('fmt'))">
+
+<table border="0" cellpadding="2" cellspacing="2" width="100%">
+<dtml-in expl prefix="f">
+  <dtml-in "f_item.keys()" prefix="e">
+<tr class="row_even">
+  <td class="small"><nobr><dtml-msg expr="e_item"></nobr></td>
+  <td class="small">
+    <dtml-msg expr="f_item[e_item]">
+  </td>
+</tr>
+  </dtml-in>
+</dtml-in>
+<tr>
+  <td colspan="2" align="center">
+    <a href="javascript:window.close()"><dtml-msg "Close"></a>
+  </td>
+</tr>
+</table>
+
+</dtml-let>
+<dtml-var simple_html_footer>

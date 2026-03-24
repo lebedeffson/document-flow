@@ -1,0 +1,27 @@
+<dtml-comment>
+This page is displayed after logging out of the portal.
+
+$Editor: vpastukhov $
+$Id: logged_out.dtml,v 1.3 2004/03/09 16:48:28 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.3 $>
+
+<dtml-var simple_html_header>
+
+<p>
+<dtml-if expr="portal_membership.isAnonymousUser()">
+
+<dtml-msg "You are logged out of the portal.">
+
+<dtml-else>
+
+<dtml-msg "You are logged in outside the portal."><br />
+<dtml-msg "You may need to log out of the Zope management interface."><br />
+<br />
+<a href="&dtml-portal_url;/manage_zmi_logout"><dtml-msg "Log out"></a>
+
+</dtml-if>
+</p>
+
+<dtml-var simple_html_footer>

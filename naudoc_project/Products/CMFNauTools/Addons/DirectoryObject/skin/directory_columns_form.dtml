@@ -1,0 +1,245 @@
+<dtml-comment>
+Directory columns configuration form.
+
+$Editor: vpastukhov $
+$Id: directory_columns_form.dtml,v 1.9 2006/02/22 11:42:39 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Directory attributes">: <dtml-var this fmt=object></h2>
+
+<dtml-let form_name="'directory_columns_form'"
+          usage_codes="['all','entries','branches']"
+          scope_codes="['none','parent','owner','directory']" >
+
+<form name="&dtml-form_name;" method="post"
+      action="<dtml-var "relative_url( action='directory_columns_handler' )" html_quote>"
+      onSubmit="return validateForm(this, 1)">
+
+<script type="text/javascript">
+<!--
+
+messageCatalog['directories.confirm_columns_deletion'] =
+    '<dtml-msg "directories.confirm_columns_deletion" jscript>';
+
+function confirmDelete( form )
+{
+    return confirm( messageCatalog['directories.confirm_columns_deletion'] );
+}
+
+//-->
+</script>
+
+<table width="90%" border="0" cellpadding="2">
+
+  <tr class="row_title">
+    <td width="20">&nbsp;</td>
+    <td nowrap="1"><dtml-msg "ID"></td>
+    <td nowrap="1"><dtml-msg "Type"></td>
+    <td nowrap="1"><dtml-msg "Title"></td>
+    <td nowrap="1"><dtml-msg "Usage"></td>
+    <td nowrap="1"><dtml-msg "Uniqueness"></td>
+    <td nowrap="1"><dtml-msg "Read only"></td>
+  </tr>
+
+<dtml-in "[ getTitleColumn(), getCodeColumn() ] + listColumns()">
+<dtml-let usage_value="(isEntryColumn() and isBranchColumn()) and 'all' or None"
+          usage_value="usage_value or (isEntryColumn()  and 'entries')"
+          usage_value="usage_value or (isBranchColumn() and 'branches')"
+          unique_value="scope_codes[ isUnique() or 0 ]" >
+
+  <tr class="row_even">
+
+    <td valign="top">
+      <dtml-if isReserved>
+        &nbsp;
+      <dtml-else>
+        <input type="checkbox" name="names:list" value="&dtml-name;" />
+      </dtml-if>
+    </td>
+
+    <td valign="top" width="20%">
+      &dtml-name;
+    </td>
+
+    <td valign="top">
+      <dtml-msg expr=type>
+    </td>
+
+    <td valign="top" width="50%">
+      <dtml-if isImmutable>
+        &dtml-title;
+      <dtml-else>
+        <input type="text"name="col/&dtml-name;.title:string:record"
+               value="&dtml-title;" size="15" style="width:100%" />
+      </dtml-if>
+    </td>
+
+    <td valign="top">
+      <dtml-if isReserved>
+        <dtml-msg expr="'directories.column_usage.%s' % usage_value">
+      <dtml-else>
+        <select name="col/&dtml-name;.usage:record">
+        <dtml-in usage_codes>
+          <option value="&dtml-sequence-item;" <dtml-var "usage_value == _['sequence-item']" fmt=selected> >
+                  <dtml-msg expr="'directories.column_usage.%s' % _['sequence-item']"></option>
+        </dtml-in>
+        </select>
+      </dtml-if>
+    </td>
+
+    <td valign="top">
+      <dtml-if isImmutable>
+        <dtml-msg expr="'directories.column_scope.%s' % unique_value">
+      <dtml-else>
+        <select name="col/&dtml-name;.unique:record">
+        <dtml-in scope_codes>
+          <option value="&dtml-sequence-item;" <dtml-var "unique_value == _['sequence-item']" fmt=selected> >
+                  <dtml-msg expr="'directories.column_scope.%s' % _['sequence-item']"></option>
+        </dtml-in>
+        </select>
+      </dtml-if>
+    </td>
+
+    <td valign="top">
+      <input type="checkbox" name="col/&dtml-name;.disable:boolean:record"
+             <dtml-var "not allowsInput()" fmt=checked> <dtml-var isConstant fmt=disabled> />
+      <input type="hidden" name="col/&dtml-name;.disable:boolean:default:record" value="" />
+    </td>
+
+  </tr>
+
+</dtml-let>
+</dtml-in>
+
+  <tr>
+    <td colspan="7">
+      <br />
+      <input type="submit" name="save_columns" value="<dtml-msg "Save changes">" />
+      &nbsp;&nbsp;&nbsp;
+      <input type="submit" name="delete_columns" value="<dtml-msg "Remove">"
+             onClick="return confirmDelete( this.form )" />
+      &nbsp;&nbsp;&nbsp;
+      <input type="submit" name="cancel" value="<dtml-msg "Cancel">" />
+    </td>
+  </tr>
+
+</table>
+
+</form>
+
+</dtml-let>
+
+<br/>
+
+<dtml-let form_name="'directory_add_column_form'"
+          usage_codes="['all','entries','branches']"
+          scope_codes="['none','parent','owner','directory']"
+          usage_value="None"
+          unique_value="None"
+          value_types="portal_types.listValueTypes()" >
+
+<form name="&dtml-form_name;" method="post"
+      action="<dtml-var "relative_url( action='directory_columns_handler' )" html_quote>"
+      onSubmit="return validateForm(this, 1)">
+
+<script type="text/javascript">
+<!--
+
+// validateIdentifier( this.form.fName, '<dtml-var "msg('Field is invalid')">', 1)
+
+function changeValueType( field )
+{
+    return this.frames['properties_frame'].changeValueType( field.value );
+}
+
+function updatePropertiesForm( field )
+{
+    //return this.frames['properties_frame'].updateValueProperties( field.form );
+}
+
+
+//-->
+</script>
+
+<h3><dtml-msg "Add new directory attribute"></h3>
+
+<table id="new_attribute_table" width="90%" border="0" cellspacing="2" cellpadding="2">
+  <tr>
+    <td><dtml-msg "Identifier"></td>
+    <td width="100%"><input type="text" name="name:string"></td>
+  </tr>
+
+  <tr>
+    <td><dtml-msg "Title"></td>
+    <td><input type="text" name="title:string"></td>
+  </tr>
+
+  <tr>
+    <td><dtml-msg "Usage"></td>
+    <td>
+      <select name="usage">
+      <dtml-in usage_codes>
+        <option value="&dtml-sequence-item;" <dtml-var "usage_value == _['sequence-item']" fmt=selected> >
+                <dtml-msg expr="'directories.column_usage.%s' % _['sequence-item']"></option>
+      </dtml-in>
+      </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td><dtml-msg "Uniqueness"></td>
+    <td>
+      <select name="unique">
+      <dtml-in scope_codes>
+        <option value="&dtml-sequence-item;" <dtml-var "unique_value == _['sequence-item']" fmt=selected> >
+                <dtml-msg expr="'directories.column_scope.%s' % _['sequence-item']"></option>
+      </dtml-in>
+      </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td><dtml-msg "Read only"></td>
+    <td>
+      <input type="checkbox" name="disable:boolean" />
+      <input type="hidden" name="disable:boolean:default" value="" />
+    </td>
+  </tr>
+
+  <tr>
+    <td><dtml-msg "Data type"></td>
+    <td>
+      <select name="type:required:string" onChange="changeValueType(this)" validation_message="directories.empty_attribute_type">
+        <option value="">(<dtml-msg "not selected">)</option>
+        <dtml-in "portal_metadata.listAttributeTypes( construction=True )" sort="getId">
+        <dtml-unless isDerived>
+        <option value="&dtml-id;"><dtml-msg expr="'valuetype.%s' % id"></option>
+        </dtml-unless>
+        </dtml-in>
+      </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2">
+      <input type="submit" name="add_column" value="<dtml-msg "Add">" />
+    </td>
+  </tr>
+
+</table>
+
+<iframe name="properties_frame"
+        src="<dtml-var "relative_url( action='attr_properties', params={'construction':True, 'with_default':False} )" html_quote>"
+        properties_table_id="new_attribute_table"
+        properties_table_row="6"
+        scrolling="no" height="0" width="0"
+        frameborder="0" marginwidth="0"></iframe>
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

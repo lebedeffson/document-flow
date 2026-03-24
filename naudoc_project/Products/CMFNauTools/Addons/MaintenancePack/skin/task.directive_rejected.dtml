@@ -1,0 +1,20 @@
+<dtml-comment>
+$Id: task.directive_rejected.dtml,v 1.1 2009/02/17 15:04:22 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+<dtml-let membername="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='en'">
+Subject: Task "<dtml-var task_title>" rejected
+
+Your task "<dtml-var task_title>" has been rejected by <dtml-var membername>.
+URL: &dtml-task_url;
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: <dtml-var over_subject fmt=untaint>
+
+<dtml-var membername> отказался от выполнения "<dtml-var task_title>".
+URL: &dtml-task_url;
+
+</dtml-if>
+</dtml-let>

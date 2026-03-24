@@ -1,0 +1,59 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_rollback_form1.dtml,v 1.11 2004/04/02 07:35:43 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let entry=this
+          step=getStep
+          rollback_steps="step.listRollbackSteps()"
+>
+
+<h1><dtml-msg "Rollback step"></h1>
+<h2><dtml-msg "Current step">:<dtml-var "step.Title()" html_quote></h2>
+
+<form method="POST" action="&dtml-absolute_url;">
+<table cellspacing="1" cellpadding="3">
+
+<dtml-in rollback_steps>
+<dtml-if sequence-start>
+  <tr>
+    <td valign="top">
+      <dtml-msg "Choose step to rollback">: <br>
+      <select name="rollback_step">
+</dtml-if>
+       <option value="&dtml-sequence-item;">
+         <dtml-var "getStep(_['sequence-item']).Title()" html_quote>
+       </option>
+<dtml-if sequence-end>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input type="submit" name="vdocument_rollback_form2:method" value="<dtml-msg "Next"> &gt;&gt; "/>
+      <input type="submit" name="vdocument_entry_form:method" value="<dtml-msg "Cancel">"/>
+    </td>
+  </tr>
+</dtml-if>
+<dtml-else>
+  <tr>
+    <td class="small"><dtml-msg "There are no rollback steps defined"></td>
+  </tr>
+  <tr>
+    <td>
+      <input type="submit" name="vdocument_entry_form:method" value="<dtml-msg "Back">"/>
+    </td>
+  </tr>
+</dtml-in>
+
+</table>
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>
+

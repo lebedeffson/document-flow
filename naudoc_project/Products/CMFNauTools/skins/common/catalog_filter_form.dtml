@@ -1,0 +1,202 @@
+<dtml-comment>
+Entries filter form
+
+'filter_id' - required
+'filter' - required
+'mode_name' - optional. used for SearchProfile
+
+$Editor: ikuleshov$
+$Id: catalog_filter_form.dtml,v 1.22 2007/06/29 12:25:30 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.22 $>
+
+<dtml-let columns="filter.get('columns')"
+          query="filter.get('query',{})"
+          profile_title="filter.get('profile_title','')"
+          conditions="[x.get('id') for x in columns if x.get('id') in query.keys()]"
+          form_name="'catalog_filter_form'"
+          mode_name="_.get('mode_name',None,0)"
+          session="REQUEST['SESSION']">
+
+<dtml-call "session.get('%s_filter' % filter_id) != filter and session.set('%s_filter' % filter_id, filter)">
+
+<form name="&dtml-form_name;"
+      class="inline" method="POST"
+      action="<dtml-var "relative_url(action='catalog_filter')" html_quote>"
+      onsubmit="return validateForm( this, true );">
+  <hr />
+  <input type="hidden" name="filter_id" value="&dtml-filter_id;">
+  <input type="hidden" name="mode_name" value="&dtml.null.missing-mode_name;">
+  <table>
+    <tr class="row_title">
+      <td class="smallHeader" colspan="2">
+        <dtml-msg "View filter"> <dtml-if profile_title>(&dtml-profile_title;)</dtml-if>
+      </td>
+    </tr>
+
+   <dtml-in conditions>
+     <dtml-let id=sequence-item
+               value="query.get(id, [])"
+               usage="query.get('%s_usage' % id, [])"
+               column="[x for x in columns if x.get('id') == id][0]"
+               column_title="column.get('title')"
+               column_type="column.get('type')"
+     >
+      <tr class="row_even">
+        <td class="smallHeader">
+          <input type="checkbox" name="selected_conditions:list" value="&dtml-id;" id="sc_&dtml-id;">
+          <label for="sc_&dtml-id;"><dtml-msg expr="column_title"></label>
+        </td>
+        <td>
+          <dtml-if "column_type=='date'">
+            <table>
+              <tr>
+                <td><dtml-msg "From:"></td>
+                <td>
+                  <dtml-var "entry_field_edit( None, _,
+                                               type=column_type,
+                                               name='filter_min_%s' % id,
+                                               value=_.len(value) == 2 and value[0],
+                                             )">
+                </td>
+              </tr>
+              <tr>
+                <td><dtml-msg "Till:"></td>
+                <td>
+                  <dtml-var "entry_field_edit( None, _,
+                                               type=column_type,
+                                               name='filter_max_%s' % id,
+                                               value=_.len(value) == 2 and value[1],
+                                             )">
+                </td>
+              </tr>
+            </table>
+            <input type="hidden" name="<dtml-var "'%s_usage' % id">" value="range:min:max"/>
+          <dtml-elif "column_type in ['int', 'float', 'currency']">
+            <dtml-var "entry_field_edit( None,
+                                         _,
+                                         type=column_type,
+                                         name='filter_%s' % id,
+                                         value=value
+                                       )">
+            <dtml-msg "usage:">
+            <select name="<dtml-var "'%s_usage' % id">"/>
+              <dtml-in "('range:max', 'less than'),
+                        ('', 'equal'),
+                        ('range:min', 'greater than')"
+              >
+                <option value="&dtml-sequence-key;"
+                        <dtml-var "_['sequence-key'] == usage" fmt=selected>
+                /> <dtml-msg expr=sequence-item></option>
+              </dtml-in>
+            </select>
+          <dtml-elif "column_type in ['list', 'lines', 'userlist']">
+            <dtml-var "entry_field_edit( None, _,
+                                         type=column_type,
+                                         name='filter_%s' % id,
+                                         value=value,
+                                         multiple=column.get('multiple'),
+                                         options=column.get('options',[]),
+                                       )">
+          <dtml-elif "column_type in ['file', 'link']">
+            <dtml-comment> XXX value of link column is 'link_001',
+                                     of file column is file name
+
+                           so search on link target value find nothing
+
+            </dtml-comment>
+            <dtml-var "entry_field_edit( None, _,
+                                         type='string',
+                                         name='filter_%s' % id,
+                                         value=value,
+                                       )">
+          <dtml-else>
+            <dtml-var "entry_field_edit( None, _,
+                                         type=column_type,
+                                         name='filter_%s%s' % (id, column.get('used_NG2') and ':search' or '') ,
+                                         value=value,
+                                       )">
+          </dtml-if>
+        </td>
+      </tr>
+     </dtml-let>
+   <dtml-if sequence-end>
+     <tr class="row_title">
+       <td colspan="2">
+         <input type="submit"
+                name="apply_filter"
+                value="<dtml-msg "Apply filter">"
+         >
+         <input type="submit"
+                name="remove_condition"
+                value="<dtml-msg "Remove condition">"
+                onClick="this.form.onsubmit=null;"
+         >
+       </td>
+     </tr>
+   </dtml-if>
+   </dtml-in>
+   <tr class="row_title">
+     <td class="smallHeader">
+       <dtml-msg "Column">:
+     </td>
+     <td>
+        <select name="condition">
+          <dtml-in columns mapping>
+            <option value="&dtml-id;"><dtml-msg expr=title></option>
+          </dtml-in>
+        </select>
+        <input type="submit"
+               name="add_condition"
+               value="<dtml-msg "Add condition">"
+        >
+     </td>
+   </tr>
+   <tr>
+     <td colspan="2">
+       <input type="submit"
+              name="save_filter"
+              value="<dtml-msg "Save filter">"
+       >&nbsp;
+       <input type="submit"
+              name="reset"
+              value="<dtml-msg "Reset">"
+              onClick="this.form.onsubmit=null;"
+       >
+     </td>
+   </tr>
+
+  </table>
+
+  <dtml-comment><dtml-var this html_quote></dtml-comment>
+  <dtml-let links="portal_links.searchLinks( source=this()
+                                           , source_collection='filters'
+                                           , source_mode=mode_name
+                                           , relation='collection'
+                                           )"
+            filters="[ l.getObject() for l in links if l.getObject().isTargetAllowed() ]"
+            moniker_frame="'_self'"
+  >
+  <dtml-in filters>
+
+    <dtml-if sequence-start>
+    <dtml-msg "Saved filters">:
+    <table>
+    </dtml-if sequence-start>
+
+    <tr>
+      <td><img src="&dtml-portal_url;/view.gif" /></td>
+      <td><dtml-var sequence-item fmt=link.target></td>
+    </tr>
+
+    <dtml-if sequence-end>
+    </table>
+    </dtml-if>
+
+  </dtml-in filters>
+  </dtml-let>
+
+  <hr />
+
+</form>
+</dtml-let>

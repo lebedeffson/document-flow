@@ -1,0 +1,21 @@
+
+<dtml-in getHistory mapping reverse>
+  <dtml-if sequence-start>
+    <table cellspacing="3">
+      <tr>
+        <td class="smallHeader"><dtml-msg "Modifications log"></td>
+      </tr>
+  </dtml-if>
+      <tr>
+        <td class="small">
+          <dtml-var date fmt="%d.%m.%Y %H:%M">
+          <b><dtml-var actor fmt=member.brief></b>
+          <em><dtml-msg expr=action></em> :
+          <dtml-var "_.has_key('step') and '%s %s'%(getStepById(step).Title(), '<br>') or ''">
+          <em>&dtml-text;</em>
+        </td>
+      </tr>
+  <dtml-if sequence-end>
+    </table>
+  </dtml-if>
+</dtml-in>

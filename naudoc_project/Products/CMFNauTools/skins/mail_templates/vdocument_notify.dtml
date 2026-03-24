@@ -1,0 +1,19 @@
+Content-Type: text/plain; charset=windows-1251
+Subject: [&dtml-vdocument_title;] Требуется ваше участие
+
+Требуется ваше участие на этапе "&dtml-step_title;"
+<dtml-let entry=this>
+<dtml-in "getTable().listColumnsMetadata()">
+<dtml-if sequence-start>
+
+Параметры записи:
+</dtml-if>
+&dtml-title; : <dtml-var "entry_field_view( None, _
+                                          , name=id
+                                          , type=type
+                                          , value=entry.get(id, moniker=1)
+                                          )" fmt=strip>
+</dtml-in>
+</dtml-let>
+
+URL: &dtml-vdocument_url;

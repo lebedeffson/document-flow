@@ -1,0 +1,119 @@
+# Translation of Zope External Editor Helper App to Russian.
+# Copyright (C) 2004 NAUMEN
+# Yura Petrov <ypetrov@naumen.ru>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Zope External Editor Helper App 0.7.3-ND\n"
+"POT-Creation-Date: Tue Jun 15 14:35:04 2004\n"
+"PO-Revision-Date: 2004-06-16 15:44+0500\n"
+"Last-Translator: Yura Petrov <ypetrov@naumen.ru>\n"
+"Language-Team: NauDoc Developers <naudoc-devel@naumen.ru>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=cp1251\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: zopeedit.py:461
+msgid "(object already locked)"
+msgstr "(объект уже заблокирован)"
+
+#: zopeedit.py:171
+msgid "SSL support is not available on this system. Make sure openssl is installed and reinstall Python."
+msgstr "Поддержка SSL не доступна в данной системе. Убедитесь, что openssl установлен и переустановите Python."
+
+#: zopeedit.py:291
+msgid "Zope External Editor"
+msgstr "Внешний редактор Zope"
+
+#: zopeedit.py:292
+msgid "Enter the command to launch the default editor"
+msgstr "Введите команду для запуска редактора по умолчанию"
+
+#: zopeedit.py:301
+msgid ""
+"No editor was found for that object.\n"
+"Specify an editor in the configuration file:\n"
+"(%s)"
+msgstr ""
+"Для этого объекта не найден редактор.\n"
+"Укажите редактор в конфигурационном файле:\n"
+"(%s)"
+
+#: zopeedit.py:313
+msgid ""
+"This object is already locked by you in another session.\n"
+"Do you want to borrow this lock and continue?"
+msgstr ""
+"Этот объект был заблокирован вами в другом сеансе.\n"
+"Снять блокировку и продолжить?"
+
+#: zopeedit.py:387
+msgid ""
+"Editor did not launch properly.\n"
+"External editor lost connection to editor process.\n"
+"(%s)"
+msgstr ""
+"Неуспешный запуск редактора.\n"
+"Была потеряна связь с его процессом.\n"
+"(%s)"
+
+#: zopeedit.py:393
+msgid ""
+"File not saved to Zope.\n"
+"Reopen local copy?"
+msgstr ""
+"Файл не был сохранен в Zope.\n"
+"Открыть локальную копию?"
+
+#: zopeedit.py:402
+msgid "Could not acquire lock. Attempt to save to Zope anyway?"
+msgstr "Невозможно снять блокировку. Попытаться сохранить в Zope?"
+
+#: zopeedit.py:421
+msgid ""
+"Could not save to Zope.\n"
+"Error occurred during HTTP put"
+msgstr ""
+"Невозможно сохранить в Zope.\n"
+"Ошибка во время HTTP put"
+
+#: zopeedit.py:465
+msgid "Lock request failed"
+msgstr "Блокирование не удалось"
+
+#: zopeedit.py:482
+msgid "Unlock request failed"
+msgstr "Разблокирование не удалось"
+
+#: zopeedit.py:584
+msgid ""
+"Error launching editor process\n"
+"(%s):\n"
+"%s"
+msgstr ""
+"Ошибка при запуске редактора\n"
+"(%s):\n"
+"%s"
+
+#: zopeedit.py:663
+msgid "FATAL ERROR: %s"
+msgstr "ОШИБКА: %s"
+
+#: zopeedit.py:745
+msgid ""
+"Zope External Editor %s\n"
+"By Casey Duncan, Zope Corporation\n"
+"http://www.zope.com/"
+msgstr ""
+"Внешний редактор Zope %s\n"
+"Кэйси Данкан, корпорация Zope\n"
+"http://www.zope.com/"
+
+#: zopeedit.py:756
+msgid ""
+"Input file name missing.\n"
+"Usage: zopeedit inputfile"
+msgstr ""
+"Отсутствует имя входного файла.\n"
+"Использование: zopeedit inputfile"
+

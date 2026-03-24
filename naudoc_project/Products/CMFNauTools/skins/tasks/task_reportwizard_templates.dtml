@@ -1,0 +1,3 @@
+        <select name="template">
+          <option value='task_reportgenerator_tabular'><dtml-var "msg('Tabular report')"></option>
+        </select>

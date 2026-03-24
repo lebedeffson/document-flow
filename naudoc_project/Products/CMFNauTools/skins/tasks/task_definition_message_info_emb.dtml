@@ -1,0 +1,16 @@
+<dtml-comment>
+$Id: task_definition_message_info_emb.dtml,v 1.1 2003/09/03 09:15:11 inemihin Exp $
+
+showing action template 'message', in info mode
+
+called from list_activated_action_templates_emb.dtml
+
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<table cellspacing="2" cellpadding="2"> 
+  <tr class="row_even">
+    <td class="smallHeader"><dtml-var "msg('Message text')">:</td>
+    <td><dtml-var "task_definition['message']"></td>
+  </tr>
+</table>

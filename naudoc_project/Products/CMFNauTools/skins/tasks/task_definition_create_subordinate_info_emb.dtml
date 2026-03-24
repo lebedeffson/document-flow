@@ -1,0 +1,111 @@
+<dtml-comment>
+$Id: task_definition_create_subordinate_info_emb.dtml,v 1.9 2005/09/19 07:02:24 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-let task_definition_uid="task_definition['uid']">
+
+<table cellspacing="2" cellpadding="2">
+  <tr class="row_odd">
+    <td colspan="2" class="smallHeader">
+      <dtml-msg "Metadata">:
+    </td>
+  </tr>
+  <tr class="row_even">
+    <dtml-let dest_folder_template="task_definition.get('dest_folder_template', '')"
+              type_is_template="task_definition.get('dest_folder_type', 'path')=='template'">
+      <dtml-if type_is_template>
+    <td class="smallHeader"><dtml-msg "New location template">:</td>
+    <td>
+        <dtml-pattern expr=dest_folder_template ptype=folder_routing doc="this()">
+      <dtml-else>
+    <td class="smallHeader"><dtml-msg "New location">:</td>
+    <td>
+        <dtml-let dest_uid="task_definition.get('dest_folder_uid', '')"
+                  dest_brains="dest_uid and portal_catalog.searchResults(nd_uid=dest_uid)"
+                  dest_brain="dest_brains and dest_brains[0] or None"
+                  dest_URL="dest_brain is not None and dest_brain.getURL() or task_definition.get('dest_folder_URL', '')"
+                  dest_title="dest_brain is not None and (dest_brain['Title'] or dest_brain['id']) or task_definition.get('dest_folder_title', '')">
+          <dtml-var dest_URL>&nbsp;<b>(&dtml-dest_title;)</b>
+        </dtml-let>
+      </dtml-if>
+    </dtml-let>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <dtml-msg "Title template">
+    </td>
+    <td>
+      <dtml-pattern expr="task_definition['object_title_template']" ptype=title doc="this()">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <dtml-msg "Id">
+    </td>
+    <td>
+        <input type="text" name="id_&dtml-task_definition_uid;">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <dtml-msg "Title">
+    </td>
+    <td>
+      <input type="text" name="title_&dtml-task_definition_uid;">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <dtml-msg "Description">
+    </td>
+    <td>
+      <textarea name="description_&dtml-task_definition_uid;:text" rows="5" cols="65"></textarea>
+    </td>
+  </tr>
+
+<dtml-let category="portal_metadata.getCategoryById(task_definition['dest_category'])"
+          attributes="category is not None and category.listAttributeDefinitions()"
+          context=this
+>
+
+<dtml-in attributes>
+
+<dtml-if sequence-start>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr class="row_odd">
+    <td colspan="2" class="smallHeader"><dtml-msg "Document attributes">:</td>
+  </tr>
+</dtml-if>
+
+<dtml-unless isReadOnly>
+
+  <tr class="row_even">
+    <td valign="top" align="right" class="smallHeader">
+      <span <dtml-var "isMandatory() and 'mandatory'" fmt=class> ><dtml-msg expr=Title></span>
+    </td>
+    <td>
+    <dtml-let uid="_['task_definition_uid']"
+              form_elem_name="'_'.join((getId(),uid))"
+    >
+      <dtml-var "entry_field_edit( None, _,
+                                   descriptor=getFieldDescriptor(),
+                                   value=getDefaultValue(moniker=1),
+                                 )">
+    </dtml-let>
+    </td>
+  </tr>
+
+</dtml-unless>
+
+</dtml-in>
+
+</dtml-let>
+
+</table>
+
+</dtml-let>

@@ -1,0 +1,11 @@
+<dtml-var migration_html_header>
+
+<p>NauDoc version migration has been finished, the portal is now up to date.</p>
+
+<form action="&dtml-portal_url;" method="POST">
+  <input type="submit" name="finish" value=" Open portal ">
+</form>
+
+
+
+<dtml-var migration_html_footer>

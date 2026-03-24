@@ -1,0 +1,16 @@
+
+LICENSE.txt		: File
+manual.pdf		: File
+manual1.pdf		: File
+manual2.pdf		: File
+technologist.pdf	: File
+box.pdf			: File
+modules.pdf		: File
+
+LICENSE.txt.properties	: None
+manual.pdf.properties	: None
+manual1.pdf.properties	: None
+manual2.pdf.properties	: None
+technologist.pdf.properties	: None
+box.pdf.properties		: None
+modules.pdf.properties		: None

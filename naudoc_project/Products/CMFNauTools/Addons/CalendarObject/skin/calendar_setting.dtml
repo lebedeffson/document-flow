@@ -1,0 +1,118 @@
+<dtml-comment>
+Calendar settings
+$Editor: spinagin $
+$Id: calendar_setting.dtml,v 1.2 2007/07/03 12:18:53 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-let skin_version="getSettingById('calendar_skin_version')">
+<dtml-var simple_html_header>
+<dtml-if "skin_version=='0.1'">
+  <H3 align="center"><dtml-msg "Calendar setting"></H3>
+<dtml-else>
+  <H2><dtml-msg "Calendar setting"></H2>
+</dtml-if>
+
+<dtml-with "getSetting()" mapping>
+<form name="setting_form" action="calendar_setting_handler" method="POST">
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+
+<dtml-comment>========    visual setting   ==================</dtml-comment>
+
+<tr><td align="left">
+  <dtml-if "skin_version=='1.0'">
+  <table cellspacing="1" cellpadding="2" border="0" width="100%">
+    <tr class="row_odd"><td><b><dtml-msg "Visual setting"></b></td></tr>
+  </table>
+  </dtml-if>
+
+  <dtml-var ramka_header>
+
+  <dtml-if "skin_version=='0.1'">
+  <table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr><td align="center"><font color="#3366CC"><b><dtml-msg "Visual setting"></b></font></td></tr>
+  </table>
+  </dtml-if>
+
+  <table cellspacing="0" cellpadding="0" border="0">
+   <tr>
+     <td><dtml-msg "Calendar skin version">:</td>
+     <td>
+       <select name="calendar_skin_version">
+         <option value="0.1" <dtml-var "calendar_skin_version=='0.1'" fmt=selected> /><dtml-msg "Old version skin">
+         <option value="1.0" <dtml-var "calendar_skin_version=='1.0'" fmt=selected> /><dtml-msg "Standard skin">   
+       </select>
+     </td>
+   <tr>
+     <td><dtml-msg "view_month_select">:</td>
+     <td align="left"><input type="checkbox" name="view_month_select" value="1" <dtml-var "view_month_select" fmt=checked> /></td>
+   <tr>
+     <td><dtml-msg "view_month_list">:</td>
+     <td align="left"><input type="checkbox" name="view_month_list" value="1" <dtml-var "view_month_list" fmt=checked> /></td>
+   <tr>
+    <td><dtml-msg "view week mode">:</td>
+    <td align="left">
+       <table cellspacing="0" cellpadding="0" border="0" width="100%">
+         <tr>
+           <td>  
+            <input type="radio" name="week_mode" value="short" <dtml-var "week_mode=='short'" fmt=checked> /><dtml-msg "simple">
+           </td>
+           <td>
+            <input type="radio" name="week_mode" value="table" <dtml-var "week_mode=='table'" fmt=checked> /><dtml-msg "table">
+           </td>
+       </table>
+    </td>
+   <tr>
+     <td><dtml-msg "len_of_text">:</td>
+     <td align="left"><input type="text" name="len_of_text" value="<dtml-var "len_of_text">" >
+     </td>
+   <tr>
+     <td><dtml-msg "popup_full_text">:</td>
+     <td align="left"><input type="checkbox" name="popup_full_text" value="1" <dtml-var "popup_full_text" fmt=checked> /></td>
+   <tr>
+     <td><dtml-msg "week_table_mode_only_title">:</td>
+     <td align="left"><input type="checkbox" name="week_table_mode_only_title" value="1" <dtml-var "week_table_mode_only_title" fmt=checked> /></td>
+   <tr>
+     <td><dtml-msg "show_holidays_together">:</td>
+     <td align="left"><input type="checkbox" name="show_holidays_together" value="1" <dtml-var "show_holidays_together" fmt=checked> /></td>    </td>
+
+   <tr>
+     <td><dtml-msg "show_tasks_month_view">:</td>
+     <td align="left"><input type="checkbox" name="show_tasks_month_view" value="1" <dtml-var "show_tasks_month_view" fmt=checked> /></td>    </td>
+  </table>
+  <dtml-var ramka_footer>
+</td></tr>
+
+<tr><td align="left">
+  <dtml-if "skin_version=='1.0'">
+  <table cellspacing="1" cellpadding="2" border="0" width="100%">
+    <tr class="row_odd"><td><b><dtml-msg "Functional setting"></b></td></tr>
+  </table>
+  </dtml-if>
+
+  <dtml-var ramka_header>
+
+  <dtml-if "skin_version=='0.1'">
+  <table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr><td align="center"><font color="#3366CC"><b><dtml-msg "Functional setting"></b></font></td></tr>
+  </table>
+  </dtml-if>
+
+  <table cellspacing="0" cellpadding="0" border="0">
+   <tr>
+    <td><dtml-msg "Default create note and task as public">:</td>
+    <td align="left"><input type="checkbox" name="public_default_check" value="1" <dtml-var "public_default_check" fmt=checked> />
+  </table>
+  <dtml-var ramka_footer>
+</td></tr>
+
+<tr><td>
+<input type="submit" value="<dtml-msg "Save">">
+</table>
+</form>
+
+
+</dtml-with>
+
+<dtml-var simple_html_footer>
+</dtml-let>

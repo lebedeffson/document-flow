@@ -1,0 +1,28 @@
+<dtml-var migration_html_header>
+
+<h2>Portal system scripts setup</h2>
+
+<dtml-with getMigrationContext>
+
+<form method="POST" onsubmit="disableForm(this);">
+
+<p>The following scripts will be replaced.</p>
+
+<dtml-let script_init="script_init[now_configuring]"
+          scripts_to_update="script_init.get('scripts_to_update')"
+>
+
+  <dtml-in scripts_to_update>
+  <input type="checkbox" name="fields:list" value="&dtml-sequence-item;" >
+  &nbsp;&dtml-sequence-item;
+  </dtml-in>
+
+</dtml-let>
+<br /><br />
+<input type="submit" name="configure_next" value=" Ok ">
+
+</form>
+
+</dtml-with>
+
+<dtml-var migration_html_footer>

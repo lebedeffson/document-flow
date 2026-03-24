@@ -1,0 +1,51 @@
+<dtml-comment>
+
+$Id: explorer_tree.dtml,v 1.7 2005/11/03 06:07:03 vsafronovich Exp $
+$Editor: vsafronovich$
+</dtml-comment>
+
+<dtml-revision $Revision: 1.7 $>
+
+<dtml-if dynamic_item>
+
+<dtml-let explorer_context=this
+          Explorer=explorer_init>
+  <dtml-jungle expr="Explorer.tree_index(item=dynamic_item)"
+               state_id="explorer"
+               urlparams="{'explorer_id':explorer_id}"
+               dynamic_item>
+    <dtml-var "_[ 'explorer_%s_tree_item'% Explorer.mode ]">
+  </dtml-jungle>
+</dtml-let>
+
+<dtml-else>
+
+
+<dtml-if "not REQUEST.has_key('disable_dynamic')">
+
+  <dtml-comment>
+  Detecting dynamic-compartibility of client browser
+  </dtml-comment>
+  <script language="javascript">
+  location.replace( setParam(location.href, 'disable_dynamic:int', (userAgent.hasXMLHTTP ? 0 : 1)) );
+  </script>
+
+<dtml-else>
+
+<dtml-let explorer_context=this>
+  <dtml-jungle expr="Explorer.tree_index(item=item)"
+               state_id="explorer"
+               sort_order=Title,id
+               dynamic="not disable_dynamic"
+               dynamic_item_id="explorer_tree"
+               urlparams="{'explorer_id':explorer_id}"
+  >
+    <dtml-var "_[ 'explorer_%s_tree_item'% Explorer.mode ]">
+  </dtml-jungle>
+</dtml-let>
+
+<p align="center"><a href="javascript: top.close();"><dtml-msg "Close"></a></p>
+
+</dtml-if>
+
+</dtml-if>

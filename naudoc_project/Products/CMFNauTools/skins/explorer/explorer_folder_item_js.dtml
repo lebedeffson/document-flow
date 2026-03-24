@@ -1,0 +1,53 @@
+//
+// $Editor: vsafronovich $
+// $Id: explorer_folder_item_js.dtml,v 1.6 2006/05/29 13:27:46 ypetrov Exp $
+// $Revision: 1.6 $
+//
+<dtml-let data="REQUEST.SESSION[('explorer',explorer_id)]"
+          callback_function="data['callback_function']">
+
+// Shows version selection box and saves last selected result
+function showVersionsBox(result)
+{  
+    var div_element = document.getElementById( 'subitems_block_' + result );
+    if (div_element)
+        div_element.style.display = "block";
+
+    last_selected_result = result;
+}
+
+// Hides version selection box and reset subitem radio buttons
+function hideVersionsBox(subitem_input)
+{
+    var div_element = document.getElementById( 'subitems_block_' + last_selected_result );
+    if (last_selected_result && div_element)
+        div_element.style.display = "none";
+
+    resetRadioButton( subitem_input );
+}
+
+// saves and returns result to callback form
+function SaveAndReturn(item_input, subitem_input)
+{
+    var option = getCheckedRadioButton(item_input);
+
+    if (! option) {
+        alert('<dtml-msg "Please select object">');
+        return false;
+    }
+
+    var suboption = getCheckedRadioButton(subitem_input);
+
+    top.opener.&dtml-callback_function;( '<dtml-var "data.get('callback_form')" null fmt=jscript html_quote>',
+                                         suboption ? suboption.value : option.value,
+                                         option.title || '<dtml-msg "Object selected">', null,
+                                         '<dtml-var "data.get('uid_field')" null fmt=jscript>',
+                                         '<dtml-var "data.get('title_field')" null fmt=jscript html_quote>');
+
+    top.opener.focus();
+    top.close();
+    return true;
+}
+
+last_selected_result = '';
+</dtml-let>

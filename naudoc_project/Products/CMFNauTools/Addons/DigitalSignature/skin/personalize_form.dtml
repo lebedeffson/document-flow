@@ -1,0 +1,275 @@
+<dtml-comment>
+$Id: personalize_form.dtml,v 1.4 2008/06/18 10:06:32 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let member="(_.hasattr(REQUEST, 'userid') and portal_membership.getMemberById(userid)) or portal_membership.getAuthenticatedMember()"
+          cert="member.getProperty( 'ds_certificate' )"
+          csp_name="portal_signature.getProperty('csp_name')"
+          key_length="portal_signature.getProperty('key_length')">
+
+<object
+  style="display:none;"
+  id="oCAPICOM"
+  classid="clsid:A996E48C-D3DC-4244-89F7-AFA33EC60679"
+  codebase="&dtml-portal_url;/capicom.cab#version=2,0,0,0">
+</object>
+
+<script type="text/javascript">
+<!--
+
+  var CAPICOM_INFO_SUBJECT_SIMPLE_NAME = 0;
+  var CAPICOM_STORE_OPEN_READ_ONLY = 0;
+  var CAPICOM_CURRENT_USER_STORE = 2;
+  var CAPICOM_CERTIFICATE_FIND_SHA1_HASH = 0;
+  var CAPICOM_CERTIFICATE_FIND_KEY_USAGE = 12;
+  var CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE = 0x00000080;
+  var CAPICOM_E_CANCELLED = -2138568446;
+  var CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY = 6;
+  var CAPICOM_CERTIFICATE_FIND_TIME_VALID = 9;
+  var AT_EXCHANGE = 1;
+  var AT_SIGNATURE = 2;
+  var CERT_KEY_SPEC_PROP_ID = 6;
+
+function IsCAPICOMInstalled() {
+    if (typeof(oCAPICOM) == "object")
+      if (oCAPICOM.object != null)
+        return true;
+}
+
+function init() {
+  if (!IsCAPICOMInstalled()) {
+      alert('<dtml-msg "ds.error_capicom_not_found">');
+  }
+  listCertificates();
+  <dtml-if cert>
+    updateCertLink('&dtml-cert;');
+  </dtml-if>
+}
+
+function displayCert( hash ) {
+  // find the certificate specified
+  var Certificate = FindCertificateByHash(hash);
+  Certificate.Display();
+}
+
+function listCertificates() {
+    var FilteredCertificates = FilterCertificates();
+    var cert_cnt = FilteredCertificates.Count;
+    var hash = '';
+    var cert_cont = document.getElementById('certificate');
+    var k = 1;
+
+    if (cert_cnt > 0) {
+      cert_cont.options[0] = new Option('<dtml-msg "not selected">', '');
+      for (var i=1; i<=cert_cnt; i++) {
+        hash = FilteredCertificates.Item(i).Thumbprint;
+        if (validateCert(hash)) {
+          cert_cont.options[k] = new Option(FilteredCertificates.Item(i).GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME), hash);
+          if (hash == '&dtml-cert;')
+            cert_cont.options[k].selected = true;
+          k++;
+        }
+      }
+    } else
+      cert_cont.options[0] = new Option('<dtml-msg "N/A">', '');
+
+    // Clean Up
+    FilteredCertificates = null;
+}
+
+function FindCertificateByHash(hash) {
+  // instantiate the CAPICOM objects
+  var MyStore = new ActiveXObject("CAPICOM.Store");
+
+  // open the current users personal certificate store
+  try {
+    MyStore.Open(CAPICOM_CURRENT_USER_STORE, "My", CAPICOM_STORE_OPEN_READ_ONLY);
+  } catch (e) {
+    if (e.number != CAPICOM_E_CANCELLED) {
+      alert('<dtml-msg "An error occurred while opening your certificate stores">');
+      return false;
+    }
+  }
+
+  // find all of the certificates that have the specified hash
+  var FilteredCertificates = MyStore.Certificates.Find(CAPICOM_CERTIFICATE_FIND_SHA1_HASH, hash);
+  return FilteredCertificates.Item(1);
+
+  // Clean Up
+  MyStore = null;
+  FilteredCertificates = null;
+}
+
+function FilterCertificates() {
+    var MyStore = new ActiveXObject("CAPICOM.Store");
+    var FilteredCertificates = new ActiveXObject("CAPICOM.Certificates");
+    
+    // open the current users personal certificate store
+    try {
+      MyStore.Open(CAPICOM_CURRENT_USER_STORE, "My", CAPICOM_STORE_OPEN_READ_ONLY);
+    } catch (e) {
+      if (e.number != CAPICOM_E_CANCELLED) {
+        alert('<dtml-msg "An error occurred while opening your certificate stores">');
+        return false;
+      }
+    }
+    // Find all of the certificates that:
+    //   * Are good for signing data
+    //  * Have PrivateKeys associated with then - Note how this is being done
+    //   * Are they time valid
+    var FilteredCertificates = MyStore.Certificates.Find(CAPICOM_CERTIFICATE_FIND_KEY_USAGE, CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE).Find(CAPICOM_CERTIFICATE_FIND_TIME_VALID).Find(CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY, CERT_KEY_SPEC_PROP_ID);
+    return FilteredCertificates;
+    
+    // Clean Up
+    MyStore = null;
+    FilteredCertificates = null;
+}
+
+function updateCertLink( hash ) {
+  if (hash) {
+    document.getElementById('cert_link').innerHTML = '&nbsp;<img src="&dtml-portal_url;/certificate.gif" alt="<dtml-msg "ds.certificate">" title="<dtml-msg "ds.certificate">" border="0" onMouseOver="this.style.cursor = \'hand\'" onClick="displayCert(\''+hash+'\')"/>';
+  } else
+    document.getElementById('cert_link').innerHTML = '';
+}
+
+function validateCert( hash ) {
+    var cert = FindCertificateByHash(hash);
+    var result = 0;
+    if (cert) {
+      var cert_rk = cert.PrivateKey;
+      var cert_uk = cert.PublicKey();
+      var key_length = cert_uk.Length;
+      var csp_name = cert_rk.ProviderName;
+      var key_spec = cert_rk.KeySpec;
+      var equil_csp = csp_name=='&dtml-csp_name;';
+      var equil_key_length = key_length=='&dtml-key_length;';
+      var equil_key_spec = key_spec==(AT_SIGNATURE | AT_EXCHANGE) || key_spec==AT_SIGNATURE;
+      result = equil_csp && equil_key_length && equil_key_spec;
+    }
+    return result
+}
+//-->
+</script>
+
+ <dtml-if "not portal_membership.checkPermission( 'Set own properties', this() )">
+   <dtml-raise Unauthorized>
+     You must be logged in to view this resource.
+   </dtml-raise>
+  </dtml-if>
+
+<div class="Desktop">
+
+<h1> <dtml-var "msg('Personal properties')"> </h1>
+<dtml-var "msg('User')">: <dtml-var "member.getUserName()">
+
+
+<form action="personalize" method="post">
+
+ <dtml-if userid>
+    <h5><a href="&dtml-absolute_url;/manage_users_form"><dtml-var "msg('Portal users list')"></a></h5>
+    <input type="hidden" name='userid' value="&dtml-userid;">
+    <p><a href="password_form<dtml-if userid>?userid=&dtml-userid;</dtml-if>"><dtml-var "msg('Change password')"></a></p>
+ </dtml-if>
+
+ <table class="FormLayout">
+  <tr>
+   <th><dtml-var "msg('E-mail address')"></th>
+   <td><input type="text" name="email"
+              value="<dtml-var "member.getProperty( 'email' )" html_quote>"></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('First name')"></th>
+   <td><input type="text" name="fname"
+              value="<dtml-var "member.getProperty( 'fname' )" html_quote>"></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Middle name')"></th>
+   <td><input type="text" name="mname"
+              value="<dtml-var "member.getProperty( 'mname' )" html_quote>"></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Last name')"></th>
+   <td><input type="text" name="lname"
+              value="<dtml-var "member.getProperty( 'lname' )" html_quote>"></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Company')"></th>
+   <td><input type="text" name="company"
+              value="<dtml-var "member.getProperty( 'company' )" html_quote>"></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Phone')"></th>
+   <td><input type="text" name="phone"
+              value="<dtml-var "member.getProperty( 'phone' )" html_quote>"></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('ds.certificate')"></th>
+   <td>
+     <table cellspacing="0" cellpadding="0" border="0">
+       <tr>
+         <td><select id="certificate" name="ds_certificate" style="width: 87pt;" onChange="updateCertLink(this.value)"></select></td>
+         <td id="cert_link"></td>
+       </tr>
+     </table>
+   </td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Notes')"></th>
+   <td><textarea cols=40 rows=5 name="notes"><dtml-var "member.getProperty( 'notes' )" html_quote></textarea></td>
+  </tr>
+
+ <dtml-if "portal_membership.checkPermission( 'Manage portal', this() )">
+  <tr>
+   <th><dtml-var "msg('Portal administrator')"></th>
+   <td>
+       <input name="manager" type="checkbox" value="1"
+           <dtml-if "member.has_role('Manager')">
+             checked
+           </dtml-if>
+       />
+   </td>
+  </tr>
+ </dtml-if>
+
+  <dtml-comment>
+  <dtml-in "member.propertysheets.CommonProperties.propertyIds()">
+   <tr>
+    <th>&dtml-sequence-item;</th>
+    <td><input type="text" name="&dtml-sequence-item;" value="<dtml-var "_.getattr(member, _['sequence-item'])" html_quote>"></td>
+   </tr>
+  </dtml-in>
+  </dtml-comment>
+
+
+  <tr>
+   <td></td>
+   <td><input type="submit" value=" <dtml-var "msg('Save')"> "></td>
+  </tr>
+ </table>
+</form>
+
+</div>
+
+<script type="text/javascript">
+<!--
+init();
+// -->
+</script>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>
+
+<dtml-comment>
+<dtml-var standard_html_footer>
+</dtml-comment>

@@ -1,0 +1,16 @@
+fckblank.html	: File
+fckblank.html.properties	: None
+fckconfig.js	: File
+fckconfig.js.properties	: None
+fckdebug.html	: File
+fckdebug.html.properties	: None
+fckdialog.html	: File
+fckdialog.html.properties	: None
+fckeditor.html	: File
+fckeditor.html.properties	: None
+fckeditor.js	: File
+fckeditor.js.properties	: None
+fckeditorarea.html	: File
+fckeditorarea.html.properties	: None
+fckstyles.xml	: File
+fckstyles.xml.properties	: None

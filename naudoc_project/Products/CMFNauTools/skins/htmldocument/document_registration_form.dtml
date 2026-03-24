@@ -1,0 +1,114 @@
+<dtml-call "REQUEST.set('editMode',1)">
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1><a href="&dtml-absolute_url;">&dtml-title_or_id;</a></h1>
+
+<script type="text/javascript"><!--
+
+function sendForm(form)
+{
+    var radioButtonOrGroup = form.registry_url
+    
+    if (radioButtonOrGroup.length) { // group 
+        for (var b = 0; b < radioButtonOrGroup.length; b++)
+            if (radioButtonOrGroup[b].checked)
+                value = radioButtonOrGroup[b].value;
+    } else if (radioButtonOrGroup.checked)
+        value = radioButtonOrGroup.value;
+    
+    form.action=value;
+    form.submit();
+    return true;
+}
+
+function useVersion(use){
+    document.registration_form.came_version_id.value = use?'<dtml-var getCurrentVersionId>':''
+}
+
+//--></script>
+
+<form action="" name="registration_form" onSubmit="return sendForm(this)">
+
+<dtml-let registries="portal_catalog.searchResults( meta_type='Registry', sort_on='Title' )"
+          container="this()"
+>
+
+<dtml-in registries prefix="rgs">
+
+  <dtml-if sequence-start>
+     <p><dtml-var "msg('You are able to register this document in the following registries')">:</p>
+     <table cellpadding="2" width="70%">
+     <tr class="row_title">
+       <td class="small">
+         <dtml-var "msg('Title')">
+       </td>
+       <td class="small" width="5%">
+         <dtml-var "msg('Department')">
+       </td>
+     </tr>
+  </dtml-if>
+
+  <dtml-with getObject>
+  <dtml-if "portal_membership.checkPermission('Add portal content', this())">
+     <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>" width="80%">
+       <td class="small">
+         <input type="radio" name="registry_url" <dtml-var "rgs_start and 'checked' or ''"> value="<dtml-var "absolute_url()">">
+         &dtml-title_or_id;
+         <dtml-if Description>
+            <br> <dtml-var Description newline_to_br>
+         </dtml-if>
+       </td>
+       <td class="small" align="center">
+          <dtml-var department>
+       </td>
+     </tr>
+     <dtml-call "REQUEST.set('have_valid_registries', 1)">
+  </dtml-if>
+  </dtml-with>
+
+  <dtml-if sequence-end>
+   </table>
+  </dtml-if>
+  
+<dtml-else>
+
+</dtml-in>
+
+<dtml-if have_valid_registries>
+<hr width="70%" align="left">
+  <table cellpadding="2" width="70%">
+     <tr width="80%">
+       <td class="small" colspan="2">
+         <input type="radio" name="what_to_register" value="Document" checked onClick="useVersion(false);"><dtml-var "msg('Register document itself')">
+       </td>
+     </tr>
+     <tr width="80%">
+       <td class="small" colspan="2">
+         <input type="radio" name="what_to_register" value="Version" onClick="useVersion(true);"><dtml-var "msg('Register current version only')"> <br>
+       </td>
+     </tr>
+
+       
+     
+  </table>
+    <input type="hidden" name="came_from_url" value="<dtml-var absolute_url>">
+    <input type="hidden" name="came_from" value="<dtml-var getUid>">
+    <input type="hidden" name="came_version_id" value="">
+  <input type="submit" value="<dtml-var "msg('Register')">">
+  </form>
+<dtml-else>
+   <p>
+     <dtml-var "msg('There are no registries available for you')">
+   </p>
+</dtml-if>
+
+</dtml-let>
+
+
+
+</div>
+
+<dtml-var simple_html_footer>

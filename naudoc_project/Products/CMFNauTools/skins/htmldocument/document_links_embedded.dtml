@@ -1,0 +1,173 @@
+<dtml-comment>
+$Id: document_links_embedded.dtml,v 1.22 2006/07/11 09:10:50 oevsegneev Exp $
+
+Lists the document related links
+
+</dtml-comment>
+<dtml-revision $Revision: 1.22 $>
+
+<dtml-let container=this
+          doc_uid="getVersionable().getResourceUid()"
+          ver_uid="getVersion().getResourceUid()"
+          links_from_query="{'SourceUid': {'operator': 'and', 'query': portal_links.getLinkKey(ver_uid)}}"
+          links_from="portal_links.searchLinks( **links_from_query )"
+          links_to_query="{'TargetUid': {'operator': 'and', 'query': portal_links.getLinkKey(ver_uid)}}"
+          links_to="portal_links.searchLinks( **links_to_query )"
+          links_to_doc_query="{'TargetUid': {'operator': 'and', 'query': portal_links.getLinkKey(doc_uid)}}"          
+          links_to_doc="portal_links.searchLinks( **links_to_doc_query )"
+> <dtml-comment> not used ResourceUid, because it restricted </dtml-comment>
+
+  <dtml-if links_from>
+    <h3><dtml-msg "Links from this version"></h3>
+
+    <dtml-if can_modify>
+      <form action="&dtml-portal_url;/portal_links/removeLinks" method="post" target="workfield" style="margin: 0;">
+    </dtml-if>
+
+    <table class="LinksList">
+    <dtml-in links_from prefix="links">
+      <dtml-if links_start>
+        <tr>
+          <th>&nbsp;</th>
+          <th><dtml-msg "Document"></th>
+          <th><dtml-msg "Relation type"></th>
+        </tr>
+      </dtml-if>
+
+      <dtml-let link=getObject
+                target="link and link.getTargetObject()"
+                target_uid="target and target.getUid()"
+                relation="link and link.getRelation()"
+                relation_info="relation and portal_links.getRelationInfo(relation)"
+                relation_title="relation_info and relation_info['title']"
+                relation_manual="not not (relation_info and relation_info['allow_manual'])"
+                >
+        <tr>
+          <td>
+            <dtml-if can_modify>
+              <input type="checkbox" name="remove_links:list" value="<dtml-var id>" <dtml-var "relation_manual and ' ' or 'disabled'">>
+            </dtml-if>
+          </td>
+          <td>
+            <dtml-if "target is not None and _.SecurityCheckPermission('View', target)">
+              <a href="<dtml-var "target.absolute_url()" html_quote>"
+                 target="_blank"
+              /><dtml-var "target.title_or_id()" html_quote>
+                <dtml-if "target.implements('isVersion')">
+                  (<dtml-msg "Version"> <dtml-var "target.getVersionNumber()">)
+                </dtml-if>
+              </a>
+            <dtml-elif "target and container.proxy.checkPermission( 'View', target_uid )">
+              <a href="<dtml-var "container.proxy.relative_url( action=target_uid )" html_quote>"
+                 target="_blank"
+              ><dtml-var "target.Title() or msg('No title')" html_quote></a>
+            <dtml-else>
+              <dtml-var "link.getTargetMetadata('Title')">
+              <span class="error"><dtml-if "target">(<dtml-msg inaccessible>)<dtml-else>(<dtml-msg removed>)</dtml-if></span>
+            </dtml-if>
+          </td>
+          <td>
+            <dtml-msg expr=relation_title>
+          </td>
+        </tr>
+      </dtml-let>
+    </dtml-in>
+
+    <dtml-if can_modify>
+      <tr>
+        <td colspan="3">
+          <input type="submit" name="remove" value="<dtml-msg "Remove links">">
+        </td>
+      </tr>
+    </table>
+      </form>
+    <dtml-else>
+    </table>
+    </dtml-if>
+
+  </dtml-if>
+
+  <dtml-if links_to>
+    <h3><dtml-msg "Links to this version"></h3>
+    <table class="LinksList">
+      <dtml-in links_to>
+        <dtml-if sequence-start>
+          <tr>
+            <th><dtml-msg "Document"></th>
+            <th><dtml-msg "Relation type"></th>
+          </tr>
+        </dtml-if>
+        <dtml-let link=getObject
+                  source="link and link.getSourceObject()"
+                  relation="link and link.getRelation()"
+                  relation_info="relation and portal_links.getRelationInfo(relation)"
+                  relation_title="relation_info and relation_info['title']"
+                  >
+          <tr>
+            <td>
+              <dtml-if "source is not None and _.SecurityCheckPermission('View', source)">
+                <a href="<dtml-var "source.absolute_url()" html_quote>"
+                   target="_blank"
+                /><dtml-var "source.title_or_id()" html_quote>
+                  <dtml-if "source.implements('isVersion')">
+                    (<dtml-msg "Version"> <dtml-var "source.getVersionNumber()">)
+                  </dtml-if>
+                </a>
+              <dtml-elif "source is not None">
+                <dtml-var "link.getTargetMetadata('Title')">
+              <dtml-else>
+                <dtml-comment>
+                This case is totally impossible but just to be sure..
+                </dtml-comment>
+                <dtml-msg "broken link">
+              </dtml-if>
+            </td>
+            <td><dtml-msg expr=relation_title></td>
+          </tr>
+        </dtml-let>
+      </dtml-in>
+    </table>
+  </dtml-if>
+
+  <dtml-if links_to_doc>
+    <h3><dtml-msg "Links to this document"></h3>
+    <table class="LinksList">
+      <dtml-in links_to_doc>
+        <dtml-if sequence-start>
+          <tr>
+            <th><dtml-msg "Document"></th>
+            <th><dtml-msg "Relation type"></th>
+          </tr>
+        </dtml-if>
+        <dtml-let link=getObject
+                  source="link and link.getSourceObject()"
+                  relation="link and link.getRelation()"
+                  relation_info="relation and portal_links.getRelationInfo(relation)"
+                  relation_title="relation_info and relation_info['title']"
+                  >
+          <tr>
+            <td>
+              <dtml-if "source is not None and _.SecurityCheckPermission('View', source)">
+                <a href="<dtml-var "source.absolute_url()" html_quote>"
+                   target="_blank"
+                /><dtml-var "source.title_or_id()" html_quote>
+                  <dtml-if "source.implements('isVersion')">
+                    (<dtml-msg "Version"> <dtml-var "source.getVersionNumber()">)
+                  </dtml-if>
+                </a>
+              <dtml-elif "source is not None">
+                <dtml-var "link.getTargetMetadata('Title')">
+              <dtml-else>
+                <dtml-comment>
+                This case is totally impossible but just to be sure..
+                </dtml-comment>
+                <dtml-msg "broken link">
+              </dtml-if>
+            </td>
+            <td><dtml-msg expr=relation_title></td>
+          </tr>
+        </dtml-let>
+      </dtml-in>
+    </table>
+  </dtml-if>
+</dtml-let>

@@ -1,0 +1,172 @@
+<dtml-comment>
+$Id: task_elaborate_form.dtml,v 1.8 2009/02/09 13:41:51 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.8 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let wizard_data="REQUEST['SESSION'].get(wizard_data_id) or {}"
+          task_form="wizard_data.get('task_form') or {}"
+          task_items="wizard_data.get('task_items') or []"
+          items_count="_.len(task_items)"
+>
+<script type="text/javascript"><!--
+
+  function Validate(frm)
+  {
+    var len = <dtml-var items_count>;
+
+    selectAll(frm.selected_members);
+
+    for(var i = 0; i < len; i++)
+    {
+       item_users = frm['involved_users_' + i]
+       selectAll(item_users);
+       if (! item_users.options.length) {
+          alert('<dtml-msg "Please specify responsible members">');
+          return false;
+       }
+    }
+    return true;
+  }
+
+  //
+  // Open task item edit popup
+  //
+  function OpenTaskItemEditWnd( key )
+  {
+      var url = setParam( window.objectBaseURL + '/task_elaborate_edit_form', 'key', key );
+      window.open( url, '_blank', 'toolbar=no,scrollbars=no,status=yes,width=550,height=400,resizable=yes' );
+  }
+
+//--></script>
+
+<dtml-if "meta_type=='Task Item'">
+<h1> <dtml-var aboveInThread> </h1>
+</dtml-if>
+
+<h2>
+  <img src="&dtml-portal_url;/task_icon.gif" alt="" />
+  <dtml-var "task_form.get('title')">
+</h2>
+
+<form name="elaboration_form" method="POST" action="task_elaborate" onSubmit="return Validate(this);">
+
+<dtml-let inline="1"
+          expiration_date="task_form.get('expiration_date')"
+          available_members="task_form.get('involved_users')"
+          description="task_form.get('description')"
+> 
+  <dtml-var task_elaborate_edit_form>
+</dtml-let>
+
+<dtml-in task_items mapping>
+<dtml-if sequence-start>
+  <table cellspacing="8">
+</dtml-if>
+<dtml-let index="_['sequence-index'] + 1"
+          anchor="'#item%s' % index"
+
+>
+  <tr>
+     <td>
+<a name="&dtml-anchor;">
+<input type="hidden" name="task_items.title:records" value="">
+
+<table>
+<tr class="row_title">
+  <td colspan="2">
+    <table width="100%">
+    <tr>
+      <td class="small">
+          <input type="checkbox" name="selected_keys:int:list" value="<dtml-var sequence-index>">
+          <dtml-msg "Subtask #"><dtml-var index>
+      </td>
+      <td align="right">
+        <a onClick="javascript: OpenTaskItemEditWnd('&dtml-sequence-index;')" 
+           href="<dtml-var anchor>"><dtml-msg edit></a>
+      </td>
+    </tr>
+    </table>
+  </td>
+</tr>
+<tr class="row_even">
+  <td class="small">
+     <dtml-msg "Involved members">
+  </td>
+  <td>
+        <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td class="small">
+             <select id="<dtml-var "'involved_users_%s' % _['sequence-index']">"
+                     name="task_items.involved_users:list:records"
+                     size="8"
+                     multiple
+             >
+               <dtml-in "portal_membership.listSortedUserNames(involved_users)" mapping>
+                 <option value="<dtml-var user_id>">
+                   <dtml-var user_id fmt=member>
+                 </option>
+               </dtml-in>
+             </select>
+          </td>
+       </tr>
+       </table>
+  </td>
+</tr>
+<tr class="row_even">
+  <td class="small">
+    <dtml-msg Description>
+  </td>
+  <td>
+       <textarea id="<dtml-var "'description_%s' % _['sequence-index']">"
+                 name="task_items.description:records" 
+                 rows="6" 
+                 cols="50" 
+                 readonly
+       ><dtml-var description></textarea>
+  </td>
+</tr>
+<tr class="row_even">
+  <td class="small">
+    <dtml-msg "Expiration date">
+  </td>
+  <td>
+       <input id="<dtml-var "'expiration_date_%s' % _['sequence-index']">"
+              type="text" 
+              name="task_items.expiration_date:date_:records" 
+              value="<dtml-var expiration_date fmt="%d.%m.%Y %H:%M">" 
+              size="20"
+              readonly
+       >
+  </td>
+</tr>
+</table>
+</dtml-let>
+    </td>
+  </tr>
+<dtml-if sequence-end>
+  <tr>
+    <td>
+       <input type=submit name="delete" value="<dtml-msg Delete>">
+    </td>
+  </tr>
+  </table>
+
+</dtml-if>
+</dtml-in>
+
+ <input type=hidden name="wizard_data_id" value="&dtml-wizard_data_id;">
+
+ <input type=submit name="back" value="&lt;&lt; <dtml-msg Back>">
+ <input type=submit 
+        name="finish" 
+        value="<dtml-msg Next> &gt;&gt; " 
+        <dtml-var "not (task_items and task_form) and 'disabled'">
+ >
+
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

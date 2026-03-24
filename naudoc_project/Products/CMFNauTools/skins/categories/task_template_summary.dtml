@@ -1,0 +1,109 @@
+<dtml-comment>
+$Id: task_template_summary.dtml,v 1.16 2005/08/21 12:53:07 vsafronovich Exp $
+
+show summary tables, for view/editing of Docflow
+
+</dtml-comment>
+<dtml-revision $Revision: 1.16 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let c_id=getId
+          wf=getWorkflow
+          ttAdapter="portal_metadata.taskTemplateContainerAdapter"
+>
+
+<a name="save_state2tasktemplatedie"></a>
+
+<b><dtml-msg "Finalize in this states tasks based on next actions templates">:</b>
+<dtml-let ttfilter="['have_result_codes', 'followup_only']"
+          ttarray="ttAdapter.getTaskTemplatesAsArray(c_id, filter=ttfilter)"
+          >
+<dtml-if "ttarray">
+<form action="action_task_template_summary" method="POST">
+<table>
+  <tr class="row_odd">
+    <td align="center">
+      <b><dtml-msg States><br />/<br /><dtml-msg "Actions templates"></b>
+    </td>
+    <dtml-in ttarray mapping>
+      <td align="center">
+        &dtml-template_title;
+      </td>
+    </dtml-in>
+  </tr>
+  <dtml-in "wf.states.objectItems()" prefix=state>
+    <tr class="row_even">
+      <td>
+        &dtml-title_or_id;
+      </td>
+      <dtml-in "ttAdapter.getState2TaskTemplateToDieMapped( c_id, state_key
+                                                          , filter=ttfilter )" mapping>
+        <td align="center">
+          <input type="checkbox" name="&dtml-state_key;_task_templates:list"
+                 value="<dtml-var template_id>"
+                 <dtml-var finalize fmt=checked> />
+          
+          <select name="&dtml-state_key;_result_code_&dtml-template_id;" size="1">
+            <dtml-in result_codes mapping>
+              <option value="<dtml-var id>" <dtml-var "id == result_code" fmt=selected> >
+                <dtml-msg expr=title>
+              </option>
+            </dtml-in>
+          </select>
+        </td>
+      </dtml-in>
+    </tr>
+  </dtml-in>
+</table>
+<input type="submit" 
+       name="save_state2tasktemplatedie" 
+       value="<dtml-msg Save>" />
+</form>
+<dtml-else>
+<br /><br /><dtml-msg "n/a">
+</dtml-if>
+</dtml-let>
+
+
+<hr size="1" noshade>
+
+<a name="resultcode2transition"></a>
+<dtml-var "edit_script2transition_emb( None, _, container_page='task_template_summary')">
+
+<hr size="1" noshade>
+
+<a name="state2transition"></a>
+<form action="action_task_template_summary" method="POST">
+<b><dtml-msg "Possible transitions for state">:</b>
+<table>
+  <tr class="row_odd">
+    <td align="center"><b><dtml-msg States><br />/<br /><dtml-msg Transitions></b></td>
+    <dtml-in "wf.transitions.objectValues()">
+      <td align="center">
+        &dtml-title_or_id;
+      </td>
+    </dtml-in>
+  </tr>
+  <dtml-in "wf.states.objectItems()" prefix="state">
+    <tr class="row_even">
+      <td>
+        <dtml-var sequence-item fmt=workflow_state>
+      </td>
+      <dtml-in "wf.transitions.objectItems()" prefix="transition">
+        <td align="center">
+          <input type="checkbox" 
+                 name="&dtml-state_key;_transitions:list" 
+                 value="&dtml-transition_key;"
+                 <dtml-var "transition_key in state_item.transitions" fmt=checked> />
+        </td>
+      </dtml-in>
+    </tr>
+  </dtml-in>
+</table>
+<input type="submit" name="save_state2transition" value="<dtml-msg Save>">
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

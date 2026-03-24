@@ -1,0 +1,50 @@
+<dtml-comment>
+$Id: workflow_permissions.dtml,v 1.5 2005/08/21 12:53:07 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+
+<dtml-with getWorkflow>
+
+<form action="workflows" method="POST">
+  <table border=0>
+    <tr >
+      <td class="form-help" >
+      <dtml-msg "The selected permissions are managed by this workflow.  The role to permission mappings for an object in this workflow depend on its state.">
+      </td>
+    </tr>
+  <dtml-in permissions sort>
+    <tr>
+      <td>
+        <input type="checkbox" name="ids:list" value="&dtml-sequence-item;">
+         <dtml-msg expr=sequence-item>  (&dtml-sequence-item;)
+      </td>
+    </tr>
+  <dtml-else>
+    <tr>
+      <td>
+        <em><dtml-msg "No permissions are managed by this workflow."></em>
+      </td>
+    </tr>
+  </dtml-in>
+  </table>
+
+  <dtml-if permissions>
+    <input type="submit" name="delManagedPermissions" value="<dtml-msg "Remove selected">" />
+  </dtml-if>
+  <hr />
+  <h3><dtml-msg "Add a managed permission"></h3>
+  <select name="p">
+   <dtml-in getPossiblePermissions>
+     <dtml-if expr="_['sequence-item'] not in permissions">
+        <option value="&dtml-sequence-item;">&dtml-sequence-item;</option>
+     </dtml-if>
+   </dtml-in>
+  </select>
+  <input type="submit" name="addManagedPermission" value="<dtml-msg "Add">" />
+</form>
+
+</dtml-with>
+
+<dtml-var simple_html_footer>

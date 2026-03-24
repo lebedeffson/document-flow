@@ -1,0 +1,48 @@
+<dtml-unless "REQUEST.get('prn')">
+  <dtml-if localFooter>
+   <dtml-var localFooter>
+  </dtml-if>
+
+     </td>
+     <td background='&dtml-portal_url;/content_line_v_r.gif'><img src='&dtml-portal_url;/null.gif' width=1 height=1></td>
+    <tr>
+     <td><img src='&dtml-portal_url;/content_arc_b_l.gif'></td>
+     <td background='&dtml-portal_url;/content_line_h_b.gif' width=99%><img src='&dtml-portal_url;/null.gif' width=1 height=1></td>
+     <td><img src='&dtml-portal_url;/content_arc_b_r.gif' width=12 height=12></td>
+    </tr>
+   </table>    
+  </td>
+ </tr>
+ 
+ 
+
+ <tr>
+  <td colspan=2><img src='&dtml-portal_url;/null.gif' width=1 height=1></td>
+ </tr>
+
+ <tr>
+  <td colspan="2">
+    <dtml-var mail_page_include>
+  </td>
+ </tr>
+ 
+ <tr>
+  <td>
+   <a href='http://www.naumen.ru'><img src='&dtml-portal_url;/nausite_button.gif' width=88 height=31 border=0></a></td>
+  <td align=right>&copy; Наумен<br><a href='mailto:webmaster@naumen.ru'>webmaster@naumen.ru</a></td>
+ </tr>
+
+</table>
+</dtml-unless "REQUEST.get('prn')">
+</td>
+</tr>
+</table>
+
+  <!--begin of Top100-->
+  <a href="http://top100.rambler.ru/top100/">
+  <img src="http://counter.rambler.ru/top100.cnt?305051" alt="Rambler's Top100" width=1 height=1 border=0></a><br>
+  <!--a href="http://top100.rambler.ru/top100/" target='_blank'><img src='./external/img/rambler.gif' alt="Rambler's Top100" width=88 height=31 border=0></a-->
+  <!--end of Top100 code-->
+
+</body>
+</html>

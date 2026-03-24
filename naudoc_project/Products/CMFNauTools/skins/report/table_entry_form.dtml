@@ -1,0 +1,95 @@
+<dtml-comment>
+$Editor: ikuleshov$
+$Id: table_entry_form.dtml,v 1.18 2004/09/15 05:10:45 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.18 $>
+
+<dtml-var simple_html_header>
+
+<h1> &dtml-title_or_id; </h1>
+
+<dtml-comment>
+   New entry form
+</dtml-comment>
+
+<dtml-let parent_url="parent().absolute_url()"
+          entry=this
+          form_name="'entry_edit_form'">
+
+<form name="entry_edit_form" 
+      method="POST" 
+      action="editEntry" 
+      enctype="multipart/form-data"
+      onsubmit="return validateForm(this,1) ? disableForm(this) : false;">
+<table cellspacing="1" cellpadding="3">
+  <tr class="row_title">
+    <td class="small" colspan="2">
+      <dtml-msg "Entry contents">
+    </td>
+  </tr>
+
+<dtml-in listColumns>
+<tr class="row_even">
+  <td class="smallHeader"><dtml-msg expr=Title></td>
+  <td>
+
+  <dtml-let name=getId>
+
+  <dtml-if "isSetAllowed(name) and name=='Creator' and _.SecurityCheckPermission('Modify portal content', this())">
+
+    <dtml-comment> XXX remove 'Creator' column unique code </dtml-comment>
+
+    <dtml-call "REQUEST.set('_entry_field_edit', 1)">
+
+    <select name="entry_creator" size="1" >
+      <dtml-in "portal_membership.listSortedUserNames(portal_membership.listMemberIds())" mapping>
+        <option value="<dtml-var user_id>" <dtml-var "entry.get('Creator')==user_id" fmt=selected> >
+          <dtml-var user_name>
+          <dtml-var "user_position and ' [%s]' % (user_position)">
+        </option>
+      </dtml-in>
+    </select>
+
+  <dtml-else>
+    <dtml-var "entry_field_edit( None, _
+                               , descriptor=getColumnDescriptor(
+                                   modify=isSetAllowed(name),
+                                   view=isGetAllowed(name)
+                                   )
+                               , value=entry.get(name, moniker=1) 
+                               )" >
+     
+  </dtml-if>
+
+  </dtml-let>
+
+  </td>
+</tr>
+</dtml-in listColumns>
+
+<dtml-if "REQUEST.get('_entry_field_edit.common')">
+  <tr class="row_title">
+     <td class="small" colspan="2"><dtml-msg "Comment"><br> <textarea name="comment:text" rows="4" cols="80"></textarea></td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <input type="hidden" name="record_id" value="&dtml-getId;"/>
+      <input type="submit" name="save" value="<dtml-msg "Save entry">"/>
+      <input type="button" onClick="JavaScript:location.href='&dtml-parent_url;'" value="<dtml-msg "Cancel">"/>
+    </td>
+  </tr>
+<dtml-else>
+  <tr>
+    <td>
+      <input type="button" onClick="JavaScript:location.href='&dtml-parent_url;'" value="<dtml-msg "Back">"/>
+    </td>
+  </tr>
+</dtml-if>
+</table>
+</form>
+
+</dtml-let>
+
+<dtml-var viewModificationLog>
+
+<dtml-var simple_html_footer>

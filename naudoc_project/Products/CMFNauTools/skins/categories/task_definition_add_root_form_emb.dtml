@@ -1,0 +1,99 @@
+<dtml-if "REQUEST.get('task_definition_type', None) is None ">
+  <dtml-call "REQUEST.set('task_definition_type', 'create_document')">
+</dtml-if>
+
+<form action="action_template_task_definition" method="POST" name="taskDefinitionForm" onSubmit="return taskDefinitionFormScriptOnSubmit(this);">
+<dtml-let form_name="'taskDefinitionForm'">
+
+<table bgcolor="#cccccc" cellpadding="5" cellspacing="1" border="0">
+<tr>
+<td bgcolor="ffffff">
+
+  <table>
+
+  <tr class="row_title">
+    <td colspan="2" class="smallHeader"><dtml-msg "Adding main action template"></td>
+  </tr>
+
+  <tr class="row_even">
+    <td><dtml-msg "Action type">:</td>
+    <td>
+      <dtml-var "task_definition_type_list_emb( None, _
+                                              , from_page=from_page)">
+   </td>
+  </tr>
+
+  <tr class="row_even">
+    <td><dtml-msg "Id">:</td>
+    <td>
+      <input type="text" 
+             id="template_id"
+             name="template_id:id_" 
+             size="40"
+             value="<dtml-var "REQUEST.get('task_definition_type', None)=='routing_object' and 'move_' or ''">"
+             />
+    </td>
+  </tr>
+
+  <tr class="row_even">
+    <td><dtml-msg "Template title">:</td>
+    <td>
+      <input type="text" 
+             id="template_name"
+             name="name:string:required"
+             size="40" value="" 
+             validation_message="'<dtml-msg "Please specify the template title">" />
+      </td>
+  </tr>
+
+
+  <tr>
+    <td colspan="2"><dtml-msg "Template fields">:</td>
+  </tr>
+
+  <tr>
+    <td colspan="2">
+<table bgcolor="#cccccc" cellpadding="5" cellspacing="1" border="0">
+<tr>
+<td bgcolor="ffffff">
+  <table>
+    <dtml-var "taskDefinitionFactory.getTaskDefinitionFormByTaskType( task_definition_type, mode='add', namespace=_ )">
+  </table>
+</td>
+</tr>
+</table>
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2">
+      <input type="submit" value="<dtml-msg "Add">">
+    </td>
+  </tr>
+
+  </table>
+  <input type="hidden" name="task_definition_type" value="<dtml-var task_definition_type>">
+  <input type="hidden" name="action" value="add_root_task_definition">
+</td>
+</tr>
+</table>
+
+</dtml-let>
+</form>
+  <script>
+    function taskDefinitionFormScriptOnSubmit( form ){
+    if ( !validateIdentifierStrong( document.getElementById('template_id'), '<dtml-msg "Object id is invalid">') )
+        return false;
+    if ( ! document.getElementById('template_name').value){
+        alert('<dtml-msg "Please specify the template title">');
+        form.elements['name:string'].focus();
+        return false;
+    }
+     
+<dtml-var "taskDefinitionFactory.getTaskDefinitionFormScriptOnSubmit( task_definition_type )">
+    }
+    function taskDefinitionFormScriptOnLoad( form ){
+<dtml-var "taskDefinitionFactory.getTaskDefinitionFormScriptOnLoad( task_definition_type )">
+    }
+    taskDefinitionFormScriptOnLoad( this.taskDefinitionForm )
+  </script>

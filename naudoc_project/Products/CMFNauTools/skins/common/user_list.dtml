@@ -1,0 +1,67 @@
+<dtml-comment>
+$Id: user_list.dtml,v 1.35 2006/12/01 11:49:41 ypetrov Exp $
+
+'name'        - selectbox id
+'list_size'   - selectbox size
+'user_ids'    - user ids to display
+'all'         - show locked and orphaned users too
+'value'       - preselected users
+'multiple'    - allow multiple selection
+'blank'       - append a blank value to the list
+'on_dbl_click'- onDblClick event handler
+
+</dtml-comment>
+
+<dtml-let ids="_.has_key('users_ids') and users_ids"
+          ids="ids in [ None, 0 ] and portal_membership.listMemberIds() or
+               ids and [ i for i in ids if not i.count(':') ] or []"
+          multiple="_.get('multiple', False)"
+          blank="_.get('blank', False)"
+          blank_user="blank and
+                      [ {   'user_id':'',
+                            'user_name': '- %s -' % (msg('n/a')),
+                            'user_position': '' }
+                      ] or []"
+          value="_.get('value', [])"
+          users="blank_user + portal_membership.listSortedUserNames( ids )"
+          users_len="_.len(users)"
+          on_dbl_click="_.has_key('on_dbl_click') and 'onDblClick=\'%s\'' % (on_dbl_click) or ''"
+          str_data="_.get('str_data', '')"
+          init_size="_.get('list_size', 8)"
+          size="_.min(users_len, init_size)"
+          >
+
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>
+      <select id="&dtml-name;" name="&dtml-name;<dtml-var "multiple and ':list' or ''">"
+              size="<dtml-var size>" <dtml-var "multiple" fmt="multiple">
+              &dtml.-on_dbl_click; &dtml.-str_data;
+              >
+        <dtml-in users mapping>
+        <option value="<dtml-var user_id html_quote>"
+                id="<dtml-var user_id html_quote>"
+                <dtml-if multiple><dtml-var "user_id in value" fmt="selected">
+                <dtml-else><dtml-var "user_id == value" fmt="selected">
+                </dtml-if>
+                >
+          <dtml-var user_name html_quote>
+        </option>
+        </dtml-in>
+      </select>
+      <dtml-if multiple><input type="hidden" name="&dtml-name;:tokens:default" value=""></dtml-if>
+    </td>
+  </tr>
+  <dtml-if "users_len > size">
+  <tr>
+    <td nowrap>
+
+      <dtml-msg "Fast search">:
+      <input type="text" value="" size="15"
+             onKeyUp="SearchStrInSelect(value, document.getElementById('<dtml-var name fmt="jscript">'))"
+             >
+    </td>
+  </tr>
+  </dtml-if>
+</table>
+</dtml-let>

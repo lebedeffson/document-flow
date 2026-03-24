@@ -1,0 +1,98 @@
+<dtml-comment>
+Viewer for one day in month view mode
+$Editor: spinagin $
+$Id: calendar_month_day_view.dtml,v 1.1.1.1 2005/04/07 10:35:58 spinagin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1.1.1 $>
+
+<script type="text/javascript">
+<!--
+
+function addNoteFromMonth(year, month_name, month_number, day) {
+        document.getElementById( 'add_note_day' ).innerText=day;
+        document.getElementById( 'add_note_month' ).innerText=month_name;
+        document.getElementById( 'add_note_year' ).innerText=year;
+        
+        var form=document.getElementById( 'add_note_form' );
+        form.selected_year.value=year;
+        form.selected_month.value=month_number;
+        form.selected_day.value=day;
+        form.from_month.value=1;
+}
+
+//-->
+</SCRIPT>
+<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+<tr><td valign="top">
+
+<dtml-comment> --------   view date ----------------</dtml-comment>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td height="10" align="right" onDblClick="addNoteFromMonth(<dtml-var "date.year()">,'<dtml-msg expr="date.Month()">',<dtml-var "date.month()">,<dtml-var "date.day()">)">
+    <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "date.day()">&month=<dtml-var "date.month()">&year=<dtml-var "date.year()">"
+        <dtml-if "date.isCurrentDay()">class="navigate_blue"<dtml-else>class="navigate"</dtml-if>
+    >
+      <dtml-var "date.day()">
+        <dtml-if "date==month_info[0] and date.month()<>selected_month 
+                  or date.day()==1 or (date.day()==1 and date.month()<>selected_month)">
+           <dtml-msg expr="date.Month()">
+        </dtml-if>&nbsp;
+    </a>
+    <td>
+  </tr>
+<dtml-comment> --------   view notes ----------------</dtml-comment>
+  <dtml-let notes="listNotesForDate(date.year(), date.month(), date.day(), filter_topic)">
+  <dtml-in "notes" mapping size=max_notes>
+    <tr>
+      <td title="<dtml-var "text[:300]">">
+        <dtml-if title><b>
+             <dtml-if "_.len(title)<20">
+                &dtml-title;<br>
+             <dtml-else>
+                <dtml-var "title[:17]"> ...<br>
+             </dtml-if></b>
+       <dtml-else>            
+              <dtml-var "text[:17]">...
+       </dtml-if>
+    <tr>
+      <td height="1"><img src="&dtml-portal_url;/spacer.gif" height="1"></td>
+    </tr>
+  </dtml-in>
+  <dtml-if "_.len(notes)>max_notes">
+  <tr>
+    <td align="left">
+      <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "date.day()">&month=<dtml-var "date.month()">&year=<dtml-var "date.year()">" class="navigate_blue">
+       more>>>
+      </a>
+  </dtml-if>
+  </dtml-let>
+</table>
+<tr><td valign="bottom" align="right">
+
+    <dtml-comment> --------   view tasks ----------------------</dtml-comment>
+<dtml-if show_tasks_month_view>
+<dtml-let tasks="listTasksForDate(date.year(), date.month(), date.day())">
+<table  cellpadding="0" cellspacing="0" border="0">
+    <dtml-in "tasks" size=2>
+      <tr>
+        <td align="right">
+         <a href="<dtml-var "_['sequence-item'].getObject().absolute_url()">" target="blank" class="Navigate">
+          <dtml-if "now>=_['sequence-item']['expires'] and not _['sequence-item']['isFinalized']">
+                    <font color="red">
+                <dtml-else> 
+                    <font color="#3366CC">
+                </dtml-if>
+                <dtml-var "_['sequence-item']['Title'][:18]"></font>
+         </a>      
+      </dtml-in>
+  <dtml-if "_.len(tasks)>2">
+  <tr>
+    <td align="right">
+      <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "date.day()">&month=<dtml-var "date.month()">&year=<dtml-var "date.year()">" class="navigate">
+       <font size=1>more>>></font>
+      </a>
+  </dtml-if>
+</table>
+</dtml-let>
+</dtml-if>
+</table>

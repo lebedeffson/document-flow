@@ -1,0 +1,24 @@
+<dtml-comment>
+Moniker view of the MemberData object.
+
+$Editor: vpastukhov $
+$Id: member_moniker.dtml,v 1.11 2007/10/01 08:46:12 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-if "moniker_object">
+
+<a href="javascript:OpenUserInfoWnd('&dtml-getUserName;')"
+   style="text-decoration: underline; cursor: hand;"
+   title="<dtml-msg "Open user info">">
+  <dtml-var "getMemberName(brief=moniker_brief, positions=True)">
+</a>
+
+<dtml-elif moniker_id>
+
+<dtml-unless moniker_brief>
+<dtml-msg "unknown user '%(name)s'" name="moniker_id.uid">
+</dtml-unless>
+
+</dtml-if>

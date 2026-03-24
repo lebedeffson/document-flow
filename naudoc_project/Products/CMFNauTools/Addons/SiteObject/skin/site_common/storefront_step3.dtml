@@ -1,0 +1,27 @@
+<dtml-comment>
+Step3: Customer data
+$Id: storefront_step3.dtml,v 1.1 2008/10/15 12:48:08 oevsegneev Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-var "msg('Step3: Customer data')">
+<dtml-var "canSendOrder()">
+<dtml-if "canSendOrder()">
+<dtml-call "storefront_wizard('3')">
+<form name="quest_form" action="&dtml-absolute_url;" method="POST">
+<table border=0 cellpadding="2" cellspacing="0" width="100%">
+  <tr>
+    <td valign="top">
+      <dtml-var "getQuestionnaireBody()">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><br><br>
+      <input type="hidden" name="go_step" value="4">
+      <input name="send_order" type="submit" class="button" style="width: 30em;" value="<dtml-var "msg('Checkout')">" >
+    </td>
+  </tr>
+</table>
+</form>
+</dtml-if>

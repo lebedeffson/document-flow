@@ -1,0 +1,122 @@
+<dtml-comment>
+Displays directory entry.
+
+$Editor: vpastukhov $
+$Id: directory_entry_form.dtml,v 1.10 2004/09/16 12:03:46 spinagin Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.10 $>
+
+<dtml-var simple_html_header>
+
+<dtml-var directory_trail>
+
+<dtml-let add_element_type="_.has_key('add_element_type') and _['add_element_type'] or None"
+          is_branch="not add_element_type and isBranch() or add_element_type == 'branch'"
+          entry=this
+          root=getDirectory
+          columns="root.listColumns( entries=(not is_branch), branches=(is_branch) )"
+          allow_view="_.SecurityCheckPermission( 'View', entry )"
+          allow_modify="_.SecurityCheckPermission( 'Modify portal content', entry )"
+          form_name="'directory_entry_form'">
+
+<h2>
+  <dtml-if add_element_type>
+    <dtml-msg "Add"> <dtml-msg expr=add_element_type>
+  <dtml-else>
+    &dtml-title;
+  </dtml-if>
+</h2>
+
+<form name="&dtml-form_name;" method="post"
+      action="<dtml-var "relative_url( action='directory_entry_handler' )" html_quote>"
+      onSubmit="javascript: return validateForm(this, 1)">
+
+<table width="100%" border="0" cellpadding="3">
+
+<dtml-with "root.getTitleColumn()">
+
+  <tr>
+    <td width="20" align="right"><dtml-msg expr=title>:</td>
+    <td>
+      <dtml-var "entry_field_edit( None, _,
+                                   descriptor = getFieldDescriptor(
+                                     name   = 'title',
+                                     view   = allow_view,
+                                     modify = allow_modify,
+                                   ),
+                                   value=(not add_element_type and entry.title() or ''),
+                                 )">
+    </td>
+  </tr>
+
+</dtml-with>
+
+<dtml-with "root.getCodeColumn()">
+
+  <tr>
+    <td width="20" align="right"><dtml-msg expr=title>:</td>
+    <td>
+      <dtml-var "entry_field_edit( None, _,
+                                   descriptor = getFieldDescriptor(
+                                     name   = 'code',
+                                     view   = allow_view,
+                                     modify = allow_modify,
+                                   ),
+                                   value=(not add_element_type and entry.code() or ''),
+                                 )">
+    </td>
+  </tr>
+
+</dtml-with>
+
+<dtml-in columns>
+
+<tr>
+  <td width="20" valign="top" align="right">&dtml-title;:</td>
+  <td>
+      <dtml-var "entry_field_edit( None, _,
+                                   descriptor = getFieldDescriptor(
+                                     name   = 'attr/%s' % name(),
+                                     view   = allow_view,
+                                     modify = allow_modify,
+                                   ),
+                                   value=(not add_element_type and entry.getEntryAttribute( name(), moniker=1 ) or None),
+                                   blank=1
+                                 )">
+  </td>
+</tr>
+</dtml-in>
+
+<tr>
+  <td>&nbsp;</td>
+  <td>
+    <br />
+    <dtml-if allow_modify>
+
+      <dtml-if "add_element_type == 'branch'">
+        <input type="submit" name="add_branch" value="<dtml-msg directories.add_branch>" />
+
+      <dtml-elif "add_element_type == 'entry'">
+        <input type="submit" name="add_entry" value="<dtml-msg directories.add_entry>" />
+
+      <dtml-else>
+        <input type="submit" name="save_entry" value="<dtml-msg "Save">" />
+      </dtml-if>
+
+      &nbsp;
+      <input type="submit" name="cancel" value="<dtml-msg "Cancel">" />
+
+    <dtml-else>
+      <input type="submit" name="back" value="<dtml-msg "Back">" />
+    </dtml-if>
+  </td>
+</tr>
+
+</table>
+
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

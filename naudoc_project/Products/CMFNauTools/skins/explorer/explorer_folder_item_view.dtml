@@ -1,0 +1,40 @@
+<dtml-comment>
+
+$Id: explorer_folder_item_view.dtml,v 1.4 2005/03/26 17:38:55 vsafronovich Exp $
+$Editor: vsafronovich$
+</dtml-comment>
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-let view_url="'%s/%s'% (getURL(1), 'view')">
+
+  <tr valign="top">
+    <td>
+       <input type="radio" 
+              name="target_item"
+              value="&dtml-result;"
+              title="<dtml-var "Title or id" html_quote>"
+              <dtml-if check_first_item><dtml-if sequence-start>checked</dtml-if></dtml-if>
+              <dtml-if "'isVersionable' in implements">
+              onClick="hideVersionsBox( this.form.target_subitem ); showVersionsBox(this.value);"
+              <dtml-else>
+              onClick="hideVersionsBox( this.form.target_subitem );"
+              </dtml-if>
+       >
+    </td>
+    <td valign="top">
+      <dtml-var "content_icon(None, _, target = '_blank')">
+    </td>
+    <td>
+      <a href="&dtml-view_url;" 
+         target="_blank"
+      ><dtml-var "Title or id" html_quote></a>
+    </td>
+    <td>
+      <dtml-msg expr=Type>
+    </td>
+    <td>
+      <dtml-var "rDate(None, _, time=_.DateTime(Date))">
+    </td>
+  </tr>
+
+</dtml-let>

@@ -1,0 +1,30 @@
+<dtml-comment>
+Workspace frame template.
+
+$Editor: vpastukhov $
+$Id: inFrame.dtml,v 1.21 2005/09/09 13:53:38 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.21 $>
+
+<dtml-if "implements('isHTMLDocument')">
+
+<dtml-if "_.string.find(link, 'addtoFavorites') >= 0">
+    <dtml-return addtoFavorites>
+</dtml-if>
+
+<dtml-comment>
+<dtml-call "parse_link(link=link)">
+</dtml-comment>
+</dtml-if>
+
+<dtml-var standard_html_header>
+
+    <iframe name="workfield" src="&dtml-link;<dtml-if hash>#&dtml-hash;</dtml-if>"
+	scrolling="auto" width="100%" height="100%" frameborder="0">
+
+	Unfortunately your browser does not support frames.
+
+    </iframe>
+
+<dtml-var standard_html_footer>

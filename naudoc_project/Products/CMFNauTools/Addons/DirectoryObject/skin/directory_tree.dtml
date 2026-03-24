@@ -1,0 +1,57 @@
+<dtml-comment>
+
+$Editor: vpastukhov $
+$Id: directory_tree.dtml,v 1.6 2005/11/24 16:48:46 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.6 $>
+
+<dtml-if dynamic_item>
+
+<dtml-jungle expr="getDirectoryTree(item=dynamic_item)"
+             state_id="directory"
+             dynamic_item>
+<dtml-var "explorer_directory_tree_item(
+               None, _,
+               link_url=relative_url( action='directory_view' ),
+               link_target='workfield',
+           )">
+</dtml-jungle>
+
+<dtml-else>
+
+<dtml-var simple_html_header>
+
+<dtml-if "not REQUEST.has_key('disable_dynamic')">
+
+  <dtml-comment>
+  Detecting dynamic-compartibility of client browser
+  </dtml-comment>
+  <script language="javascript">
+  location.replace( setParam( location.href
+                            , 'disable_dynamic:int'
+                            , (userAgent.hasXMLHTTP ? 0 : 1) ) );
+  </script>
+
+<dtml-else>
+
+<h1><dtml-msg "Directory branches hierarchy"></h1>
+
+<dtml-jungle expr="getDirectoryTree( item='' )"
+             state_id="directory"
+             sort_order=title,id
+             dynamic="not disable_dynamic"
+             dynamic_item_id="directory_tree"
+>
+<dtml-var "explorer_directory_tree_item(
+               None, _,
+               link_url=relative_url( action='directory_view' ),
+               link_target='workfield',
+           )">
+</dtml-jungle>
+
+</dtml-if>
+
+<dtml-var simple_html_footer>
+
+</dtml-if>

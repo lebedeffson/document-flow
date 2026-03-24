@@ -1,0 +1,130 @@
+<dtml-comment>
+External site settings form.
+
+$Editor: vpastukhov $
+$Id: site_edit_form.dtml,v 1.9 2004/06/04 12:14:25 kfirsov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<div class="File">
+
+<h2><dtml-var "msg( Type() )"></h2>
+
+<form action="site_edit" method="post" onsubmit="return Validate(this)" target="workspace">
+<script language="javascript"><!--
+
+function Validate(frm)
+{
+    if( frm.title.value )
+         return true;
+    else {
+         alert('<dtml-var "msg('Specify the site title')">');
+         return false;
+    }
+}
+//--></script>
+
+<table class="FormLayout">
+  <tr>
+    <th align="right">
+      <dtml-msg "Title">
+    </th>
+    <td>
+      <input type="text" name="title" value="&dtml-title;" size="50">
+    </td>
+  </tr>
+
+  <tr>
+    <th align="right">
+      <dtml-msg "Remote ZEO server address">:
+    </th>
+    <td align="left">
+      <input type="text" name="sync_addr:string" value="&dtml-sync_addr;" size="50">
+    </td>
+  </tr>
+
+  <tr>
+    <th align="right">
+      <dtml-msg "Path to external site on the server">:
+    </th>
+    <td align="left">
+      <input type="text" name="sync_path:string" value="&dtml-sync_path;" size="50">
+    </td>
+  </tr>
+
+  <tr>
+    <td align="right" colspan="2">
+      <input type="submit" value="<dtml-msg "Apply"> ">
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2"><br><br>
+      <h3><dtml-msg "Documents presentation levels"></h3>
+      <dtml-let levels="listPresentationLevels()[1:]"
+                levels_count="_.len(levels)+1"
+      >
+      <dtml-in levels prefix="l" mapping>
+        <dtml-if sequence-start>
+          <table width="100%" cellspacing="1">
+            <tr class="row_title">
+              <td align="center">#</td>
+              <td align="center"><dtml-msg "Title"></td>
+              <td align="center"><dtml-msg "Maximum count"></td>
+              <td></td>
+            </tr>
+        </dtml-if>
+        <tr<dtml-if sequence-even> class="row_even"</dtml-if>>
+          <td align="center"><dtml-var sequence-number></td>
+          <td align="center">
+            <input type="text" value="&dtml-title;" name="level_title:list" size="50">
+          </td>
+          <td align="center">
+            <input type="text" value="&dtml-max_count;" name="level_max_count:list:int" maxlength="3" size="2">
+          </td>
+          <td align="center">
+            <dtml-if sequence-end><input type="submit" value="<dtml-msg "Delete">" name="del_level">
+            </dtml-if>
+          </td>
+        </tr>
+        <dtml-if sequence-end>
+          </table>
+        </dtml-if>
+      </dtml-in>
+      <input type="submit" value=" <dtml-msg "Save"> " name="save_levels">
+      <table cellspacing="1">
+        <tr>
+          <td colspan="2"><br><h3><dtml-msg "Add documents presentation level"></h3></td>
+        </tr>
+        <tr>
+          <th><dtml-msg "Level number">:</th>
+          <td><dtml-var levels_count></td>
+        </tr>
+        <tr>
+          <th><dtml-msg "Title">:</th>
+          <td><input type="text" value="<dtml-msg "New level">" name="new_level_title" size="50"></td>
+        </tr>
+        <tr>
+          <th><dtml-msg "Maximum count">:</th>
+          <td><input type="text" value="0" name="new_level_max_count:int" size="2"></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right"><input type="submit" value="<dtml-msg "Add">" name="add_level"></td>
+        </tr>
+      </table>
+      </dtml-let>
+    </td>
+  </tr>
+</table>
+</form>
+
+</div>
+
+</div>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,21 @@
+<dtml-comment>
+
+$Id: position_moniker.dtml,v 1.4 2006/06/05 12:04:41 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-if "moniker_object">
+<dtml-let staff_attr="portal_membership.getStaffListAttribute"
+          position="staff_attr( this(), 'position' )"
+          name="staff_attr( this(), 'employee' ) and staff_attr( this(), 'employee', 1 ) or 
+                staff_attr( this(), 'deputy' ) and staff_attr( this(), 'deputy', 1 ) or
+                msg('No employee assigned')"
+>
+<a href="javascript: OpenPositionInfoWnd( '&dtml-absolute_url;' );"><dtml-msg expr="position"> (&dtml-name;)</a>
+</dtml-let>
+<dtml-elif moniker_id>
+
+<dtml-msg "unknown position '%(name)s'" name="moniker_id.uid">
+
+</dtml-if>

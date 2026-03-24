@@ -1,0 +1,107 @@
+<dtml-comment>
+$Id: documents_stat.dtml,v 1.16 2005/12/07 07:26:46 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<dtml-let created_from="REQUEST.get('apply_filter') and REQUEST.get('created_from_date')
+                        or _.DateTime()-7.0"
+          created_till="(REQUEST.get('apply_filter') and REQUEST.get('created_till_date')
+                        or _.DateTime()+7.0)+0.99999"
+          member="portal_membership.getAuthenticatedMember()"
+          is_manager="portal_membership.checkPermission('Manage portal', this())"
+          involved_users="is_manager and portal_membership.listMemberIds(all=True) or [member.getId()]"
+          is_filtered="REQUEST.get('apply_filter')"
+>
+
+<h1><dtml-msg "Documents report"></h1>
+
+<dtml-call "REQUEST.set('created_from', created_from)">
+<dtml-call "REQUEST.set('created_till', created_till)">
+
+<dtml-in involved_users prefix="m">
+<dtml-if sequence-start>
+  <table cellspacing="1" cellpadding="3" width="100%">
+  <tr class="row_title">
+    <td class="small" valign="middle" align="center">
+       <dtml-msg "User">
+    </td>
+    <td class="small" valign="middle" align="center" width="10%">
+       <dtml-msg "Documents created">
+    </td>
+  </tr>
+</dtml-if>
+  <tr class="row_even">
+    <td class="small" nowrap>
+       <b><dtml-var m_item fmt=member.brief></b>
+       <a class="navigate" 
+          href=""
+          title="<dtml-msg "User documents list">"
+          id="&dtml-m_item;_doc_link<dtml-if is_filtered>_f</dtml-if>">&gt;&gt;</a>
+    </td>
+    <td class="small">
+      <dtml-if is_filtered>
+        <dtml-var "_.len(portal_catalog.searchResults(Creator=m_item, implements={'query':['isHTMLDocument', 'isPortalContent'], 'operator':'and'}, created={'query':(created_from, created_till),'range':'min:max'}))">
+      <dtml-else>
+        <dtml-var "_.len(portal_catalog.searchResults(Creator=m_item, implements={'query':['isHTMLDocument', 'isPortalContent'], 'operator':'and'}))">
+      </dtml-if>
+    </td>
+  <tr>
+<dtml-if sequence-end>
+  </table>
+</dtml-if>
+</dtml-in>
+
+<form method="POST" onSubmit="return validate(this)">
+<table>
+<tr>
+  <td class="smallHeader" colspan="2">
+     <dtml-msg "List documents created">
+  </td>
+</tr>
+<tr>
+  <td>
+    <dtml-var "daterange_template( None, _
+                                 , mindate_name='created_from_date'
+                                 , mindate_value=created_from
+                                 , maxdate_name='created_till_date'
+                                 , maxdate_value=created_till
+                                 , date_only=True)">
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+     <input type="submit" name="apply_filter" value="<dtml-msg "Apply">">
+  </td>
+</tr>
+</table>
+</form>
+
+<script type="text/javascript">
+<!--
+  var url_1 = '&dtml-portal_url;/search_query?mode=doc_stat&implements:tokens=isHTMLDocument';
+  var url_2 = url_1;
+  url_2 = setParam( url_2, 'created_from', '&dtml-created_from;' );
+  url_2 = setParam( url_2, 'created_till', '&dtml-created_till;' );
+
+  <dtml-in involved_users>
+    <dtml-if "not is_filtered">
+      document.getElementById('&dtml-sequence-item;_doc_link').href = url_1+'&owners:tokens=&dtml-sequence-item;';
+    <dtml-else>
+      document.getElementById('&dtml-sequence-item;_doc_link_f').href = url_2+'&owners:tokens=&dtml-sequence-item;';
+    </dtml-if>
+  </dtml-in>
+
+  function validate( form ) {
+    if (!validateRange( 'datetime', form.created_from_date_field.value, form.created_till_date_field.value )) {
+      alert('<dtml-msg "Creation from date must be smaller than created till date">');
+      return false;
+    }
+    return true;
+  }
+//-->
+</script>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

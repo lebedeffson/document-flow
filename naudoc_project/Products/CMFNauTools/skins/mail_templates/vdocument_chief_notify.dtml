@@ -1,0 +1,20 @@
+Content-Type: text/plain; charset=windows-1251
+Subject: [&dtml-vdocument_title;] Вы назначены ответственным за этап
+
+Вы назначены ответственным за этап "&dtml-step_title;"
+<dtml-let entry=this>
+<dtml-in "getTable().listColumnsMetadata()" mapping>
+<dtml-if sequence-start>
+
+Параметры записи:
+</dtml-if>
+&dtml-title; : <dtml-var "_.has_key('entry_field_view') 
+                          and entry_field_view( None, _
+                                          , name=name
+                                          , type=type
+                                          , value=entry.get(id, moniker=1)
+                                          ) or 'Недоступен'" fmt=strip>
+</dtml-in>
+</dtml-let>
+
+URL: &dtml-vdocument_url;

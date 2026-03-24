@@ -1,0 +1,328 @@
+# Hungarian Translation of FSR.
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Gábor Süveg <gsuveg@sgsystem.com>, 2001.
+# Reviewed by: Emese Kovács <emese@gnome.hu> on 2001-10-11
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ZOPE HEAD\n"
+"POT-Creation-Date: 2002-01-28 11:01+CET\n"
+"PO-Revision-Date: 2001-10-11 10:38+0200\n"
+"Last-Translator: Gabor Suveg <gsuveg@sgsystem.com>\n"
+"Language-Team: Hungarian <magyar@linux.hu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid ""
+"A Local Content object provides an storage for multilingual (and non "
+"multilingual) properties. It also helps to keep your content separated from "
+"the logic and the presentation."
+msgstr ""
+
+msgid ""
+"A Localizer object provides <em>locale folders</em>, each one associated "
+"with a language. It transparently adds a locale folder to the path so "
+"objects for that language will be used. It's useful to localize special "
+"objects like images, or specific logic (to format dates for example)."
+msgstr ""
+
+msgid ""
+"A locale folder is just a normal folder with a <tt>SiteRoot</tt>. Its id "
+"must be a language code, the title is optional. Locale folders are used to "
+"store special objects like images and logic that needs to be localized."
+msgstr ""
+
+msgid ""
+"A message catalog stores messages and its translations to different "
+"languages. It provides the <tt>gettext</tt> method to get the right "
+"translation for a given message. Message catalogs are useful to translate "
+"the application interfaces (labels, buttons, etc..)."
+msgstr ""
+
+msgid "Add"
+msgstr "Hozzáadás"
+
+msgid "Add Local Content"
+msgstr "Új nyelvi tartalom"
+
+msgid "Add Locale Folder"
+msgstr "Nyelvi mappa hozzáadása"
+
+msgid "Add Localizer"
+msgstr "Új fordító"
+
+msgid "Add Message Catalog"
+msgstr "Üzenet katalógus hozzáadása"
+
+msgid "Back to manage messages."
+msgstr "Vissza az üzenetek szerkesztéséhez"
+
+msgid ""
+"Besides the title the header of a PO file stores more information, the name "
+"and the email address of the last translator, the email adress of the "
+"translation team and the charset. The forms below let to modify this "
+"information for each language."
+msgstr ""
+
+msgid "Change"
+msgstr "Változtat"
+
+#, fuzzy
+msgid "Charset"
+msgstr "Változtat"
+
+msgid "Contents"
+msgstr "Tartalom"
+
+msgid "Default"
+msgstr "Alapértelmezett"
+
+msgid "Delete"
+msgstr "Törlés"
+
+msgid "Export"
+msgstr "Exportálás"
+
+msgid "File"
+msgstr "Fájl"
+
+msgid "File / Language"
+msgstr "Új nyelv"
+
+msgid "Filter"
+msgstr "Szûrõ"
+
+msgid "Find"
+msgstr "Keresés"
+
+msgid "Header"
+msgstr ""
+
+#, fuzzy
+msgid "Hide this language"
+msgstr "Új nyelv"
+
+msgid "Id"
+msgstr "Azonosító"
+
+msgid "Import"
+msgstr "Importálás"
+
+msgid "Import/Export"
+msgstr "Impotálás/Exportálás"
+
+msgid "Language"
+msgstr "Nyelv"
+
+msgid "Languages"
+msgstr "Nyelvek"
+
+msgid "Local properties"
+msgstr "Tulajdonságok"
+
+msgid "Locale folders"
+msgstr "Mappák"
+
+msgid ""
+"Locale folders are useful to store special multilingual objects like images "
+"and specific logic. If used the <tt>Localizer</tt> object will transparently "
+"add the right locale folder to the url. If you want to use locale folders "
+"check the checkbox, otherwise uncheck it, then click the <tt>Change</tt> "
+"button."
+msgstr ""
+
+msgid "Message"
+msgstr "Üzenet"
+
+msgid "Message catalog"
+msgstr "Üzenetkatalógus"
+
+msgid "Messages"
+msgstr "Üzenetek"
+
+msgid "Name"
+msgstr "Név"
+
+msgid "Next"
+msgstr "Következõ"
+
+msgid "No languages available."
+msgstr "Nincs elérhetõ nyelv"
+
+msgid "Ownership"
+msgstr "Tulajdonos"
+
+msgid "Previous"
+msgstr "Elõzõ"
+
+msgid "Properties"
+msgstr "Tulajdonságok"
+
+msgid "Results %d-%d of %d"
+msgstr "Eredemények %d-%d / %d"
+
+msgid "Save changes"
+msgstr "Változások mentése"
+
+msgid "Security"
+msgstr "Biztonság"
+
+#, fuzzy
+msgid "Show this language"
+msgstr "Nincs bejegyzés."
+
+msgid "Team e-mail address"
+msgstr ""
+
+msgid "Text to translate:"
+msgstr "Fordítandó szöveg:"
+
+msgid "There aren't languages"
+msgstr "Nincs bejegyzés."
+
+msgid "There aren't messages."
+msgstr "Nincs bejegyzés."
+
+msgid "There aren't properties."
+msgstr "Nincs tulajdonságokat leíró lap."
+
+msgid "This <tt>%s</tt> object needs to be upgraded"
+msgstr "Ezt a <tt>%s</tt> objektumot frissítsd!"
+
+msgid "This <tt>Localizer</tt> object don't needs to be upgraded."
+msgstr "Ez a <tt>Localizer</tt> objektum nem igényel frissitést."
+
+msgid "This <tt>Localizer</tt> object needs to be upgraded."
+msgstr "Ezt a <tt>Localizr</tt> objektumtumot frissítsd!"
+
+msgid "This object don't needs to be upgraded."
+msgstr "Ez az objektum nem igényel frissitést."
+
+msgid "Title"
+msgstr "Cím"
+
+msgid "To add a language select it and click the <tt>Add</tt> button."
+msgstr "Nyelv hozzáadásához kattints a <tt>Hozzáadás</tt> gombra."
+
+msgid "To add a new message enter it and click the <tt>Add</tt> button."
+msgstr ""
+"Új üzenet hozzadásához ird be, majd kattintsd a <tt>Hozzáadás</tt> gombra."
+
+msgid ""
+"To add a new property enter its name and type and click the <tt>Add</tt> "
+"button."
+msgstr ""
+
+msgid ""
+"To add a new property enter its name, select its type and click the <tt>Add</"
+"tt> button."
+msgstr ""
+
+msgid ""
+"To delete a language check it and click the <tt>Delete</tt> button. To "
+"change the default language select it and click the <tt>Change</tt> button."
+msgstr ""
+
+msgid ""
+"To show only few messages enter a regular expression and click the "
+"<tt>Filter</tt> button."
+msgstr ""
+
+msgid "Type"
+msgstr "Típus"
+
+msgid "Undo"
+msgstr "Visszavonás"
+
+msgid "Upgrade"
+msgstr "Frissítés"
+
+msgid "Use locale folders"
+msgstr "Nyelvi mappák használata"
+
+msgid "View"
+msgstr "Nézet"
+
+msgid ""
+"With this form you can change the title of the message catalog. The title "
+"also is used as the value of the <tt>Project-Id-Version</tt> field in the "
+"header of the PO files, which are generated when the message catalog is "
+"exported."
+msgstr ""
+
+msgid ""
+"You can add new messages and translations importing a PO file. Enter the "
+"filename, select the language of the translations and click the <tt>Import</"
+"tt> button."
+msgstr ""
+"Új nyelvet és a forditás hozzáadásához inportáld be a PO fájlt. Írd be a \n"
+"fájlnevet, válaszd ki a fordítás nyelvét, és kattints a <tt>Import</tt>\n"
+"gombra."
+
+msgid ""
+"You can export the messages and their translations to PO files. Check "
+"<tt>locale.pot</tt> to get only the messages, without their translations. "
+"Check any other option to get a PO file with the messages and their "
+"translations to the selected language. Then click the <tt>Export</tt> button."
+msgstr ""
+
+msgid "Your e-mail address"
+msgstr ""
+
+msgid "Your name"
+msgstr ""
+
+msgid "default"
+msgstr "alapértelmezett"
+
+#~ msgid "All"
+#~ msgstr "Összes"
+
+#~ msgid "Available translations"
+#~ msgstr "Elérhetõ fordítások"
+
+#~ msgid "Batch size"
+#~ msgstr "Köteg mérete"
+
+#~ msgid "Default language"
+#~ msgstr "Alapértelmezett nyelv"
+
+#~ msgid "Full"
+#~ msgstr "Teljes"
+
+#~ msgid "Localized Content"
+#~ msgstr "Lokalizált tartalom"
+
+#~ msgid "Localized Strings"
+#~ msgstr "Lokalizált karakterláncok"
+
+#~ msgid "Only valid"
+#~ msgstr "Csak érvényes"
+
+#~ msgid "Partial"
+#~ msgstr "Részleges"
+
+# nem biztos, hogy jó
+#~ msgid "Pending languages"
+#~ msgstr "Kapcsolódó nyelvek"
+
+# Az állandó kifejezés nem túl jó.
+#~ msgid "Regular expression"
+#~ msgstr "Reguláris kifejezés"
+
+#~ msgid "Results"
+#~ msgstr "Eredmény"
+
+#~ msgid "Status"
+#~ msgstr "Állapot"
+
+#~ msgid "Text"
+#~ msgstr "Szöveg"
+
+#~ msgid "This property sheet is empty."
+#~ msgstr "Ez a tulajdonságokat leíró lap üres."
+
+# ból/bõl ragozástól függ. A szövegkörnyezet valószínûleg pl. 25 / 30
+#~ msgid "of"
+#~ msgstr "/"

@@ -1,0 +1,121 @@
+<dtml-comment>
+$Id: task_alarm_form.dtml,v 1.3 2007/09/19 10:22:30 oevsegneev Exp $
+$Editor$
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+<script type="text/javascript">
+<!--
+
+  function toggleList(event) {
+    var element = getEventTarget(event);
+
+    if (userAgent.MZ && element.tagName == 'LABEL')
+      element = document.getElementById(element.htmlFor);
+
+    if (element.type == 'radio')
+      if (element.value == 'custom' && element.checked)
+        displayElements(['dates_list']);
+      else
+        displayElements(null, ['dates_list']);
+  }
+
+  function triggerDiv(id) {
+    var div = document.getElementById('div_'+id);
+    if (div.style.display == 'none')
+      div.style.display = '';
+    else
+      div.style.display = 'none';
+  }
+  
+//-->
+</script>
+
+  <dtml-let settings="default.get('alarm_settings')">
+
+  <tr class="row_even">
+<dtml-if view_alarm_settings>
+    <td class="smallHeader">
+      <dtml-msg "Send reminders">
+    </td>
+    <td class="small">
+      <dtml-if "settings and settings['type'] == 'percents'">
+        <dtml-msg "Before %(value)s%% till expiration" value="settings['value']">
+      <dtml-elif "settings and settings['type'] == 'periodical'">
+        <dtml-msg "Every"> <dtml-var "settings['value']"> <dtml-msg expr="settings['period_type']">
+      <dtml-elif "settings and settings['type'] == 'custom'">
+        <dtml-msg "Using dates list">
+        <dtml-in "settings['value']" prefix="d"><dtml-var d_item fmt="%d.%m.%Y">&nbsp;</dtml-in>
+      <dtml-else>
+        &mdash;
+      </dtml-if>
+      <br/>
+      <dtml-if "settings and settings['include_descr']">
+        <dtml-msg "Reminders text">: <dtml-var "settings and settings['note'] or ''" html_quote>
+      </dtml-if>
+    </td>
+  </tr>
+<dtml-else>
+    <td class="small">
+      <dtml-msg "Send reminders">
+    </td>
+    <td class="small" onClick="toggleList(event)">
+      <dtml-let checked="settings and settings['type'] == 'percents'"
+                value="not checked and 10 or settings['value']">
+      <input type="radio" name="alarm_type" value="percents" id="at_percents"
+             <dtml-var checked fmt="checked">>
+      <label for="at_percents">
+        <dtml-msgtext>
+          Before %(value)s%% till expiration
+        <dtml-msgparam value>
+          <input type="text" name="alarm_percents:int" value="&dtml-value;" size="2">
+        </dtml-msgtext>
+      </label><br>
+      </dtml-let>
+
+      <dtml-let checked="settings and settings['type'] == 'periodical'"
+                value="not checked and 1 or settings['value']"
+                type="checked and settings['period_type']">
+      <input type="radio" name="alarm_type" value="periodical" id="at_periodical"
+             <dtml-var checked fmt="checked">>
+      <label for="at_periodical">
+        <dtml-msg "Every"> 
+        <input type="text" name="alarm_period:int" value="&dtml-value;" size="2">
+        <select name="alarm_period_type">
+        <dtml-in "'hours', 'days', 'months'" prefix="d">
+          <option value="&dtml-d_item;" 
+                  <dtml-var "d_item == type" fmt="selected">><dtml-msg expr=d_item>
+        </dtml-in>
+        </select>
+      </label><br>
+      </dtml-let>
+
+      <dtml-let checked="settings and settings['type'] == 'custom'"
+                value="checked and settings['value'] or []"
+                style="not checked and 'display: none' or ''">
+      <input type="radio" name="alarm_type" value="custom" id="at_custom"
+             <dtml-var checked fmt="checked">>
+      <label for="at_custom"><dtml-msg "Using dates list">...</label><br>
+      <dtml-var "dates_list(None, _, name = 'alarm_dates', value = value,
+                            extra_attrs = {'id': 'dates_list', 'style': style})">
+      </dtml-let>
+
+      <input type="radio" name="alarm_type" value="disable" id="at_disable"
+             <dtml-var "settings is None" fmt="checked">>
+      <label for="at_disable"><dtml-msg "Do not send"></label><br>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small" colspan="2">
+      <input type="checkbox" name="alarm_includes_descr" id="aid"
+             <dtml-var "settings and settings['include_descr']" fmt="checked"> onClick="triggerDiv(this.id);">
+      <label for="aid" onselectstart="return false;"><dtml-msg "Reminders text"></label><br>
+
+      <div id="div_aid" style="display: <dtml-var "not (settings and settings['include_descr']) and 'none' or ''">;">
+        <textarea name="alarm_note" rows="5" style="width: 100%" id="an"
+        ><dtml-var "settings and settings['note'] or ''" html_quote></textarea>
+      </div>
+    </td>
+  </tr>
+</dtml-if>
+  </dtml-let>

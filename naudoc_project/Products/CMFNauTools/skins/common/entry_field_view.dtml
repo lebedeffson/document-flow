@@ -1,0 +1,92 @@
+<dtml-comment>
+Field view template.
+
+Template params:
+  'type' - Field type. Allowed values are 'int', 'float', 'currency',
+           'string', 'boolean', 'text', 'date', 'lines', 'list'.
+  'name' - Field id.
+  'value' - Field value.
+  'default_value' - Field default_value
+
+$Editor: vpastukhov $
+$Id: entry_field_view.dtml,v 1.43 2007/05/03 14:37:15 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.43 $>
+
+<dtml-with "_.has_key('descriptor') and descriptor or {'view':True}" mapping>
+
+<dtml-if "_.getitem('value',0) not in [None,[],(),{}, Missing]">
+
+  <dtml-if "type == 'file'">
+
+    <a href="&dtml-absolute_url;/&dtml-value;" target="_blank">&dtml-value;</a>
+
+  <dtml-elif "type == 'date'">
+
+    <dtml-let value="_.same_type(value, '') and _.DateTime(value) or value"
+              format="_.get('properties',{}).get('show_time',False) and '%d.%m.%Y %H:%M'
+                      or '%d.%m.%Y'">
+      <dtml-var "value.strftime(format)">
+    </dtml-let>
+
+  <dtml-elif "type == 'time_period'">
+    
+    <dtml-var "dateperiod( value )">
+
+  <dtml-elif "type == 'boolean'">
+
+    <dtml-msg expr="value and 'Yes' or 'No'">
+
+  <dtml-elif "type == 'text'">
+
+    &dtml.null.newline_to_br.html_quote-value;
+
+  <dtml-elif "type == 'lines'">
+
+    <dtml-if "_.has_key('multiple') and multiple">
+      <dtml-var "'\n'.join(value)" null newline_to_br html_quote>
+    <dtml-else>
+      &dtml.null-value;
+    </dtml-if>
+
+  <dtml-elif "type == 'userlist'">
+
+    <dtml-in "_.has_key('multiple') and multiple and value or [value]">
+      <dtml-var sequence-item fmt=member><br />
+    </dtml-in>
+
+  <dtml-elif "type == 'advanced_userlist'">
+
+    <dtml-let values="value.getSelection(this())">
+    <dtml-in "portal_membership.listSourceIds()" prefix="tab">
+      <dtml-in "portal_membership.getSourceItems( tab_item, values.get(tab_item, ()) )">
+        <dtml-msg expr="portal_membership.getSourceProperty(tab_item, 'title')">: &dtml-sequence-item;<br>
+      </dtml-in>
+    </dtml-in>
+    </dtml-let>
+
+  <dtml-elif "type == 'link'">
+    <dtml-if "_.has_key('descriptor') and descriptor.get('external', None)">
+      <dtml-var "value" fmt=object.title>
+    <dtml-else>
+      <dtml-var "value" fmt=object>
+    </dtml-if>
+
+  <dtml-elif "type == 'object'">
+
+    <dtml-var value>
+
+  <dtml-else> <dtml-comment> 'int', 'float', 'currency' types </dtml-comment>
+
+     &dtml.null.html_quote-value;
+
+  </dtml-if>
+
+<dtml-elif default_value>
+
+  &dtml-default_value;
+
+</dtml-if>
+
+</dtml-with>

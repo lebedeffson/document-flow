@@ -1,0 +1,117 @@
+            </td>
+        </tr>
+      </table>
+    </td>
+    <td bgcolor="#E8F8F0"> 
+      <table width="100%" border="0" cellspacing="5" cellpadding="0">
+        <tr>
+          <td align="left" valign="top"> 
+           <dtml-var news_box>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td width="160" align="center" valign="top">
+      <dtml-var site_actions_box>
+      <dtml-var voting_box>
+    </td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr valign="top"> 
+    <td align="right"> 
+      <table width="20" border="0" cellspacing="1" cellpadding="0" bgcolor="#333333">
+        <tr> 
+          <td> 
+            <table width="20" border="0" cellspacing="2" cellpadding="0" bgcolor="#C8D8D0">
+              <tr> 
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td align="right" height="20"> 
+      <table width="100%" border="0" cellspacing="1" cellpadding="0" bgcolor="#333333">
+        <tr> 
+          <td> 
+            <table width="100%" border="0" cellspacing="2" cellpadding="0" bgcolor="#C8D8D0">
+              <tr> 
+                <td><dtml-if "meta_type=='HTMLDocument'"><b><a target=_blank href="&dtml-absolute_url;?prn=yes">Версия для печати</a></b>
+                       <dtml-else>&nbsp;</dtml-if></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td align="right" width="160"> 
+      <table width="100%" border="0" cellspacing="1" cellpadding="0" bgcolor="#333333">
+        <tr> 
+          <td> 
+            <table width="100%" border="0" cellspacing="2" cellpadding="0" bgcolor="#C8D8D0">
+              <tr> 
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td align="right"> 
+      <table width="100%" border="0" cellspacing="1" cellpadding="0" bgcolor="#333333">
+        <tr> 
+          <td> 
+            <table width="100%" border="0" cellspacing="2" cellpadding="0" bgcolor="#C8D8D0">
+              <tr> 
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td align="left"> 
+      <table width="20" border="0" cellspacing="1" cellpadding="0" bgcolor="#333333">
+        <tr> 
+          <td> 
+            <table width="20" border="0" cellspacing="2" cellpadding="0" bgcolor="#C8D8D0">
+              <tr> 
+                <td>&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td align="right" height="6">&nbsp;</td>
+    <td align="left">
+       <table width=100% cellspacing=2 cellpadding=0>
+         <tr>
+             <td align=left valign="middle">&copy;&nbsp;NAUMEN, 2002<br></td>
+             <td align="right"><b>Екатеринбург</b>, ул. Успенская (Вайнера), 30<br>телефон: (3432) 76-30-53<BR>
+             <b>Москва</b>, ул. Новаторов, 7A<br>телефон: (095) 935-02-12, 935-02-13</td>
+         </tr>
+        </table>
+    </td>
+    <td align="center" valign="middle"><a href="http://www.nausite.ru/" target="_blank"><img src="&dtml-portal_url;/poweredNS.gif" border="0" alt="Powered by NauSite"></a></td>
+    <td align="center" valign="middle"><a href="mailto:info@naumen.ru">info@naumen.ru</a></td>
+    <td align="left">&nbsp;</td>
+  </tr>
+  <tr valign="top"> 
+    <td height="6"><img src="&dtml-portal_url;/null.gif" width="6" height="6"></td>
+    <td background="&dtml-portal_url;/fongorb.gif"><img src="&dtml-portal_url;/null.gif" width="6" height="6"></td>
+    <td><img src="&dtml-portal_url;/null.gif" width="6" height="6"></td>
+    <td background="&dtml-portal_url;/fongorg.gif"><img src="&dtml-portal_url;/null.gif" width="6" height="6"></td>
+    <td><img src="&dtml-portal_url;/null.gif" width="6" height="6"></td>
+  </tr>
+  <tr valign="top"> 
+    <td height="6">&nbsp;</td>
+    <td colspan="7">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

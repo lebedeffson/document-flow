@@ -1,0 +1,24 @@
+<html>
+<head>
+  <title>Service unavailable</title>
+</head>
+<body>
+
+  <h1>Service unavailable</h1>
+
+  <p>
+  System is currenly in maintainance mode and unavailable. Please try again
+  later. In case you have some questions regarding the portal functionality,
+  please ask the portal administrator.
+  </p>
+
+  <p>
+  Note: this message was not caused by a system error and will disappear right
+  after the maintainance operations complete.
+  </p>
+
+  <p>We apologise for inconvenience.</p>
+
+  <em>NauDoc version &dtml-productVersion;</em>
+</body>
+</html>

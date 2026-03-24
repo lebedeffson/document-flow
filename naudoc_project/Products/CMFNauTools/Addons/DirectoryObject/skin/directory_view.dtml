@@ -1,0 +1,207 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: directory_view.dtml,v 1.29 2008/08/21 13:39:51 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.29 $>
+
+<dtml-if "implements('isProxyObject') and not isActive()">
+  <dtml-return "redirect( action='metadata_edit_form',
+                message='External directory service is not configured.' )">
+</dtml-if>
+
+<dtml-var simple_html_header>
+
+<dtml-let context=this
+          directory=getDirectory
+          code_column="directory.getCodeColumn()"
+          title_column="directory.getTitleColumn()"
+          custom_columns="directory.listColumns()"
+          table_columns="4 + _.len(custom_columns)"
+          allow_modify="_.SecurityCheckPermission('Modify portal content', directory)"
+
+          search_enable="REQUEST.get('search_enable', False)"
+          include_nested="REQUEST.has_key('include_nested') and _.int(include_nested) or search_enable and 1 or 0"
+          search_text="search_enable and (not REQUEST.has_key('text') and REQUEST.SESSION.get('directory_search_text', '') or REQUEST.get('text'))"
+          batch_start="REQUEST.get('qs', 1)"
+          batch_size="_.int(portal_membership.getInterfacePreferences('viewing_document_number'))"
+          kw="search_enable and {'searchabletext__': search_text} or {}"
+          results="listEntries(include_nested = include_nested, start = batch_start - 1, size = batch_size, **kw)"
+          results_count="results.countItems()"
+          pages_list_params="'&search_enable:boolean=%s'%(search_enable)"
+          >
+
+<dtml-if "search_enable and REQUEST.has_key('text')">
+  <dtml-call "REQUEST.SESSION.set('directory_search_text', REQUEST['text'])">
+</dtml-if>
+
+<h2>
+  <img src="&dtml-portal_url;/&dtml-getIcon;"
+       width="16" height="16" border="0" style="vertical-align:top" />
+  <dtml-if "implements('IDirectoryRoot')">
+    <a href="&dtml-absolute_url;"><dtml-msg "Directory"> &dtml-Title;</a>
+  <dtml-else>
+    <dtml-msg "Directory branch">:&nbsp; <dtml-var directory_trail>
+  </dtml-if>
+</h2>
+
+
+<script type="text/javascript">
+<!--
+
+messageCatalog['directories.confirm_entries_deletion'] =
+    '<dtml-msg "directories.confirm_entries_deletion" jscript>';
+
+function changeDisplay( include_nested )
+{
+    var url = window.location.href;
+
+    if (include_nested != null)
+        url = setParam( url, 'include_nested', include_nested );
+
+    if (window.location.href != url)
+        window.location.href = url;
+}
+
+function confirmDelete( form )
+{
+    return confirm( messageCatalog['directories.confirm_entries_deletion'] );
+}
+
+//-->
+</script>
+
+<h2><a href="&dtml-portal_url;/menu?where=directory&link=<dtml-var "directory.absolute_url(action='directory_tree')" url_quote>"
+       target="menu">&lt;&lt; <dtml-msg "Display branches hierarchy"></a></h2>
+
+<dtml-var directory_search_form>
+<dtml-if search_enable>
+  <h2><dtml-msg "Search results"> </h2>
+</dtml-if>
+
+<form action="<dtml-var "relative_url( action='directory_entry_handler' )" html_quote>" method="post">
+
+<p align="right">
+
+<dtml-if "implements('IDirectoryRoot')">
+    <label>
+        <input style="vertical-align:middle" type="checkbox" name="include_nested"
+        <dtml-var include_nested fmt=checked> onClick="changeDisplay( this.checked ? 1 : 0 )" />
+        <dtml-msg "show nested entries">
+    </label>
+</dtml-if
+</p>
+
+<dtml-in results>
+
+  <dtml-if sequence-start>
+    <dtml-if "results_count > batch_size">
+      <dtml-var "table_pages_list(None, _, disable_controls = True, qs = batch_start, params=pages_list_params)">
+    </dtml-if>
+
+<table width="100%" border="0" cellpadding="2">
+
+  <tr class="row_title">
+    <td width="1%">&nbsp;</td>
+    <td width="1%">&nbsp;</td>
+    <td><dtml-msg expr="code_column.title()"></td>
+    <td><dtml-msg expr="title_column.title()"></td>
+    <dtml-in custom_columns>
+      <td>&dtml-title;</td>
+    </dtml-in>
+  </tr>
+
+  </dtml-if>
+
+  <tr onDblClick="followInnerLink( this, 1 )">
+    <td align="center"><input type="checkbox" name="ids:list" value="&dtml-id;" /></td>
+    <td>
+      <dtml-if isBranch>
+        <a href="<dtml-var "relative_url( action='directory_view', params={'include_nested':include_nested} )" html_quote>">
+           <img src="&dtml-portal_url;/directory_branch_open.gif" /></a>
+      <dtml-else>
+        <a href="<dtml-var "relative_url( action='directory_entry_form' )" html_quote>">
+           <img src="&dtml-portal_url;/&dtml-getIcon;" /></a>
+      </dtml-if>
+    </td>
+    <td>&dtml-code;</td>
+    <td>
+      <a href="<dtml-var "relative_url( action='directory_entry_form' )" html_quote>"><dtml-var "title() or msg('No title')" html_quote></a>
+    </td>
+    <dtml-in custom_columns>
+    <td>
+      <dtml-var "entry_field_view( None, _,
+                                   type=type(),
+                                   value=getEntryAttribute( name(), default=None, moniker=1 ),
+                                   default_value=((isBranch() and not isBranchColumn()) or (not isBranch() and not isEntryColumn())) and '-' or None,
+                                 )">
+    </td>
+    </dtml-in>
+  </tr>
+
+  <dtml-if sequence-end>
+    <dtml-if allow_modify>
+
+  <tr>
+    <td colspan="&dtml-table_columns;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="&dtml-table_columns;">
+      <dtml-if "not directory.isSoleRoot() or context.implements('IDirectoryEntry')">
+        <input type="submit" name="add_branch_form" value="<dtml-msg directories.add_branch>" style="margin-right: 5px;" />
+        <input type="submit" name="add_entry_form" value="<dtml-msg directories.add_entry>" style="margin-right: 5px;" />
+        <input type="submit" name="cut_entries" value="<dtml-msg "Cut">" style="margin-right: 5px;" />
+        <input type="submit" name="paste_entries" value="<dtml-msg "Paste">" style="margin-right: 5px;" <dtml-unless cb_dataValid>disabled</dtml-unless>/>
+      </dtml-if>
+
+      <input type="submit" name="delete_entries" value="<dtml-msg "Delete">"
+             onClick="return confirmDelete( this.form )" />
+    </td>
+  </tr>
+    </dtml-if>
+
+</table>
+
+    <dtml-if "results_count > batch_size">
+      <dtml-var "table_pages_list(None, _, disable_controls = True, qs = batch_start, params=pages_list_params)">
+    </dtml-if>
+  </dtml-if>
+
+<dtml-else>
+
+<table width="100%" border="0" cellpadding="2">
+  <tr>
+    <td>
+      <h3>
+      <dtml-if "implements('IDirectoryRoot')">
+        <dtml-msg "The directory contains no entries.">
+      <dtml-else>
+        <dtml-msg "The branch contains no entries.">
+      </dtml-if>
+      </h3>
+    </td>
+  </tr>
+
+  <dtml-unless "implements('IDirectoryEntry') and level() == directory.getMaxLevel() and directory.isSoleRoot()" >
+    <dtml-if allow_modify>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>
+      <input type="submit" name="add_entry_form" value="<dtml-msg directories.add_entry>" style="margin-right: 5px;" />
+      <input type="submit" name="add_branch_form" value="<dtml-msg directories.add_branch>" style="margin-right: 5px;" />
+      <input type="submit" name="paste_entries" value="<dtml-msg "Paste">" <dtml-unless cb_dataValid>disabled</dtml-unless> />
+    </td>
+  </tr>
+    </dtml-if>
+  </dtml-unless>
+
+</table>
+</dtml-in>
+
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

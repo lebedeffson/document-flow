@@ -1,0 +1,11 @@
+<li><strong><a href="<dtml-var "item['absolute_url']">"><dtml-var "item['title']"></strong></a>
+<ul>
+    <dtml-in "publisher.publishedItems(root, 1)" prefix="f" sort="Title" mapping>
+        <a class="menu" href="&dtml-absolute_url;">&dtml-Title_or_id;</a><br>
+    </dtml-in>
+
+    <dtml-in "publisher.listSubFolders(root)" prefix="f" sort="title">
+      <dtml-var "publisher.custom.site_map_item(item=f_item, root=root+[f_item['id']], publisher=publisher)">
+    </dtml-in>
+</ul>
+</li>

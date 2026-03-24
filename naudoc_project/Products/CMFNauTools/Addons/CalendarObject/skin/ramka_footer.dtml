@@ -1,0 +1,19 @@
+<dtml-if "skin_version=='1.0'">
+
+    </td>
+  </tr>
+  </table>
+
+<dtml-else>
+
+  </td>
+    <td height="100%"><img src="&dtml-portal_url;/line_vr_right_gray.jpg" border="0" height="100%" width="8"></td>
+  </tr>
+  <tr>
+    <td width="8"><img src="&dtml-portal_url;/ugol_ld_gray.jpg" border="0"></td>
+    <td height="8" background="&dtml-portal_url;/line_hr_down_gray.jpg"></td>
+    <td width="8"><img src="&dtml-portal_url;/ugol_rd_gray.jpg" border="0"></td>
+  </tr>
+  </table>
+
+</dtml-if>

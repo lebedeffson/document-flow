@@ -1,0 +1,147 @@
+<dtml-comment>
+$Id: task_definition_another_doc_transition.dtml,v 1.8 2006/06/29 11:03:51 adolgushin Exp $
+$Editor: kfirsov $
+</dtml-comment>
+<dtml-revision $Revision: 1.8 $>
+
+<script type="text/javascript">
+<!--
+  var data = {
+    <dtml-in "portal_metadata.listCategories()">'<dtml-var getId fmt="jscript">':
+    {
+      'states': [
+         <dtml-in "getWorkflow().states.items()">
+             ['&dtml-sequence-key;', '<dtml-msg expr=title_or_id jscript>']
+             <dtml-unless sequence-end>,</dtml-unless>
+         </dtml-in>
+      ],
+
+      'transitions': [
+         <dtml-in "getWorkflow().transitions.items()">
+             ['&dtml-sequence-key;', '<dtml-msg expr=title_or_id jscript>']
+             <dtml-unless sequence-end>,</dtml-unless>
+         </dtml-in>
+      ]
+    }
+    <dtml-unless sequence-end>,</dtml-unless>
+    </dtml-in>
+  },
+      availableStates = [];
+
+function isInOptions(list, param)
+{
+    for (var i=0; i<list.options.length; i++)
+        if (list.options[i].value==param)
+            return true;
+    return false;
+}
+
+function onChangeCategories(selectObject)
+{
+    clearList( selectStates );
+    clearList( selectTransitions );
+
+    for( var i=0; i<selectObject.options.length; i++)
+        if (selectObject.options[i].selected)
+        {
+            available_states = data[ selectObject.options[i].value ]['states'];
+            for (j=0; j < available_states.length; j++)
+                if ( !isInOptions( selectStates, available_states[j][0] ) )
+                    addOptionTo( selectStates
+                               , available_states[j][1]
+                               , available_states[j][0]
+                               );
+
+            available_transitions = data[ selectObject.options[i].value ]['transitions'];
+            for (j=0; j < available_transitions.length; j++)
+                if ( !isInOptions( selectTransitions, available_transitions[j][0] ) )
+                    addOptionTo( selectTransitions
+                               , available_transitions[j][1]
+                               , available_transitions[j][0]
+                               );
+        }
+}
+
+//-->
+</script>
+<tr class="row_even">
+  <td colspan=2>
+    <dtml-msg "Performing transition in documents, to which there is link from document, where action is initiated">:
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <dtml-msg "Document categories">
+  </td>
+  <td>
+<dtml-in "portal_metadata.listCategories()">
+  <dtml-if sequence-start>
+    <select name="document_category" onChange="onChangeCategories(this);">
+  </dtml-if>
+      <option value="<dtml-var getId>"  <dtml-var "getId()==taskDefinitionArray['document_category']" fmt=selected>> <dtml-msg expr=Title> </option>
+  <dtml-if sequence-end>
+
+    </select>
+  </dtml-if>
+</dtml-in>
+  </td>
+</tr>
+<tr>
+  <td><dtml-msg "Use inheritance">
+  </td>
+  <td>
+     <input type="checkbox" name="use_inheritance" value="1"
+       <dtml-var "taskDefinitionArray['use_inheritance']" fmt=checked>>
+  </td>
+</tr>
+<tr>
+  <td><dtml-msg "Link type">
+  </td>
+  <td>
+<dtml-in "portal_links.listRelations(allow_manual_only=False).items()" prefix="lnk">
+  <dtml-if sequence-start>
+    <select name="link_type">
+  </dtml-if>
+      <option value="<dtml-var lnk_key>" <dtml-var "taskDefinitionArray['link_type']==lnk_key" fmt=selected> > <dtml-msg expr="lnk_item"></option>
+  <dtml-if sequence-end>
+    </select>
+  </dtml-if>
+</dtml-in>
+  </td>
+</tr>
+<tr>
+  <td><dtml-msg "State">
+  </td>
+  <td>
+    <select name="state_id">
+    </select>
+  </td>
+</tr>
+<tr>
+  <td><dtml-msg "Execute transition">
+  </td>
+  <td>
+    <select name="transition_id">
+    </select>
+  </td>
+</tr>
+<tr>
+  <td><dtml-msg "Add comment for this action">
+  </td>
+  <td>
+    <textarea cols=40 rows=3 name="comment"><dtml-var "taskDefinitionArray['comment']" html_quote></textarea>
+  </td>
+</tr>
+<script type="text/javascript">
+
+var selectStates = document.getElementById('state_id'),
+    selectTransitions = document.getElementById('transition_id');
+
+onChangeCategories( document.getElementById('document_category') );
+
+selectValues( selectStates
+            , '<dtml-var "taskDefinitionArray['state_id']" fmt=jscript>');
+selectValues( selectTransitions
+            , '<dtml-var "taskDefinitionArray['transition_id']" fmt=jscript>');
+</script>

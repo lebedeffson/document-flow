@@ -1,0 +1,56 @@
+<dtml-comment>
+$Editor: kfirsov $
+$Id: task_definition_routing.dtml,v 1.6 2005/09/19 08:45:56 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+<script type="text/javascript">
+function open_folders_wnd(){
+  window.open('<dtml-var absolute_url>/task_reportwizard_folders', 'wnd_popup_menu', 'toolbar=no,scrollbars=yes,width=300,height=400,resizable=yes');
+}
+
+function setFolderUrl(  folder_uid, title )
+{
+    document.forms[0].folder_title.value = title;
+    document.forms[0].dest_folder_uid.value = folder_uid;
+}
+
+</script>
+
+<tr class="row_even">
+  <td>
+    <dtml-msg "Move document to the folder (create shortcut in the folder)">:
+  </td>
+  <td></td>
+</tr>
+
+<dtml-let dest_template="taskDefinitionArray.get('dest_folder_template', '')"
+          dest_type="taskDefinitionArray.get('dest_folder_type', 'path')">
+
+<tr class="row_even">
+  <td>
+    <input type="radio" name="dest_folder_type" value="path" <dtml-var "dest_type=='path' and 'checked' or ' '"> >
+    <dtml-msg "selected folder">:
+  </td>
+  <td>
+  <dtml-let dest_uid="taskDefinitionArray.get('dest_folder_uid', '')"
+            dest_URL="taskDefinitionArray.get('dest_folder_URL', '')"
+            dest_title="taskDefinitionArray.get('dest_folder_title', '')">
+    <input type="text" disabled size=50 id="folder_title" value="<dtml-var "dest_title">" />
+    <input type="hidden" name="dest_folder_uid" value="<dtml-var "dest_uid">" />
+    <input type="button" value="<dtml-msg "Browse...">" onClick="return open_folders_wnd();" />
+  </dtml-let>
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td>
+    <input type="radio" name="dest_folder_type" value="template" <dtml-var "dest_type!='path' and 'checked' or ' '"> >
+    <dtml-msg "folder template">
+  </td>
+  <td>
+    <input type="text" size=50 name="dest_folder_template" value="<dtml-var "dest_template or ''">" /><br/>
+    (<a href="javascript:showHint('folder_routing')"><dtml-msg "help"></a>)
+  </td>
+</tr>
+
+</dtml-let>

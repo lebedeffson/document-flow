@@ -1,0 +1,381 @@
+<dtml-comment>
+Form for modification of the folder settings.
+
+$Editor: vpastukhov $
+$Id: folder_edit_form.dtml,v 1.51 2004/09/14 11:39:31 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.51 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let availableCategories="portal_metadata.listCategories()">
+
+<div class="Desktop">
+
+<div class="File">
+
+<h2><dtml-msg expr=Type></h2>
+
+<form action="<dtml-var "absolute_url(action='folder_edit')">" method="post" name="folder_edit" onSubmit="return selectAll(allowed_categories);">
+
+<table class="FormLayout" border="0">
+
+<dtml-if availableCategories>
+  <tr valign="top">
+    <th>
+        <dtml-msg "Documents of the following categories can be created in this folder">
+    </th>
+    <td class="small" align="left">
+      <table>
+       <tr>
+         <td class="small" width="40%"><dtml-msg "Content categories">
+         </td>
+         <td >&nbsp;</td>
+         <td class="small" width="40%" nowrap><dtml-msg "Allowed categories">
+         </td>
+       </tr>
+
+       <tr>
+         <td>
+         <select name="available_categories" size="8" multiple
+	    onDblClick="javascript:addSelectionToList(available_categories, allowed_categories);">
+          <dtml-in availableCategories>
+           <dtml-if sequence-item>
+            <option value="&dtml-getId;"> <dtml-var "msg(Title(), add=None)"> </option>
+           </dtml-if>
+          </dtml-in>
+         </select>
+         </td>
+         <td align="center"><input type=button onClick="javascript:addSelectionToList(available_categories, allowed_categories);" value=" >> "> <br><br>
+        <input type=button onClick="javascript:deleteSelectionFromList(allowed_categories);" value=" << ">
+         </td>
+         <td>
+         <select id="allowed_categories" name="allowed_categories:list" size="8" multiple
+	    onDblClick="javascript:deleteSelectionFromList(allowed_categories);">
+          <dtml-in "listAllowedCategories( explicit=1 )">
+            <option value="&dtml-getId;"><dtml-msg expr=Title></option>
+          </dtml-in>
+         </select>
+         </td>
+       </tr>
+
+       <tr>
+         <td nowrap><dtml-msg "Fast search">: <input type="text" value="" onKeyUp="SearchStrInSelect(value, available_categories);"></td>
+         <td class="small">&nbsp;</td>
+         <td class="small">&nbsp;</td>
+       </tr>
+       <tr>
+        <td colspan="3">
+         <input type="checkbox" name="category_inheritance" <dtml-if "getCategoryInheritance()">checked</dtml-if>
+	  value="1"><dtml-msg "Use allowed categories list from the parent folder">
+	</td>
+       </tr>
+       <tr>
+        <td colspan="3">
+	  <b><dtml-msg "Allowed categories in the parent folder">:</b>
+	  <br />
+	  <dtml-in "listAllowedCategories( inherited=1 )">
+	    <dtml-msg expr=Title><dtml-if sequence-end>.<dtml-else>,</dtml-if>
+	  <dtml-else>
+	    <dtml-msg "No">
+	  </dtml-in>
+        </td>
+       </tr>
+      </table>
+    </td>
+  </tr>
+</dtml-if>
+
+<dtml-if "implements('isIncomingMailFolder')">
+
+<tr>
+  <th><dtml-msg "Mail account name"></th>
+  <td class="small">
+    <input type="text" name="mail_login" value="&dtml-mail_login;" size="25" />
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Password"></th>
+  <td class="small">
+    <input type="password" name="mail_password" value="*****" size="25" />
+    <br />
+    <input type="password" name="mail_password2" value="" size="25" />
+    (<dtml-msg "confirm password">)
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Server type"></th>
+  <td class="small">
+    <input type="radio" name="mail_type" id="mail_type" value="imap"
+	   <dtml-var "mail_type == 'imap'" fmt=checked> onClick="javascript: this.form.mail_folder.disabled = false;"/><dtml-msg "IMAP4">
+    &nbsp;
+    <input type="radio" name="mail_type" id="mail_type" value="pop"
+           <dtml-var "mail_type == 'pop'" fmt=checked> onClick="javascript: this.form.mail_folder.disabled = true; this.form.mail_folder.value = 'INBOX';" /><dtml-msg "POP3">
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Folder"></th>
+  <td class="small">
+    <input type="text" name="mail_folder" value="&dtml-mail_folder;"
+           <dtml-var "mail_type != 'imap'" fmt=disabled> size="25" />
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Keep messages on server"></th>
+  <td class="small">
+    <input type="radio" name="mail_keep" value="1"
+	   <dtml-var "mail_keep" fmt=checked> /><dtml-msg "Yes">
+    &nbsp;
+    <input type="radio" name="mail_keep" value=""
+           <dtml-var "not mail_keep" fmt=checked> /><dtml-msg "No">
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Mail check interval"></th>
+  <td class="small">
+    <input type="text" name="mail_interval" value="&dtml-mail_interval;" size="6" />
+    (<dtml-msg "minutes">)
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Document category of the received mail"></th>
+  <td class="small">
+    <select name="mail_category">
+    <dtml-in listAllowedCategories>
+      <option value="&dtml-getId;" <dtml-var "getId() == mail_category" fmt=selected> ><dtml-msg expr=Title></option>
+    </dtml-in>
+    </select>
+  </td>
+</tr>
+
+</dtml-if>
+
+<dtml-if "implements('isOutgoingMailFolder')">
+
+<tr>
+  <th><dtml-msg "From field name"></th>
+  <td class="small">
+    <input type="text" name="mail_from_name" value="&dtml-mail_from_name;" size="25" />
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "From field address"></th>
+  <td class="small">
+    <input type="text" name="mail_from_address" value="&dtml-mail_from_address;" size="25" />
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Mail recipients"></th>
+  <td class="small">
+    <textarea name="mail_recipients" cols="65" rows="5" wrap="soft"
+      ><dtml-if "REQUEST.has_key('mail_recipients')"><dtml-var mail_recipients html_quote
+      ><dtml-else><dtml-var expr="'\n'.join(getRecipients())" html_quote
+      ></dtml-if></textarea>
+  </td>
+</tr>
+
+</dtml-if>
+
+<dtml-if "implements('isSubscriptionRoot')">
+
+<tr>
+  <th><dtml-msg "From field name"></th>
+  <td class="small">
+    <input type="text" name="mail_from_name" value="&dtml-mail_from_name;" size="25">
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "From field address"></th>
+  <td class="small">
+    <input type="text" name="mail_from_address" value="&dtml-mail_from_address;" size="25">
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "'Subject' header"></th>
+  <td class="small">
+    <input type="text" name="subject_header" value="&dtml-subject_header;" size="25">
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Mail sending"></th>
+  <td class="small">
+  </td>
+</tr>
+
+<tr>
+  <th><dtml-msg "Start"></th>
+  <td class="small">
+    <input type="text" name="send_hour:int" value="&dtml-getSendHour;" size="2" maxlength="2">:
+    <input type="text" name="send_minute:int" value="&dtml-getSendMinute;" size="2" maxlength="2">,
+    <dtml-msg "interval">
+    <input type="text" name="send_interval:float" value="&dtml-getSendInterval;" size="5" >
+    <dtml-msg "days">
+  </td>
+</tr>
+
+</dtml-if>
+
+<dtml-if "implements('isStorefront')">
+
+<tr>
+  <th><dtml-msg "Send order on e-mail"></th>
+  <td class="small">
+    <input type="radio"
+           name="send_order"
+           value="1"
+           onClick="changeState( true );"
+	   <dtml-var "canSendOrder()" fmt=checked> /><dtml-msg "Yes">
+    &nbsp;
+    <input type="radio"
+           name="send_order"
+           value=""
+           onClick="changeState( false );"
+           <dtml-var "not canSendOrder()" fmt=checked> /><dtml-msg "No">
+  </td>
+</tr>
+<tr>
+  <th><dtml-msg "Questionnaire"></th>
+  <td class="small">
+    <input type="hidden" name="document_uid" value="<dtml-var getQuestionnaireUid>">
+    <input type="text"
+           name="document_title"
+           size="20"
+           value="&dtml-getQuestionnaireTitle;"
+           disabled
+    />
+
+    <input name="browse"
+           type="button"
+           value="<dtml-msg "Browse...">"
+           onClick="return OpenDocumentSelectionWnd(this.form.name, 'callbackFunctionTemplate');"
+           <dtml-var "not canSendOrder()" fmt=disabled> />
+    <script>
+      function callbackFunctionTemplate( formId, uid, title )
+      {
+          document.forms[formId]['document_uid'].value = uid
+          document.forms[formId]['document_title'].value = title
+      }
+
+      function changeState( state )
+      {
+          form = document.forms['folder_edit'];
+          setControlState( form, 'browse', state );
+          setControlState( form, 'quest_email', state );
+      }
+    </script>
+  </td>
+</tr>
+<tr>
+  <th class="small"><dtml-msg "e-mail"><br></th>
+  <td class="small">
+    <input type="text"
+           name="quest_email"
+           value="<dtml-var "getEmails('string')">"
+           size="20"
+           <dtml-var "not canSendOrder()" fmt=disabled> /><br>
+  </td>
+</tr>
+<tr>
+  <th rowspan=2><dtml-msg "Default category of the products"></th>
+  <td class="small">
+    <select name="base_category">
+    <dtml-in "listAllowedCategories( inherited=1 )" >
+      <option value="&dtml-getId;" <dtml-var "getId() == base_category" fmt=selected> ><dtml-msg expr=Title></option>
+    </dtml-in>
+    </select>
+  <td>
+<tr>
+  <td>
+    <dtml-msg "Note: Category must have"> 'product_title' , 'product_description' , 'product_price'
+    <dtml-msg "Category attributes">
+  </td>
+</tr>
+
+</dtml-if>
+
+<dtml-if getSite>
+ <tr>
+  <td colspan="2"><br><h2><dtml-msg "Web presentation"></h2></td>
+ </tr>
+ <tr>
+  <th><dtml-msg "Display mode"></th>
+  <td class="small">
+      <input type="radio" name="display_mode:int" value="0"
+        <dtml-var "hasMainPage() or  'checked'">
+      />
+      <dtml-msg "Documents list">
+
+      <input type="radio" name="display_mode:int" value="1"
+        <dtml-var "hasMainPage() and 'checked'">
+      />
+      <dtml-msg "Main page">
+  </td>
+ </tr>
+
+<tr>
+    <th valign="top">
+        <dtml-msg "Maximum number of documents in list">
+    </th>
+    <td class="small">
+        <select name="maxNumberOfPages">
+            <dtml-in "_.range(0, 101)" prefix="num">
+                <option value="&dtml-num_item;" <dtml-if "num_item==getMaxNumberOfPages()">selected</dtml-if>
+                >&dtml-num_item;</option>
+            </dtml-in>
+        </select>
+    </td>
+</tr>
+
+ <tr>
+  <th><dtml-msg "Document groupe in virtual archive mode"></th>
+  <td class="small">
+      <input type="radio" name="varchive_settings" value="None"
+        <dtml-var "getArchiveProperty()=='None' and 'checked'">
+      />
+      <dtml-msg "No grouped">
+      <br>
+      <input type="radio" name="varchive_settings" value="byYear"
+        <dtml-var "getArchiveProperty()=='byYear' and 'checked'">
+      />
+      <dtml-msg "By year">
+      <br>
+      <input type="radio" name="varchive_settings" value="byMonth"
+        <dtml-var "getArchiveProperty()=='byMonth' and 'checked'">
+      />
+      <dtml-msg "By month">
+      <br>
+      <input type="radio" name="varchive_settings" value="byDay"
+        <dtml-var "getArchiveProperty()=='byDay' and 'checked'">
+      />
+      <dtml-msg "By day">
+  </td>
+ </tr>
+</dtml-if>
+
+<tr>
+  <td><br /></td>
+  <td><input type="submit" value=" <dtml-msg "Save"> " /></td>
+</tr>
+
+</table>
+</form>
+
+</div>
+
+</div>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

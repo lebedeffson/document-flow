@@ -1,0 +1,71 @@
+<dtml-comment>
+$Id: member_documents.dtml,v 1.2 2006/01/18 11:09:37 ishabalin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-unless home_call>
+  <dtml-var simple_html_header>
+</dtml-unless home_call>
+
+<dtml-let uname="portal_membership.getAuthenticatedMember().getUserName()"
+          home_folder="portal_membership.getPersonalFolder()"
+          my_docs="portal_catalog.searchResults( Creator=uname
+                                               , sort_on='modified'
+                                               , sort_order='reverse'
+                                               , sort_limit=10
+                                               , implements='isPortalContent')">
+
+  <dtml-in my_docs>
+  <dtml-let view_url="getURL()+'/inFrame?link=view'"
+            is_shortcut="'isShortcut' in implements"
+  >
+
+  <dtml-if sequence-start>
+  <dtml-msg "Total">: <dtml-var "my_docs and my_docs.actual_result_count or 0">
+
+  <table width="100%" border="0" cellspacing="1" cellpadding="1">
+  <tr class="row_title">
+   <td colspan="2">
+    <strong><dtml-msg "Title"></strong>
+   </td>
+   <td>
+    <strong><dtml-msg "Modified"></strong>
+   </td>
+  </tr>
+  </dtml-if>
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+   <td>
+     <dtml-var content_icon>
+   </td>
+   <td nowrap width="99%">
+     <a class="navigate"
+        target="workspace"
+        href="&dtml-view_url;"
+        title="<dtml-var "Description or Title" size="70" html_quote>"
+     >
+       <dtml-var "Title or id" size="30" html_quote>
+     </a>
+   </td>
+   <td nowrap>
+     <dtml-var modified fmt="%Y-%m-%d">
+   </td>
+  </tr>
+  <dtml-if sequence-end>
+  </table>
+  </dtml-if>
+  </dtml-let>
+  <dtml-else>
+    <dtml-msg "No personal documents"> <br />
+  </dtml-in>
+  <dtml-if "home_folder">
+    <span class="Navigation">
+    <a href="<dtml-var "home_folder.relative_url( action='folder_contents' )" html_quote>"
+       target="workspace" ><dtml-msg "personal folder"> &gt;&gt;</a>
+    </span>
+  </dtml-if>
+</dtml-let>
+
+<dtml-unless home_call>
+  <dtml-var simple_html_footer>
+</dtml-unless home_call>
+

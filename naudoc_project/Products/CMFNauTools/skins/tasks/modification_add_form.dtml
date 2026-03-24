@@ -1,0 +1,2 @@
+<dtml-var "modification_edit_form(this(), REQUEST, action='add')">
+

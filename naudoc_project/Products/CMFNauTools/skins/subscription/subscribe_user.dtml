@@ -1,0 +1,129 @@
+<dtml-comment>
+$Id: subscribe_user.dtml,v 1.2 2004/04/27 09:08:25 kfirsov Exp $
+
+$Editor: kfirsov $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-call "REQUEST.set( 'noCache', 1 )">
+
+<dtml-var simple_html_header>
+<dtml-if email>
+<h3><dtml-msg "Change user details"></h3>
+<dtml-else>
+<h3><dtml-msg "Subscribe user"></h3>
+</dtml-if>
+
+<dtml-let usr="getSubscribedUser(_.has_key('email') and email or '')"
+          context="this()"
+          table_columns="[ { 'id'     : 'email',
+                             'title'  : 'Email',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'lname',
+                             'title'  : 'Last name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'fname',
+                             'title'  : 'First name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'mname',
+                             'title'  : 'Middle name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'company_name',
+                             'title'  : 'Company',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'position',
+                             'title'  : 'Position',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'company_business_activity',
+                             'title'  : 'Company business activity',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'contact',
+                             'title'  : 'Contact',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'phones',
+                             'title'  : 'Phones',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'post_address',
+                             'title'  : 'Post address',
+                             'type'   : 'string',
+                           },
+                         ]">
+
+<form method="POST" action="&dtml-absolute_url;" target="workfield">
+
+<table>
+
+<dtml-if email>
+  <tr class="row_title">
+    <td colspan="2" height="25">
+      <dtml-if "usr.get('aborted')">
+        <font color="red">&dtml-email; (<dtml-msg "User\'s subscription is discontinued">) </font>
+      <dtml-else>
+        &dtml-email;
+        <input type="hidden" name="email" value="&dtml-email;">
+      </dtml-if>
+    </td>
+  </tr>
+<dtml-else>
+  <tr>
+    <td><dtml-msg expr="table_columns[0]['title']">:&nbsp;</td>
+    <td><input type="text" size="40" name="email" value=""></td>
+  </tr>
+
+</dtml-if>
+
+<dtml-in "table_columns[1:]" mapping>
+
+  <tr>
+    <td><dtml-msg expr="title">:&nbsp;</td>
+    <td><input type="text" size="40" name="&dtml-id;" value="<dtml-var "usr.get(id, '')">" ></td>
+  </tr>
+</dtml-in>
+
+  <tr>
+    <td><dtml-msg "Account manager">:&nbsp;</td>
+    <td><dtml-var "usr.get('account_manager', '')">&nbsp;</td>
+  </tr>
+
+<dtml-unless email>
+  <tr>
+    <td><dtml-msg "Do not notify subscriber">: </td>
+    <td><input type="checkbox" name="dont_notify" value="on"></td>
+  </tr>
+</dtml-unless >
+  <tr>
+    <td colspan="2"><dtml-msg "Topics to subscribe">:</td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <dtml-var "subscriptions_hierarchy(this(), parent_path=this().getSubscriptionObject().absolute_url(1), user=usr)">
+    </td>
+  </tr>
+</table>
+
+
+
+<br><br>
+
+<dtml-if email>
+  <dtml-unless "usr.get('aborted')">
+    <input type="submit" name="edit_user:method" value="<dtml-msg "Change user details">">
+  </dtml-unless>
+<dtml-else>
+  <input type="submit" name="subscribe:method" value="<dtml-msg "Subscribe user">">
+</dtml-if>
+
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

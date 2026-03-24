@@ -1,0 +1,35 @@
+<h4><dtml-msg expr="attr.Title()"></h4>
+
+<dtml-let multiple="1">
+  <dtml-var "user_list( None, _, all=True )">
+</dtml-let>
+<br />
+<script type="text/javascript">
+<!--
+
+function Return()
+{
+    var selections = '';
+    var k = 0;
+    var ctrl = document.getElementById('&dtml-name;');
+    for (i = 0; i < ctrl.length; i++)
+        if (ctrl.options[i].selected == true)
+        {
+            if (selections == '')
+                selections = ctrl.options[i].value;
+            else
+                selections = selections+'\n'+ctrl.options[i].value;
+            k++;
+        }
+
+    opener.&dtml-callback_function;( '&dtml-callback_form;',
+                                     '&dtml-cat_id;',
+                                     '&dtml-attr_id;',
+                                     '&dtml-type;',
+                                     selections,
+                                     document.getElementById('child').checked
+                                   );
+}
+
+//-->
+</script>

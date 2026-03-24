@@ -1,0 +1,110 @@
+<dtml-comment>
+$Id: task_controls.dtml,v 1.12 2008/05/20 12:01:03 oevsegneev Exp $
+</dtml-comment>
+
+<script language="javascript">
+<!--
+
+function showStructure( type ){
+    var url = window.objectBaseURL + '/task_' + type + '_form';
+    window.open( url, '_blank', 'toolbar=no,scrollbars=yes,status=yes,width=700,height=400,resizable=yes' );
+}
+
+//-->
+</script>
+
+<table cellspacing="3" cellpadding="0">
+<tr>
+    <form name="followup" method="post" action="&dtml-absolute_url;">
+<dtml-if isEnabled>
+       <dtml-if "portal_membership.checkPermission('Modify portal content', this())">
+       <td>
+          <input type="hidden"
+                 name="selectall"
+                 value="1"
+          />
+          <table cellspacing="3" cellpadding="0" bgcolor="#E5E5E5">
+          <tr>
+             <td>
+             <input type="image" src="&dtml-portal_url;/task_report.gif"
+                    name="task_reportwizard_form:method"
+                    alt="<dtml-var "msg('Report wizard')">"
+             /></td>
+             <td><a class="tabs" href="&dtml-absolute_url;/task_reportwizard_form"><dtml-var "msg('Report wizard')"></a></td>
+          </tr>
+          </table>
+       </td>
+       </dtml-if>
+
+       <td>
+        <table cellspacing="3" cellpadding="0" bgcolor="#E5E5E5">
+        <tr>
+          <td>
+          <input type="image" src="&dtml-portal_url;/task_report.gif"
+                 onClick="javascript: showStructure('structure');"
+                 alt="<dtml-var "msg('Define a subtask')">"
+          /></td>
+          <td><a class="tabs" href="javascript: showStructure('structure');"><dtml-msg "Task structure"></a></td>
+        </tr>
+        </table>
+       </td>
+
+       <dtml-if "isInvolved() or isCreator()">
+       <td>
+        <table cellspacing="3" cellpadding="0" bgcolor="#E5E5E5">
+        <tr>
+          <td>
+          <input type="image" src="&dtml-portal_url;/task_delegate.gif"
+                 name="task_add_form:method"
+                 alt="<dtml-var "msg('Define a subtask')">"
+          /></td>
+          <td><a class="tabs" href="&dtml-absolute_url;/task_add_form"><dtml-var "msg('Define a subtask')"></a></td>
+         </tr>
+        </table>
+       </td>
+       </dtml-if>
+</dtml-if>
+       <dtml-if "portal_membership.checkPermission('Manage portal', this())">
+       <td>
+        <table cellspacing="3" cellpadding="0" bgcolor="#E5E5E5">
+        <tr>
+          <td>
+          <input type="image" src="&dtml-portal_url;/task_reject.gif"
+                 name="task_delete_confirmation:method"
+                 alt="<dtml-var "msg('Delete task')">"
+          /></td>
+          <td><a class="tabs" href="&dtml-absolute_url;/task_delete_confirmation"><dtml-var "msg('Delete task')"></a></td>
+         </tr>
+        </table>
+       </td>
+       </dtml-if>
+    </form>
+</tr>
+</table>
+
+<dtml-unless isFinalized>
+<dtml-in listAllowedResponseTypes mapping>
+  <dtml-if sequence-start>
+<br>
+<table cellspacing="4" cellpadding="0">
+<tr>
+  </dtml-if>
+  <td>
+    <table cellspacing="3" cellpadding="3" bgcolor="#E5E5E5">
+    <tr class="row_title">
+      <td
+        <dtml-if "_['sequence-item'].get('color', None) is not None">
+          bgcolor="<dtml-var "_['sequence-item'].get('color')">"
+        </dtml-if>
+        >
+        <a class="tabs" href="&dtml-absolute_url;/&dtml-url;?status=&dtml-id;"><dtml-var "msg(title, add=0)"></a>
+      </td>
+    </tr>
+    </table>
+  </td>
+  <dtml-if sequence-end>
+</tr>
+</table>
+  </dtml-if>
+</dtml-in>
+</dtml-unless>

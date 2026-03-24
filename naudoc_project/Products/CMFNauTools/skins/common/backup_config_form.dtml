@@ -1,0 +1,152 @@
+<dtml-comment>
+$Id: backup_config_form.dtml,v 1.9 2005/05/12 08:56:52 kfirsov Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h3><dtml-msg "Configure pack and backup options"></h3>
+
+<form name="portal_properties" action="portal_backup" method="POST">
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2" >
+
+<dtml-let pack_opts="portal_backup.getPackOptions()"
+          backup_opts="portal_backup.getBackupOptions()">
+  <tr class="row_title">
+    <td>
+      <dtml-msg "Pack Zope database">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+      <dtml-msg "Date and time of the nearest event">:
+      <dtml-var "datetime_form( this()
+                             , prefix='pack_next_date'
+                             , date=pack_opts['nextEvent']
+                             , fast_input=1
+                             , date_only=0
+                             )">
+      <br>
+      <dtml-msg "Pack each">
+      <select name="pack_interval_days:int">
+       <dtml-in "_.range(31)">
+         <option value="&dtml-sequence-item;" <dtml-var "_['sequence-item'] == pack_opts['days']" fmt="selected"> >&dtml-sequence-item;</option>
+       </dtml-in>
+      </select> <dtml-msg "days">
+      <select name="pack_interval_hours:int">
+       <dtml-in "_.range(24)">
+         <option value="&dtml-sequence-item;" <dtml-var "_['sequence-item'] == pack_opts['hours']" fmt="selected"> >&dtml-sequence-item;</option>
+       </dtml-in>
+      </select> <dtml-msg "hours">
+      <select name="pack_interval_minutes:int">
+       <dtml-in "(0, 15, 30, 45)">
+         <option value="&dtml-sequence-item;" <dtml-var "_['sequence-item'] == pack_opts['minutes']" fmt="selected"> >&dtml-sequence-item;</option>
+       </dtml-in>
+      </select> <dtml-msg "minutes">
+      <br>
+      <dtml-msg "Removing revisions of objects that are older than">
+      <input type="text" name="pack_days_older:float" value="<dtml-var "pack_opts['days_older']">" size="3" >
+      <dtml-msg "days">.
+      <br>
+      <dtml-msg "State">:<b><dtml-msg expr="portal_backup.isPackTaskActive() and 'active' or 'paused'">.</b>
+   </td>
+  </tr>
+
+  <tr class="row_title">
+   <td>
+   <dtml-msg "Backup Zope database">
+   </td>
+  </tr>
+  <tr class="row_even">
+   <td valign="top">
+     <table border=0>
+       <tr>
+         <td colspan="2">
+
+            <dtml-msg "Date and time of the nearest event">:
+            <dtml-var "datetime_form( this()
+                             , prefix='backup_next_date'
+                             , date=backup_opts['nextEvent']
+                             , fast_input=1
+                             , date_only=0
+                             )">
+            <br>
+
+            <dtml-msg "Backup each">
+            <select name="backup_interval_days:int">
+              <dtml-in "_.range(31)">
+                <option value="&dtml-sequence-item;" <dtml-var "_['sequence-item'] == backup_opts['days']" fmt="selected"> >&dtml-sequence-item;</option>
+              </dtml-in>
+            </select> <dtml-msg "days">
+            <select name="backup_interval_hours:int">
+              <dtml-in "_.range(24)">
+                <option value="&dtml-sequence-item;" <dtml-var "_['sequence-item'] == backup_opts['hours']" fmt="selected"> >&dtml-sequence-item;</option>
+              </dtml-in>
+            </select> <dtml-msg "hours">
+            <select name="backup_interval_minutes:int">
+              <dtml-in "(0, 15, 30, 45)">
+                <option value="&dtml-sequence-item;" <dtml-var "_['sequence-item'] == backup_opts['minutes']" fmt="selected"> >&dtml-sequence-item;</option>
+              </dtml-in>
+            </select> <dtml-msg "minutes"> <br>
+            <br> <dtml-msgtext>Note: an incremental backup is made if possible (e.g., if a pack has occurred since the last incremental backup, a full backup is necessary).</dtml-msgtext>
+            <br>
+            <dtml-msg "Store no more than">
+            <input type="text" name="backup_copies:int" value="<dtml-var "backup_opts['copies']">" size="2" maxlength="2">
+            <dtml-msg "full backup copies">.
+            <br>
+            <br>
+            <dtml-msg "Path to store backups">: <input type="text" name="backup_path:str" value="<dtml-var "backup_opts['path']">" size="50">
+            <br>
+            <dtml-msg "State">:<b><dtml-msg expr="portal_backup.isBackupTaskActive() and 'active' or 'paused'">.</b>
+         </td>
+       </tr>
+       <tr>
+         <td colspan="2">
+            <input type="checkbox" name="backup_gzip" <dtml-var "backup_opts['gzip']" fmt="checked">>
+            <dtml-msg "Compress the backup files with gzip">
+         </td>
+       </tr>
+       <tr>
+         <td width="10%" valign="top" nowrap>
+           <dtml-msg "Notified members"><br>
+           (<dtml-msg "Administrators only">)
+         </td>
+         <td align="left">
+           <select name="notified_members:list" size="5" multiple>
+             <dtml-let notified_members="portal_membership.listMemberIds()">
+               <dtml-in notified_members sort>
+                 <dtml-if "portal_membership.getMemberById(_['sequence-item']).has_role('Manager') ">
+                   <option value="&dtml-sequence-item;" <dtml-var "_['sequence-item'] in portal_backup.getNotifiedMembers()" fmt="selected">><dtml-msg expr="portal_membership.getMemberName(_['sequence-item'])"></option>
+                 </dtml-if>
+               </dtml-in>
+             </dtml-let>
+           </select>
+         </td>
+       </tr>
+     </table>
+   </td>
+  </tr>
+</dtml-let>
+
+  <tr class="row_even">
+   <td colspan="1" align="right"><input type="Submit" name="manage_reconfigure:method" value="<dtml-msg "Apply">"></td>
+  </tr>
+  <tr>
+   <td colspan="1"><hr></td>
+  </tr>
+  <tr>
+   <td colspan="1">
+   <input type="Submit" name="pack:method" value="<dtml-msg "Pack now">">&nbsp;
+   <input type="Submit" name="backup:method" value="<dtml-msg "Backup now">"></td>
+  </tr>
+  <input type="hidden" name="backup_or_pack_only" value="1" />
+
+</table>
+
+</form>
+
+</div>
+
+<dtml-var simple_html_footer>

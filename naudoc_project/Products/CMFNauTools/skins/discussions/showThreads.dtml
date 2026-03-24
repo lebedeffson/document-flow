@@ -1,0 +1,41 @@
+<dtml-comment>
+For viewing in tree mode.
+
+$Editor: oevsegneev $
+$Id: showThreads.dtml,v 1.12 2004/02/18 10:41:43 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.12 $>
+
+<dtml-unless sort><dtml-call expr="REQUEST.set('sort', 'date')"></dtml-unless>
+
+<dtml-if "REQUEST.has_key('show')==0">
+ <dtml-if "REQUEST.has_key('ShowTopics')">
+  <dtml-call expr="REQUEST.set('show', ShowTopics)">
+ <dtml-else>
+  <dtml-call expr="REQUEST.set('show', 'all')">
+ </dtml-if>
+</dtml-if>
+
+<dtml-tree branches_expr="branches(REQUEST.get('show',''),REQUEST.get('discussions_filter',''),REQUEST.get('discussions_filter_ver',''))" sort="bobobase_modification_time">
+<small>
+
+ <a href="&dtml-absolute_url;"
+ ><img border=0 src="&dtml-portal_url;/&dtml-getIcon;"></a>
+
+ <dtml-var "msg('From user')">:&nbsp;<dtml-var Creator fmt=member>,&nbsp;
+
+ <dtml-if comment_type>
+    <dtml-if "_.len(parentsInThread())==1">
+      <b>¹ <dtml-var number></b>
+    </dtml-if>
+ </dtml-if>
+ <a href="&dtml-absolute_url;">&dtml-Description;</a>,&nbsp;
+
+ <dtml-var CreationDate>
+ <dtml-if doc_ver>
+   (<dtml-var "msg('for document version')">&nbsp;<dtml-var doc_ver html_quote>)
+ </dtml-if>
+</small>
+
+</dtml-tree>

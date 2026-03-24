@@ -1,0 +1,27 @@
+<dtml-comment>
+$Id: followup_tabs_embedded.dtml,v 1.5 2005/07/03 13:31:43 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-let tabs="[]">
+  <dtml-let
+    url="REQUEST['URL']"
+    defaultMode="{ 'incoming': 'showCurrent', 'outgoing': 'showCurrentAndWithClosedReport' }"
+    showTaskMode="REQUEST.get('showTaskMode') or defaultMode[type]"
+    tabsArray="[
+      { 'showTaskMode': 'showNew', 'title': 'tasks.tabs.new', 'whenShow': ['incoming'] },
+      { 'showTaskMode': 'showCurrent', 'title': 'tasks.tabs.current', 'whenShow': ['incoming'] },
+      { 'showTaskMode': 'showCurrentAndWithClosedReport', 'title': 'tasks.tabs.current_and_closed', 'whenShow': ['outgoing'] },
+      { 'showTaskMode': 'showWithClosedReport', 'title': 'tasks.tabs.closed', 'whenShow': ['incoming'] },
+      { 'showTaskMode': 'showFinalized', 'title': 'tasks.tabs.finalized', 'whenShow': ['incoming', 'outgoing'] }]"
+  >
+    <dtml-in tabsArray mapping prefix=tab>
+      <dtml-if "type in tab_whenShow">
+        <dtml-call "tabs.append( { 'url' : url+'?showTaskMode='+tab_showTaskMode
+                                 , 'title' : msg(tab_title)
+                                 , 'selected' : showTaskMode == tab_showTaskMode
+                                 } )">
+      </dtml-if>
+    </dtml-in>
+  </dtml-let>
+  <dtml-var "tabs_head(tabs)">
+</dtml-let>

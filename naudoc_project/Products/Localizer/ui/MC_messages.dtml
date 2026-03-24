@@ -1,0 +1,180 @@
+<dtml-comment> -*- mode: dtml; dtml-top-element: "body" -*- </dtml-comment>
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<dtml-comment>
+  Initialize variables
+</dtml-comment>
+
+<dtml-unless "REQUEST.has_key('regex')">
+ <dtml-call "REQUEST.set('regex', '')">
+</dtml-unless>
+
+<dtml-unless "REQUEST.has_key('batch_start')">
+ <dtml-call "REQUEST.set('batch_start', 0)">
+</dtml-unless>
+<dtml-unless "REQUEST.has_key('batch_size')">
+ <dtml-call "REQUEST.set('batch_size', 20)">
+</dtml-unless>
+
+<dtml-unless "REQUEST.has_key('lang')">
+  <dtml-call "REQUEST.set('lang', _.None)">
+</dtml-unless>
+
+
+<dtml-comment>
+  Put our "lang" at the top of the namespace stack, to avoid it to be
+  overriden by another lang defined somewhere else.
+</dtml-comment>
+<dtml-let lang="REQUEST['lang']">
+
+
+<p class="form-help">
+  <dtml-gettext>
+    To show only few messages enter a regular expression and click the
+    <tt>Filter</tt> button.
+  </dtml-gettext>
+</p>
+
+<blockquote>
+  <form action="manage_messages" method="post">
+    <input type="hidden" name="lang" value="<dtml-var "lang or ''">">
+    <table cellspacing="0" cellpadding="2" border="0">
+      <tr>
+        <td>
+          <input type="text" name="regex" value="<dtml-var regex>" />
+        </td>
+        <td>
+          <input type="submit" value=" <dtml-var "gettext('Filter')"> " />
+        </td>
+      </tr>
+    </table>
+  </form>
+</blockquote>
+
+
+
+<p class="form-help">
+  <dtml-gettext>
+    To add a new message enter it and click the <tt>Add</tt> button.
+  </dtml-gettext>
+</p>
+<blockquote>
+  <form action="manage_addLS" method="post">
+    <input type="hidden" name="batch_start:int"
+           value="<dtml-var batch_start>" />
+    <input type="hidden" name="batch_size:int" value="<dtml-var batch_size>" />
+    <input type="hidden" name="regex" value="<dtml-var regex>" />
+    <input type="hidden" name="lang" value="<dtml-var "lang or ''">" />
+    <table cellspacing="0" cellpadding="2" border="0">
+      <tr>
+        <td><input type="text" name="message" /></td>
+        <td><input type="submit" value=" <dtml-var "gettext('Add')"> " /></td>
+      </tr>
+    </table>
+  </form>
+</blockquote>
+
+
+
+
+
+
+
+<dtml-let languages=get_languages
+          len_languages="_.len(languages)">
+
+<dtml-with "filter(regex, batch_start)" mapping>
+ <dtml-if entries>
+  <form action="<dtml-var URL1>" method="post">
+   <input type="hidden" name="batch_start:int"
+          value="<dtml-var batch_start>" />
+   <input type="hidden" name="batch_size:int" value="<dtml-var batch_size>" />
+   <input type="hidden" name="regex" value="<dtml-var regex>" />
+   <input type="hidden" name="lang" value="<dtml-var "lang or ''">" />
+   <table cellspacing="0" cellpadding="2" border="1" width="100%">
+    <tr>
+     <td colspan="<dtml-var "2 + len_languages">">
+      <dtml-var "gettext('Results %d-%d of %d') % (batch_start + 1, (batch_start+batch_size < nentries and batch_start+batch_size) or nentries, nentries)">
+
+      <dtml-if "batch_start > 0">
+       <a href="<dtml-var "get_url(URL, batch_start - batch_size, batch_size, regex, lang)">"><dtml-var "gettext('Previous')"></a>
+      </dtml-if>
+      <dtml-if "batch_start + batch_size < nentries">
+       <a href="<dtml-var "get_url(URL, batch_start + batch_size, batch_size, regex, lang)">"><dtml-var "gettext('Next')"></a>
+      </dtml-if>
+     </td>
+    </tr>
+    <tr class="list-header">
+      <td class="form-label">&nbsp;</td>
+      <td class="form-label">
+        <a href="<dtml-var "get_url(URL, batch_start, batch_size, regex, _.None)">"><dtml-var "gettext('Message')"></a></td>
+      <dtml-in languages>
+        <dtml-let id=sequence-item
+                  title="gettext(get_language_name(id))">
+          <th><a href="<dtml-var "get_url(URL, batch_start, batch_size, regex, id)">"><dtml-if "id == lang"><span style="color: white"><em><dtml-var title></em></span><dtml-else><dtml-var title></dtml-if></a></th>
+        </dtml-let>
+      </dtml-in>
+    </tr>
+
+    <dtml-in entries>
+      <dtml-let message=sequence-key
+                translations="get_translations(message)">
+        <tr>
+          <td valign="top">
+            <input type="checkbox" name="messages_del:list"
+                   value="<dtml-var message>" />
+          </td>
+          <td>
+            <a href="<dtml-var "get_url('manage_message', batch_start, batch_size, regex, lang, ls=message)">"><dtml-var message></a>
+          </td>
+          <dtml-if lang>
+            <td colspan="<dtml-var len_languages>">
+              <input type="hidden" name="messages:list"
+                     value="<dtml-var message>">
+              <input type="text" name="messages:list" size="60"
+                     value="<dtml-var "translations.get(lang,'')" html_quote>">
+            </td>
+          <dtml-else>
+            <dtml-in languages>
+              <dtml-if "translations.get(_['sequence-item'], '')">
+                <td bgcolor="#C0C0C0" align="center"
+                    width="<dtml-var "70/len_languages">%">
+                  &nbsp;
+                </td>
+              <dtml-else>
+                <td width="<dtml-var "70/len_languages">%">
+                  &nbsp;
+                </td>
+              </dtml-if>
+            </dtml-in>
+          </dtml-if>
+        </tr>
+      </dtml-let>
+    </dtml-in>
+    <tr>
+      <td>&nbsp;</td>
+      <td><input type="submit" name="manage_delMessages:method"
+                 value=" <dtml-var "gettext('Delete')"> " /></td>
+      <td colspan="<dtml-var len_languages>">
+        <dtml-if lang>
+          <input type="submit" name="manage_changeMessages:method"
+                 value=" <dtml-var "gettext('Save changes')"> ">
+        <dtml-else>
+          &nbsp;
+        </dtml-if>
+      </td>
+    </tr>
+   </table>
+  </form>
+ <dtml-else>
+  <em><dtml-gettext>There aren't messages.</dtml-gettext></em>
+ </dtml-if>
+</dtml-with>
+
+</dtml-let>
+</dtml-let>
+
+
+
+<dtml-var manage_page_footer>

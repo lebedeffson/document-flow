@@ -1,0 +1,84 @@
+services:
+  rukovoditel_db:
+    image: mariadb:10.11
+    container_name: rukovoditel_db_test
+    environment:
+      MARIADB_DATABASE: rukovoditel
+      MARIADB_USER: rukovoditel
+      MARIADB_PASSWORD: rukovoditel
+      MARIADB_ROOT_PASSWORD: root_rukovoditel
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - rukovoditel_db_data:/var/lib/mysql
+    restart: unless-stopped
+
+  rukovoditel:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: rukovoditel_test
+    depends_on:
+      - rukovoditel_db
+    ports:
+      - "18081:80"
+    environment:
+      TZ: Europe/Moscow
+      RUKOVODITEL_PUBLIC_URL: https://localhost:18443
+      NAUDOC_PUBLIC_URL: https://localhost:18443/docs
+      BRIDGE_BASE_URL: http://host.docker.internal:18082
+      ONLYOFFICE_INTEGRATION_BASE_URL: http://rukovoditel
+      ONLYOFFICE_PUBLIC_JS_API_URL: https://localhost:18443/office/web-apps/apps/api/documents/api.js
+      ONLYOFFICE_JWT_SECRET: onlyoffice_dev_secret
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./dist:/var/www/html
+    restart: unless-stopped
+
+  onlyoffice_docs:
+    image: onlyoffice/documentserver:latest
+    container_name: onlyoffice_docs_test
+    environment:
+      TZ: Europe/Moscow
+      JWT_ENABLED: "true"
+      JWT_SECRET: onlyoffice_dev_secret
+    ports:
+      - "18083:80"
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+      - onlyoffice_logs:/var/log/onlyoffice
+      - onlyoffice_lib:/var/lib/onlyoffice
+      - onlyoffice_db:/var/lib/postgresql
+    shm_size: "1gb"
+    restart: unless-stopped
+
+  rukovoditel_sync_worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: rukovoditel_sync_worker_test
+    depends_on:
+      - rukovoditel_db
+      - rukovoditel
+    environment:
+      TZ: Europe/Moscow
+      RUKOVODITEL_PUBLIC_URL: https://localhost:18443
+      NAUDOC_PUBLIC_URL: https://localhost:18443/docs
+      BRIDGE_BASE_URL: http://host.docker.internal:18082
+      SYNC_INTERVAL_SECONDS: "60"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["/bin/bash", "/sync-worker.sh"]
+    volumes:
+      - ./dist:/var/www/html
+      - ./docker/sync-worker.sh:/sync-worker.sh:ro
+    restart: unless-stopped
+
+volumes:
+  rukovoditel_db_data:
+  onlyoffice_data:
+  onlyoffice_logs:
+  onlyoffice_lib:
+  onlyoffice_db:

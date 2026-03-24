@@ -1,0 +1,88 @@
+<dtml-comment>
+$Id: followup_menu.dtml,v 1.27 2006/02/06 08:12:41 vsafronovich Exp $
+$Editor: ikuleshov $
+</dtml-comment>
+<dtml-revision $Revision: 1.27 $>
+
+<dtml-if dynamic_item>
+  <dtml-jungle expr="portal_followup.getTaskFilterTree(dynamic_item)"
+               state_id=task_tree
+               dynamic_item>
+    <dtml-let view_url="portal_url(action='followup_in', params={'showTaskMode':id})"
+              meta_info="msg(title)"
+              implements="()"
+              getIcon="getIcon(opened=_['tree-item-expanded'])">
+      <dtml-var jungle_item>(<dtml-var countTasks>)
+    </dtml-let>
+  </dtml-jungle>
+
+<dtml-else>
+
+<dtml-var simple_html_header>
+
+<dtml-if "not REQUEST.has_key('disable_dynamic')">
+
+  <dtml-comment>
+  Detecting dynamic-compartibility of client browser
+  </dtml-comment>
+  <script language="javascript">
+  location.replace( setParam( location.href
+                            , 'disable_dynamic:int'
+                            , (userAgent.hasXMLHTTP ? 0 : 1) ) );
+  </script>
+
+<dtml-else>
+
+<span class="Navigation">
+
+  <dtml-jungle expr="portal_followup.getTaskFilterTree()"
+               dynamic="not disable_dynamic"
+               dynamic_item_id="followup_menu"
+               state_id=task_tree>
+    <dtml-let view_url="portal_url(action='followup_in', params={'showTaskMode':id})"
+              meta_info="msg(title)"
+              implements="()"
+              getIcon="getIcon(opened=_['tree-item-expanded'])">
+      <dtml-var jungle_item>(<dtml-var countTasks>)
+    </dtml-let>
+  </dtml-jungle>
+
+<style>
+
+ul { 
+  list-style-image: url("taskfolder.gif");
+  margin: 0px 0px 0px 20px;
+  padding: 0px;
+}
+
+ul li {
+  padding: 0px 0px 2px 2px;
+}
+
+</style>
+
+<span class="Navigation">
+
+<dtml-in "portal_actions.listFilteredActionsFor(this())['report']" mapping>
+<dtml-if sequence-start>
+<ul>
+</dtml-if>
+  <li>
+    <a href="<dtml-var url html_quote>"
+       target="workspace">
+      <dtml-msg expr=name>
+    </a>
+  </li>
+<dtml-if sequence-end>
+</ul>
+</dtml-if>
+</dtml-in>
+
+</span>
+
+</dtml-if>
+
+<dtml-var simple_html_footer>
+
+</dtml-if>
+

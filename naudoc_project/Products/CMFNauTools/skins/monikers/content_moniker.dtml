@@ -1,0 +1,27 @@
+<dtml-comment>
+Moniker view of the ContentBase object.
+
+$Editor: vpastukhov $
+$Id: content_moniker.dtml,v 1.11 2004/11/23 17:54:12 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-if "moniker_object">
+
+<dtml-if "_.SecurityCheckPermission( 'View', this() )">
+  <a href="<dtml-var "moniker_url or relative_url( action=moniker_method )" html_quote>"
+     target="&dtml.null-moniker_frame;"><dtml-msg "No title" expr=Title translate=0></a>
+
+<dtml-elif "not moniker_unauthorized">
+  <dtml-msg "No title" expr=Title translate=0>
+
+<dtml-else>
+    <dtml-raise Unauthorized></dtml-raise>
+</dtml-if>
+
+<dtml-elif moniker_id>
+
+<dtml-msg "unknown object '%(uid)s'" uid="moniker_id.uid">
+
+</dtml-if>

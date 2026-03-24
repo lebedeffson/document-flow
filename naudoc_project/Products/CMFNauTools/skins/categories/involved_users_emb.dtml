@@ -1,0 +1,26 @@
+<dtml-comment>
+$Id: involved_users_emb.dtml,v 1.20 2006/04/12 14:05:47 adolgushin Exp $
+
+show two html-selects, 
+left side - users from action-template,
+rigth side - users included in task
+
+called from task_definition_followup_info_emb.dtml
+
+</dtml-comment>
+
+<dtml-revision $Revision: 1.20 $>
+
+<dtml-let pre="_.has_key('template_id') and '%s_' % template_id or ''"
+          mode="'task'"
+          brains_type="_.has_key('brains_type') and brains_type or 
+                       _.has_key('task_definition_type') and task_definition_type[ _.len('followup_'): ] or 'directive'"
+          ordered="_.has_key('ordered') and ordered"
+          ordered="brains_type in [ 'request', 'signature_request' ] or ordered"
+          name="'involved_users'"
+          selected_users_id="'involved_users'"
+          selected_users_title="'Responsible members'"
+          preselected_users="_.has_key('involved_users') and involved_users"
+>
+  <dtml-var users_selection>
+</dtml-let>

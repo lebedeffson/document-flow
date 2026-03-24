@@ -1,0 +1,28 @@
+<dtml-comment>
+Add form for note or task
+$Editor: spinagin $
+$Id: add_form.dtml,v 1.2 2007/07/03 12:18:52 adolgushin Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-let public_default_check="getSettingById('public_default_check')">
+
+<dtml-if "skin_version=='0.1'">
+  <dtml-var ramka_header>
+</dtml-if>
+
+  <dtml-if "not show_tasks">
+    <div id="div_add_note_form" style="display:''">
+        <dtml-var add_note_form>
+    </div>
+  </dtml-if>
+    <div id="div_add_task_form" style="display:<dtml-if show_tasks>''<dtml-else>none</dtml-if>">
+        <dtml-var add_task_form>
+    </div>
+
+<dtml-if "skin_version=='0.1'">
+  <dtml-var ramka_footer>
+</dtml-if>
+
+</dtml-let>

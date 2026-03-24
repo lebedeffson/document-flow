@@ -1,0 +1,205 @@
+<script type="text/javascript">
+<!--
+
+function validateSearchForm( form )
+{
+// XXX
+    var cat_id = '';
+    var otype = form['otype'].value;
+    if (otype == 'HTMLDocument')
+        cat_id = form['category'].value;
+    else
+        switch (otype)
+        {
+            case 'Heading': cat_id = 'Folder';
+        }
+
+    var cat_element = form['conditions_' + cat_id + ':list'];
+    if ( cat_element )
+        selectAll( cat_element );
+
+<dtml-if "REQUEST.get('callback_form', '') or _.has_key('from_explorer') and from_explorer">
+    var path = window.parent.opener.objectPath;
+<dtml-else>
+    var path = window.top.frames.workspace.objectPath;
+</dtml-if>
+    var error;
+    try
+    {
+        form.location.value = path != null ? path : '';
+    }
+    catch (error)
+    {
+        // XXX ignore -- why?
+    }
+
+    if (! testField( form['text'], 'search', null, true ) )
+        return false;
+
+    return validateForm(form, 1);
+}
+
+function selectOptions( element, selected )
+{
+    selected = selected || selected == null;
+    for ( var i = 0; i < element.options.length; i++ )
+       element.options[i].selected = selected;
+}
+
+function getTextByValue( element, value )
+{
+    for ( var i = 0; i < element.options.length; i++ )
+        if (element.options[i].value == value)
+            return element.options[i].text
+}
+
+function downloadDIV( form, callback_func, div, ctrl_id, ctrl_value, any )
+{
+    try {
+        div.innerHTML = userAgent.downloadURL('&dtml-absolute_url;/search_'+ctrl_id+'?ctrl_value='+ctrl_value+'&query_id=<dtml-var "query.getId()">');
+        callback_func( form, ctrl_id, ctrl_value, any );
+    } catch (error) {
+        // pass
+    }
+}
+
+function checkDiv( form, ctrl_id, ctrl_value, any )
+{
+//    alert( ctrl_id+' - '+ctrl_value+' - '+any );
+
+    switch (ctrl_value)
+    {
+        case 'Heading': ctrl_value = 'Folder';
+        break;
+    }
+
+    var ctrl_img = document.getElementById(ctrl_id+'_img');
+    var divs = form.getElementsByTagName('DIV');
+    var div_id = ctrl_id+'_'+ctrl_value+'_div';
+    var div = document.getElementById(div_id);
+    if (div && !div.innerHTML)
+    {
+        downloadDIV( form, checkDiv, div, ctrl_id, ctrl_value, any );
+        return 0;
+    }
+
+    for (var i = 0; i < divs.length; i++)
+        if (divs[i].id != ctrl_id && divs[i].id.indexOf(ctrl_id) > -1)
+        {
+            if (any && ctrl_value != 'any')
+                divs[ctrl_id+'_any_div'].style.display = '';
+            if (divs[i].id == div_id )
+            {
+                if (ctrl_value == 'any' || divs[i].style.display != 'none')
+                    divs[i].style.display = 'none';
+                else
+                    divs[i].style.display = '';
+            }
+            else
+                divs[i].style.display = 'none';
+        }
+
+    if (ctrl_img)
+        if (document.getElementById(div_id).style.display != 'none')
+        {
+            document.getElementById(ctrl_id+'_trigger').value = '1';
+            ctrl_img.src = "&dtml-portal_url;/bull_down.gif";
+        }
+        else
+        {
+            document.getElementById(ctrl_id+'_trigger').value = '';
+            ctrl_img.src = "&dtml-portal_url;/bull_right.gif";
+        }
+}
+
+function openPopUp( form, cat_id, mode )
+{
+    var attr_id = document.getElementById('attrs_'+cat_id).value;
+    var url = window.objectBaseURL + '/search_catattr_form';
+
+    if (mode)
+    {
+        var conditions = form['conditions_'+cat_id+':list'];
+        if (!conditions.length) return 0;
+        var attr_value = document.getElementById(conditions.options[conditions.selectedIndex].value).value;
+
+        attr_id = conditions.options[conditions.selectedIndex].value;
+        attr_id = attr_id.replace(cat_id + '_', '');
+
+        var in_child = document.forms[form.id][cat_id+'_'+attr_id+'_inchild'].value;
+
+        url = setParam( url, 'attr_value:lines', attr_value );
+        url = setParam( url, 'in_child', in_child );
+    }
+
+    url = setParam( url, 'callback_function', 'callbackFunction_attr' );
+    url = setParam( url, 'callback_form', form.id );
+    url = setParam( url, 'attr_id', attr_id );
+    url = setParam( url, 'cat_id', cat_id );
+//    alert(url);
+    window.open( url, '_blank', 'toolbar=no, scrollbars=yes, status=yes, width=300, height=200, resizable=yes' );
+}
+
+function callbackFunction_attr( formId, cat_id, attr_id, attr_type, attr_value, in_child )
+{
+    document.forms[formId][cat_id+'_'+attr_id+':lines'].value = attr_value;
+    document.forms[formId][cat_id+'_'+attr_id+'_inchild'].value = in_child && 1 || '';
+
+    var conditions = document.forms[formId]['conditions_'+cat_id+':list'];
+    var len = conditions.length;
+
+    for (var i = 0; i < len; i++)
+        if (conditions.options[i].value==cat_id+'_'+attr_id)
+            return 1;
+
+    var new_option = document.createElement('OPTION');
+    new_option.text = getTextByValue(document.forms[formId]['attrs_'+cat_id], attr_id);
+    new_option.value = cat_id+'_'+attr_id;
+    conditions.options[len] = new_option;
+}
+
+function deleteSelection( form, select_name )
+{
+    var dest_list = form[select_name];
+    var len = dest_list.options.length;
+
+    for(var i = (len-1); i >= 0; i--)
+        if ((dest_list.options[i] != null) && (dest_list.options[i].selected == true))
+        {
+            form[dest_list.options[i].value+':lines'].value='';
+            dest_list.options[i] = null;
+        }
+}
+
+function setupForm( form, cat_id )
+{
+    checkDiv( form, 'category', cat_id, 1 );
+    var div = document.getElementById('attrs_'+cat_id+'_div');
+    downloadDIV( form, fillConditions, div, 'attrs', cat_id, 1 );
+}
+
+function fillConditions()
+{
+    var form = arguments[0];
+    var cat_id = arguments[2];
+    var cat_ids = form['category'];
+    var attr_ids = form['attrs_'+cat_id];
+
+    checkDiv( form, 'attrs', cat_id, 0 );
+
+    if (attr_ids)
+    {
+        var conditions = form['conditions_'+cat_id+':list'];
+        for (var i = 0; i < attr_ids.length; i++)
+            if (form[cat_id+'_'+attr_ids.options[i].value+':lines'].value != '')
+            {
+                var new_option = document.createElement('OPTION');
+                new_option.text = getTextByValue(form['attrs_'+cat_id], attr_ids.options[i].value);
+                new_option.value = cat_id+'_'+attr_ids.options[i].value;
+                conditions.options[conditions.length] = new_option;
+            }
+    }
+}
+
+//-->
+</script>

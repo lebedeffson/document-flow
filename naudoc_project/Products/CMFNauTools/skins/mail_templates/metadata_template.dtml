@@ -1,0 +1,26 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=&dtml-charset;">
+</head>
+<table border="0">
+<tr>
+  <td valign="top" align="right"><dtml-msg "Title">:</td>
+  <td>&dtml-Title;</td>
+</tr>
+<tr>
+  <td valign="top" align="right"><dtml-msg "Description">:</td>
+  <td>&dtml-Description;</td>
+</tr>
+<dtml-in "listCategoryAttributes( monikers=True )" prefix="attr">
+<dtml-with attr_key>
+<tr>
+  <td valign="top" align="right">&dtml-Title;:</td>
+  <td>
+    <dtml-comment> XXX link and user monikers insert links, this is no good </dtml-comment>
+    <dtml-var "entry_field_view( None, _, descriptor=getFieldDescriptor(), value=attr_item )">
+  </td>
+</tr>
+</dtml-with>
+</dtml-in>
+</table>
+</html>

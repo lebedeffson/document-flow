@@ -1,0 +1,21 @@
+<dtml-comment>
+$Id: task.request_user_excluded.dtml,v 1.6 2004/01/16 16:46:24 vpastukhov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+<dtml-let actor="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='en'">
+Subject: Information about request "<dtml-var task_title>"
+
+You have been excluded from the request "&dtml-task_title;"
+Creator: <dtml-var actor>
+URL: &dtml-task_url;
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Запрос "<dtml-var task_title>" отменен
+
+Запрос "<dtml-var task_title>" отменен
+Автор задания: <dtml-var actor>
+URL: &dtml-task_url;
+</dtml-if>
+</dtml-let>

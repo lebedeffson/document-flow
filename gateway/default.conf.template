@@ -1,0 +1,92 @@
+server {
+    listen 80;
+    server_name ${SERVER_NAME};
+    client_max_body_size 64m;
+
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+    }
+
+    location / {
+        return 301 https://$host:${EXTERNAL_HTTPS_PORT}$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${SERVER_NAME};
+    client_max_body_size 64m;
+
+    ssl_certificate /etc/nginx/certs/dms.crt;
+    ssl_certificate_key /etc/nginx/certs/dms.key;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-Host $http_host;
+    proxy_set_header X-Forwarded-Port ${EXTERNAL_HTTPS_PORT};
+    proxy_read_timeout 300s;
+    proxy_connect_timeout 30s;
+    proxy_send_timeout 300s;
+
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+    }
+
+    location = /bridge {
+        return 301 /bridge/;
+    }
+
+    location /bridge/ {
+        proxy_set_header X-Forwarded-Prefix /bridge;
+        proxy_pass http://${BRIDGE_UPSTREAM}/;
+    }
+
+    location = /office {
+        return 301 /office/;
+    }
+
+    location /office/ {
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Forwarded-Host $http_host/office;
+        proxy_pass http://${ONLYOFFICE_UPSTREAM}/;
+    }
+
+    location = /docs {
+        return 301 /docs/;
+    }
+
+    location /docs/ {
+        proxy_set_header Accept-Encoding "";
+        proxy_set_header Host ${SERVER_NAME}:${EXTERNAL_HTTPS_PORT};
+        proxy_set_header HTTPS on;
+        proxy_set_header X-Forwarded-Ssl on;
+        proxy_set_header X-Url-Scheme https;
+        proxy_set_header Front-End-Https on;
+        proxy_pass http://${NAUDOC_UPSTREAM};
+        proxy_redirect ~^http://${SERVER_NAME}(/docs/.*)$ https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}$1;
+        sub_filter_once off;
+        sub_filter_types text/css application/javascript application/x-javascript text/javascript;
+        sub_filter 'http://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/docs' 'https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/docs';
+        sub_filter 'http://${NAUDOC_UPSTREAM}/docs' 'https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/docs';
+        sub_filter 'http%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Fdocs' 'https%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Fdocs';
+        sub_filter 'http%3A%2F%2F${NAUDOC_UPSTREAM_ESCAPED}%2Fdocs' 'https%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Fdocs';
+    }
+
+    location / {
+        proxy_pass http://${RUKOVODITEL_UPSTREAM};
+        proxy_redirect ~^http://${SERVER_NAME}(/.*)$ https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}$1;
+    }
+}

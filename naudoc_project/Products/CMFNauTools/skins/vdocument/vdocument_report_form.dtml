@@ -1,0 +1,100 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_report_form.dtml,v 1.18 2004/06/07 12:28:19 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.18 $>
+
+<dtml-var simple_html_header>
+
+<dtml-if template>
+
+  <iframe src="<dtml-var "getTable().absolute_url( action=template, params=getData() )" html_quote>"
+          width="100%" height="80%"></iframe>
+
+<form method="GET" action="&dtml-absolute_url;">
+  <table>
+    <tr>
+      <td class="small">
+        <dtml-msg "Title">:<input type="text" 
+                                  size="50" 
+                                  name="report_title:method" 
+                                  value="&dtml-Title; - <dtml-var "getStep().Title()" html_quote>" />
+      </td>
+    </tr>
+    <tr>
+      <td class="small">
+        <dtml-msg "Description">:<br> <textarea rows="10" cols="40" name="report_description"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td class="small">
+        <input type="submit" name="vdocument_report_save:method" value="<dtml-msg "Save report">">
+      </td>
+    </tr>
+  </table>
+  <input type="hidden" name="template:string" value="&dtml-template;">
+</form>
+
+<dtml-elif doc_template>
+
+<script>
+
+window.onload=applyMSWordTemplate;
+
+function applyMSWordTemplate()
+{
+  /*@cc_on @*/
+  /*@if (@_jscript_version>4) 
+  
+  try {
+    //create activex object
+    var word = new ActiveXObject("Word.Application");
+    word.Visible = true;
+  }
+  catch (err) {
+    alert(err.description);
+    alert('<dtml-msg "You need to add this site in list of trusted sites in InternetExplorer.">')
+    return false;
+  }
+  
+  try {
+    word.Documents.Open('<dtml-var "getTable().absolute_url( action=doc_template )" fmt=jscript html_quote>');
+  }
+  catch (err) {
+    alert(err.description);
+    word.Quit()
+    return false;
+  } 
+  //do something
+
+  <dtml-in "getData().items()" prefix="data">
+  try {
+    <dtml-if "getTable().getColumnById(data_key).Type() in ['lines', 'link', 'file']">
+    //not worked yet pass TODO: need work up this types too
+    <dtml-else>
+      word.Application.ActiveDocument.Variables.Add("<dtml-var data_key fmt=jscript>").Value = "<dtml-var data_item null="" fmt=jscript>";
+    </dtml-if>
+      
+  }
+  catch (err) {
+    //alert('<dtml-var data_key fmt=jscript>: ' + err.description);
+  }
+  </dtml-in>
+
+  try {
+    word.Application.ActiveDocument.Fields.Update();
+  }
+  catch (err) {
+    alert(err.description);
+  }
+
+  word = null;
+  @end @*/
+  alert('<dtml-msg "New window with Microsoft Word"> (&dtml-doc_template;) <dtml-msg "appears. Report has been placed there.">');
+}
+
+</script>
+</dtml-if>
+
+<dtml-var simple_html_footer>

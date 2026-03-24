@@ -1,0 +1,391 @@
+<dtml-comment>
+$Id: task_edit_form.dtml,v 1.63 2007/03/19 11:49:16 oevsegneev Exp $
+$Editor: ikuleshov $
+</dtml-comment>
+<dtml-revision $Revision: 1.63 $>
+
+<dtml-var simple_html_header>
+<dtml-let action="_.has_key('action') and _.getitem('action') or 'edit'"
+          edit="action == 'edit'"
+          wizard_data="_.has_key('wizard_data_id') and REQUEST['SESSION'].get(wizard_data_id)"
+          templates="portal_membership.listTaskTemplates().items()"
+          default="wizard_data and wizard_data.get('task_form')
+                   or edit and { 'title': Title()
+                               , 'description': Description()
+                               , 'effective_date': effective()
+                               , 'expiration_date': expires()
+                               , 'plan_time': implements('isDirectiveTask') and getPlanTime()
+                               , 'alarm_settings': alarm_settings
+                               , 'periodical': implements('isRecurrentTask') and 'checked'
+                               , 'temporal_expr': implements('isRecurrentTask') and temporal_expr
+                               , 'duration_time': (implements('isDirectiveTask') or implements('isRecurrentTask')) and duration
+                               , 'involved_users': listInvolvedUsers()
+                               , 'supervisor': Supervisor()
+                               }
+                   or { 'title': not implements('isPortalRoot') and Title() or ''
+                      , 'description': ''
+                      , 'effective_date': ZopeTime()
+                      , 'expiration_date': ZopeTime() + 1.0
+                      , 'plan_time': 0
+                      , 'alarm_settings': {'type': 'percents', 'value': 10,
+                                           'include_descr': False,
+                                           'note': msg('Task revision is needed')}
+                      , 'periodical': ''
+                      , 'temporal_expr': None
+                      , 'duration_time': 0
+                      , 'involved_users': []
+                      , 'supervisor': None
+                      }
+                  "
+>
+<script type="text/javascript"><!--
+  function switchScheduleControls( form, state ) {
+      var dialog = document.getElementById( 'schedule_dialog' );
+
+      if (userAgent.MZ && state) {
+          // workaround of strange Mozilla bug
+          var selects = dialog.getElementsByTagName('SELECT');
+          for (var i = selects.length; i-- > 0;)
+              selects[i].style.visibility = 'visible';
+      }
+
+      dialog.style.display = state ? '' : 'none';
+
+      var elaborate = form[ 'task_elaborate_button' ];
+      if ( elaborate ) elaborate.disabled = state;
+  }
+
+  function Validate(frm, save_template)
+  {
+    if (!save_template && !frm.title.value) {
+      alert('<dtml-msg "Please specify task title">');
+      return false;
+    }
+    if (save_template && ! frm['template_name'].value){
+      alert('<dtml-msg "Please specify template title">');
+      return false;
+    }
+
+    if (!frm['involved_users:list'].options.length) {
+      alert('<dtml-msg "Please specify responsible members">');
+      return false;
+    }
+
+    if (! validateRange('datetime', frm.effective_date_field.value, frm.expiration_date_field.value)) {
+      alert('<dtml-msg "Effective date must be smaller than Expiration date">');
+      return false;
+    }
+
+    selectAll(frm['involved_users:list']);
+
+    // FIXME: Must be done in a alarm part of form method (something like onSubmit)
+    alarm_dates = frm.elements['alarm_dates:list']
+    if ( alarm_dates )
+        selectAll( alarm_dates ); 
+
+    var is_periodical = <dtml-var "edit and default.get('periodical') and 'true' or 'false'"> || document.getElementById('periodical').checked;
+
+    return validateForm(frm) && (is_periodical && validateSheduleForm(frm) || !is_periodical);
+  }
+
+  function sendForm(action)
+  {
+    var form = document.forms['followup'];
+    <dtml-if templates>
+    if (action == 'create_new_template')
+    {
+        var options = form['template_list'].options;
+        var new_template = form['template_name'];
+        for (t = 0; t < options.length; t++)
+            if (options[t].text == new_template.value)
+            {
+                alert('<dtml-msg "Template with such name already exist">');
+                return;
+            }
+    }
+    </dtml-if>
+    if (action == 'delete_template' && !form['template_list'].options.length)
+      return;
+
+    form.action='portal_membership/processTemplateActions';
+    form.template_action.value = action
+    if (action == 'delete_template' || Validate(form,true)) form.submit();
+  }
+
+  function setTemplate(list_name) {
+    var form = document.forms['followup']
+    var templates = new Array(
+      <dtml-in templates prefix="t">
+        ['&dtml-t_key;', '<dtml-var "t_item['name']">', '<dtml-var "t_item['supervisor']">',
+         <dtml-var "t_item['responsible_users']">]<dtml-unless t_end>, </dtml-unless>
+      </dtml-in>
+                             )
+    var template_list = form[list_name]
+    if ( !template_list.options.length )
+      return;
+    var template_id = template_list.options[template_list.selectedIndex].value
+
+    for (var i=0; i<templates.length; i++) {
+       if (templates[i][0] == template_id) {
+
+          form.template_name.value = templates[i][1]
+
+          //select supervisor
+          if( form.supervisor )
+              for (var su=0; su<form.supervisor.options.length; su++) {
+                form.supervisor.options[su].selected = false;
+                if (form.supervisor.options[su].value == templates[i][2])
+                  form.supervisor.options[su].selected = true;
+              }
+
+
+          //clear involved_users
+          clearList(form.involved_users);
+
+          //put into involved_users users exists in all_users && templates
+          for (var usr=0; usr < form.all_users.options.length; usr++) {
+            for (var t_usr=0; t_usr < templates[i][3].length; t_usr++) {
+              if (templates[i][3][t_usr] == form.all_users.options[usr].value) {
+                //create new option
+                addOptionTo(form.involved_users, form.all_users.options[usr].text, templates[i][3][t_usr]);
+                break;
+              }
+            }
+          }
+       }
+    }
+  }
+//--></script>
+
+
+
+<dtml-if expr="not _.hasattr(this(), 'followup') and not this().implements( 'isTaskItem' )">
+  <dtml-call expr="portal_followup.getTasksFor(this())">
+</dtml-if>
+
+
+<dtml-if "implements('isTaskItem')">
+<h1> <dtml-var aboveInThread> </h1>
+</dtml-if>
+
+<form name='followup' method="POST" action="&dtml-absolute_url;/followup" onSubmit="return Validate(this);">
+
+  <input type="hidden" name="template_action" value="">
+
+<dtml-if wizard_data_id>
+  <input type=hidden name="wizard_data_id" value="&dtml-wizard_data_id;">
+</dtml-if>
+
+<dtml-if edit>
+  <input type="hidden" name="task_id" value="&dtml-getId;">
+</dtml-if>
+
+<dtml-if brains_type>
+  <input type="hidden" name="brains_type" value="&dtml-brains_type;">
+<dtml-elif BrainsType>
+  <input type="hidden" name="brains_type" value="&dtml-BrainsType;">
+</dtml-if>
+
+  <table>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "New task details">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Task title">
+    </td>
+    <td>
+       <input name="title" size="86"
+        value="<dtml-var "default.get('title')" html_quote>"
+       />
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Task description">
+    </td>
+    <td>
+       <dtml-comment> 
+       <textarea name="description"
+                 rows="10"
+                 cols="85"
+       ><dtml-var "default.get('description')"></textarea>
+       </dtml-comment>
+       <dtml-var "comment_template( this()
+                                  , title='Description'
+                                  , form='followup'
+                                  , field='description'
+                                  , value=default.get('description')
+                                  , context='task.assign.%s' % REQUEST.get('brains_type') or _.get('BrainsType','request',1) 
+                                  )">
+
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Effective date">
+    </td>
+    <td>
+       <table>
+       <tr>
+         <td class="small">
+            <dtml-var "datetime_form( this()
+                                    , prefix='effective_date'
+                                    , date=default.get('effective_date')
+                                    )"
+            >
+         </td>
+       </tr>
+       </table>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Expiration date">
+    </td>
+    <td>
+       <table>
+       <tr>
+         <td class="small">
+            <dtml-var "datetime_form( this()
+                                    , prefix='expiration_date'
+                                    , date=default.get('expiration_date')
+                                    )"
+            >
+         </td>
+       </tr>
+       </table>
+    </td>
+  </tr>
+
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Plan time">
+    </td>
+    <td>
+       <table>
+       <tr>
+         <td class="small">
+            <dtml-var "entry_field_edit( None, _
+                                      , type='time_period'
+                                      , name='plan_time'
+                                      , value=default.get('plan_time') or 0
+                                      )"
+            >
+         </td>
+       </tr>
+       </table>
+    </td>
+  </tr>
+
+<dtml-var task_alarm_form>
+
+<dtml-unless "edit and not default.get('periodical')">
+  <tr class="row_even">
+    <td class="small" colspan="2">
+    <dtml-if edit>
+      <dtml-msg Schedule>
+      <input name="periodical" type="hidden" value="1">
+    <dtml-else>
+      <input type="checkbox"
+             id="periodical"
+             name="periodical"
+             value="1"
+             onClick="switchScheduleControls( this.form, this.checked )"
+             <dtml-var "default.get('periodical')" fmt="checked">
+      >
+      <label for="periodical"><dtml-msg "Scheduled task"></label>
+    </dtml-if>
+    </td>
+  </tr>
+
+  <dtml-var task_schedule_form>
+
+</dtml-unless>
+  <tr class="row_even">
+    <td colspan="2" class="small" align="left">
+         <dtml-var "involved_users_emb( this(), involved_users=default.get('involved_users'), suppress_roles=1 )">
+    </td>
+  </tr>
+<dtml-if "edit or not implements( 'isTaskItem' )">
+  <tr class="row_even">
+    <td class="small" colspan="2" align="left">
+      <table>
+        <tr>
+          <td class="small">
+            <dtml-msg "Supervisor">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <dtml-var "user_list(this(), name='supervisor', value=default.get('supervisor'), blank=1)">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</dtml-if>
+  <tr class="row_even">
+    <dtml-if templates>
+    <td class="small" nowrap>
+      <dtml-msg "Template list">
+      <select name="template_list"
+              id="template_list"
+              <dtml-var "not templates" fmt=disabled>
+      />
+      <dtml-in templates prefix="t">
+        <option value="<dtml-var "t_key">"><dtml-var "t_item['name']" ></option>
+      </dtml-in>
+      </select>
+      <a href="javascript: setTemplate('template_list')"><img
+         name="load_template" src="&dtml-portal_url;/load_filter.gif" alt="<dtml-msg "Load template">"></a>
+      <a href="javascript: sendForm('delete_template')"><img
+         name="delete_template" src="&dtml-portal_url;/delete.gif" alt="<dtml-msg "Delete template">"></a>
+      &nbsp;
+   </td><td class="small">
+   <dtml-else>
+   <td colspan=2 class="small">
+   </dtml-if>
+     <dtml-msg "Template name">
+     <input type="text" name="template_name" value="">
+     <a href="javascript: sendForm('create_new_template')"><img
+        name="create_new_template" src="&dtml-portal_url;/create_new_filter.gif" alt="<dtml-msg "Create template">"></a>
+     <a href="javascript: sendForm('save_template')"><img
+        name="save_template" src="&dtml-portal_url;/save.gif" alt="<dtml-msg "Save template">"></a>
+
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2" class="small">
+       <dtml-var task_finalization_mode>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+	<input type=submit name="task_edit:method" value="<dtml-var "edit and msg('Edit task') or msg('Add task')">">
+       <dtml-unless "edit or _.has_key('brains_type') and brains_type!='directive'">
+	<input type=submit id="task_elaborate_button" name="task_elaborate:method" value="<dtml-msg "Elaborate task"> &gt;&gt;">
+       </dtml-unless>
+        <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;/followup_tasks_form'" value=" <dtml-msg "Cancel"> ">
+    </td>
+  </tr>
+  </table>
+
+</form>
+
+<dtml-if CookedBody>
+<table width="100%">
+ <tr class="task_title">
+  <td class="smallHeader"><dtml-msg "Document text"></td>
+ </tr>
+ <tr>
+  <td><dtml-var "this().CookedBody(view=1)"></td>
+ </tr>
+</table>
+</dtml-if>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

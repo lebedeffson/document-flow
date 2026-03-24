@@ -1,0 +1,203 @@
+<dtml-comment>
+Form for view one day.
+Show notes and tasks from portal_followup
+$Editor: spinagin $
+$Id: calendar_day_view.dtml,v 1.4 2007/07/03 12:18:52 adolgushin Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-let user="portal_membership.getAuthenticatedMember()"
+          user_name="user.getUserName()"
+          show_button="False"
+>
+
+<form id="manage_day_notes" action="manage_note_handler" method="POST">
+
+<dtml-if "skin_version=='1.0'">
+<dtml-in "listNotesForDate(selected_year, selected_month, selected_day, filter_topic)" mapping>
+
+  <dtml-if sequence-start>
+  <table width="100%" border="0" cellpadding="2" cellcpacing="2">
+  <tr noWrap>
+    <td colspan="2" valign="middle"><font size="2" color=#3366CC><b><dtml-msg "Notes"></b></font></td>
+    <td colspan="2" noWrap>
+    <dtml-msg "Filter">:
+    <select name="filter_topic" onChange="document.location.replace('calendar_view?day='+&dtml-selected_day;+'&month='+&dtml-selected_month;+'&year='+&dtml-selected_year;+'&filter_topic='+this.value)">
+      <option value="">&mdash;&mdash;</option>
+      <dtml-in "listTopics()">
+        <option value="&dtml-sequence-item;" <dtml-var "filter_topic==_['sequence-item']" fmt=selected>>&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>
+    </td>
+  </tr>
+  <tr class="row_title">
+    <td>&nbsp;</td>
+    <td><dtml-var "selected_day"> <dtml-msg expr="months_map[selected_month].capitalize()"> <dtml-var "selected_year"></td>
+    <td noWrap><dtml-msg "Topic"></td>
+    <td noWrap><dtml-msg "Public"></td>
+  </tr>
+  </dtml-if>
+
+  <tr class="row_even" valign="middle" align="left"
+    onDblClick="document.location.replace('&dtml-absolute_url;/calendar_view?year=<dtml-var selected_year>&month=<dtml-var selected_month>&day=<dtml-var selected_day>&changed_note_id=&dtml-id;');"
+  >
+    <td>
+      <dtml-if "allow_edit and (user_name==creator or user.has_role('Manager'))">
+        <dtml-call "_.set('show_button',1)">
+        <input type="checkbox" name="ids:list" value="&dtml-id;" />
+      </dtml-if>
+    </td>
+    <td width="100%">
+      <a href="#"
+      <dtml-if "allow_edit and user_name==creator">
+        title="<dtml-msg "Change">"
+        onClick="document.location.replace('&dtml-absolute_url;/calendar_view?year=<dtml-var selected_year>&month=<dtml-var selected_month>&day=<dtml-var selected_day>&changed_note_id=&dtml-id;');"
+      </dtml-if>
+      >
+      <b>&dtml-title;</b>
+      </a>
+      <br>
+      &dtml-text;
+    </td>
+    <td>
+      <dtml-if "topic">&dtml-topic;<dtml-else>&nbsp;</dtml-if>
+    </td>
+    <td align="center" 
+      <dtml-if "creator<>user_name">class="blue"<dtml-else>class="red"</dtml-if>
+    >
+      <dtml-if isPublic><b>*</b>
+      <dtml-else>&nbsp;
+      </dtml-if>        
+    </td>
+  </tr>
+
+  <dtml-if sequence-end>
+  <tr>
+    <td align="right" colspan="4">
+      <dtml-if "allow_edit and show_button">
+          <input type="submit" name="delete_notes" value="<dtml-msg "Delete">"
+               onClick="return confirm( '<dtml-msg "Are you shure?">' )" />
+      </dtml-if>
+    </td>
+  </tr>
+  </table>
+  </dtml-if>
+
+<dtml-else>
+ <p>&nbsp;<dtml-msg "No notes for selected date"> ( <dtml-var "selected_day"> <dtml-msg expr="months_map[selected_month].capitalize()"> <dtml-var "selected_year"> ).</p>
+</dtml-in>
+
+<dtml-else>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+  <td><h3 align="center"><dtml-var "selected_day"> <dtml-msg expr="months_map[selected_month].capitalize()"> <dtml-var "selected_year"></h3>
+  <td align="right" width="5%" nowrap="1">
+    <dtml-msg "Filter">:
+    <select name="filter_topic" onChange="document.location.replace('calendar_view?day='+&dtml-selected_day;+'&month='+&dtml-selected_month;+'&year='+&dtml-selected_year;+'&filter_topic='+this.value)">
+      <option value="">&mdash;&mdash;</option>
+      <dtml-in "listTopics()">
+        <option value="&dtml-sequence-item;" <dtml-var "filter_topic==_['sequence-item']" fmt=selected>>&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>
+  </td>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
+    <dtml-in "listNotesForDate(selected_year, selected_month, selected_day, filter_topic)" mapping>
+        <dtml-if sequence-start>
+          <dtml-var ramka_header>
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        </dtml-if>
+      <tr>
+       <td class="blue"
+            <dtml-if "allow_edit and user_name==creator">
+              onDblClick="document.location.replace('&dtml-absolute_url;/calendar_view?year=<dtml-var selected_year>&month=<dtml-var selected_month>&day=<dtml-var selected_day>&changed_note_id=&dtml-id;');"
+            </dtml-if>
+       ><b>&dtml-title;</b>
+       <td align="right" class="blue">&dtml-topic; &nbsp;&nbsp;&nbsp;
+       <td rowspan="2" width="10" align="right" valign="middle"
+         <dtml-if "creator<>user_name">class="blue"<dtml-else>class="red"</dtml-if>
+       >
+        <dtml-if isPublic>
+          <b>*</b>
+        </dtml-if>
+       <td rowspan="2" width="15" valign="middle" nowrap="1">
+         <dtml-if "allow_edit and (user_name==creator or user.has_role('Manager'))">
+           <dtml-call "_.set('show_button',1)">
+           <input type="checkbox" name="ids:list" value="&dtml-id;" />
+         </dtml-if>
+      <tr>
+        <td colspan="2"
+          <dtml-if "allow_edit and user_name==creator">
+              onDblClick="document.location.replace('&dtml-absolute_url;/calendar_view?year=<dtml-var selected_year>&month=<dtml-var selected_month>&day=<dtml-var selected_day>&changed_note_id=&dtml-id;');"
+          </dtml-if>
+        >
+            &dtml-text;
+      <tr>
+        <td height="2" colspan="4"><hr width="90%" align="center" size="1"></td>
+
+        <dtml-if sequence-end>
+          </table>
+          <dtml-var ramka_footer>
+          <tr><td align="right"> <dtml-if "allow_edit and show_button">
+          <input type="submit" name="delete_notes" value="<dtml-msg "Delete">"
+                 onClick="return confirm( 'Are you shure?' )" />
+                                 </dtml-if>
+        </dtml-if>
+    <dtml-else>
+        <dtml-var ramka_header>
+         <dtml-msg "No notes for selected date"> ( <dtml-var "selected_day"> <dtml-msg expr="months_map[selected_month].capitalize()"> <dtml-var "selected_year"> )
+        <dtml-var ramka_footer>
+    </dtml-in>
+
+  </td></tr>
+
+</table>
+</dtml-if>
+        <input type="hidden" name="selected_year" value="<dtml-var "selected_year">" >
+        <input type="hidden" name="selected_month" value="<dtml-var "selected_month">">
+        <input type="hidden" name="selected_day" value="<dtml-var "selected_day">" >
+
+</form>
+</table>
+
+
+
+<dtml-in "listTasksForDate(selected_year, selected_month, selected_day)">
+<dtml-if sequence-start>
+  <h3 align="center"><dtml-msg "In this day your involved in tasks">:</h3>
+  <table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr><td> 
+    <dtml-var ramka_header>
+    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+</dtml-if>
+  <tr>
+    <td colspan="3">
+      <a href="<dtml-var "_['sequence-item'].getObject().absolute_url()">" target="blank" class="Navigate"> <b><dtml-var "_['sequence-item']['Title']"></b></a><br>
+  <tr>
+    <td colspan="3">
+      <dtml-var "_['sequence-item']['Description']">
+  <tr>
+    <td nowrap="1"><dtml-msg "Effective date">:
+    <td nowrap="1"><dtml-var "_['sequence-item']['effective']" fmt="%Y-%m-%d %H:%M">
+    <td rowspan="2" valign="middle" width="60%" align="left"
+       <dtml-if "now>=_['sequence-item']['expires'] and not _['sequence-item']['isFinalized']">
+        class="red"
+       </dtml-if>
+    >  <dtml-msg "Expired">
+        
+  <tr>
+    <td nowrap="1"><dtml-msg "Expiration date">:
+    <td nowrap="1"><dtml-var "_['sequence-item']['expires']" fmt="%Y-%m-%d %H:%M">
+
+  <tr>
+    <td height="2" colspan="3"><hr width="90%" align="center" size="1"></td>
+
+<dtml-if sequence-end>
+        </table>
+      <dtml-var ramka_footer>
+</table>
+</dtml-if>
+</dtml-in>
+</dtml-let>

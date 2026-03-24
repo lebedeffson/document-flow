@@ -1,0 +1,280 @@
+<dtml-comment>
+$Id: task_definition_followup_info_emb.dtml,v 1.23 2008/01/29 09:44:59 oevsegneev Exp $
+
+showing action template 'followup', in info mode,
+also show fields allowed for editing in edit mode
+
+called from list_activated_action_templates_emb.dtml
+
+</dtml-comment>
+<dtml-revision $Revision: 1.23 $>
+<dtml-let var_postfix="'var'"
+          vars="task_definition['vars']"
+>
+<table cellspacing="2" cellpadding="3">
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+      <dtml-msg "Task info">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="smallHeader">
+      <dtml-msg "Task title">
+    </td>
+    <td>
+    <dtml-if "'title' in task_definition['_allow_edit']">
+      <input type="text" size="50" name="&dtml-template_id;_title"
+             value="<dtml-var "task_definition.get('title')" null html_quote>" 
+      />
+    <dtml-elif "task_definition['vars'].has_key('title')">
+      <dtml-msg "The parameter's value will be obtained from context variable">
+    <dtml-else>
+      <dtml-var "task_definition['title']">
+    </dtml-if>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <dtml-if "'involved_users' in task_definition['_allow_edit']">
+      <dtml-comment>--------[ edit mode ]--------</dtml-comment>
+      <td colspan="2">
+        <dtml-var "involved_users_emb(
+                      None, _,
+                      involved_users = task_definition['involved_users'],
+                      template_id = template_id,
+                      options = not task_definition['_full_userlist'] and task_definition['involved_users'] or None,
+                      task_definition_type = task_definition['type']
+                   )">
+      </td>
+      <dtml-comment>--------[ /edit mode ]--------</dtml-comment>
+    <dtml-elif "task_definition['vars'].has_key('involved_users')">
+      <td class="smallHeader">
+        <dtml-msg "Responsible members">
+      </td>
+      <td>
+        <dtml-msg "The parameter's value will be obtained from context variable">
+      </td>    
+    <dtml-else>
+      <dtml-comment>--------[ info mode ]--------</dtml-comment>
+      <td class="smallHeader">
+        <dtml-msg "Responsible members">
+      </td>
+      <td>
+      <dtml-in "task_definition['involved_users']">
+        <dtml-let item=sequence-item
+        >          
+        <dtml-var item fmt="member">
+        <dtml-unless sequence-end><br /></dtml-unless>
+        </dtml-let>
+      <dtml-else>
+        <dtml-msg "All involved users are locked. Task will be not assigned.">
+      </dtml-in>
+      </td>
+      <dtml-comment>--------[ /info mode ]--------</dtml-comment>
+    </dtml-if>
+  </tr>
+
+<dtml-if "task_definition['type']=='followup_request' or task_definition['type'] == 'followup_signature_request'"> 
+    <tr class="row_even">
+       <td class="smallHeader">
+         <dtml-msg "Use confirmation queue">
+       </td>
+    <dtml-if "'confirm_by_turn' in task_definition['_allow_edit']">    
+       <td>  
+        <input type="radio" name="&dtml-template_id;_confirm_by_turn:int"
+               value="1" <dtml-var "task_definition['confirm_by_turn']" fmt=checked> 
+        /> <dtml-msg "Yes"><br>       
+        <input type="radio" name="&dtml-template_id;_confirm_by_turn:int"
+               value="0" <dtml-var "not task_definition['confirm_by_turn']" fmt=checked> 
+        /> <dtml-msg "No">      
+       </td>
+    <dtml-elif "task_definition['vars'].has_key('title')">
+      <td>
+        <dtml-msg "The parameter's value will be obtained from context variable"> 
+      </td>
+    <dtml-else>
+       <td>
+         <dtml-msg expr="task_definition['confirm_by_turn'] and 'Yes' or 'No'">
+       </td>
+    </dtml-if>
+    </tr>
+    <tr class="row_even">
+       <td class="smallHeader">
+         <dtml-msg "Notify every">
+       </td>
+    <dtml-if "'notification_level' in task_definition['_allow_edit']">    
+       <td>  
+        <input type="radio" name="&dtml-template_id;_notification_level:int"
+               value="1" <dtml-var "task_definition['notification_level']" fmt=checked> 
+        /> <dtml-msg "Yes"><br>       
+        <input type="radio" name="&dtml-template_id;_notification_level:int"
+               value="0" <dtml-var "not task_definition['notification_level']" fmt=checked> 
+        /> <dtml-msg "No">      
+       </td>
+    <dtml-else>
+       <td>
+         <dtml-msg expr="task_definition['notification_level'] and 'Yes' or 'No'">
+       </td>
+    </tr>
+    </dtml-if>
+</dtml-if>
+
+<dtml-if "task_definition['type']=='followup_directive' or task_definition['type'] == 'followup_information'"> 
+
+<tr class="row_title"> 
+  <td class="smallHeader" colspan="2">
+    <dtml-msg "Alarm settings">
+  </td> 
+</tr> 
+
+<dtml-let default="{'alarm_settings':task_definition['alarm_settings']}"
+          view_alarm_settings="'alarm_settings' not in task_definition['_allow_edit']">
+  <dtml-var task_alarm_form>
+</dtml-let>
+
+  <tr class="row_even"> 
+    <dtml-if "'supervisor_user' in task_definition['_allow_edit']"> 
+      <dtml-comment>--------[ edit mode ]--------</dtml-comment> 
+      <td colspan="2"> 
+        <dtml-var "involved_supervisor_emb(this(), supervisor_user=task_definition['supervisor_user'], template_id=template_id)"> 
+      </td> 
+      <dtml-comment>--------[ /edit mode ]--------</dtml-comment> 
+    <dtml-elif "task_definition['vars'].has_key('supervisor_user')">
+      <td class="smallHeader"><dtml-msg "Supervisor"></td>
+      <td>
+        <dtml-msg "The parameter's value will be obtained from context variable"> 
+      </td>
+    <dtml-else> 
+      <dtml-comment>--------[ info mode ]--------</dtml-comment> 
+      <td class="smallHeader"><dtml-msg "Supervisor"></td> 
+      <td> 
+          <dtml-var "task_definition['supervisor_user']" fmt=member> 
+      </td> 
+      <dtml-comment>--------[ /info mode ]--------</dtml-comment> 
+    </dtml-if> 
+  </tr>
+     
+</dtml-if> 
+
+
+  <dtml-if "'duration_time' in task_definition['_allow_edit']">
+      <dtml-comment>--------[ edit mode ]--------</dtml-comment> 
+    <tr class="row_title">
+      <td class="smallHeader" colspan="2">
+        <dtml-msg "Relative expiration date">
+      </td>
+    </tr>
+    <tr class="row_even">
+      <td colspan="2">
+        <dtml-var "entry_field_edit( None, _
+                 , type='time_period'
+                 , name=template_id + '_duration_time'
+                 , value=task_definition['duration_time']
+                 )"
+        >
+      </td>
+    </tr>
+      <dtml-comment>--------[ /edit mode ]--------</dtml-comment>
+  <dtml-elif "task_definition['vars'].has_key('duration_time')">
+    <tr class="row_even">
+      <td class="smallHeader">
+        <dtml-msg "Relative expiration date">
+      </td>
+      <td>
+        <dtml-msg "The parameter's value will be obtained from context variable"> 
+      </td>
+    </tr>
+  <dtml-else>
+      <dtml-comment>--------[ info mode ]--------</dtml-comment> 
+    <tr class="row_even">
+      <td class="smallHeader">
+        <dtml-msg "Relative expiration date">
+      </td>
+      <td>
+        <dtml-var expr="_.DateTime(_.float(_.DateTime()) + task_definition['duration_time'])"
+                  fmt="%d.%m.%Y %H:%M">
+
+      </td>
+    </tr>
+      <dtml-comment>--------[ /info mode ]--------</dtml-comment>
+  </dtml-if>
+  <dtml-if "'description' in task_definition['_allow_edit']">
+    <tr class="row_title">
+      <td class="smallHeader" colspan="2">
+        <dtml-msg "Task description">
+      </td>
+    </tr>
+    <tr class="row_even">
+      <td colspan="2">
+        <textarea name="&dtml-template_id;_description" rows="10" cols="50"><dtml-var "task_definition['description']" html_quote></textarea>
+      </td>
+    </tr>
+  <dtml-elif "task_definition['vars'].has_key('description')">
+    <tr class="row_even">
+      <td class="smallHeader">
+        <dtml-msg "Task description">
+      </td>
+      <td>
+        <dtml-msg "The parameter's value will be obtained from context variable"> 
+      </td>
+    </tr>
+  <dtml-else>
+    <tr class="row_even">
+      <td class="smallHeader"><dtml-msg "Task description"></td>
+      <td>
+        <dtml-var "task_definition['description']">
+      </td>
+    </tr>
+  </dtml-if>
+    <tr class="row_even">
+      <td class="smallHeader"><dtml-msg "Finalization condition"></td>
+      <td>
+        <dtml-msg expr="task_definition['finalization_mode']">
+      </td>
+    </tr>
+</table>
+</dtml-let>
+<script type="text/javascript">
+<!--
+
+registerFormCallback( '<dtml-var form_name fmt=jscript>',
+        followup_info_on_check, true,
+        // callback arguments
+        '<dtml-var template_id fmt=jscript>',
+        <dtml-var "'title' in task_definition['_allow_edit'] and 1 or 0">,
+        <dtml-var "'involved_users' in task_definition['_allow_edit'] and 1 or 0">
+    );
+
+registerFormCallback( '<dtml-var form_name fmt=jscript>',
+        followup_info_on_submit, null,
+        // callback arguments
+        '<dtml-var template_id fmt=jscript>'
+    );
+
+<dtml-unless "REQUEST.get( '_task_definition_followup_info_emb' )">
+<dtml-call "REQUEST.set( '_task_definition_followup_info_emb', 1 )">
+
+function followup_info_on_check( event, id, check_title, check_users )
+{
+    if (check_title && !this.elements[ id+'_title' ].value){
+        alert('<dtml-msg "Please specify task title">');
+        return false;
+    }
+
+    if (check_users && !this.elements[ id+'_involved_users:list'].options.length){
+        alert('<dtml-msg "Please specify responsible members">');
+        return false;
+    }
+
+    return true;
+}
+
+function followup_info_on_submit( event, id ){
+    var users = this.elements[ id+'_involved_users:list' ];
+    if (users)
+        selectAll( users );
+}
+
+</dtml-unless>
+
+// -->
+</script>

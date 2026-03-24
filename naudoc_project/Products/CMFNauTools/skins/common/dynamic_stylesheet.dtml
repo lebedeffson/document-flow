@@ -1,0 +1,33 @@
+<dtml-comment>
+Insertion of localized fonts and other styles into page header.
+
+$Editor: vpastukhov $
+$Id: dynamic_stylesheet.dtml,v 1.4 2004/02/08 14:01:38 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<style type="text/css">
+
+body, td, h1, h2, h3, p, div.Desktop p, li,
+table.FormLayout th, table.SearchFormLayout th {
+    font-family: <dtml-var "portal_membership.getFontFamily()">;
+}
+
+.DesktopStatusBar, p.DesktopStatusBar, p.DocumentStatusBar {
+    font-family: <dtml-var "portal_membership.getFontFamily('message')">;
+}
+
+div.Desktop h1, div.DesktopTitle h2 {
+    font-family: <dtml-var "portal_membership.getFontFamily('title')">;
+}
+
+input, select, textarea {
+    font-family: <dtml-var "portal_membership.getFontFamily('input')">;
+}
+
+.symbs {
+    font-family: <dtml-var "portal_membership.getFontFamily('symbol')">;
+}
+
+</style>

@@ -1,0 +1,42 @@
+<dtml-comment>
+Subtemplate for displaying folder contents using default viewing format.
+
+$Editor: vpastukhov $
+$Id: folder_view_default.dtml,v 1.5 2004/04/30 14:44:45 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+  <table class="ContentsList" cellspacing="2" cellpadding="2" width="100%" border="0">
+    <dtml-if "directives and _.len(directives) >= qs">
+      <dtml-let is_directive="1" hide_buttons="1" documents=directives>
+        <tr class="Title">
+          <td colspan=3 align="center" class="small"><dtml-msg "Directive documents"></td>
+        </tr>
+        <tr>
+          <td colspan=7 align="center"><img src="spacer.gif" height="5"></td>
+        </tr>
+        <dtml-in documents size=batch_size start=qs>
+          <dtml-var folder_item_default>
+        </dtml-in>
+      </dtml-let>
+    </dtml-if>
+
+    <dtml-if "documents and directives">
+      <tr>
+        <td colspan=7 align="center"><img src="spacer.gif" height="5"></td>
+      </tr>
+      <tr class="Title">
+        <td colspan=7 align="center" class="small"><dtml-msg "Folder content"></td>
+      </tr>
+      <tr>
+        <td colspan=7 align="center"><img src="spacer.gif" height="5"></td>
+      </tr>
+    </dtml-if>
+
+    <dtml-let is_directive="0">
+      <dtml-in documents size=batch_size start=qs>
+        <dtml-var folder_item_default>
+      </dtml-in>
+    </dtml-let>
+  </table>

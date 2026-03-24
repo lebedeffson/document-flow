@@ -1,0 +1,97 @@
+<dtml-let isAnon="portal_membership.isAnonymousUser()"
+          container="this()"
+>
+
+<table width="100%" cellspacing=0 cellpadding=0 border=0>
+<tr>
+	<td class="blue"><img src="&dtml-portal_url;/null.gif" width=150 height=3></td>
+</tr>
+
+<tr>
+  <td background="&dtml-portal_url;/line_menu_h_1.gif"><img src="&dtml-portal_url;/null.gif" width="200" height="1"></td>
+  <td><img src='&dtml-portal_url;/arc_menu_1.gif' width="12" height="12"></td>
+</tr>
+
+<tr>
+  <td>
+    <dtml-comment>
+        Folders list
+    </dtml-comment>
+
+    <dtml-in "go.listSubFolders()" mapping>
+      <dtml-if sequence-start>
+        <table>
+      </dtml-if>
+         <tr>
+           <td valign="middle"><img src="&dtml-portal_url;/li-folder.gif" border="0"></td>
+           <td valign="top"><a class="big_menu_dark" href="&dtml-absolute_url;">&dtml-title;</a></td>
+         </tr>
+      <dtml-if sequence-end>
+        </table>
+      </dtml-if>
+    </dtml-in>
+
+    <dtml-comment>
+        Documents list
+    </dtml-comment>
+  <dtml-let   items="_.hasattr(this(), 'publishedItems') and  publishedItems( exact=1 )"
+              maxNumber="this().maxNumOfPages() or _.len(items)"
+   >
+
+    <dtml-in items size="maxNumber" mapping>
+
+       <dtml-if sequence-start>
+	 <dtml-unless "REQUEST.has_key('actionIds')">
+	       <dtml-call "REQUEST.set( 'actionIds', [] )">
+	 </dtml-unless>
+         <ul class="txt_news">
+       </dtml-if>
+
+       <dtml-call "REQUEST['actionIds'].append( id )">
+
+       <li>
+	 <dtml-if "container.getId() == id">
+	  <i class="menu">&dtml-Title_or_id;</i>
+	 <dtml-else>
+	  <a class="menu" href="&dtml-absolute_url;">&dtml-Title_or_id;</a>
+	 </dtml-if>
+       </li>
+       <br><br>
+
+       <dtml-if sequence-end>
+         </ul>
+       </dtml-if>
+
+    </dtml-in>
+
+<dtml-comment>
+Virtual archive
+</dtml-comment>
+
+    <dtml-if "(maxNumber > 0) and (_.len(items) > maxNumber)">
+         <ul class="txt_news"><li>
+              <dtml-if "traverse_subpath and traverse_subpath[-1]=='viewArchive' or REQUEST.has_key('archive')">
+                  <i class="menu"><dtml-var "msg('Archive')"></i>
+              <dtml-else>
+                  <a class="menu" href="<dtml-var "heading_external_url()">/viewArchive"><dtml-var "msg('Archive')"></a>
+              </dtml-if>
+         </li><br><br></ul>
+    </dtml-if>
+
+  </dtml-let>
+
+
+  </td>
+  <td background="&dtml-portal_url;/line_menu_v_1.gif" width=12><img src="&dtml-portal_url;/null.gif" width="1" height="1"></td>
+</tr>
+
+<tr>
+  <td background="&dtml-portal_url;/line_menu_h_b_1.gif"><img src="&dtml-portal_url;/null.gif" width="1" height="1"></td>
+  <td><img src="&dtml-portal_url;/arc_menu_2.gif" width="12" height="12"></td>
+</tr>
+
+</table>
+
+<dtml-var site_subscription_box>
+
+</dtml-let>

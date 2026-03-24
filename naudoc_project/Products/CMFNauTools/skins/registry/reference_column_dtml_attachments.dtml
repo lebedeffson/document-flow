@@ -1,0 +1,30 @@
+<dtml-comment>
+$Id: reference_column_dtml_attachments.dtml,v 1.1 2005/10/06 11:07:47 vsafronovich Exp $
+$Editor: vsafronovich$
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-if "implements('isHTMLDocument')">
+<dtml-in listAttachments>
+  <dtml-if sequence-start>
+    <table border="0" style="border: 1px solid black" cellpadding="2" cellspacing="0" class="List">
+  </dtml-if>
+    <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+      <td>
+        <a target="_blank"
+           href="<dtml-var "implements('isAttachment') and relative_url()
+                            or relative_url(action = getId(),
+                                            params = _.hasattr(this(), 'wasTIFF') and {'display': 'tiff'} or None)">">
+           <img src="&dtml-portal_url;/&dtml-getIcon;" alt="<dtml-msg expr=meta_type>" title="<dtml-msg expr=meta_type>" 
+                align="absmiddle" border="0" />
+           &dtml-title_or_id; (<dtml-var "'%.1f' % (get_size() / 1024.0)"> Kb)
+        </a>
+      </td>
+    </tr>
+  <dtml-if sequence-end>
+    </table>
+  </dtml-if>
+<dtml-else>
+<dtml-msg "No files attached">
+</dtml-in>
+</dtml-if>

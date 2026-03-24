@@ -1,0 +1,19 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: attr_construction_string.dtml,v 1.6 2004/09/08 09:40:15 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.6 $>
+
+<tr>
+  <td><dtml-msg "Input field length"></td>
+  <td nowrap="1">
+    <dtml-var "entry_field_edit( None, _,
+                                 type='int',
+                                 name='properties.input_length:record',
+                                 value=properties.get('input_length'),
+                                 properties={},
+                               )">
+    <i>(<dtml-msg "number of characters">)</i>
+  </td>
+</tr>

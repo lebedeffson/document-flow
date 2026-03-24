@@ -1,0 +1,43 @@
+<dtml-comment>
+HTML header section for standalone, workfield and menu pages.
+
+$Editor: vpastukhov $
+$Id: simple_html_header.dtml,v 1.57 2006/05/16 11:12:46 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.57 $>
+
+<dtml-call "REQUEST.has_key('OpenInFrame') or REQUEST.set('OpenInFrame', 'workfield')">
+<dtml-call "REQUEST.has_key('BackgroundColor') or REQUEST.set('BackgroundColor', REQUEST.get('OpenInFrame','') not in ['','menuTree','workfield'] and '#E5E5E5' or 'window')">
+
+<html>
+
+<dtml-var dynamic_html_head>
+
+<body style="overflow: auto; margin: <dtml-if inline>0<dtml-else>5</dtml-if>px;
+<dtml-if "REQUEST.get('BackgroundColor')">background: <dtml-var "REQUEST['BackgroundColor']">;</dtml-if>"
+>
+
+<dtml-if "implements('isLockable')">
+<dtml-if "REQUEST.has_key('unlock')">
+  <dtml-if wl_isLocked>
+    <dtml-call expr="unlock()">
+  </dtml-if>
+<dtml-elif "REQUEST.has_key('lock')">
+  <dtml-unless wl_isLocked>
+    <dtml-call expr="lock()">
+  </dtml-unless>
+</dtml-if>
+</dtml-if>
+
+<script type="text/javascript">
+  //make the frame 'workfield' focused
+  if (this.name=='workfield')
+    this.focus();
+</script>
+
+<dtml-if portal_status_message>
+<p class="DocumentStatusBar">
+<dtml-msg expr=portal_status_message msgparams=REQUEST moniker_frame="'_blank'">
+</p>
+</dtml-if>

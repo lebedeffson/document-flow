@@ -1,0 +1,40 @@
+<dtml-comment>
+Content of the search tab for the left frame.
+
+$Editor: vpastukhov $
+$Id: search_form.dtml,v 1.5 2004/03/24 13:47:58 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+
+<dtml-var search_advanced>
+
+<dtml-in "portal_catalog.searchResults( implements='isSearchProfile', parent_path=portal_membership.getPersonalFolderPath('favorites') )">
+
+<dtml-if sequence-start>
+<form name="profile_form" action="&dtml-URL;" method="POST">
+
+<h2><dtml-msg "Saved search profiles"></h2>
+
+<p>
+<select name="profile_id" style="width:100%">
+</dtml-if>
+
+<option value="&dtml-nd_uid;"
+	<dtml-var "_.has_key('profile_id') and nd_uid == profile_id" fmt=selected> >&dtml-Title;</option>
+
+<dtml-if sequence-end>
+</select>
+<br />
+
+<input type="submit" name="load" value="<dtml-msg "Load">" />
+</p>
+
+</form>
+</dtml-if>
+
+</dtml-in>
+
+<dtml-var simple_html_footer>

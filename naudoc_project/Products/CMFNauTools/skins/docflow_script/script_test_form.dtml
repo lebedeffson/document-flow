@@ -1,0 +1,81 @@
+<dtml-comment>
+$Id: script_test_form.dtml,v 1.6 2005/04/30 14:06:47 vsafronovich Exp $
+$Editor: mbernatski $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<div class="File">
+
+<form action="&dtml-absolute_url;/script_test" method="post" name="script_test">
+
+<h2><dtml-msg "Test script"></h2>
+<table class="FormLayout" border="0">
+ <tr>
+ <td>
+  <dtml-in listParameters>
+  <dtml-if sequence-start>
+  <tr>
+     <td><h3><dtml-msg "Script parameters"></h3></td>
+  </tr>
+  <tr>
+   <td>
+      <table border="0" cellpadding="2" width="100%">
+        <tr class="row_title">
+          <td><dtml-msg "Id"></td>
+          <td><dtml-msg "Type"></td>
+          <td><dtml-msg "Title"></td>
+          <td><dtml-msg "Value"></td>
+        </tr>
+   </dtml-if>
+   <dtml-let param=sequence-item
+             default_value="getParameterDefaultValue( param['id'], moniker=1 )"
+             form_name="'script_test'"   
+   >
+          <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+          <td valign="top">
+            <dtml-var "param['id']">
+          </td>
+          <td valign="top"><dtml-msg expr="param['data_type']"></td>
+          <td valign="top">
+            <dtml-msg expr="param['title']">
+           </td>
+          <td>
+            <dtml-var "entry_field_edit( None, _,
+                                         name='value_%s' % param['id'],
+                                         type=param['data_type'],
+                                         value=default_value,
+                                         options=default_value,
+                                         edit_options=1,
+                                         )"
+            >
+          </td>
+        </tr>
+    </dtml-let>
+  <dtml-else>
+     <dtml-msg "No parameters for this script"> 
+  </dtml-in>
+       <tr>
+         <td colspan="4">
+          &nbsp;
+         </td>
+       </tr>
+       <tr>
+         <td colspan="4"><input type="submit" name="evaluateScript" value="<dtml-msg "Evaluate script">"></td>
+       </tr>
+      </table>
+    </td>
+  </tr>
+ </td>
+ </tr>
+</form> 
+</table>
+
+</div>
+
+</div>
+
+<dtml-var simple_html_footer>

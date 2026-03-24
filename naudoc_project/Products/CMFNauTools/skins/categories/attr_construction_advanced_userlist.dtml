@@ -1,0 +1,18 @@
+<dtml-comment>
+$Editor $
+$Id $
+</dtml-comment>
+
+<dtml-revision $Revision $>
+
+<tr>
+  <td><dtml-msg "Store members"></td>
+  <td>
+    <dtml-var "entry_field_edit( None, _,
+                                 type='boolean',
+                                 name='properties.store_members:record',
+                                 value=properties.get('store_members'),
+                                 properties={},
+                               )">
+  </td>
+</tr>

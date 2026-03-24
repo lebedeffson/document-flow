@@ -1,0 +1,137 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
+""" Basic portal discussion access tool.
+
+$Id: DiscussionTool.py,v 1.14.20.4 2005/03/17 18:10:32 sidnei Exp $
+"""
+
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo
+from OFS.SimpleItem import SimpleItem
+from Acquisition import aq_base
+
+from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
+from Products.CMFCore.interfaces.Discussions import DiscussionResponse
+
+from utils import _dtmldir
+from DiscussionItem import DiscussionItemContainer
+from Products.CMFCore.ActionInformation import ActionInformation
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.Expression import Expression
+
+from Products.CMFCore.interfaces.portal_discussion \
+        import portal_discussion as IDiscussionTool
+
+
+class DiscussionNotAllowed( Exception ):
+    pass
+
+class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
+
+    __implements__ = (IDiscussionTool, ActionProviderBase.__implements__)
+
+    id = 'portal_discussion'
+    meta_type = 'Default Discussion Tool'
+    _actions = (ActionInformation(id='reply'
+                                , title='Reply'
+                                , action=Expression(
+                text='string:${object_url}/discussion_reply_form')
+                                , condition=Expression(
+                text='python: object is not None and ' +
+                'portal.portal_discussion.isDiscussionAllowedFor(object)')
+                                , permissions=('Reply to item',)
+                                , category='object'
+                                , visible=1
+                                 )
+               ,
+               )
+
+    security = ClassSecurityInfo()
+
+    manage_options = (ActionProviderBase.manage_options +
+                     ({ 'label' : 'Overview', 'action' : 'manage_overview' }
+                     ,
+                     ) + SimpleItem.manage_options)
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected(ManagePortal, 'manage_overview')
+    manage_overview = DTMLFile( 'explainDiscussionTool', _dtmldir )
+
+    #
+    #   'portal_discussion' interface methods
+    #
+
+    security.declarePublic( 'overrideDiscussionFor' )
+    def overrideDiscussionFor(self, content, allowDiscussion):
+        """
+            Override discussability for a per object basis or clear and let
+            the site default override.
+        """
+        mtool = getToolByName( self, 'portal_membership' )
+        if not mtool.checkPermission(ModifyPortalContent, content):
+            raise "Unauthorized"
+
+        if allowDiscussion is None or allowDiscussion == 'None':
+            if hasattr(content, 'allow_discussion'):
+                del content.allow_discussion
+        else:
+            content.allow_discussion = int(allowDiscussion)
+
+    security.declarePublic( 'getDiscussionFor' )
+    def getDiscussionFor(self, content):
+        """
+            Return the talkback for content, creating it if need be.
+        """
+        if not self.isDiscussionAllowedFor( content ):
+            raise DiscussionNotAllowed
+
+        if not DiscussionResponse.isImplementedBy(content):
+            talkback = getattr( aq_base(content), 'talkback', None )
+            if not talkback:
+                talkback = self._createDiscussionFor(content)
+
+        return content.talkback # Return wrapped talkback
+
+    security.declarePublic( 'isDiscussionAllowedFor' )
+    def isDiscussionAllowedFor( self, content ):
+        '''
+            Returns a boolean indicating whether a discussion is
+            allowed for the specified content.
+        '''
+        if hasattr( content, 'allow_discussion' ):
+            return content.allow_discussion
+        typeInfo = getToolByName(self, 'portal_types').getTypeInfo( content )
+        if typeInfo:
+            return typeInfo.allowDiscussion()
+        return 0
+
+    #
+    #   Utility methods
+    #
+    security.declarePrivate( '_createDiscussionFor' )
+    def _createDiscussionFor( self, content ):
+        """
+            Create the object that holds discussion items inside
+            the object being discussed, if allowed.
+        """
+        if not self.isDiscussionAllowedFor( content ):
+            raise DiscussionNotAllowed
+
+        content.talkback = DiscussionItemContainer()
+        return content.talkback
+
+InitializeClass( DiscussionTool )

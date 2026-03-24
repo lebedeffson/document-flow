@@ -1,0 +1,40 @@
+<dtml-comment>
+Message template sent to internal recipients when delivering
+outgoing mail documents.
+
+$Editor: vpastukhov $
+$Id: mail_notify.dtml,v 1.3 2004/03/09 16:33:40 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.3 $>
+
+<dtml-if "lang=='en'">
+
+Subject: <dtml-var "message.title_or_id()">
+
+A message under the topic "<dtml-var "parent.title_or_id()">" has been sent to you.
+
+Please open this location to read the message:
+<dtml-var "message.absolute_url()">
+
+<dtml-if "message.Description()">
+Document summary:
+<dtml-var "message.Description()">
+</dtml-if>
+
+<dtml-else>
+
+Content-Type: text/plain; charset=windows-1251
+Subject: <dtml-var "message.title_or_id()">
+
+Вам было отправлено сообщение из темы "<dtml-var "parent.title_or_id()">"
+
+Вы можете просмотреть его, открыв страницу по адресу:
+<dtml-var "message.absolute_url()">
+
+<dtml-if "message.Description()">
+Описание документа:
+<dtml-var "message.Description()">
+</dtml-if>
+
+</dtml-if>

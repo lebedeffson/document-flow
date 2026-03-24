@@ -1,0 +1,17 @@
+0.01 - 12-17-2001
+
+  - first public release
+
+
+0.1 - 01-10-2002
+
+  - destructor frees all memory now
+  - change license from BSD to MIT license
+  - added internal caching
+  - improved cleanup
+  - updated README
+
+
+0.2 - 01-04-2002
+
+  - update to latest snowball release

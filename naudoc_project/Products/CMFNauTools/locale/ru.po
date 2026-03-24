@@ -1,0 +1,7634 @@
+msgid ""
+msgstr "Project-Id-Version: Messages\n"
+"POT-Creation-Date: 2004-05-12 14:05+YEKT\n"
+"PO-Revision-Date: 2004-05-12 14:05+YEKT\n"
+"Last-Translator:  <>\n"
+"Language-Team: ru <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CP1251\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+msgid ""
+msgstr ""
+
+msgid " and ending %(end_date)s"
+msgstr "по %(end_date)s"
+
+msgid " and ending %s"
+msgstr " и заканчивая %s"
+
+msgid "#"
+msgstr "№"
+
+msgid "%(count)d object(s) of %(number)d were not published."
+msgstr "Не были опубликованы %(count)d объект(а) из %(number)d."
+
+msgid "%(count)d object(s) were not deleted. Either you have no permission to delete them or they are locked."
+msgstr "Не были удалены %(count)d объект(а) . У Вас недостаточно прав для их удаления, либо они заблокированы."
+
+msgid "'Subject' header"
+msgstr "Заголовок 'Subject'"
+
+msgid ", starting %(start_date)s"
+msgstr ", начиная с %(start_date)s"
+
+msgid ", starting %s"
+msgstr ", начиная с %s"
+
+msgid "A username must be specified."
+msgstr "Имя пользователя должно быть указано."
+
+msgid "A user with the specified name already exists."
+msgstr "Пользователь с указаным именем уже существует."
+
+msgid "Abandon"
+msgstr "Прервать выполнение"
+
+msgid "Abandon registration."
+msgstr "Отказаться от регистрации."
+
+msgid "Abandoned"
+msgstr "Прервано"
+
+msgid "About NauDoc"
+msgstr "О NauDoc"
+
+msgid "Accept"
+msgstr "Принять"
+
+msgid "Accept task"
+msgstr "Принять к исполнению"
+
+msgid "Accepted senders"
+msgstr "Допустимые отправители"
+
+msgid "Access contents information"
+msgstr "Доступ к объекту"
+
+msgid "Access control"
+msgstr "Контроль доступа"
+
+msgid "Access denied"
+msgstr "Доступ запрещен"
+
+msgid "Access rights have been granted."
+msgstr "Права доступа добавлены."
+
+msgid "Access rights have been removed."
+msgstr "Права доступа удалены."
+
+msgid "Accessible documents"
+msgstr "Доступные документы"
+
+msgid "Account manager"
+msgstr "Эккаунт менеджер"
+
+msgid "Acquire permission settings?"
+msgstr "Наследовать права"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "Action cancelled."
+msgstr "Действие отменено."
+
+msgid "Action template"
+msgstr "Шаблон действия"
+
+msgid "Action template information"
+msgstr "Информация по шаблону действия"
+
+msgid "Action templates"
+msgstr "Шаблоны действий"
+
+msgid "Action type"
+msgstr "Тип действия"
+
+msgid "Actions templates"
+msgstr "Шаблоны действий"
+
+msgid "Activate mail"
+msgstr "Разрешить прием почты"
+
+msgid "Activate"
+msgstr "Активировать"
+
+msgid "Activate next task templates, when transition is performed"
+msgstr "Активировать следующие шаблоны действий при выполнении перехода"
+
+msgid "Active users"
+msgstr "Активные пользователи"
+
+msgid "Actual task perfomance time exceeds planned on"
+msgstr "Фактическое время выполнения задания больше запланированного на"
+
+msgid "Actual task perfomance time outstrips planned on"
+msgstr "Фактическое время выполнения задания меньше запланированного на"
+
+msgid "Actual time"
+msgstr "Фактическое время выполнения"
+
+msgid "Actual time spent to accomplish the task"
+msgstr "Фактическое время, затраченное на выполнение задания"
+
+msgid "Adapter"
+msgstr "Адаптер"
+
+msgid "Adapter type"
+msgstr "Тип адаптера"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Add a comment"
+msgstr "Добавить комментарий"
+
+msgid "Add a managed permission"
+msgstr "Добавьте права доступа"
+
+msgid "Add a new mail message filter"
+msgstr "Добавить новый фильтр почтовых сообщений"
+
+msgid "Add a state"
+msgstr "Добавить состояние"
+
+msgid "Add a transition"
+msgstr "Добавить переход"
+
+msgid "Add an attachment"
+msgstr "Добавить вложение"
+
+msgid "Add category"
+msgstr "Добавить категорию"
+
+msgid "Add column"
+msgstr "Добавить колонку"
+
+msgid "Add column after"
+msgstr "Добавить столбец справа"
+
+msgid "Add column before"
+msgstr "Добавить столбец слева"
+
+msgid "Add comment for this action"
+msgstr "Добавить комментарий для этого действия"
+
+msgid "Add condition"
+msgstr "Добавить условие"
+
+msgid "Add document entry"
+msgstr "Добавить запись"
+
+msgid "Add documents presentation level"
+msgstr "Добавить уровень представления документов"
+
+msgid "Add entry"
+msgstr "Добавить запись"
+
+msgid "Add field"
+msgstr "Добавить поле"
+
+msgid "Add group"
+msgstr "Создать группу"
+
+msgid "Add header cells"
+msgstr "Добавить строку заголовков"
+
+msgid "Add included template"
+msgstr "Добавить вложенный шаблон"
+
+msgid "Add local role"
+msgstr "Выдать персональный доступ"
+
+msgid "Add new"
+msgstr "Добавить новое"
+
+msgid "Add new adapter"
+msgstr "Добавить новый адаптер"
+
+msgid "Add new attribute"
+msgstr "Добавить новое реквизитное поле"
+
+msgid "Add new condition"
+msgstr "Добавить новое условие"
+
+msgid "Add new directory attribute"
+msgstr "Добавить новый реквизит справочника"
+
+msgid "Add new field"
+msgstr "Добавить новое поле"
+
+msgid "Add new holder"
+msgstr "Добавить нового держателя"
+
+msgid "Add new parameter"
+msgstr "Добавить параметр"
+
+msgid "Add new service"
+msgstr "Добавить новый сервис"
+
+msgid "Add or change LDAP attribute definition"
+msgstr "Добавить или изменить атрибут LDAP"
+
+msgid "Add portal content"
+msgstr "Добавление содержимого"
+
+msgid "Add portal folders"
+msgstr "Добавление папок"
+
+msgid "Add report"
+msgstr "Добавить отчет"
+
+msgid "Add row after"
+msgstr "Добавить строку ниже"
+
+msgid "Add row before"
+msgstr "Добавить строку выше"
+
+msgid "Add step"
+msgstr "Добавить шаг"
+
+msgid "Add table"
+msgstr "Добавить таблицу"
+
+msgid "Add task"
+msgstr "Добавить задание"
+
+msgid "Add to Favorites"
+msgstr "Добавить в Избранное"
+
+msgid "Add to favorites"
+msgstr "Добавить в избранное"
+
+msgid "Add user"
+msgstr "Создать пользователя"
+
+msgid "Add-ons"
+msgstr "Модули расширения"
+
+msgid "Adding included action template"
+msgstr "Добавление вложенного шаблона действия"
+
+msgid "Adding main action template"
+msgstr "Добавление основного шаблона действия"
+
+msgid "Additional metadata"
+msgstr "Дополнительные сведения"
+
+msgid "Additional options"
+msgstr "Дополнительные настройки"
+
+msgid "Administrative e-mail address is not set in the portal configuration."
+msgstr "Административный адрес электронной почты не указан в свойствах портала."
+
+msgid "Administrators only"
+msgstr "Только администраторы"
+
+msgid "Advanced search"
+msgstr "Расширенный поиск"
+
+msgid "Agreement"
+msgstr "На согласовании"
+
+msgid "Agreement document"
+msgstr "На согласование"
+
+msgid "Agreement history"
+msgstr "История согласования"
+
+msgid "Alarm settings"
+msgstr "Настройка напоминаний"
+
+msgid "Align"
+msgstr "Выравнивание"
+
+msgid "All"
+msgstr "Все"
+
+msgid "All categories"
+msgstr "Все категории"
+
+msgid "All pages"
+msgstr "Все страницы"
+
+msgid "All result codes None"
+msgstr "Все коды нуль"
+
+msgid "All users"
+msgstr "Все пользователи"
+
+msgid "All tasks"
+msgstr "Все задания"
+
+msgid "Allowable number of levels"
+msgstr "Допустимое количество уровней"
+
+msgid "Allowed categories"
+msgstr "Допустимые категории"
+
+msgid "Allowed categories in the parent folder"
+msgstr "Допустимые категории из родительской папки"
+
+msgid "Allowed content type"
+msgstr "Допустимый тип объекта"
+
+msgid "Allowed content types"
+msgstr "Допустимые типы объектов"
+
+msgid "Allowed groups"
+msgstr "Вовлеченные группы"
+
+msgid "Allowed members"
+msgstr "Вовлеченные пользователи"
+
+msgid "Allowed permissions"
+msgstr "Требуемые полномочия"
+
+msgid "Allowed roles"
+msgstr "Требуемые роли"
+
+msgid "Allowed types list"
+msgstr "Список допустимых типов"
+
+msgid "Allows input"
+msgstr "Допускает ввод"
+
+msgid "Allows modification"
+msgstr "Допускает редактирование"
+
+msgid "Alternative text"
+msgstr "Альтернативный текст"
+
+msgid "An internal server error occured during processing of your operation. You may try to repeat the action that caused the error, or if this doesn't help, report the error to the portal administrator."
+msgstr "При выполнении Вашей операции произошла внутренняя ошибка сервера. Вы можете попробовать повторить действие, которое вызвало ошибку, или, если это не помогает, сообщить об ошибке администратору портала."
+
+msgid "Announcement"
+msgstr "Объявление"
+
+msgid "Annulment"
+msgstr "Аннулирование"
+
+msgid "Annulment document"
+msgstr "Аннулировать"
+
+msgid "Anonymous"
+msgstr "Аноним"
+
+msgid "Any"
+msgstr "Не важно"
+
+msgid "Apply"
+msgstr "Применить"
+
+msgid "Apply cell background color"
+msgstr "Установить цвет фона ячейки"
+
+msgid "Apply filter"
+msgstr "Применить фильтр"
+
+msgid "Apply font color"
+msgstr "Установить цвет шрифта"
+
+msgid "Apply font size"
+msgstr "Установить размер шрифта"
+
+msgid "Apply font type"
+msgstr "Установить шрифт"
+
+msgid "Apply paragraph style"
+msgstr "Установить стиль"
+
+msgid "Appropriate converter is not installed"
+msgstr "Соответствующий конвертер не установлен"
+
+msgid "Apr"
+msgstr "апреля"
+
+msgid "April"
+msgstr "Апрель"
+
+msgid "Archival documents"
+msgstr "Архивные документы"
+
+msgid "Archive"
+msgstr "Архив"
+
+msgid "Archive date"
+msgstr "Дата списания"
+
+msgid "Archive detachable document"
+msgstr "Архивировать заменяемый документ"
+
+msgid "Archive document"
+msgstr "В архив"
+
+msgid "Assign one-time task"
+msgstr "Назначить разовое задание"
+
+msgid "Assign periodical task"
+msgstr "Назначить периодическое задание"
+
+msgid "Assign task"
+msgstr "Назначить задание"
+
+msgid "Assign the following roles to selected users:"
+msgstr "Назначить следующие роли выбранным пользователям:"
+
+msgid "Assign to the selected users"
+msgstr "Направить пользователям"
+
+msgid "Assigned by"
+msgstr "Назначено"
+
+msgid "Associate version with the file text"
+msgstr "Ассоциировать версию с текстом файла"
+
+msgid "Associated object"
+msgstr "Ссылается на объект"
+
+msgid "At %(hour)02d:%(minute)02d:%(second)02d every %(days)2d days"
+msgstr "В %(hour)02d:%(minute)02d:%(second)02d каждые %(days234)2d дней"
+
+msgid "At %(hour)02d:%(minute)02d:%(second)02d every %(days)d day(s)"
+msgstr "С периодом %(days)d дн. в %(hour)02d:%(minute)02d:%(second)02d"
+
+msgid "At %(hour)02d:%(minute)02d:%(second)02d every %(days234)2d days"
+msgstr "В %(hour)02d:%(minute)02d:%(second)02d каждые %(days234)2d дня"
+
+msgid "At %(hour)02d:%(minute)02d:%(second)02d every day"
+msgstr "В %(hour)02d:%(minute)02d:%(second)02d каждый день"
+
+msgid "At %(time)s every %(week_days)s of every %(weeks_period)s weeks"
+msgstr "С периодом %(weeks_period)s нед. по %(week_days)s в %(time)s"
+
+msgid "At %(time)s every %(week_days)s of every week"
+msgstr "Еженедельно по %(week_days)s в %(time)s"
+
+msgid "At %(time)s on %(date)s"
+msgstr "%(date)s в %(time)s "
+
+msgid "At %(time)s on day %(day)s in the %(months)s of every %(years_period)s"
+msgstr "С периодом %(years_period)s, в %(months)s, на %(day)s день месяца, в %(time)s"
+
+msgid "At %(time)s on day %(days)s of every %(months_period)s month"
+msgstr "С периодом %(months_period)s мес., на %(days)s день месяца, в %(time)s"
+
+msgid "At %(time)s on the %(weeks)s %(weekdays)s of every %(months_period)s month"
+msgstr "С периодом %(months_period)s мес., в %(weeks)s %(weekdays)s месяца, в %(time)s"
+
+msgid "At this step you can edit the contents of the general report"
+msgstr "Данный этап позволяет изменять содержимое общего отчета"
+
+msgid "Attach"
+msgstr "Вложение"
+
+msgid "Attached file has been removed"
+msgstr "Вложенный файл удален"
+
+msgid "Attached files"
+msgstr "Вложенные файлы"
+
+msgid "Attachments"
+msgstr "Вложения"
+
+msgid "Attachment is broken"
+msgstr "Вложение сломано"
+
+msgid "Attention! Changing this value will cause documents that doesn't match selected category to be unregistered!"
+msgstr "Внимание! Изменение этого значения приведет к тому, что для документов, не подходящих под выбранную категорию, регистрация будет отменена!"
+
+msgid "Attention! The information will be sent over non-secure connection, continue?"
+msgstr "Внимание! Информация будет выслана по незащищенному каналу связи, продолжить?"
+
+msgid "Attribute name"
+msgstr "Имя реквизита"
+
+msgid "Attribute of the object"
+msgstr "Реквизит объекта"
+
+msgid "Attribute permissions"
+msgstr "Права доступа к реквизиту"
+
+msgid "Attribute properties"
+msgstr "Свойства реквизита"
+
+msgid "Attribute type must be specified."
+msgstr "Необходимо указать тип реквизита."
+
+msgid "Attribute value"
+msgstr "Значение реквизита"
+
+msgid "Attributes"
+msgstr "Параметры"
+
+msgid "Attributes of "%(category)s" category"
+msgstr "Реквизиты категории "%(category)s""
+
+msgid "Aug"
+msgstr "августа"
+
+msgid "August"
+msgstr "Август"
+
+msgid "Authenticated"
+msgstr "Авторизованный пользователь"
+
+msgid "Author"
+msgstr "Автор"
+
+msgid "Autonumbering"
+msgstr "Автонумерация"
+
+msgid "Available action templates"
+msgstr "Доступные шаблоны действий"
+
+msgid "Available categories"
+msgstr "Допустимые категории"
+
+msgid "Available documents in this folder"
+msgstr "Доступные документы в данной папке"
+
+msgid "Available old version registries"
+msgstr "Доступные журналы старого образца"
+
+msgid "Available registries"
+msgstr "Доступные журналы"
+
+msgid "Available roles"
+msgstr "Доступные роли"
+
+msgid "Available skin folders"
+msgstr "Подключаемые папки"
+
+msgid "Available users"
+msgstr "Доступные пользователи"
+
+msgid "Available versions"
+msgstr "Доступные версии"
+
+msgid "Average"
+msgstr "Среднее"
+
+msgid "Awaiting publication"
+msgstr "Ожидание публикации"
+
+msgid "Back"
+msgstr "Назад"
+
+msgid "Back to the summary tasks statistics page"
+msgstr "Вернуться к странице общей статистики"
+
+msgid "Backup operation is not available"
+msgstr "Операция резервного копирования недоступна"
+
+msgid "Backup Zope database"
+msgstr "Резервное копирование базы данных Zope"
+
+msgid "Backup copy has been created"
+msgstr "Резервная копия создана"
+
+msgid "Backup each"
+msgstr "Создавать резервную копию каждые"
+
+msgid "Backup now"
+msgstr "Сделать резервную копию сейчас"
+
+msgid "Bad Links"
+msgstr "Неверные ссылки"
+
+msgid "Base categories"
+msgstr "Базовые категории"
+
+msgid "Base categories provide their attributes and workflow states to the current category."
+msgstr "Базовые категории предоставляют свои реквизитные поля и состояния текущей категории."
+
+msgid "Be aware that new object has Private state by default."
+msgstr "По умолчанию новый объект имеет состояние Скрытый."
+
+msgid "Before %(value)s%% till expiration"
+msgstr "За %(value)s%% до окончания"
+
+msgid "Beginning Folder"
+msgstr "Начальная папка"
+
+msgid "Black"
+msgstr "Черный"
+
+msgid "Board"
+msgstr "Форум"
+
+msgid "Bold"
+msgstr "Полужирный"
+
+msgid "Border"
+msgstr "Толщина рамки"
+
+msgid "Border color"
+msgstr "Цвет границ"
+
+msgid "Border width"
+msgstr "Толщина границ"
+
+msgid "Box manual"
+msgstr "Описание конфигураций 'Автоматизация делопроизводства' и 'СМК'"
+
+msgid "Branch title forming rule"
+msgstr "Правило формирования заголовка узла"
+
+msgid "Brief contents"
+msgstr "Краткое содержание"
+
+msgid "Brief description of the portal."
+msgstr "Краткое описание портала."
+
+msgid "Browse"
+msgstr "Обзор"
+
+msgid "Browse..."
+msgstr "Обзор..."
+
+msgid "Business Procedure"
+msgstr "Деловая процедура"
+
+msgid "Buy / Go to cart"
+msgstr "Купить / Перейти в корзину"
+
+msgid "By day"
+msgstr "по дням"
+
+msgid "By default user folder has the same name as the login name"
+msgstr "По умолчанию название личной папки будет совпадать с именем пользователя в системе"
+
+msgid "By month"
+msgstr "по месяцам"
+
+msgid "By year"
+msgstr "по годам"
+
+msgid "By:"
+msgstr "Выполнил:"
+
+msgid "Can't delete document, because it has subordinate documents."
+msgstr "Невозможно удалить документ, так как существуют ему подчиненные."
+
+msgid "Cancel"
+msgstr "Отменить"
+
+msgid "Cancel request"
+msgstr "Отменить запрос"
+
+msgid "Categories list"
+msgstr "Список категорий"
+
+msgid "Category"
+msgstr "Категория"
+
+msgid "Category attribute"
+msgstr "Реквизитное поле категории"
+
+msgid "Category attributes"
+msgstr "Реквизитные поля категории"
+
+msgid "Category cannot be manually picked by users"
+msgstr "Пользователи не могут создавать документы данной категории"
+
+msgid "Category id is invalid"
+msgstr "неправильный идентификатор категории"
+
+msgid "Category of document"
+msgstr "Категория документа"
+
+msgid "Category of registered documents"
+msgstr "Категория регистрируемых документов"
+
+msgid "Category of subordinate document"
+msgstr "Категория подчиненного документа"
+
+msgid "Category of the primary document does not match the specified primary category"
+msgstr "Категория главного документа не совпадает с установленной главной категорией"
+
+msgid "Cell background"
+msgstr "Цвет фона ячейки"
+
+msgid "Cell padding"
+msgstr "Заполнение ячейки"
+
+msgid "Cell spacing"
+msgstr "Расстояние между ячейками"
+
+msgid "Cell width"
+msgstr "Ширина ячейки"
+
+msgid "Center of location"
+msgstr "Место нахождения"
+
+msgid "Chain confirmation of the document"
+msgstr "Пошаговое согласование документа"
+
+msgid "Chain publication request for the document"
+msgstr "Пошаговый запрос на публикацию документа"
+
+msgid "Chain signature request for the document"
+msgstr "Пошаговый запрос на подписание документа"
+
+msgid "Change"
+msgstr "Изменить"
+
+msgid "Change category of documents"
+msgstr "Изменять категорию документов"
+
+msgid "Change ownership"
+msgstr "Сменить владельца"
+
+msgid "Change password"
+msgstr "Изменение пароля"
+
+msgid "Change permissions"
+msgstr "Изменение прав доступа"
+
+msgid "Change settings"
+msgstr "Изменить настройки"
+
+msgid "Change state"
+msgstr "Изменить состояние"
+
+msgid "Change title"
+msgstr "Изменить заголовок"
+
+msgid "Change user details"
+msgstr "Изменить детали подписчика"
+
+msgid "Change:"
+msgstr "Изменить:"
+
+msgid "Changes"
+msgstr "Изменения"
+
+msgid "Changes log"
+msgstr "История изменений"
+
+msgid "Changes log message"
+msgstr "Комментарий к изменениям"
+
+msgid "Changes saved"
+msgstr "Изменения сохранены"
+
+msgid "Changes saved."
+msgstr "Изменения сохранены."
+
+msgid "Check mail"
+msgstr "Проверить почту"
+
+msgid "Check the mail settings please"
+msgstr "Пожалуйста, проверьте настройки почты"
+
+msgid "Check the report and change it if necessary"
+msgstr "Убедитесь в правильности отчета и измените его при необходимости"
+
+msgid "Checking and sending mail for users who want to receive dispatches once a week or month"
+msgstr "Проверка и отправка почты подписчикам, которые хотят получать рассылку раз в неделю или месяц"
+
+msgid "Chief user"
+msgstr "Ответственный пользователь"
+
+msgid "Choice"
+msgstr "Вариант"
+
+msgid "Choice added"
+msgstr "Вариант добавлен"
+
+msgid "Choice of a language"
+msgstr "Выберите язык"
+
+msgid "Choices deleted"
+msgstr "Варианты удалены"
+
+msgid "Choose"
+msgstr "Выбрать"
+
+msgid "Choose design category"
+msgstr "Выберите категорию дизайнов"
+
+msgid "Choose design for site"
+msgstr "Выберите дизайн для сайта"
+
+msgid "Choose step to rollback"
+msgstr "Укажите шаг для отката"
+
+msgid "Choose the document to associate with the shortcut"
+msgstr "Укажите документ, на который будет ссылаться ярлык"
+
+msgid "Choose the document to creat link to"
+msgstr "Укажите документ, для создания ссылки на него"
+
+msgid "Choose the responsible user for the next processing step"
+msgstr "Укажите пользователя, ответственного за следующий шаг"
+
+msgid "Cleanup HTML-code of documents"
+msgstr "Очистка HTML кода у документов"
+
+msgid "Clear"
+msgstr "Очистить"
+
+msgid "Clear list"
+msgstr "Очистить список"
+
+msgid "Clear timer"
+msgstr "Отменить таймер"
+
+msgid "Click on symbol to type it"
+msgstr "Щелкните на нужном символе, чтобы вставить его в текст"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Close report"
+msgstr "Закрыть отчет"
+
+msgid "Close task"
+msgstr "Завершить"
+
+msgid "Closed"
+msgstr "Завершено"
+
+msgid "Code"
+msgstr "Код"
+
+msgid "Code forming rule"
+msgstr "Правило формирования кода"
+
+msgid "Collection of values"
+msgstr "Набор значений"
+
+msgid "Color"
+msgstr "Цвет"
+
+msgid "Column"
+msgstr "Колонка"
+
+msgid "Column added"
+msgstr "Колонка добавлена"
+
+msgid "Column id is invalid"
+msgstr "Неверный идентификатор колонки"
+
+msgid "Column removed"
+msgstr "Колонка удалена"
+
+msgid "Columns"
+msgstr "Количество столбцов"
+
+msgid "Columns to export"
+msgstr "Экспортировать столбцы"
+
+msgid "Comment"
+msgstr "Комментарий"
+
+msgid "Comments"
+msgstr "Комментарии"
+
+msgid "Commit"
+msgstr "Доложить о выполнении"
+
+msgid "Commit request"
+msgstr "Удовлетворить запрос"
+
+msgid "Commit task"
+msgstr "Доложить о выполнении"
+
+msgid "Commited members"
+msgstr "Выполнили задание"
+
+msgid "Commited task:"
+msgstr "Доложили о выполнении:"
+
+msgid "Commited tasks"
+msgstr "Завершенные задания"
+
+msgid "Company"
+msgstr "Компания"
+
+msgid "Company business activity"
+msgstr "Направление деятельности компании"
+
+msgid "Compare"
+msgstr "Сравнить"
+
+msgid "Compare versions"
+msgstr "Сравнить версии"
+
+msgid "Compress the backup files with gzip"
+msgstr "Архивировать файлы резервной копии с помощью gzip"
+
+msgid "Conditions"
+msgstr "Условия"
+
+msgid "Configuration of the incoming mail messages filtering"
+msgstr "Настройка фильтрации входящих почтовых сообщений"
+
+msgid "Configure"
+msgstr "Настройка"
+
+msgid "Configure attributes"
+msgstr "Настроить реквизиты"
+
+msgid "Configure documents routing"
+msgstr "Настройка маршрутизации документов"
+
+msgid "Configure mail filters"
+msgstr "Настроить почтовые фильтры"
+
+msgid "Configure object"
+msgstr "Настройка объекта"
+
+msgid "Configure pack and backup options"
+msgstr "Настройки упаковки и резервного копирования"
+
+msgid "Configure the Portal"
+msgstr "Настройки портала"
+
+msgid "Configured services"
+msgstr "Настроенные сервисы"
+
+msgid "Confirm"
+msgstr "Согласовать"
+
+msgid "Confirm request"
+msgstr "Удовлетворить запрос"
+
+msgid "Confirm that you have been informed about the document contents"
+msgstr "Подтверждение об ознакомлении с содержанием документа"
+
+msgid "Confirmation"
+msgstr "На утверждении"
+
+msgid "Confirmation document"
+msgstr "На утверждение"
+
+msgid "Confirmation email was sent to the user"
+msgstr "Письмо с паролем и уведомлением о регистрации отправлено пользователю"
+
+msgid "Confirmation order"
+msgstr "Маршрут согласования"
+
+msgid "Confirmation request of the document"
+msgstr "Запрос на согласование документа"
+
+msgid "Confirmed"
+msgstr "Согласован"
+
+msgid "Confirmed request:"
+msgstr "Удовлетворили запрос:"
+
+msgid "Consideration time"
+msgstr "Срок рассмотрения предложения"
+
+msgid "Contact"
+msgstr "Контакт"
+
+msgid "Content categories"
+msgstr "Категории"
+
+msgid "Content filter"
+msgstr "Установить фильтр"
+
+msgid "Content of the letter"
+msgstr "Содержание письма"
+
+msgid "Content storage"
+msgstr "Хранилище документов"
+
+msgid "Content uploaded."
+msgstr "Содержимое обновлено."
+
+msgid "Context help"
+msgstr "Контекстная справка"
+
+msgid "Context type"
+msgstr "Тип контекста"
+
+msgid "Context type ID is invalid."
+msgstr "Задан неверный идентификатор контекста."
+
+msgid "Context variable for action parameter - %(name)s"
+msgstr "Переменная контекста для параметра действия - %(name)s"
+
+msgid "Context variable's name"
+msgstr "Имя переменной контекста"
+
+msgid "Continue shopping"
+msgstr "Продолжить совершать покупки"
+
+msgid "Copies"
+msgstr "Экземпляры"
+
+msgid "Copies holders"
+msgstr "Держатели копий"
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Copy number"
+msgstr "Экз. №"
+
+msgid "Copy or cut one or more items to paste first"
+msgstr "Необходимо вырезать или скопировать хотя бы один объект"
+
+msgid "Count from the end of month"
+msgstr "Вести отсчёт с конца месяца"
+
+msgid "Counter value, where nn - optional parameter, number of digits of the counter"
+msgstr "Значение счетчика, где nn - число цифр (необязательный параметр)"
+
+msgid "Create"
+msgstr "Создать"
+
+msgid "Create filter"
+msgstr "Создать новый фильтр"
+
+msgid "Create link to a document in the clipboard"
+msgstr "Создать ссылку на документ в буфере обмена"
+
+msgid "Create link to another document"
+msgstr "Создать ссылку на другой документ"
+
+msgid "Create new"
+msgstr "Создать новое"
+
+msgid "Create new version"
+msgstr "Создать новую версию"
+
+msgid "Create new version on basis of the version"
+msgstr "Создать новую версию на основе версии"
+
+msgid "Create object versions"
+msgstr "Создание версий объекта"
+
+msgid "Create report"
+msgstr "Сохранить отчет"
+
+msgid "Create site"
+msgstr "Создать сайт"
+
+msgid "Create subordinate"
+msgstr "Создать подчиненный документ"
+
+msgid "Create subordinate document"
+msgstr "Создать подчиненный документ"
+
+msgid "Create template"
+msgstr "Создать шаблон"
+
+msgid "Create user"
+msgstr "Регистрация пользователя"
+
+msgid "Create version with state plan"
+msgstr "Cоздать версию c состоянием Проект документа"
+
+msgid "Create version with state ReeditionPrepare"
+msgstr "Cоздать версию с состоянием Подготовка переиздания"
+
+msgid "Created"
+msgstr "Дата создания"
+
+msgid "Creating task"
+msgstr "Создание задания"
+
+msgid "Creating document"
+msgstr "Создание документа"
+
+msgid "Creation date"
+msgstr "Дата создания"
+
+msgid "Creation date must be smaller than Expiration date"
+msgstr "Дата создания должна быть меньше даты окончания"
+
+msgid "Creation from date must be smaller than created till date"
+msgstr "Начальная дата создания должна быть меньше конечной"
+
+msgid "Creator"
+msgstr "Автор"
+
+msgid "Current"
+msgstr "Текущая"
+
+msgid "Current depends on the document"
+msgstr "Текущий зависит от документа"
+
+msgid "Current document"
+msgstr "Текущий документ"
+
+msgid "Current filter"
+msgstr "Текущий фильтр"
+
+msgid "Current folder"
+msgstr "Текущая папка"
+
+msgid "Current folder only"
+msgstr "Только текущая папка"
+
+msgid "Current folder with subfolders"
+msgstr "Начиная с текущей папки"
+
+msgid "Current registry 'department' property"
+msgstr "Свойство 'Отделение/служба' текущего журнала"
+
+msgid "Current state"
+msgstr "Текущее состояние"
+
+msgid "Current step"
+msgstr "Текущий шаг"
+
+msgid "Current version is"
+msgstr "Текущая версия"
+
+msgid "Current version is not editable. Be sure you are editing the last (editable) version. (You may be able to recover your changes using the browser 'back' button.)"
+msgstr "Текущая версия не является редактируемой. Убедитесь, что Вы пытаетесь изменить последнюю (редактируемую) версию. (Вы можете восстановить Ваши изменения, используя кнопку браузера "назад".)"
+
+msgid "Cut"
+msgstr "Вырезать"
+
+msgid "DTML Document"
+msgstr "DTML документ"
+
+msgid "DTML Document edit"
+msgstr "Редактировать DTML документ"
+
+msgid "DTML template"
+msgstr "DTML-шаблон"
+
+msgid "DTMLDocument"
+msgstr "DTML документ"
+
+msgid "Daily at %(hour)02d:%(minute)02d:%(second)02d"
+msgstr "Ежедневно в %(hour)02d:%(minute)02d:%(second)02d"
+
+msgid "Daily attendance"
+msgstr "Ежедневная посещаемость"
+
+msgid "Daily attendance "
+msgstr "Ежедневная посещаемость"
+
+msgid "Dark Red"
+msgstr "Темно-красный"
+
+msgid "Dark green"
+msgstr "Темно-зеленый"
+
+msgid "Data has been changed."
+msgstr "Данные подписки изменены."
+
+msgid "Data type"
+msgstr "Тип данных"
+
+msgid "Data types in corresponding columns must coincide too."
+msgstr "Типы данных в соответствующих столбцах должны также совпадать."
+
+msgid "Database has been backed up."
+msgstr "Резервное копирование базы данных произведено."
+
+msgid "Database has been packed."
+msgstr "База упакована."
+
+msgid "Database has not been packed"
+msgstr "База НЕ была упакована"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Date and time of the nearest event"
+msgstr "Дата и время ближайшего события"
+
+msgid "Date format"
+msgstr "Формат даты"
+
+msgid "Day of the month as a decimal number"
+msgstr "День"
+
+msgid "Deactivate mail"
+msgstr "Запретить прием почты"
+
+msgid "Deactivate"
+msgstr "Выключить"
+
+msgid "Dec"
+msgstr "декабря"
+
+msgid "December"
+msgstr "Декабрь"
+
+msgid "Decline"
+msgstr "Отклонить"
+
+msgid "Default"
+msgstr "По умолчанию"
+
+msgid "Default category of the products"
+msgstr "Категория продуктов по умолчанию"
+
+msgid "Default content"
+msgstr "Документы по умолчанию"
+
+msgid "Default content folder"
+msgstr "Папка с документами по умолчанию"
+
+msgid "Default language"
+msgstr "Язык по умолчанию"
+
+msgid "Default language for new users of the portal."
+msgstr "Язык по умолчанию для новых пользователей портала."
+
+msgid "Default value"
+msgstr "Значение по умолчанию"
+
+msgid "Define a subtask"
+msgstr "Назначить подзадание"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Delete action template"
+msgstr "Удалить шаблон действия"
+
+msgid "Delete action template?"
+msgstr "Удалить шаблон действия?"
+
+msgid "Delete column"
+msgstr "Удалить столбец"
+
+msgid "Delete entry"
+msgstr "Удалить запись"
+
+msgid "Delete filter"
+msgstr "Удалить фильтр"
+
+msgid "Delete holders"
+msgstr "Удалить держателей"
+
+msgid "Delete objects"
+msgstr "Удаление объектов"
+
+msgid "Delete report"
+msgstr "Удалить отчет"
+
+msgid "Delete row"
+msgstr "Удалить строку"
+
+msgid "Delete task"
+msgstr "Удалить задание"
+
+msgid "Delete tasks"
+msgstr "Удалить задания"
+
+msgid "Delete template"
+msgstr "Удалить шаблон"
+
+msgid "Deleted."
+msgstr "Объект удален."
+
+msgid "Deleted. You don't have permissions to delete all selected objects."
+msgstr "Объект удален. Вы не имеете прав для удаления всех выделенных объектов."
+
+msgid "Deliver"
+msgstr "Отправить"
+
+msgid "Deliver to"
+msgstr "Доставить"
+
+msgid "Delivery interval"
+msgstr "Интервал доставки"
+
+msgid "Delivery of the error report failed."
+msgstr "Не удалось доставить уведомление об ошибке."
+
+msgid "Department"
+msgstr "Отделение/служба"
+
+msgid "Dequeue"
+msgstr "Отменить доставку"
+
+msgid "Dequeue message"
+msgstr "Отменить доставку сообщения"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Deselect All"
+msgstr "Снять выделение"
+
+msgid "Destination path inaccessible"
+msgstr "Указанная папка отсутствует"
+
+msgid "Destination state"
+msgstr "Перевести в состояние"
+
+msgid "Direct dependence"
+msgstr "Прямая зависимость"
+
+msgid "Directive"
+msgstr "Директива"
+
+msgid "Directive document"
+msgstr "Директивный документ"
+
+msgid "Directive documents"
+msgstr "Директивные документы"
+
+msgid "Directories"
+msgstr "Справочники"
+
+msgid "Directory"
+msgstr "Справочник"
+
+msgid "Directory attributes"
+msgstr "Реквизиты справочника"
+
+msgid "Directory branch"
+msgstr "Узел справочника"
+
+msgid "Directory branches hierarchy"
+msgstr "Иерархия узлов справочника"
+
+msgid "Directory objects folder"
+msgstr "Папка со справочниками"
+
+msgid "Directory settings"
+msgstr "Настройки справочника"
+
+msgid "Disable"
+msgstr "Отключить"
+
+msgid "Disable filter"
+msgstr "Отключить фильтрование"
+
+msgid "Disable stylesheets"
+msgstr "Отключить стилевое оформление"
+
+msgid "Disallow directory modifications"
+msgstr "Запретить изменения базы данных"
+
+msgid "Discussion Item"
+msgstr "Комментарий"
+
+msgid "Dismissed"
+msgstr "Удаленный"
+
+msgid "Dispatch"
+msgstr "Доставить"
+
+msgid "Dispatch mail message"
+msgstr "Доставить почтовое сообщение"
+
+msgid "Dispatch message"
+msgstr "Доставить сообщение"
+
+msgid "Dispatch now"
+msgstr "Доставить немедленно"
+
+msgid "Display branches hierarchy"
+msgstr "Отобразить иерархию узлов"
+
+msgid "Display full user list during state change"
+msgstr "отображать полный список пользователей во время перехода"
+
+msgid "Display in actions box"
+msgstr "Название в меню"
+
+msgid "Display mode"
+msgstr "Режим отображения"
+
+msgid "Distribute"
+msgstr "Разослать"
+
+msgid "Distribute document"
+msgstr "Разослать документ"
+
+msgid "Distribute immediately"
+msgstr "Разослать немедленно"
+
+msgid "Distribute message"
+msgstr "Разослать сообщение"
+
+msgid "Distribute the document to the following users"
+msgstr "Отправить документ следующим пользователям"
+
+msgid "Distribution log"
+msgstr "Журнал рассылки"
+
+msgid "Distribution log empty"
+msgstr "Журнал рассылки пуст"
+
+msgid "Do not archive"
+msgstr "Не архивировать"
+
+msgid "Do not move it"
+msgstr "Не переносить"
+
+msgid "Do not notify subscriber"
+msgstr "Не запрашивать подтверждение пользователя"
+
+msgid "Do not send"
+msgstr "Не отправлять"
+
+msgid "Do not track"
+msgstr "Не отслеживать"
+
+msgid "Do you really want to delete these objects?"
+msgstr "Вы действительно хотите удалить перечисленные объекты?"
+
+msgid "Do you really want to delete these users?"
+msgstr "Вы действительно хотите удалить перечисленных пользователей?"
+
+msgid "Do you really want to delete this task?"
+msgstr "Вы действительно хотите удалить задание?"
+
+msgid "Do you really want to send passwords to these users?"
+msgstr "Вы действительно хотите отправить пароль этим пользователям?"
+
+msgid "Do you want to proceed?"
+msgstr "Вы хотите продолжить?"
+
+msgid "DocFlow action on another documents"
+msgstr "Действие DocFlow на других документах"
+
+msgid "Docflow Report"
+msgstr "Отчет о движении документов"
+
+msgid "Docflow actions"
+msgstr "Шаблоны действий"
+
+msgid "Document"
+msgstr "Документ"
+
+msgid "Document '%s' has been changed"
+msgstr "Документ '%s' был изменен"
+
+msgid "Document assigned"
+msgstr "Документ зарегистрирован"
+
+msgid "Document attachments"
+msgstr "Вложения документа"
+
+msgid "Document attribute to store registration number"
+msgstr "Реквизитное поле для формирования регистрационного номера"
+
+msgid "Document attributes"
+msgstr "Реквизитные поля"
+
+msgid "Document categories"
+msgstr "Категории документов"
+
+msgid "Document categories management"
+msgstr "Управление категориями документов"
+
+msgid "Document category"
+msgstr "Категория документа"
+
+msgid "Document category attributes"
+msgstr "Реквизитные поля категории документа"
+
+msgid "Document category metadata"
+msgstr "Дополнительные сведения для категории"
+
+msgid "Document category of the received mail"
+msgstr "Категория документов полученной почты"
+
+msgid "Document category states"
+msgstr "Состояния для категории"
+
+msgid "Document category transitions"
+msgstr "Переходы для категории"
+
+msgid "Document description"
+msgstr "Описание документа"
+
+msgid "Document edit"
+msgstr "Редактировать документ"
+
+msgid "Document entry"
+msgstr "Содержание записи"
+
+msgid "Document evolution"
+msgstr "Развитие документа"
+
+msgid "Document fields"
+msgstr "Поля документа"
+
+msgid "Document fixing"
+msgstr "Фиксирование документа"
+
+msgid "Document folder"
+msgstr "Папка"
+
+msgid "Document groupe in virtual archive mode"
+msgstr "Группирование документов в виртуальном архиве"
+
+msgid "Document Id"
+msgstr "Идентификатор документа"
+
+msgid "Document is already registered"
+msgstr "Документ уже зарегистрирован"
+
+msgid "Document is not registered in parent registry"
+msgstr "Документ не зарегистрирован в вышестоящем журнале"
+
+msgid "Document must contain at least one step"
+msgstr "Документ должен содержать хотя бы один шаг"
+
+msgid "Document options"
+msgstr "Настройки"
+
+msgid "Document ownership"
+msgstr "Владелец документа"
+
+msgid "Document publication"
+msgstr "Публикация документа"
+
+msgid "Document rating"
+msgstr "Рейтинг документа"
+
+msgid "Document registration form"
+msgstr "Форма регистрации документа"
+
+msgid "Document routing via moving between folders"
+msgstr "Маршрутизация документа на основе перемещения между папками"
+
+msgid "Document routing via shortcut"
+msgstr "Маршрутизация документа на основе объекта Ярлык"
+
+msgid "Document saved."
+msgstr "Документ сохранен."
+
+msgid "Document templates"
+msgstr "Шаблоны документов"
+
+msgid "Document templates folder"
+msgstr "Папка с шаблонами документов"
+
+msgid "Document text"
+msgstr "Текст документа"
+
+msgid "Document title"
+msgstr "Заголовок документа"
+
+msgid "Document types"
+msgstr "Типы документов"
+
+msgid "Document version"
+msgstr "Версия документа"
+
+msgid "Document %(object)s was registered."
+msgstr "Документ %(object)s был зарегистрирован."
+
+msgid "Document %(object)s was registered with number %(reg_num)s."
+msgstr "Документ %(object)s был зарегистрирован под номером %(reg_num)s."
+
+msgid "Document was removed"
+msgstr "Документ был удален"
+
+msgid "Document workflow"
+msgstr "Схема документооборота"
+
+msgid "Documents"
+msgstr "Документов"
+
+msgid "Documents created"
+msgstr "Создано документов"
+
+msgid "Documents for action"
+msgstr "Документы, требующие действий от пользователя"
+
+msgid "Documents list"
+msgstr "Список документов"
+
+msgid "Documents of current category are subordinates to documents of primary category."
+msgstr "Документы данной категории являются подчиненными для документов главной категории."
+
+msgid "Documents of some categories is still exists."
+msgstr "Документы некоторых категорий всё ещё существуют в системе."
+
+msgid "Documents of some categories is still exists. Some categories has dependent ones."
+msgstr "Документы некоторых категорий всё ещё существуют в системе. Некоторые из категорий имеют зависимые категории."
+
+msgid "Documents of the following categories can be created in this folder"
+msgstr "Документы следующих категорий могут быть созданы в данной папке"
+
+msgid "Documents presentation levels"
+msgstr "Уровни представления документов"
+
+msgid "Documents registry report"
+msgstr "Отчет 'Реестр документов'"
+
+msgid "Documents report"
+msgstr "Статистика создания документов"
+
+msgid "Documents total"
+msgstr "Всего записей"
+
+msgid "Documents were successfully unregistered"
+msgstr "Регистрация документов была отменена"
+
+msgid "Domains"
+msgstr "Допустимые домены"
+
+msgid "Down"
+msgstr "Вниз"
+
+msgid "Don't add default content to the user folder"
+msgstr "Не копировать в личную папку стандартные файлы"
+
+msgid "Don't create user folder"
+msgstr "Не создавать личную папку"
+
+msgid "Double result codes"
+msgstr "Дублирование кодов"
+
+msgid "Download"
+msgstr "Загрузить"
+
+msgid "Download page"
+msgstr "Список файлов для скачивания"
+
+msgid "Duration"
+msgstr "Длительность"
+
+msgid "Duration, month"
+msgstr "Срок действия, мес."
+
+msgid "During editing, the document was changed by other user."
+msgstr "Документ был изменен другим пользователем во время редактирования."
+
+msgid "E-mail address"
+msgstr "Адрес электронной почты"
+
+msgid "Each object i.e. HTML document or image has it's own title, description and extended metadata so one can easily find the necessary document."
+msgstr "Каждый объект портала имеет свое название, краткое описание и дополнительные поля, что позволит без труда найти необходимый документ."
+
+msgid "Earlier Transactions"
+msgstr "Ранние изменения"
+
+msgid "Edit"
+msgstr "Редактировать"
+
+msgid "Edit adapter settings"
+msgstr "Редактирование настроек адаптера"
+
+msgid "Edit field"
+msgstr "Редактировать поле"
+
+msgid "Edit form"
+msgstr "Редактирование"
+
+msgid "Edit folder"
+msgstr "Редактировать папку"
+
+msgid "Edit query"
+msgstr "Редактировать запрос"
+
+msgid "Edit resolution template"
+msgstr "Редактирование шаблона резолюции"
+
+msgid "Edit service settings"
+msgstr "Редактирование настроек сервиса"
+
+msgid "Edit task"
+msgstr "Изменить задание"
+
+msgid "Edit using external editor"
+msgstr "Редактировать с помощью внешнего редактора"
+
+msgid "Editable"
+msgstr "Редактируемая"
+
+msgid "Editable entries"
+msgstr "Записи доступны для редактирования"
+
+msgid "Editing"
+msgstr "Редактирование"
+
+msgid "Editing by"
+msgstr "В данный момент редактирует"
+
+msgid "Editor"
+msgstr "Редактор"
+
+msgid "Effective"
+msgstr "Действующий"
+
+msgid "Effective date"
+msgstr "Дата начала"
+
+msgid "Effective date normative"
+msgstr "Дата ввода"
+
+msgid "Effective date must be smaller than Expiration date"
+msgstr "Дата начала должна быть меньше даты окончания"
+
+msgid "Effective document"
+msgstr "Введен в действие"
+
+msgid "Elaborate task"
+msgstr "Детализация задания"
+
+msgid "Enable"
+msgstr "Включить"
+
+msgid "Enable pseudo-groups support"
+msgstr "Включить поддержку псевдогрупп"
+
+msgid "Enable trusted front-end authentication"
+msgstr "Аутентификация фронтальным сервером"
+
+msgid "End"
+msgstr "Окончание"
+
+msgid "English"
+msgstr "Английский"
+
+msgid "Enqueue"
+msgstr "Запросить доставку"
+
+msgid "Enqueue message"
+msgstr "Запросить доставку сообщения"
+
+msgid "Enter currency number"
+msgstr "Укажите число денежного типа"
+
+msgid "Enter floating point number"
+msgstr "Укажите число с плавающей точкой"
+
+msgid "Enter integer number"
+msgstr "Укажите целое число"
+
+msgid "Enter long integer number"
+msgstr "Укажите длинное целое число"
+
+msgid "Entries added"
+msgstr "Записи добавлены"
+
+msgid "Entries have been deleted."
+msgstr "Записи удалены"
+
+msgid "Entries total"
+msgstr "Всего записей"
+
+msgid "Entry abandoned"
+msgstr "Выполнение прервано"
+
+msgid "Entry added"
+msgstr "Запись добавлена"
+
+msgid "Entry changed"
+msgstr "Запись изменена"
+
+msgid "Entry creator"
+msgstr "Автор записи"
+
+msgid "Entry deleted"
+msgstr "Запись удалена"
+
+msgid "Entry has been deleted."
+msgstr "Запись удалена."
+
+msgid "Entry step changed"
+msgstr "Шаг записи изменен"
+
+msgid "Entry title forming rule"
+msgstr "Правило формирования заголовка элемента"
+
+msgid "Entry updated"
+msgstr "Запись изменена"
+
+msgid "Entry with given id already exists."
+msgstr "Запись с таким идентификатором уже есть."
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Error ID"
+msgstr "Идентификатор ошибки"
+
+msgid "Error during delivery"
+msgstr "Ошибка при доставке"
+
+msgid "Error happened during message send"
+msgstr "При отправке сообщения произошла ошибка"
+
+msgid "Error message"
+msgstr "Сообщение об ошибке"
+
+msgid "Error report has been sent."
+msgstr "Уведомление об ошибке отправлено."
+
+msgid "Error type"
+msgstr "Тип ошибки"
+
+msgid "Error value"
+msgstr "Значение ошибки"
+
+msgid "Error while archiving file"
+msgstr "Ошибка при архивации файла"
+
+msgid "Error while compressing file"
+msgstr "Ошибка при архивации файла"
+
+msgid "Error while sending message"
+msgstr "Ошибка при отправке почтового сообщения"
+
+msgid "Errors"
+msgstr "Ошибки"
+
+msgid "Evaluate script"
+msgstr "Выполнить сценарий"
+
+msgid "Every"
+msgstr "Каждые"
+
+msgid "Every %d seconds"
+msgstr "С %d-секундным интервалом"
+
+msgid "Evolutive"
+msgstr "Развиваемый"
+
+msgid "Evolutive document becomes visible to all system members"
+msgstr "Развиваемый документ становится видимым для всех пользователей системы"
+
+msgid "Evolve"
+msgstr "Развитие"
+
+msgid "Evolve document"
+msgstr "Развитие"
+
+msgid "Evolve message"
+msgstr "Развитие"
+
+msgid "Example"
+msgstr "Пример"
+
+msgid "Execute"
+msgstr "Выполнить"
+
+msgid "Execute system script"
+msgstr "Выполнить системный сценарий"
+
+msgid "Execute transition"
+msgstr "Выполнить переход"
+
+msgid "Execution time"
+msgstr "Фактическое время выполнения"
+
+msgid "Expiration date"
+msgstr "Дата окончания"
+
+msgid "Expired"
+msgstr "Просрочено"
+
+msgid "Expired tasks"
+msgstr "Просрочено"
+
+msgid "Expires"
+msgstr "Окончание"
+
+msgid "Explorer"
+msgstr "Проводник"
+
+msgid "Export"
+msgstr "Экспорт"
+
+msgid "Export to MS Excel"
+msgstr "Экспорт в MS Excel"
+
+msgid "External Directory"
+msgstr "Внешний  справочник"
+
+msgid "External adapters"
+msgstr "Внешние адаптеры"
+
+msgid "External editor"
+msgstr "Внешний редактор"
+
+msgid "External sites"
+msgstr "Внешние сайты"
+
+msgid "Failed to associate with attachment."
+msgstr "Ошибка при попытке ассоциации с вложением."
+
+msgid "Failed to create site object"
+msgstr "Ошибка при добавлении сайта"
+
+msgid "Failed to register document %(object)s."
+msgstr "Не удалось зарегистрировать документ %(object)s."
+
+msgid "Failed to send registration data to user"
+msgstr "Ошибка при отправке регистрационных данных пользователю"
+
+msgid "Fast input"
+msgstr "Быстрый ввод"
+
+msgid "Fast search"
+msgstr "Поиск"
+
+msgid "Favorites"
+msgstr "Избранное"
+
+msgid "Favorites folder"
+msgstr "Перейти в Избранное"
+
+msgid "Feb"
+msgstr "февраля"
+
+msgid "February"
+msgstr "Февраль"
+
+msgid "Field ID"
+msgstr "Идентификатор поля"
+
+msgid "Field added"
+msgstr "Поле добавлено"
+
+msgid "Field is invalid"
+msgstr "Параметры поля заданы неверно"
+
+msgid "Field of the entry"
+msgstr "Поле записи"
+
+msgid "Field removed"
+msgstr "Поле удалено"
+
+msgid "Field title"
+msgstr "Наименование поля"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "File Attachment"
+msgstr "Прикрепленный файл"
+
+msgid "File System File"
+msgstr "Файл"
+
+msgid "File System Folder"
+msgstr "Папка файловой системы"
+
+msgid "File card"
+msgstr "Регистрационная карточка"
+
+msgid "File has been attached"
+msgstr "Вложенный файл добавлен"
+
+msgid "File not found"
+msgstr "Файл не найден"
+
+msgid "Filed to"
+msgstr "Куда подшит"
+
+msgid "Filling finished"
+msgstr "Заполнение завершено"
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Filter cleared."
+msgstr "Фильтр отменен."
+
+msgid "Filter condition has been deleted."
+msgstr "Условие фильтра удалено."
+
+msgid "Filter conditions"
+msgstr "Условия фильтра"
+
+msgid "Filter has been saved"
+msgstr "Фильтр сохранен"
+                        
+msgid "Filter is on"
+msgstr "Включен фильтр"
+
+msgid "Filter list"
+msgstr "Сохраненные фильтры"
+
+msgid "Filter name"
+msgstr "Название фильтра"
+
+msgid "Filter properties"
+msgstr "Настройки фильтра"
+
+msgid "Finalization condition"
+msgstr "Условие завершения"
+
+msgid "Finalize"
+msgstr "Завершить"
+
+msgid "Finalize in this states tasks based on next actions templates"
+msgstr "Завершить в данных состояниях задания, созданные на основе следующих шаблонов действий"
+
+msgid "Finalize task"
+msgstr "Завершить задание"
+
+msgid "Finalized"
+msgstr "Завершено"
+
+msgid "Finalized task"
+msgstr "Задание завершено"
+
+msgid "Finally you may open %(1)sthe portal main page%(2)s."
+msgstr "Затем Вы можете %(1)sоткрыть главную страницу портала%(2)s."
+
+msgid "Find broken links"
+msgstr "Найти неверные ссылки"
+
+msgid "Finish"
+msgstr "Завершить"
+
+msgid "Finished"
+msgstr "Завершено"
+
+msgid "First"
+msgstr "Первый"
+
+msgid "First name"
+msgstr "Имя"
+
+msgid "First page"
+msgstr "Первая страница"
+
+msgid "First row contains titles."
+msgstr "Первый ряд содержит заголовки."
+
+msgid "Fix"
+msgstr "Фиксировать"
+
+msgid "Fix message"
+msgstr "Фиксировать сообщение"
+
+msgid "Fix the document"
+msgstr "Фиксировать документ"
+
+msgid "Fix the folder"
+msgstr "Фиксировать папку"
+
+msgid "Fixed"
+msgstr "Фиксированный"
+
+msgid "Fixed document is not longer editable"
+msgstr "Редактирование документа завершено, документ будет считаться завершенным"
+
+msgid "Folder"
+msgstr "Папка"
+
+msgid "Folder category settings"
+msgstr "Настройки категорий для папки"
+
+msgid "Folder changed"
+msgstr "Изменения сохранены"
+
+msgid "Folder content"
+msgstr "Содержимое темы"
+
+msgid "Folder contents"
+msgstr "Работа с рубрикой"
+
+msgid "Folder editing"
+msgstr "Редактировать папку"
+
+msgid "Folder filter properties"
+msgstr "Настройка параметров отображения папки"
+
+msgid "Folder fixing"
+msgstr "Зафиксировать папку"
+
+msgid "Folder is empty"
+msgstr "Папка пуста"
+
+msgid "Folder is not empty!"
+msgstr "Папка не пустая!"
+
+msgid "Folder name"
+msgstr "Наименование Папки"
+
+msgid "Folder path"
+msgstr "Путь к папке"
+
+msgid "Folder to place paper documents"
+msgstr "Папка для размещения бумажных документов"
+
+msgid "Folders"
+msgstr "Папки"
+
+msgid "Folders to subscribe"
+msgstr "Папки рассылок"
+
+msgid "Follow-up tasks"
+msgstr "Контроль исполнения"
+
+msgid "Following script will be executed"
+msgstr "Следующий сценарий будет выполнен"
+
+msgid "Followup"
+msgstr "Задания"
+
+msgid "Followup tasks progress statistics"
+msgstr "Статистика выполнения заданий"
+
+msgid "Font"
+msgstr "Шрифт"
+
+msgid "For all documents having category %(categories)s%(inherited)s being in state '%(state)s', to which from current document there are links with type '%(link)s', perform transition: '%(transition)s'."
+msgstr "Для всех документов категории %(categories)s%(inherited)s, находящихся в состоянии '%(state)s', на которые из данного документа имеются ссылки типа '%(link)s', выполнить действие: '%(transition)s'."
+
+msgid "For boolean type you should use only values 0 and 1."
+msgstr "Для данных типа да/нет следует использовать только значения 0 и 1."
+
+msgid "For every"
+msgstr "Каждый"
+
+msgid "For every (f)"
+msgstr "Каждую"
+
+msgid "For selected"
+msgstr "За выбранный"
+
+msgid "For selected day"
+msgstr "За указанный день"
+
+msgid "For selected month"
+msgstr "За указанный месяц"
+
+msgid "For selected year"
+msgstr "За указанный год"
+
+msgid "For signature"
+msgstr "На подпись"
+
+msgid "Force reloading of user records from LDAP"
+msgstr "Произвести обновление записей пользователей из LDAP"
+
+msgid "Format"
+msgstr "Формат"
+
+msgid "Formatting toolbar is inaccessible while editing initial text"
+msgstr "Панель форматирования не доступна при редактировании исходного текста"
+
+msgid "Forwarded to"
+msgstr "Кому направлен"
+
+msgid "Fourth"
+msgstr "Четвертый"
+
+msgid "Fr"
+msgstr "Пт"
+
+msgid "Freeze"
+msgstr "Заморозить"
+
+msgid "Freeze the folder"
+msgstr "Заморозить папку"
+
+msgid "Frequency"
+msgstr "период выполнения"
+
+msgid "Friday"
+msgstr "Пятница"
+
+msgid "From date"
+msgstr "Начиная с"
+
+msgid "From field address"
+msgstr "Адрес отправителя для поля From"
+
+msgid "From field name"
+msgstr "Имя отправителя для поля From"
+
+msgid "From user"
+msgstr "От"
+
+msgid "From:"
+msgstr "С:"
+
+msgid "From value must be smaller than To value"
+msgstr "Значение С должно быть меньше значения До"
+
+msgid "Frozen"
+msgstr "Замороженная"
+
+msgid "Full name"
+msgstr "Полное имя"
+
+msgid "General parameters"
+msgstr "Основные параметры"
+
+msgid "General report"
+msgstr "Общий отчет"
+
+msgid "General report options"
+msgstr "Настройки общего отчета"
+
+msgid "Generate registration number automatically."
+msgstr "Генерировать регистрационный номер автоматически."
+
+msgid "German"
+msgstr "Немецкий"
+
+msgid "Get copy of letter"
+msgstr "Получить экземпляр письма"
+
+msgid "Give effect to the document"
+msgstr "Ввести документ в действие"
+
+msgid "Global search"
+msgstr "Доступные документы"
+
+msgid "Go to entries"
+msgstr "Перейти к объектам"
+
+msgid "Go to page #"
+msgstr "К странице №"
+
+msgid "Go to the principal version"
+msgstr "Перейти к основной версии"
+
+msgid "Got empty email"
+msgstr "Не указан адрес электронной почты"
+
+msgid "Got response"
+msgstr "Получен ответ"
+
+msgid "Grant user with the same access rights as"
+msgstr "Наделить такими же правами, как у пользователя"
+
+msgid "Gray"
+msgstr "Серый"
+
+msgid "Group"
+msgstr "Группа"
+
+msgid "Group: %s"
+msgstr "Группа: %s"
+
+msgid "Group '%s' already exists."
+msgstr "Группа '%s' уже существует."
+
+msgid "Group members"
+msgstr "Члены группы"
+
+msgid "Groups"
+msgstr "Группы"
+
+msgid "Groups base DN"
+msgstr "Базовое имя групп (DN)"
+
+msgid "Groups search filter"
+msgstr "Фильтр поиска групп"
+
+msgid "Groups search scope"
+msgstr "Область поиска групп"
+
+msgid "HTML source"
+msgstr "Исходный текст"
+
+msgid "HTML-document with WYSIWYG editor"
+msgstr "HTML-документ с встроенным WYSIWYG редактором"
+
+msgid "HTMLDocument"
+msgstr "HTML документ"
+
+msgid "Header"
+msgstr "Заголовок"
+
+msgid "Header name"
+msgstr "Имя заголовка"
+
+msgid "Heading"
+msgstr "Папка"
+
+msgid "Help"
+msgstr "Справка"
+
+msgid "Hide columns"
+msgstr "Скрыть колонки"
+
+msgid "Hide document"
+msgstr "Скрыть"
+
+msgid "Hide filter"
+msgstr "Спрятать фильтр"
+
+msgid "Hide filter form"
+msgstr "Скрыть панель"
+
+msgid "Hide finalized tasks"
+msgstr "Спрятать завершенные"
+
+msgid "Hide records older than"
+msgstr "Скрывать записи старше"
+
+msgid "Hits"
+msgstr "Хитов"
+
+msgid "Hits and hosts for"
+msgstr "Хитов и адресов за"
+
+msgid "Hits and hosts for today by hour"
+msgstr "Хитов и адресов за сегодня по часам"
+
+msgid "Home"
+msgstr "Домашняя страница"
+
+msgid "Home folders"
+msgstr "Личные папки"
+
+msgid "Home page of user"
+msgstr "Домашняя страница пользователя"
+
+msgid "Horizontal space"
+msgstr "Отступ по горизонтали"
+
+msgid "Hosts"
+msgstr "Адреса"
+
+msgid "Hour as a decimal number"
+msgstr "Час"
+
+msgid "Hyperlink"
+msgstr "Создать гиперссылку"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "IMAP server"
+msgstr "IMAP сервер"
+
+msgid "IP Mask"
+msgstr "IP-адрес"
+
+msgid "Id"
+msgstr "Идентификатор"
+
+msgid "Identifier"
+msgstr "Идентификатор"
+
+msgid "If the task occurs on a weekend"
+msgstr "Если задание выпадает на выходной день"
+
+msgid "If today is aug 19, 2003, the registry option 'Department' is set to"
+msgstr "Если сегодня 19 августа 2003 года, в свойстве журнала 'Отделение/служба' установлено"
+
+msgid "If you are not sure to select attribute or do not want the field to be copied just leave the blank value"
+msgstr "Если Вы не уверены в выборе реквизита или не хотите копировать это поле, оставьте пустое значение"
+
+msgid "If you click OK now, your changes will be lost!"
+msgstr "Если вы нажмете ОК, внесенные Вами изменения не сохранятся"
+
+msgid "Image"
+msgstr "Изображение"
+
+msgid "Image properties"
+msgstr "Свойства рисунка"
+
+msgid "Immediately"
+msgstr "Немедленно"
+
+msgid "Import entries from CSV file"
+msgstr "Импортировать записи из CSV файла"
+
+msgid "Import from file"
+msgstr "Импорт из файла"
+
+msgid "Include commitment reports"
+msgstr "Включить отчеты об исполнении"
+
+msgid "Include inherited categories"
+msgstr "Включая потомки данной категории"
+
+msgid "Include rejection reports"
+msgstr "Включить отчеты об отказе исполнения"
+
+msgid "Include task info"
+msgstr "Включить сведения о задании"
+
+msgid "Included templates"
+msgstr "Вложенные шаблоны"
+
+msgid "Incoming"
+msgstr "Входящий"
+
+msgid "Incoming Mail"
+msgstr "Входящая почта"
+
+msgid "Incoming Mail Folder"
+msgstr "Папка для входящей почты"
+
+msgid "Incoming document registration form"
+msgstr "Форма регистрации документа"
+
+msgid "Incoming documents"
+msgstr "Входящий"
+
+msgid "Incoming e-mail folder added."
+msgstr "Папка для входящей почты добавлена."
+
+msgid "Incoming tasks"
+msgstr "Входящие задания"
+
+msgid "Incoming tasks of the user"
+msgstr "Входящие задания пользователя"
+
+msgid "Incorrect e-mail address."
+msgstr "Некорректный адрес электронной почты."
+
+msgid "Incorrect query"
+msgstr "Неверный запрос"
+
+msgid "Incorrect search pattern"
+msgstr "Неверный шаблон для поиска"
+
+msgid "Indent"
+msgstr "Увеличить отступ"
+
+msgid "Information"
+msgstr "Информация"
+
+msgid "Informational reference"
+msgstr "Справочная ссылка"
+
+msgid "Informed"
+msgstr "Ознакомлен"
+
+msgid "Initial state removed"
+msgstr "Начальное состояние снято"
+
+msgid "Initial state selected"
+msgstr "Начальное состояние установлено"
+
+msgid "Initial transition removed"
+msgstr "Начальный переход снят"
+
+msgid "Initial transition selected"
+msgstr "Начальный переход установлен"
+
+msgid "Input field height"
+msgstr "Высота поля ввода"
+
+msgid "Input field length"
+msgstr "Длина поля ввода"
+
+msgid "Input field width"
+msgstr "Ширина поля ввода"
+
+msgid "Insert"
+msgstr "Вставить"
+
+msgid "Insert field"
+msgstr "Вставить поле"
+
+msgid "Insert file"
+msgstr "Вставить файл"
+
+msgid "Insert symbol"
+msgstr "Вставить символ"
+
+msgid "Insert table"
+msgstr "Добавить таблицу"
+
+msgid "Insert/change hyperlink"
+msgstr "Вставить/редактировать гиперссылку"
+
+msgid "Inspector"
+msgstr "Контролер"
+
+msgid "Instructions"
+msgstr "Резолюция"
+
+msgid "Interface preferences"
+msgstr "Настройки интерфейса"
+
+msgid "Internal counter"
+msgstr "Значение счетчика"
+
+msgid "Internal server error"
+msgstr "Внутренняя ошибка сервера"
+
+msgid "Intersection"
+msgstr "Пересечение"
+
+msgid "Invalid backup time"
+msgstr "Неверное время копирования"
+
+msgid "Invalid date"
+msgstr "Дата указана неправильно"
+
+msgid "Invalid effective date"
+msgstr "Неправильная дата начала"
+
+msgid "Invalid email address."
+msgstr "Неправильный формат электронной почты."
+
+msgid "Invalid expiration date"
+msgstr "Неправильная дата окончания"
+
+msgid "Invalid filter name"
+msgstr "Неверное название фильтра"
+
+msgid "Invalid pack time"
+msgstr "Неверное время упаковки"
+
+msgid "Invoked actions"
+msgstr "Выполняемые действия"
+
+msgid "Involved Users"
+msgstr "Ответственные пользователи"
+
+msgid "Involved groups"
+msgstr "Ответственные группы"
+
+msgid "Involved members"
+msgstr "Ответственные пользователи"
+
+msgid "Involved users list was reduced at the previous stage!"
+msgstr "Список вовлеченных пользователей был сокращен на предыдущем этапе!"
+
+msgid "Italic"
+msgstr "Курсив"
+
+msgid "Item(s) Copied"
+msgstr "Объект(ы) скопированы"
+
+msgid "Item(s) Cut"
+msgstr "Объекты вырезаны"
+
+msgid "Item(s) Pasted"
+msgstr "Объект(ы) вставлены"
+
+msgid "Itemize by groups"
+msgstr "Распределить по группам"
+
+msgid "Items found"
+msgstr "Найдено документов"
+
+msgid "Items have been published."
+msgstr "Объекты опубликованы."
+
+msgid "Jan"
+msgstr "января"
+
+msgid "January"
+msgstr "Январь"
+
+msgid "Jul"
+msgstr "июля"
+
+msgid "July"
+msgstr "Июль"
+
+msgid "Jun"
+msgstr "июня"
+
+msgid "June"
+msgstr "Июнь"
+
+msgid "Justify center"
+msgstr "По центру"
+
+msgid "Justify full"
+msgstr "Выравнивание по ширине"
+
+msgid "Justify left"
+msgstr "По левому краю"
+
+msgid "Justify right"
+msgstr "По правому краю"
+
+msgid "Kazakh"
+msgstr "Казахский"
+
+msgid "Keep messages on server"
+msgstr "Оставлять сообщения на сервере"
+
+msgid "Keep state"
+msgstr "Сохранить состояние"
+
+msgid "Key columns list changed"
+msgstr "Список ключевых колонок изменен"
+
+msgid "LDAP attribute name"
+msgstr "Имя атрибута LDAP"
+
+msgid "LDAP attribute title"
+msgstr "Заголовок атрибута LDAP"
+
+msgid "LDAP authentication settings"
+msgstr "Настройки аутентификации LDAP"
+
+msgid "LDAP server address"
+msgstr "Адрес сервера LDAP"
+
+msgid "LDAP settings"
+msgstr "Настройки LDAP"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Last"
+msgstr "Последний"
+
+msgid "Last 30 days"
+msgstr "Последние 30 дней"
+
+msgid "Last login"
+msgstr "С момента входа в систему"
+
+msgid "Last login time"
+msgstr "Время последнего входа"
+
+msgid "Last modified"
+msgstr "Последнее изменение"
+
+msgid "Last month"
+msgstr "Месяц назад"
+
+msgid "Last name"
+msgstr "Фамилия"
+
+msgid "Last page"
+msgstr "Последняя страница"
+
+msgid "Last week"
+msgstr "Неделю назад"
+
+msgid "Later Transactions"
+msgstr "Более поздние изменения"
+
+msgid "Leave blank to allow system generate the password and mail it to the user"
+msgstr "Отсутствие пароля означает, что пароль будет сгенерирован системой автоматически"
+
+msgid "Leave this field blank if not sure"
+msgstr "Оставьте поле пустым, если Вы не уверены в его значении"
+
+msgid "Left time"
+msgstr "Осталось до запуска"
+
+msgid "Letter includes"
+msgstr "Письмо включает в себя"
+
+msgid "Level added"
+msgstr "Уровень добавлен"
+
+msgid "Level deleted"
+msgstr "Уровень удален"
+
+msgid "Level number"
+msgstr "Номер уровня"
+
+msgid "Licensing"
+msgstr "Лицензионные ограничения"
+
+msgid "Link"
+msgstr "Ссылка"
+
+msgid "Link to the attachment has been inserted."
+msgstr "Ссылка на вложенный файл вставлена в текст."
+
+msgid "Link to the document"
+msgstr "Ссылка на документ"
+
+msgid "Link to the object %(link.target)s with relation "%(link.relation)s" already exists."
+msgstr "Ссылка на объект %(link.target)s с отношением "%(link.relation)s" уже существует."
+
+msgid "Link type"
+msgstr "Тип ссылки"
+
+msgid "Link was successfully created."
+msgstr "Ссылки успешно добавлены."
+
+msgid "Links"
+msgstr "Ссылки"
+
+msgid "Links & attaches"
+msgstr "Вложенные файлы и ссылки"
+
+msgid "Links from this document"
+msgstr "Ссылки из текущего документа"
+
+msgid "Links from this object"
+msgstr "Ссылки из текущего объекта"
+
+msgid "Links from this version"
+msgstr "Ссылки из текущей версии"
+
+msgid "Links to document"
+msgstr "Ссылки на документ"
+
+msgid "Links to this document"
+msgstr "Ссылки на текущий документ"
+
+msgid "Links to this object"
+msgstr "Ссылки на текущий объект"
+
+msgid "Links to this version"
+msgstr "Ссылки на текущую версию"
+
+msgid "Links were successfully removed."
+msgstr "Ссылки успешно удалены."
+
+msgid "List"
+msgstr "Список"
+
+msgid "List documents created"
+msgstr "Отображать документы, созданные"
+
+msgid "List folder contents"
+msgstr "Просмотр содержимого папки"
+
+msgid "List messages since"
+msgstr "Показать комментарии начиная с"
+
+msgid "List messages with version"
+msgstr "Показать комментарии с версией"
+
+msgid "List of bad links"
+msgstr "Список неверных ссылок"
+
+msgid "List of normative documents"
+msgstr "Перечень нормативных документов"
+
+msgid "List of possible values"
+msgstr "Список возможных значений"
+
+msgid "List tasks effective"
+msgstr "Отображать задания, действующие"
+
+msgid "Load"
+msgstr "Загрузить"
+
+msgid "Load filter"
+msgstr "Загрузить фильтр"
+
+msgid "Load template"
+msgstr "Загрузить шаблон"
+
+msgid "Loading..."
+msgstr "Загрузка..."
+
+msgid "Local roles"
+msgstr "Персональный доступ"
+
+msgid "Location"
+msgstr "Расположение"
+
+msgid "Lock"
+msgstr "Заблокировать"
+
+msgid "Locked users group"
+msgstr "Группа блокировки пользователей"
+
+msgid "Lock document"
+msgstr "Заблокировать документ"
+
+msgid "Lock file"
+msgstr "Зафиксировать файл"
+
+msgid "Lock in the news box"
+msgstr "Фиксированная новость"
+
+msgid "Lock timeout"
+msgstr "Разблокировать через"
+
+msgid "Log entry [%(id)s] not found or expired."
+msgstr "Запись [%(id)s] устарела или отсутствует в протоколе ошибок."
+
+msgid "Log out"
+msgstr "Выход из системы"
+
+msgid "Login"
+msgstr "Логин"
+
+msgid "Login Name"
+msgstr "Системное имя"
+
+msgid "Login name attribute"
+msgstr "Атрибут имени учетной записи"
+
+msgid "Login name is invalid."
+msgstr "Некорректное системное имя."
+
+msgid "Logs"
+msgstr "Логи"
+
+msgid "MS Word template"
+msgstr "Шаблон MS Word"
+
+msgid "Mail Folder"
+msgstr "Почтовая папка"
+
+msgid "Mail Password?"
+msgstr "Отправить пароль пользователю по электронной почте"
+
+msgid "Mail account name"
+msgstr "Имя учетной записи почты"
+
+msgid "Mail account password and confirmation do not match."
+msgstr "Пароль учетной записи почты и подтверждение не совпадают."
+
+msgid "Mail check interval"
+msgstr "Интервал для проверки почты"
+
+msgid "Mail folders"
+msgstr "Почтовые папки"
+
+msgid "Mail message filter parameters"
+msgstr "Параметры фильтра почтовых сообщений"
+
+msgid "Mail recipients"
+msgstr "Список адресов получателей"
+
+msgid "Mail sending"
+msgstr "Отправка почты"
+
+msgid "Mail will not be checked."
+msgstr "Почта не будет проверяться."
+
+msgid "Mailing Item"
+msgstr "Документ для рассылки"
+
+msgid "Main folder document"
+msgstr "Главный документ темы"
+
+msgid "Main page"
+msgstr "Главная страница"
+
+msgid "Main template"
+msgstr "Основной шаблон"
+
+msgid "Main voting"
+msgstr "Главное голосование"
+
+msgid "Major version"
+msgstr "Старшая версия"
+
+msgid "Make current version principal"
+msgstr "Сделать текущую версию основной"
+
+msgid "Make it directive"
+msgstr "Сделать директивным"
+
+msgid "Make the version principal"
+msgstr "Сделать версию основной"
+
+msgid "Make version principal"
+msgstr "Сделать версию основной"
+
+msgid "Manage add-ons"
+msgstr "Управление модулями расширения"
+
+msgid "Manage external adapters"
+msgstr "Управление внешними адаптерами"
+
+msgid "Manage groups"
+msgstr "Группы пользователей"
+
+msgid "Manage properties"
+msgstr "Управление настройками"
+
+msgid "Manage resolutions"
+msgstr "Управление резолюциями"
+
+msgid "Manage root folder"
+msgstr "Управление верхним уровнем"
+
+msgid "Manage scheduler"
+msgstr "Управление планировщиком"
+
+msgid "Manage site configuration"
+msgstr "Управление настройками сайта"
+
+msgid "Manage subscribed users"
+msgstr "Управление подписчиками"
+
+msgid "Manage subscription"
+msgstr "Подписка"
+
+msgid "Manage users"
+msgstr "Управление пользователями"
+
+msgid "Manager"
+msgstr "Администратор"
+
+msgid "Manager DN"
+msgstr "Имя администратора (DN)"
+
+msgid "Manager password"
+msgstr "Пароль администратора"
+
+msgid "Mandatory"
+msgstr "Обязательный"
+
+msgid "Mandatory attribute missing"
+msgstr "Не заполнены обязательные поля"
+
+msgid "Mandatory attribute missing in primary document"
+msgstr "Не заполнены обязательные поля в главном документе"
+
+msgid "Mandatory data"
+msgstr "Обязательные параметры"
+
+msgid "Mandatory field"
+msgstr "Обязательное поле"
+
+msgid "Mandatory fields can't be empty"
+msgstr "Обязательное поле не может быть пустым"
+
+msgid "Mandatory in this state"
+msgstr "Обязательно в данном состоянии"
+
+msgid "Map the attribute to user property"
+msgstr "Соответствует реквизиту учетной записи"
+
+msgid "Mapping of LDAP group objects to groups of users"
+msgstr "Отображение объектов LDAP в  группы пользователей"
+
+msgid "Mapping of LDAP user objects to user accounts"
+msgstr "Отображение объектов LDAP в учетные записи пользователей"
+
+msgid "Mapping of user properties to LDAP attributes"
+msgstr "Отображение реквизитов учетных записей в атрибуты LDAP"
+
+msgid "Mar"
+msgstr "марта"
+
+msgid "March"
+msgstr "Март"
+
+msgid "Marked roles are not active for the current state"
+msgstr "Роли, отмеченные этим знаком, не активны для данного состояния"
+
+msgid "Match case"
+msgstr "Учитывать регистр"
+
+msgid "Match whole words only"
+msgstr "Совпадение целых слов"
+
+msgid "Maximum"
+msgstr "Максимум"
+
+msgid "Maximum count"
+msgstr "Максимальное количество"
+
+msgid "Maximum number of documents in list"
+msgstr "Максимальное количество документов в списке"
+
+msgid "May"
+msgstr "Май"
+
+msgid "Member"
+msgstr "Пользователь"
+
+msgid "Member changed."
+msgstr "Параметры пользователя изменены."
+
+msgid "Message date"
+msgstr "Дата сообщения"
+
+msgid "Message filter has been deleted."
+msgstr "Фильтр сообщений удален."
+
+msgid "Message filter has been disabled."
+msgstr "Фильтр сообщений отключен."
+
+msgid "Message filter has been enabled."
+msgstr "Фильтр сообщений включен."
+
+msgid "Message filter saved."
+msgstr "Фильтр сообщений сохранен."
+
+msgid "Message is currently being sent"
+msgstr "Сообщение отправляется"
+
+msgid "Message is in the send queue"
+msgstr "Сообщение находится в очереди на отправку"
+
+msgid "Message is received"
+msgstr "Сообщение получено"
+
+msgid "Message is sent"
+msgstr "Сообщение отправлено"
+
+msgid "Message is sent and published in archive"
+msgstr "Сообщение отправлено, документ опубликован в архиве"
+
+msgid "Message is waiting for delivery permit"
+msgstr "Сообщение ожидает разрешения на доставку"
+
+msgid "Message sent"
+msgstr "Сообщение отправлено"
+
+msgid "Message subject"
+msgstr "Тема сообщения"
+
+msgid "Message template"
+msgstr "Шаблон сообщения"
+
+msgid "Message templates"
+msgstr "Шаблоны сообщений"
+
+msgid "Message templates folder"
+msgstr "Папка с шаблонами сообщений"
+
+msgid "Message text"
+msgstr "Текст сообщения"
+
+msgid "Message type"
+msgstr "Тип сообщения"
+
+msgid "Messages have been sent."
+msgstr "Сообщения были отправлены."
+
+msgid "Messaging service"
+msgstr "Служба сообщений"
+
+msgid "Metadata"
+msgstr "Описание"
+
+msgid "Metadata changed"
+msgstr "Описание сохранено"
+
+msgid "Middle name"
+msgstr "Отчество"
+
+msgid "Migration"
+msgstr "Перенос данных"
+
+msgid "Migration from old version registry"
+msgstr "Перенос данных из журнала старого образца"
+
+msgid "Migration scheme"
+msgstr "Схема переноса"
+
+msgid "Minimum"
+msgstr "Минимум"
+
+msgid "Minor version"
+msgstr "Младшая версия"
+
+msgid "Minute as a decimal number"
+msgstr "Минута"
+
+msgid "Mo"
+msgstr "По"
+
+msgid "Modify attributes"
+msgstr "Изменение реквизитных полей"
+
+msgid "Modify document"
+msgstr "Изменить"
+
+msgid "Modification date"
+msgstr "Дата модификации"
+
+msgid "Modification request"
+msgstr "Предложение о внесении изменений"
+
+msgid "Modifications log"
+msgstr "История изменений"
+
+msgid "Modified"
+msgstr "Время изменения"
+
+msgid "Modify"
+msgstr "Изменить"
+
+msgid "Modify portal content"
+msgstr "Изменение содержимого"
+
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "Modules manual"
+msgstr "Описание модулей расширения NauDoc"
+
+msgid "Month as a decimal number"
+msgstr "Месяц"
+
+msgid "More colors"
+msgstr "Другие цвета"
+
+msgid "More..."
+msgstr "Показать все"
+
+msgid "Move document to the folder (create shortcut in the folder)"
+msgstr "Переместить документ в папку (создать ярлык в папке)"
+
+msgid "Move down"
+msgstr "Вниз очереди"
+
+msgid "Move it to friday"
+msgstr "Переносить на пятницу"
+
+msgid "Move it to monday"
+msgstr "Переносить на понедельник"
+
+msgid "Move it to the closest week-day"
+msgstr "Переносить на ближайший рабочий день"
+
+msgid "Move up"
+msgstr "Вверх очереди"
+
+msgid "My documents"
+msgstr "Мои документы"
+
+msgid "My favorites"
+msgstr "Мое избранное"
+
+msgid "My mail"
+msgstr "Моя почта"
+
+msgid "My tasks"
+msgstr "Мои задания"
+
+msgid "ND label"
+msgstr "Обозначение НД"
+
+msgid "ND name"
+msgstr "Наименование НД"
+
+msgid "Name"
+msgstr "Имя"
+
+msgid "Navy"
+msgstr "Темно-синий"
+
+msgid "New"
+msgstr "Новые"
+
+msgid "New attribute's value"
+msgstr "Значение нового параметра"
+
+msgid "New category"
+msgstr "Новая категория"
+
+msgid "New document"
+msgstr "Новый документ"
+
+msgid "New entry form"
+msgstr "Добавление записи"
+
+msgid "New filter condition has been added."
+msgstr "Добавлено новое условие фильтра."
+
+msgid "New folder"
+msgstr "Новая папка"
+
+msgid "New level"
+msgstr "Новый уровень"
+
+msgid "New location"
+msgstr "Новое местоположение"
+
+msgid "New location template"
+msgstr "Шаблон нового местоположения"
+
+msgid "New mail download"
+msgstr "Получение новой почты"
+
+msgid "New mail will be checked automatically."
+msgstr "Новая почта будет проверяться автоматически."
+
+msgid "New message filter has been added."
+msgstr "Добавлен новый фильтр сообщений."
+
+msgid "New messages have been received: %(count)s"
+msgstr "Получено новых сообщений: %(count)s"
+
+msgid "New object"
+msgstr "Новый объект"
+
+msgid "New object metadata"
+msgstr "Описание объекта"
+
+msgid "New password"
+msgstr "Новый пароль"
+
+msgid "New report details"
+msgstr "Параметры нового отчета"
+
+msgid "New report form"
+msgstr "Новый отчет"
+
+msgid "New resolution template"
+msgstr "Новый шаблон резолюции"
+
+msgid "New task"
+msgstr "Новое задание"
+
+msgid "New task details"
+msgstr "Параметры нового задания"
+
+msgid "New version amount"
+msgstr "Значимость новой версии"
+
+msgid "New window"
+msgstr "Новое окно"
+
+msgid "News"
+msgstr "Новость"
+
+msgid "Next"
+msgstr "Далее"
+
+msgid "Next page"
+msgstr "Следующая страница"
+
+msgid "Next step"
+msgstr "Следующее состояние"
+
+msgid "Next time"
+msgstr "Следующее задание"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "No adapters available."
+msgstr "Установленных адаптеров нет."
+
+msgid "No add-ons installed."
+msgstr "Установленных модулей расширения нет."
+
+msgid "No categories selected"
+msgstr "Нет выбранных категорий"
+
+msgid "No changes can be applied to the fixed folder "
+msgstr "Фиксированная папка недоступна для изменений!"
+
+msgid "No changes were made."
+msgstr "Изменений нет."
+
+msgid "No choices to vote, please %(1)sconfigure this poll%(2)s."
+msgstr "Нет вариантов для голосования, пожалуйста %(1)sнастройте данный опрос%(2)s."
+
+msgid "No columns defined"
+msgstr "Колонки не определены"
+
+msgid "No description"
+msgstr "Без описания"
+
+msgid "No favorites were found"
+msgstr "Избранные документы отсутствуют"
+
+msgid "No files attached"
+msgstr "Прикрепленные файлы отсутствуют"
+
+msgid "No grouped"
+msgstr "не группировать"
+
+msgid "No input for required field. Please, fill field value"
+msgstr "Не заполнено обязательное поле. Пожалуйста, заполните его"
+
+msgid "No items were found"
+msgstr "Не найдено документов"
+
+msgid "No manuals installed"
+msgstr "Руководства не установлены"
+
+msgid "No matching tasks found"
+msgstr "Нет заданий в заданной категории"
+
+msgid "No message filters exist in this folder."
+msgstr "В этой папке нет почтовых фильтров."
+
+msgid "No modification rights"
+msgstr "Запретить изменение"
+
+msgid "No new mail."
+msgstr "Нет новых сообщений."
+
+msgid "No object selected"
+msgstr "Объект не выбран"
+
+msgid "No parameters for this script"
+msgstr "Параметры для этого сценария не заданы"
+
+msgid "No parent registry object can be found."
+msgstr "Вышестоящий журнал не может быть найден."
+
+msgid "No permissions are managed by this workflow."
+msgstr "Не выбраны права для управления доступом."
+
+msgid "No personal documents"
+msgstr "Личных документов нет"
+
+msgid "No personal mail folders were found"
+msgstr "Не найдено личных почтовых папок"
+
+msgid "No publishable objects selected."
+msgstr "Не выбраны объекты для публикации."
+
+msgid "No published documents"
+msgstr "Нет опубликованных документов"
+
+msgid "No published folders"
+msgstr "Нет опубликованных папок"
+
+msgid "No recipients specified."
+msgstr "Получатели не указаны."
+
+msgid "No reports"
+msgstr "Нет отчетов"
+
+msgid "No reports under this task"
+msgstr "Задание не содержит отчетов"
+
+msgid "No states defined"
+msgstr "Состояния не определены"
+
+msgid "No states selected"
+msgstr "Нет выбранных состояний"
+
+msgid "No such directory. Path: %(path)s."
+msgstr "Директория '%(path)s' не существует."
+
+msgid "No supervisor"
+msgstr "Нет контролера"
+
+msgid "No task members were selected"
+msgstr "Не указаны участники задания"
+
+msgid "No tasks selected"
+msgstr "Нет выбранных заданий"
+
+msgid "No title"
+msgstr "Без заголовка"
+
+msgid "No transitions"
+msgstr "Переходы отсутствуют"
+
+msgid "No transitions defined"
+msgstr "Переходы не определены"
+
+msgid "No users have been removed."
+msgstr "Ни один подписчик не удален."
+
+msgid "No votes submitted yet"
+msgstr "Нет ни одного голоса"
+
+msgid "Nomenclative number"
+msgstr "Номенклатурный номер"
+
+msgid "Nomenclative number of the folder that contains the document. It may be specified in the folder's properties"
+msgstr "Номенклатурный номер папки, содержащей документ. Его можно указать в свойствах папки"
+
+msgid "None"
+msgstr "Нет"
+
+msgid "Normal"
+msgstr "Нормальный"
+
+msgid "Normative Document"
+msgstr "Нормативный документ"
+
+msgid "Normative Documents"
+msgstr "Нормативные документы"
+
+msgid "Not specified"
+msgstr "Нет данных"
+
+msgid "Not trackable pages"
+msgstr "Неотслеживаемые страницы"
+
+msgid "Not trackable users"
+msgstr "Неотслеживаемые пользователи"
+
+msgid "Note"
+msgstr "Примечание"
+
+msgid "Note: an incremental backup is made if possible (e.g., if a pack has occurred since the last incremental backup, a full backup is necessary)."
+msgstr "Примечание: в первый раз, а также после каждой упаковки базы будет произведено полное резервное копирование базы. В остальных случаях будет производено инкрементальное копирование."
+
+msgid "Note: Category must have"
+msgstr "Примечание: Категория должна иметь"
+
+msgid "Note: columns in italic do not allow input, columns in bold allow edit entries"
+msgstr "Примечание: в колонках, отмеченных курсивом, нет возможности вводить данные, в колонках, отмеченных жирным шрифтом, допускается редактирование данных"
+
+msgid "Note: if a file is being attached, category template will not be used"
+msgstr "Примечание: при вложении файла шаблон категории использован не будет"
+
+msgid "Note: it's impossible to remove the type that is in use by some document"
+msgstr "Внимание! Невозможно удалить тип, если с ним ассоциирован хотя бы один документ."
+
+msgid "Note: number of columns and their order should correspond with number and order of columns in an imported file."
+msgstr "Внимание! Число столбцов и их порядок должны совпадать с числом и порядком столбцов в импортируемом файле."
+
+msgid "Note: number of columns and their order should correspond with ones in an imported file."
+msgstr "Внимание! число столбцов и их тип должны совпадать со столбцами в импортируемом файле."
+
+msgid "Note: path to this program have to be set in the PATH variable"
+msgstr "Внимание! путь к этой программе-упаковщику должен быть указан в переменной окружения PATH"
+
+msgid "Note: values of these fields are used at formation of nomenclative numbers in registries."
+msgstr "Примечание: значения этих полей используются при формировании номенклатурных номеров в журналах регистрации."
+
+msgid "Notes"
+msgstr "Заметки"
+
+msgid "Nothing to send."
+msgstr "Нет сообщений для отправки."
+
+msgid "Nothing was sent due to errors."
+msgstr "Сообщения не были отправлены из-за ошибок."
+
+msgid "Notification about document"
+msgstr "Уведомление о документе"
+
+msgid "Notification sent"
+msgstr "Уведомление отправлено"
+
+msgid "Notifications log"
+msgstr "История уведомлений"
+
+msgid "Notified members"
+msgstr "Уведомляемые пользователи"
+
+msgid "Notify"
+msgstr "Отправить уведомление"
+
+msgid "Notify all involved users on every turn"
+msgstr "Уведомлять всех ответственных пользователей на каждом шаге"
+
+msgid "Notify every"
+msgstr "Уведомлять всех"
+
+msgid "Notify NauDoc support service"
+msgstr "Сообщить в службу поддержки NauDoc"
+
+msgid "Nov"
+msgstr "ноября"
+
+msgid "November"
+msgstr "Ноябрь"
+
+msgid "Now you will receive update notifications for this folder."
+msgstr "Теперь Вы будете получать сообщения об обновлениях в этой папке."
+
+msgid "Number"
+msgstr "Число"
+
+msgid "Number of viewing documents on page"
+msgstr "Максимальное число документов на странице"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Object created."
+msgstr "Объект создан."
+
+msgid "Object has been added to the Favorites."
+msgstr "Объект был добавлен в Избранное."
+
+msgid "Object id is invalid"
+msgstr "Неверный идентификатор объекта"
+
+msgid "Object is inaccessible."
+msgstr "Объект недоступен."
+
+msgid "Object is not configured correctly"
+msgstr "Объект неверно сконфигурирован"
+
+msgid "Object selected"
+msgstr "Объект выбран"
+
+msgid "Object type"
+msgstr "Тип"
+
+msgid "Object was removed."
+msgstr "Объект был удален."
+
+msgid "Object(s) were not deleted. Either you have no permission to delete them or they are locked."
+msgstr "Объект(ы) не были удалены. У Вас недостаточно прав для их удаления, либо они заблокированы."
+
+msgid "Objects"
+msgstr "Объекты"
+
+msgid "Objects selection realm"
+msgstr "Область выбора объектов"
+
+msgid "Oct"
+msgstr "октября"
+
+msgid "October"
+msgstr "Октябрь"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Once a month"
+msgstr "Раз в месяц"
+
+msgid "Once a week"
+msgstr "Раз в неделю"
+
+msgid "One level"
+msgstr "Один уровень"
+
+msgid "Only for view"
+msgstr "Только для просмотра"
+
+msgid "Only one version can exists in this state,\nand exclude version by follow transition"
+msgstr "Только одна версия может находиться в данном состоянии.\nДля прежней версии будет совершен переход"
+
+msgid "Open for group"
+msgstr "Открыть для группы"
+
+msgid "Open the document for group editing"
+msgstr "Открыть документ для группового редактирования"
+
+msgid "Open user info"
+msgstr "Открыть информацию о пользователе"
+
+msgid "Optional user info"
+msgstr "Дополнительные сведения о пользователе"
+
+msgid "Options of select"
+msgstr "Значения списка"
+
+msgid "Ordered list"
+msgstr "Нумерация"
+
+msgid "Ordinary object"
+msgstr "Обычный документ"
+
+msgid "Original holder"
+msgstr "Держатель подлинника"
+
+msgid "Original report text"
+msgstr "Исходный текст отчета"
+
+msgid "Original text"
+msgstr "Исходный текст"
+
+msgid "Original version"
+msgstr "Исходная версия"
+
+msgid "Other addresses (use semicolon as separator)"
+msgstr "Другие адреса (используйте в качестве разделителя точку с запятой)"
+
+msgid "Other parameters"
+msgstr "Прочие параметры"
+
+msgid "Outcoming documents"
+msgstr "Исходящий"
+
+msgid "Outdent"
+msgstr "Уменьшить отступ"
+
+msgid "Outgoing Mail"
+msgstr "Исходящая почта"
+
+msgid "Outgoing Mail Folder"
+msgstr "Папка для исходящей почты"
+
+msgid "Outgoing e-mail folder added."
+msgstr "Папка для исходящей почты добавлена."
+
+msgid "Outgoing tasks"
+msgstr "Исходящие задания"
+
+msgid "Output parameters"
+msgstr "Выходные параметры"
+
+msgid "Owner"
+msgstr "Владелец"
+
+msgid "Owner changed"
+msgstr "Владелец изменен"
+
+msgid "POP3 server"
+msgstr "POP3 сервер"
+
+msgid "Pack and backup"
+msgstr "Упаковка базы и резервное копирование"
+
+msgid "Pack Zope database"
+msgstr "Паковать базу данных Zope"
+
+msgid "Pack each"
+msgstr "Паковать каждые"
+
+msgid "Pack now"
+msgstr "Упаковать сейчас"
+
+msgid "Page"
+msgstr "Страница"
+
+msgid "Pages"
+msgstr "Страниц"
+
+msgid "Pages are not selected"
+msgstr "Страницы не выбраны"
+
+msgid "Parameter ID"
+msgstr "Идентификатор параметра"
+
+msgid "Parameter added"
+msgstr "Параметр добавлен"
+
+msgid "Parameter title"
+msgstr "Заголовок параметра"
+
+msgid "Parameters for the remote ZEO server are invalid."
+msgstr "Неверные параметры для удаленного ZEO сервера."
+
+msgid "Parameter(s) deleted"
+msgstr "Параметр(ы) удален(ы)"
+
+msgid "Parent folder"
+msgstr "Родительская папка"
+
+msgid "Parent registry"
+msgstr "Вышестоящий журнал"
+
+msgid "Parents templates"
+msgstr "Родительские шаблоны"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Password (confirm)"
+msgstr "Подтверждение пароля"
+
+msgid "Password changed."
+msgstr "Пароль изменен."
+
+msgid "Password confirmation"
+msgstr "Подтверждение пароля"
+
+msgid "Password encryption method"
+msgstr "Метод шифрования паролей"
+
+msgid "Password have been mailed to users"
+msgstr "Пароль отправлен пользователям"
+
+msgid "Paste"
+msgstr "Вставить"
+
+msgid "Paste into text"
+msgstr "Вставить в текст"
+
+msgid "Paste to report"
+msgstr "Вставить в общий отчет"
+
+msgid "Pasting file system objects"
+msgstr "Вставка объекта файловой системы"
+
+msgid "Path"
+msgstr "Путь"
+
+msgid "Path to external site on the server"
+msgstr "Путь к внешнему сайту на сервере"
+
+msgid "Path to store backups"
+msgstr "Путь для хранения копий"
+
+msgid "Patterns"
+msgstr "Шаблоны"
+
+msgid "Pause"
+msgstr "Пауза"
+
+msgid "Pending for approvement"
+msgstr "К согласованию"
+
+msgid "Pending for confirmation"
+msgstr "Ожидается <br> подтверждение"
+
+msgid "Pending for publication"
+msgstr "Ожидает публикации"
+
+msgid "Pending for review"
+msgstr "Ожидает согласования"
+
+msgid "Pending reply from"
+msgstr "Ожидается ответ от"
+
+msgid "Pending tasks"
+msgstr "Без ответа"
+
+msgid "Performing transition in documents, to which there is link from document, where action is initiated"
+msgstr "Выполнение перехода в документах, на которые существуют ссылки из документа, в котором инициировано действие"
+
+msgid "Permission"
+msgstr "Полномочие"
+
+msgid "Permission added"
+msgstr "Право доступа добавлено"
+
+msgid "Permission(s) removed"
+msgstr "Права доступа удалены"
+
+msgid "Permissions"
+msgstr "Права доступа"
+
+msgid "Permit the author of entry to delete it"
+msgstr "Разрешить автору записи удалять ее"
+
+msgid "Personal folders container"
+msgstr "Расположение личных папок"
+
+msgid "Personal properties"
+msgstr "Личные данные"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Phones"
+msgstr "Телефоны"
+
+msgid "Photo"
+msgstr "Фото"
+
+msgid "Physical path"
+msgstr "Путь"
+
+msgid "Place document to"
+msgstr "Поместить документ в"
+
+msgid "Plan"
+msgstr "Проект документа"
+
+msgid "Plan time"
+msgstr "Запланированное время выполнения"
+
+msgid "Please choose file"
+msgstr "Пожалуйста, укажите файл"
+
+msgid "Please choose transitions you want to subscribe"
+msgstr "Пожалуйста, выберите переходы, о выполнении которых Вы хотите получать уведомления"
+
+msgid "Please fill in the first name."
+msgstr "Пожалуйста, заполните имя."
+
+msgid "Please fill in the last name."
+msgstr "Пожалуйста, заполните фамилию."
+
+msgid "Please fill in the mandatory attribute "%(name)s"."
+msgstr "Пожалуйста, заполните обязательное поле "%(name)s"."
+
+msgid "Please fill in the resolution text."
+msgstr "Пожалуйста, заполните текст резолюции."
+
+msgid "Please fill in the user's first name."
+msgstr "Пожалуйста, заполните имя пользователя."
+
+msgid "Please fill in the user's last name."
+msgstr "Пожалуйста, заполните фамилию пользователя."
+
+msgid "Please select at least one column"
+msgstr "Пожалуйста, выберите хотя бы одну колонку."
+
+msgid "Please select at least one document."
+msgstr "Пожалуйста, выберите хотя бы один документ."
+
+msgid "Please select at least one folder."
+msgstr "Пожалуйста, выберите хотя бы одну папку."
+
+msgid "Please select at least one subscriber."
+msgstr "Пожалуйста, выберите хотя бы одного подписчика."
+
+msgid "Please select at least one user."
+msgstr "Пожалуйста, выберите хотя бы одного пользователя."
+
+msgid "Please select object"
+msgstr "Пожалуйста, выберите объект"
+
+msgid "Please select one or more items first."
+msgstr "Пожалуйста, укажите хотя бы один объект."
+
+msgid "Please select one or more items to copy first"
+msgstr "Пожалуйста, укажите хотя бы один объект для копирования"
+
+msgid "Please select one or more items to cut first"
+msgstr "Пожалуйста, укажите хотя бы один объект для вырезания"
+
+msgid "Please specify day of week"
+msgstr "Пожалуйста, укажите день недели"
+
+msgid "Please specify duration time"
+msgstr "Пожалуйста, укажите длительность"
+
+msgid "Please specify mandatory attribute"
+msgstr "Пожалуйста, заполните обязательное поле"
+
+msgid "Please specify registry type"
+msgstr "Пожалуйста, укажите тип журнала"
+
+msgid "Please specify the remote document"
+msgstr "Пожалуйста, укажите внешний документ"
+
+msgid "Please specify responsible members"
+msgstr "Пожалуйста, укажите ответственных пользователей"
+
+msgid "Please specify supervisor"
+msgstr "Пожалуйста, укажите контролера"
+
+msgid "Please specify task title"
+msgstr "Пожалуйста, укажите название задания"
+
+msgid "Please specify template title"
+msgstr "Пожайлуста, укажите название шаблона"
+
+msgid "Please specify the dates"
+msgstr "Пожалуйста, укажите даты"
+
+msgid "Please specify the column title"
+msgstr "Пожалуйста, укажите заголовок колонки"
+
+msgid "Please specify the correct e-mail address."
+msgstr "Пожалуйста, укажите корректный адрес электронной почты."
+
+msgid "Please specify the expiration date"
+msgstr "Пожалуйста, укажите дату окончания"
+
+msgid "Please specify the folder to store paper documents"
+msgstr "Пожалуйста, укажите папку для размещения бумажных документов"
+
+msgid "Please specify the step title"
+msgstr "Пожалуйста, укажите заголовок шага"
+
+msgid "Please specify the template title"
+msgstr "Пожалуйста, укажите заголовок шаблона"
+
+msgid "Please specify title of choice"
+msgstr "Пожалуйста, укажите заголовок варианта"
+
+msgid "Please specify year"
+msgstr "Пожалуйста, укажите год"
+
+msgid "Plugins"
+msgstr "Расширения"
+
+msgid "Portal 'From' address"
+msgstr "Обратный адрес "
+
+msgid "Portal 'From' name"
+msgstr "Почтовое имя отправителя "
+
+msgid "Portal Image"
+msgstr "Изображение"
+
+msgid "Portal administrator"
+msgstr "Администратор системы"
+
+msgid "Portal description"
+msgstr "Описание портала "
+
+msgid "Portal manager"
+msgstr "Администратор системы"
+
+msgid "Portal managers group"
+msgstr "Группа администраторов портала"
+
+msgid "Portal properties"
+msgstr "Настройки портала"
+
+msgid "Portal root"
+msgstr "Корень портала"
+
+msgid "Portal settings changed"
+msgstr "Настройки портала изменены"
+
+msgid "Portal title"
+msgstr "Название портала "
+
+msgid "Portal users"
+msgstr "Пользователи системы"
+
+msgid "Portal users list"
+msgstr "Список пользователей"
+
+msgid "Position"
+msgstr "Должность"
+
+msgid "Position before"
+msgstr "Разместить перед"
+
+msgid "Possible Transitions"
+msgstr "Возможные переходы"
+
+msgid "Possible actions"
+msgstr "Возможные действия"
+
+msgid "Possible rollback steps"
+msgstr "Возможные шаги отката"
+
+msgid "Possible transitions for state"
+msgstr "Возможные переходы для состояния"
+
+msgid "Post address"
+msgstr "Почтовый адрес"
+
+msgid "Postfix"
+msgstr "Постфикс"
+
+msgid "Postfix of the category the document belongs to. It may be stated by creating in the document's category property with 'postfix' id"
+msgstr "Постфикс категории документа. Его можно установить созданием в категории документа свойства с идентификатором 'postfix'"
+
+msgid "Postfix of the folder that contains the document. It may be specified in the folder's properties"
+msgstr "Постфикс папки, в которой хранится документ. Его можно указать в свойствах папки"
+
+msgid "Preferences"
+msgstr "Настройки"
+
+msgid "Preview"
+msgstr "Просмотреть"
+
+msgid "Preview on site"
+msgstr "Предпросмотр на сайте"
+
+msgid "Previous page"
+msgstr "Предыдущая страница"
+
+msgid "Primary attribute"
+msgstr "Главный реквизит"
+
+msgid "Primary category"
+msgstr "Главная категория"
+
+msgid "Primary document Id"
+msgstr "Идентификатор главного документа"
+
+msgid "Primary document Title"
+msgstr "Заголовок главного документа"
+
+msgid "Primary document Version"
+msgstr "Версия главного документа"
+
+msgid "Primary news"
+msgstr "Первичная новость"
+
+msgid "Principal"
+msgstr "Основная"
+
+msgid "Print message to console"
+msgstr "Вывести сообщение на консоль"
+
+msgid "Print preview"
+msgstr "Вид для печати"
+
+msgid "Print view"
+msgstr "Вид для печати"
+
+msgid "Private"
+msgstr "Скрытый"
+
+msgid "Proceed"
+msgstr "Продолжить"
+
+msgid "Processed tasks, %"
+msgstr "Обработанных заданий, %"
+
+msgid "Program for archiving backup copy"
+msgstr "Программа-упаковщик для архивирования резервных копий"
+
+msgid "Progress report"
+msgstr "Ход выполнения"
+
+msgid "Properties"
+msgstr "Свойства"
+
+msgid "Properties of levels saved"
+msgstr "Свойства уровней сохранены"
+
+msgid "Property of the object"
+msgstr "Свойство объекта"
+
+msgid "Pseudo-group object classes"
+msgstr "Классы объектов псевдогрупп"
+
+msgid "Publication"
+msgstr "Публикация"
+
+msgid "Publication request"
+msgstr "Запрос на публикацию документа"
+
+msgid "Publication request for the document"
+msgstr "Запрос на публикацию документа"
+
+msgid "Publish"
+msgstr "Опубликовать"
+
+msgid "Publish documents"
+msgstr "Опубликовать документы"
+
+msgid "Publish message on the external site"
+msgstr "Опубликовать сообщение на внешнем сайте"
+
+msgid "Publish the document on the external site"
+msgstr "Опубликовать документ на внешнем сайте"
+
+msgid "Published"
+msgstr "Опубликованный"
+
+msgid "Published document becomes visible to the external site users"
+msgstr "Опубликованный документ становится видимым для всех посетителей внешнего сайта"
+
+msgid "Published document will be visible to the external site users after the supervisor's confirmation"
+msgstr "После подтверждения администратором системы опубликованный документ станет видимым для всех посетителей внешнего сайта"
+
+msgid "Publisher Entry Point"
+msgstr "Публикатор"
+
+msgid "Quantity"
+msgstr "Количество"
+
+msgid "Query"
+msgstr "Запрос"
+
+msgid "Questionnaire"
+msgstr "Анкета"
+
+msgid "Queue"
+msgstr "По очереди"
+
+msgid "Queue options"
+msgstr "Очередь"
+
+msgid "RTF converter is not installed"
+msgstr "Не установлен конвертер RTF-файлов"
+
+msgid "Rate"
+msgstr "Оценить"
+
+msgid "Read"
+msgstr "Чтение"
+
+msgid "Read only"
+msgstr "Только чтение"
+
+msgid "Read this document."
+msgstr "Ознакомьтесь с этим документом."
+
+msgid "Reader"
+msgstr "Читатель"
+
+msgid "Recall the document from the external site"
+msgstr "Отозвать документ с внешнего сайта"
+
+msgid "Receipt date"
+msgstr "Дата поступления"
+
+msgid "Receive notifications about document changes"
+msgstr "Получать уведомления об изменениях в документе"
+
+msgid "Received new messages."
+msgstr "Получены новые сообщения."
+
+msgid "Receive message"
+msgstr "Получить сообщение"
+
+msgid "Recent documents"
+msgstr "Последние обновления"
+
+msgid "Recently created documents"
+msgstr "Последние созданные документы"
+
+msgid "Recipient address"
+msgstr "Адрес получателя"
+
+msgid "Recipient name"
+msgstr "Имя получателя"
+
+msgid "Recipient type"
+msgstr "Тип получателя"
+
+msgid "Recipients"
+msgstr "Получатели"
+
+msgid "Reconfigure Portal"
+msgstr "Свойства портала"
+
+msgid "Reconsideration document"
+msgstr "Пересмотр документа"
+
+msgid "Record columns"
+msgstr "Колонки записи"
+
+msgid "Recursive"
+msgstr "Рекурсивно"
+
+msgid "Redo"
+msgstr "Вернуть"
+
+msgid "Reference to primary document"
+msgstr "Ссылка на главный документ"
+
+msgid "Refresh"
+msgstr "Обновить"
+
+msgid "Refresh list"
+msgstr "Обновить список"
+
+msgid "Refuse"
+msgstr "Отказать в согласовании"
+
+msgid "Refuse message delivery"
+msgstr "Отказать в доставке сообщения"
+
+msgid "Refused"
+msgstr "Отказал в согласовании"
+
+msgid "Region title"
+msgstr "Регион"
+
+msgid "Regions"
+msgstr "Регионы"
+
+msgid "Register"
+msgstr "Зарегистрировать"
+
+msgid "Register current version only"
+msgstr "Зарегистрировать только текущую версию"
+
+msgid "Register document itself"
+msgstr "Зарегистрировать документ"
+
+msgid "Register document version"
+msgstr "Зарегистрировать версию документа"
+
+msgid "Register in both registries under the number of the parent registry."
+msgstr "Зарегистрировать в обоих журналах под номером вышестоящего журнала."
+
+msgid "Register paper document"
+msgstr "Зарегистрировать бумажный документ"
+
+msgid "Register under the number of the selected registry (do not register in the parent registry)."
+msgstr "Зарегистрировать под номером выбранного журнала (не регистрировать в вышестоящем журнале)."
+
+msgid "Registered namespaces"
+msgstr "Зарегистрированные пространства имен"
+
+msgid "Registration book"
+msgstr "Журнал регистрации"
+
+msgid "Registration book columns"
+msgstr "Колонки журнала регистрации"
+
+msgid "Registration complete"
+msgstr "Регистрация завершена"
+
+msgid "Registration date"
+msgstr "Дата регистрации"
+
+msgid "Registration number"
+msgstr "Регистрационный номер"
+
+msgid "Registration number for a document will be retrieved from selected registry."
+msgstr "Регистрационный номер документа будет извлекаться из выбранного журнала."
+
+msgid "Registration number forming parameters"
+msgstr "Параметры формирования регистрационного номера"
+
+msgid "Registration number forming rule"
+msgstr "Правило формирования регистрационного номера"
+
+msgid "Registration number forming rule not specified"
+msgstr "Правило формирования регистрационного номера не определено"
+
+msgid "registration_book.recency_disabled"
+msgstr "отключено"
+
+msgid "Registry"
+msgstr "Журнал"
+
+msgid "Registry columns"
+msgstr "Колонки реестра"
+
+msgid "Registry department."
+msgstr "Отделение/служба журнала."
+
+msgid "Registry fields"
+msgstr "Регистрируемые данные"
+
+msgid "Registry id"
+msgstr "№"
+
+msgid "Registry options"
+msgstr "Настройки журнала"
+
+msgid "Reject publication"
+msgstr "Отклонить запрос на публикацию"
+
+msgid "Reject publication request"
+msgstr "Отклонить запрос на публикацию"
+
+msgid "Reject the document publication on the external site"
+msgstr "Отклонить публикацию документа на внешнем сайте"
+
+msgid "Reject request"
+msgstr "Отклонить запрос"
+
+msgid "Reject signature request"
+msgstr "Отклонить запрос на подпись"
+
+msgid "Reject task"
+msgstr "Отказаться от исполнения"
+
+msgid "Rejected"
+msgstr "Скрытый"
+
+msgid "Rejected members"
+msgstr "Отказались от выполнения"
+
+msgid "Rejected request:"
+msgstr "Отклонили запрос:"
+
+msgid "Rejected task:"
+msgstr "Отказались от выполнения:"
+
+msgid "Rejected tasks"
+msgstr "Отклонено"
+
+msgid "Rejected to sign the document:"
+msgstr "Отказали в подписи:"
+
+msgid "Relation type"
+msgstr "Тип отношения"
+
+msgid "Relative DN attribute"
+msgstr "Атрибут относительного имени (RDN)"
+
+msgid "Relative expiration date"
+msgstr "Относительное время окончания"
+
+msgid "Reload"
+msgstr "Перечитать"
+
+msgid "Remain in state"
+msgstr "Оставаться в текущем состоянии"
+
+msgid "Reminders text"
+msgstr "Текст напоминаний"
+
+msgid "Remote ZEO server address"
+msgstr "Адрес удаленного сервера ZEO"
+
+msgid "Remote copy has been deleted."
+msgstr "Внешняя копия удалена."
+
+msgid "Remote copy has been updated."
+msgstr "Внешняя копия обновлена."
+
+msgid "Remove"
+msgstr "Удалить"
+
+msgid "Remove Site Container"
+msgstr "Удалить сайт"
+
+msgid "Remove association"
+msgstr "Удалить ассоциацию"
+
+msgid "Remove condition"
+msgstr "Удалить условие"
+
+msgid "Remove directive"
+msgstr "Убрать директивность"
+
+msgid "Remove formatting"
+msgstr "Без форматирования"
+
+msgid "Remove group"
+msgstr "Удалить группу"
+
+msgid "Remove links"
+msgstr "Удалить ссылки"
+
+msgid "Remove report"
+msgstr "Удалить отчет"
+
+msgid "Remove selected"
+msgstr "Удалить выбранное"
+
+msgid "Remove shortcut"
+msgstr "Удалить ярлык"
+
+msgid "Remove this document"
+msgstr "Удалить документ"
+
+msgid "Remove this file"
+msgstr "Удалить файл"
+
+msgid "Remove this task"
+msgstr "Удалить задание"
+
+msgid "Removing revisions of objects that are older than"
+msgstr "Удаляя ревизии объектов старше, чем"
+
+msgid "Rename"
+msgstr "Переименовать"
+
+msgid "Reopen closed reports"
+msgstr "Потребовать доработки отчетов"
+
+msgid "Repeat"
+msgstr "Повторять"
+
+msgid "Repeat action that caused the error"
+msgstr "Повторить действие, которое вызвало ошибку"
+
+msgid "Repeat every"
+msgstr "Повторять с периодом"
+
+msgid "Replies"
+msgstr "Ответы"
+
+msgid "Reply"
+msgstr "Обсудить"
+
+msgid "Reply to item"
+msgstr "Добавить комментарий"
+
+msgid "Report"
+msgstr "Отчет"
+
+msgid "Report added"
+msgstr "Отчет добавлен"
+
+msgid "Report columns"
+msgstr "Колонки отчета"
+
+msgid "Report created"
+msgstr "Отчет создан"
+
+msgid "Report deleted"
+msgstr "Отчет удален"
+
+msgid "Report description"
+msgstr "Описание"
+
+msgid "Report error to the NauDoc support service"
+msgstr "Сообщить об ошибке в службу поддержки NauDoc"
+
+msgid "Report error to the portal administrator"
+msgstr "Сообщить об ошибке администратору портала"
+
+msgid "Report fields"
+msgstr "Поля отчета"
+
+msgid "Report options"
+msgstr "Настройки отчета"
+
+msgid "Report task failure"
+msgstr "Доложить о невыполнении"
+
+msgid "Report title"
+msgstr "Заголовок"
+
+msgid "Report version"
+msgstr "Версия для отчета"
+
+msgid "Report wizard"
+msgstr "Мастер отчетов"
+
+msgid "Report wizard will now create an ordinary HTML document based on your report. Please specify the document's title and description."
+msgstr "Мастер отчетов готов создать HTML-документ с общим отчетом. Пожалуйста, укажите заголовок и описание документа."
+
+msgid "Reports"
+msgstr "Отчеты"
+
+msgid "Reports total"
+msgstr "Всего отчетов"
+
+msgid "Repository"
+msgstr "Репозиторий"
+
+msgid "Repository not found"
+msgstr "Репозиторий не найден"
+
+msgid "Request"
+msgstr "Запрос"
+
+msgid "Request confirmation"
+msgstr "Запросить согласование"
+
+msgid "Request confirmation of the following users"
+msgstr "Запросить согласование у следующих пользователей"
+
+msgid "Request publication"
+msgstr "Запросить публикацию"
+
+msgid "Request signature"
+msgstr "На подпись"
+
+msgid "Request signature of the following users"
+msgstr "Запросить подписание у следующих пользователей"
+
+msgid "Request the confirmation in the given order only"
+msgstr "В данном режиме документ будет отправлен на согласование по очереди в указанном порядке. Иначе согласование будет запрошено у всех указанных пользователей одновременно"
+
+msgid "Request the document publication on the external site"
+msgstr "Запросить публикацию на внешнем сайте"
+
+msgid "Request the document signature"
+msgstr "Запрос на подпись документа"
+
+msgid "Reset"
+msgstr "Сброс"
+
+msgid "Reset format"
+msgstr "Очистить формат"
+
+msgid "Reset key columns"
+msgstr "Отменить ключ"
+
+msgid "Resolution templates management"
+msgstr "Управление шаблонами резолюций"
+
+msgid "Resolution text"
+msgstr "Текст резолюции"
+
+msgid "Responsible authors"
+msgstr "Ответственные за разработку"
+
+msgid "Responsible groups"
+msgstr "Ответственные группы"
+
+msgid "Responsible members"
+msgstr "Ответственные пользователи"
+
+msgid "Result"
+msgstr "Результат"
+
+msgid "Result codes"
+msgstr "Коды завершения"
+
+msgid "Result codes to automated transition"
+msgstr "Коды завершения -> автоматический переход"
+
+msgid "Result of document versions comparison"
+msgstr "Результат сравнения версий документа"
+
+msgid "Results on page"
+msgstr "Записей на странице"
+
+msgid "Results on page:"
+msgstr "Записей на странице:"
+
+msgid "Results per page"
+msgstr "Количество результатов на странице"
+
+msgid "Resume"
+msgstr "Продолжить"
+
+msgid "Retract"
+msgstr "Скрыть"
+
+msgid "Retract document"
+msgstr "Скрыть документ"
+
+msgid "Retry"
+msgstr "Повторить"
+
+msgid "Return to the previous page"
+msgstr "Вернуться на предыдущую страницу"
+
+msgid "Reverse dependence"
+msgstr "Обратная зависимость"
+
+msgid "Review"
+msgstr "Визировать"
+
+msgid "Review portal content"
+msgstr "Рецензирование содержимого"
+
+msgid "Review reason"
+msgstr "Причина пересмотра"
+
+msgid "Review task"
+msgstr "Визировать задание"
+
+msgid "Review task completion"
+msgstr "Визировать исполнение задания"
+
+msgid "Reviewed"
+msgstr "Согласован"
+
+msgid "Reviewed with comment"
+msgstr "Отчет контролера"
+
+msgid "Revise document"
+msgstr "На доработку"
+
+msgid "Revised version"
+msgstr "Исправленная версия"
+
+msgid "Revision date"
+msgstr "Дата пересмотра"
+
+msgid "Revoke"
+msgstr "Аннулировать"
+
+msgid "Revoke the document"
+msgstr "Аннулировать документ"
+
+msgid "Role"
+msgstr "Роль"
+
+msgid "Role: %s"
+msgstr "Роль: %s"
+
+msgid "Roles"
+msgstr "Роли"
+
+msgid "Rollback"
+msgstr "Откат состояния"
+
+msgid "Rollback step"
+msgstr "Откат шага"
+
+msgid "Root tasks tree"
+msgstr "Дерево корневых заданий"
+
+msgid "Rows"
+msgstr "Число строк"
+
+msgid "Running"
+msgstr "Выполняется"
+
+msgid "Running status"
+msgstr "Статус выполнения"
+
+msgid "Russian"
+msgstr "Русский"
+
+msgid "SMTP server"
+msgstr "SMTP сервер"
+
+msgid "Sa"
+msgstr "Сб"
+
+msgid "Same window"
+msgstr "То же самое окно"
+
+msgid "Satisfy request"
+msgstr "Удовлетворить запрос"
+
+msgid "Saturday"
+msgstr "Суббота"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Save anyway"
+msgstr "Сохранить всё равно"
+
+msgid "Save changes"
+msgstr "Сохранить изменения"
+
+msgid "Save document"
+msgstr "Сохранить документ"
+
+msgid "Save entry"
+msgstr "Сохранить запись"
+
+msgid "Save filter"
+msgstr "Сохранить фильтр"
+
+msgid "Save query"
+msgstr "Сохранить запрос"
+
+msgid "Save report"
+msgstr "Сохранить отчет"
+
+msgid "Save report to folder"
+msgstr "Сохранить отчет в папку"
+
+msgid "Save template"
+msgstr "Сохранить шаблон"
+
+msgid "Saved search profiles"
+msgstr "Сохраненные поисковые запросы"
+
+msgid "Saved filters"
+msgstr "Сохраненные фильтры"
+
+msgid "Schedule"
+msgstr "Расписание"
+
+msgid "Scheduled task"
+msgstr "Периодическое задание"
+
+msgid "Scheduler management"
+msgstr "Управление планировщиком"
+
+msgid "Script"
+msgstr "Сценарий"
+
+msgid "Script parameters"
+msgstr "Параметры сценария"
+
+msgid "Scripts"
+msgstr "Сценарии"
+
+msgid "Scripts folder"
+msgstr "Папка со сценариями"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Search direction"
+msgstr "Направление поиска"
+
+msgid "Search Profile"
+msgstr "Поисковый запрос"
+
+msgid "Search documents for revision"
+msgstr "Поиск документов подлежащих пересмотру"
+
+msgid "Search in all accessible documents (otherwise only in current folder)"
+msgstr "Поиск по всем доступным документам (в противном случае - только в текущей папке)"
+
+msgid "Search in attachments"
+msgstr "Поиск во вложениях"
+
+msgid "Search in attributes"
+msgstr "Поиск по реквизитам"
+
+msgid "Search in child categories"
+msgstr "Поиск в дочерних категориях"
+
+msgid "Search in document fields"
+msgstr "Поиск в полях документов"
+
+msgid "Search in documents"
+msgstr "Поиск в документах"
+
+msgid "Search in folder properties"
+msgstr "Поиск в свойствах папок"
+
+msgid "Search in properties"
+msgstr "Поиск в свойствах"
+
+msgid "Search in versions of documents"
+msgstr "Поиск в версиях документов"
+
+msgid "Search object"
+msgstr "Объект поиска"
+
+msgid "Search profiles"
+msgstr "Поисковые запросы"
+
+msgid "Search query has been saved."
+msgstr "Поисковый запрос сохранен."
+
+msgid "Search results"
+msgstr "Результаты поиска"
+
+msgid "Search results of normative documents for revision"
+msgstr "Результаты поиска документов подлежащих пересмотру"
+
+msgid "Search scope"
+msgstr "Область поиска"
+
+msgid "Search text"
+msgstr "Поиск текста"
+
+msgid "Searched word was not found on this page"
+msgstr "Искомое словое не найдено"
+
+msgid "Second"
+msgstr "Второй"
+
+msgid "Secondary news"
+msgstr "Вторичная новость"
+
+msgid "Security settings of a dismissed user cannot be modified."
+msgstr "Настройки безопасности удаленного пользователя не могут быть изменены."
+
+msgid "Select All"
+msgstr "Выделить все"
+
+msgid "Select category attributes (in the list boxes below) to which corresponding registry fields should be copied"
+msgstr "Выберите реквизитные поля категории (в выпадающих списках), в которые будут копироваться соответствующие поля журнала"
+
+msgid "Select content types allowed to switch into this category"
+msgstr "Укажите типы объектов, допускающие переключение в данную категорию"
+
+msgid "Select content types on which context is allowed to call script"
+msgstr "Укажите типы объектов, в контексте которых можно выполнить сценарий"
+
+msgid "Select day"
+msgstr "Укажите день"
+
+msgid "Select document"
+msgstr "Выбрать документ"
+
+msgid "Select division"
+msgstr "Выбрать подразделение"
+
+msgid "Select employee"
+msgstr "Выбрать сотрудника"
+
+msgid "Select entry"
+msgstr "Выбрать элемент"
+
+msgid "Select month"
+msgstr "Укажите месяц"
+
+msgid "Select one or more allowed categories first."
+msgstr "Укажите хотя бы одну допустимую категорию."
+
+msgid "Select one or more fields first"
+msgstr "Укажите хотя бы одно поле"
+
+msgid "Select one or more parameters first"
+msgstr "Укажите хотя бы однин параметр"
+
+msgid "Select one or more users first"
+msgstr "Укажите хотя бы одного пользователя"
+
+msgid "Select primary document"
+msgstr "Укажите главный документ"
+
+msgid "Select role"
+msgstr "Укажите роль"
+
+msgid "Select template"
+msgstr "Укажите шаблон"
+
+msgid "Select user"
+msgstr "Укажите пользователя"
+
+msgid "Select year"
+msgstr "Укажите год"
+
+msgid "Select your voting choice"
+msgstr "Выберите один из вариантов ответа"
+
+msgid "Selected action templates"
+msgstr "Выбранные шаблоны действий"
+
+msgid "Selected content types"
+msgstr "Выбранные типы объектов"
+
+msgid "Selected users"
+msgstr "Выбранные пользователи"
+
+msgid "Selection box height"
+msgstr "Высота поля выбора"
+
+msgid "Send"
+msgstr "Отправить"
+
+msgid "Send date"
+msgstr "Дата отправки"
+
+msgid "Send document as is, without modifications"
+msgstr "Отправить документ без изменений"
+
+msgid "Send e-mail messages"
+msgstr "Отправка сообщений электронной почты"
+
+msgid "Send email"
+msgstr "Отправить письмо"
+
+msgid "Send mail"
+msgstr "Отправить почту"
+
+msgid "Send notification"
+msgstr "Разослать уведомление"
+
+msgid "Send notification about transition perform"
+msgstr "Разослать уведомление о выполнении перехода"
+
+msgid "Send order"
+msgstr "Отправить заказ"
+
+
+msgid "Send partial document contents"
+msgstr "Отправить указанные элементы документа"
+
+msgid "Send password"
+msgstr "Отправить пароль"
+
+msgid "Send reminders"
+msgstr "Отправлять напоминания"
+
+msgid "Send queued email"
+msgstr "Доставка стоящей в очереди почты"
+
+msgid "Send report to e-mail address"
+msgstr "Отправить отчет на адрес электронной почты"
+
+msgid "Sender"
+msgstr "Отправитель"
+
+msgid "Sender address"
+msgstr "Адрес отправителя"
+
+msgid "Sender name"
+msgstr "Имя отправителя"
+
+msgid "Sent to users"
+msgstr "Направлено пользователям"
+
+msgid "Sep"
+msgstr "сентября"
+
+msgid "September"
+msgstr "Сентябрь"
+
+msgid "Server address"
+msgstr "Адрес сервера"
+
+msgid "Server type"
+msgstr "Тип сервера"
+
+msgid "Service type"
+msgstr "Тип сервиса"
+
+msgid "Session data was lost"
+msgstr "Промежуточные данные утеряны"
+
+msgid "Set"
+msgstr "Набор"
+
+msgid "setInitialTransition"
+msgstr "Установить начальный переход"
+
+msgid "Set Initial State"
+msgstr "Установить начальное состояние"
+
+msgid "Set association"
+msgstr "Ассоциировать"
+
+msgid "Set category attribute"
+msgstr "Изменить реквизитное поле категории"
+
+msgid "Set cell background"
+msgstr "Установить цвет фона ячейки"
+
+msgid "Set column background"
+msgstr "Установить цвет фона столбца"
+
+msgid "Set key columns"
+msgstr "Установить ключ"
+
+msgid "Set row background"
+msgstr "Установить цвет фона строки"
+
+msgid "Set the following value:"
+msgstr "Установить следующее значение:"
+
+msgid "Set timer"
+msgstr "Установить таймер"
+
+msgid "Set version state"
+msgstr "Состояние новой версии"
+
+msgid "Set work template"
+msgstr "Установить рабочий шаблон"
+
+msgid "Setting archive date"
+msgstr "Настройка даты списания"
+
+msgid "Setting effective date"
+msgstr "Настройка даты ввода"
+
+msgid "Setting revision date"
+msgstr "Настройка даты пересмотра"
+
+msgid "Setting the association will replace document text with text containing in the attachment"
+msgstr "Ассоциирование заменит текст документа текстом, содержащимся во вложении"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Settings have been changed"
+msgstr "Настройки изменены"
+
+msgid "Sheet"
+msgstr "Лист"
+
+msgid "Shortcut"
+msgstr "Ярлык"
+
+msgid "Shortcut to this object already exists in the Favorites."
+msgstr "Ярлык на этот объект уже существует в Избранном."
+
+msgid "Show"
+msgstr "Показать"
+
+msgid "Show ID field"
+msgstr "Показывать поле 'Идентификатор'"
+
+msgid "Show all"
+msgstr "Показать все"
+
+msgid "Show all records"
+msgstr "Показывать все записи"
+
+msgid "Show all versions of documents"
+msgstr "Показывать все версии документов"
+
+msgid "Show contents size in folder view"
+msgstr "Показывать размер объекта в папке"
+
+msgid "Show copyholders"
+msgstr "Показывать местонахождение"
+
+msgid "Show external editor buttons in folder view"
+msgstr "Показывать кнопки внешнего редактора в папке"
+
+msgid "Show finalized entries"
+msgstr "Показывать завершенные записи"
+
+msgid "Show finalized tasks"
+msgstr "Включить завершенные в список"
+
+msgid "Show navigation frame"
+msgstr "Отображать панель навигации"
+
+msgid "Show only editable entries"
+msgstr "Показывать только редактируемые записи"
+
+msgid "Show reports"
+msgstr "Показать"
+
+msgid "Show selected"
+msgstr "Показать выбранные"
+
+msgid "Show the difference between saved data and your data"
+msgstr "Показать различия между сохранёнными и Вашими данными"
+
+msgid "Show time"
+msgstr "Показывать время"
+
+msgid "Show users which allowed to access this object"
+msgstr "Показать пользователей, имеющих доступ к данному объекту"
+
+msgid "Sign"
+msgstr "Подписать"
+
+msgid "Sign the document"
+msgstr "Подписать документ"
+
+msgid "Signature request"
+msgstr "Запрос на подпись"
+
+msgid "Signature request for the document"
+msgstr "Запрос на подпись документа"
+
+msgid "Signed the document:"
+msgstr "Подписали документ:"
+
+msgid "Simple Document"
+msgstr "Простой Документ"
+
+msgid "Simple Publication"
+msgstr "Простая Публикация"
+
+msgid "Simple text"
+msgstr "Просто текст"
+
+msgid "Since document is locked, it was not saved."
+msgstr "Документ заблокирован, он не может быть сохранен."
+
+msgid "Site"
+msgstr "Сайт"
+
+msgid "Site Container"
+msgstr "Сайт"
+
+msgid "Site Image"
+msgstr "Изображение"
+
+msgid "Site added"
+msgstr "Сайт добавлен"
+
+msgid "Site configuration saved."
+msgstr "Настройки сайта сохранены."
+
+msgid "Site construction aborted"
+msgstr "Создание сайта прерванно"
+
+msgid "Site constructor"
+msgstr "Конструктор сайтов"
+
+msgid "Site content"
+msgstr "Содержимое сайта"
+
+msgid "Site presentation mode"
+msgstr "Режим отображения на внешнем сайте"
+
+msgid "Site settings"
+msgstr "Настройки сайта"
+
+msgid "Site statistics"
+msgstr "Статистика сайте"
+
+msgid "Site title"
+msgstr "Название сайта"
+
+msgid "Size"
+msgstr "Размер"
+
+msgid "Skin"
+msgstr "Вариант дизайна"
+
+msgid "Skin design"
+msgstr "Структура дизайна"
+
+msgid "Skin images"
+msgstr "Изображения дизайна"
+
+msgid "Skinned Folder"
+msgstr "Папка со скинами"
+
+msgid "Skip documents whose category does not match"
+msgstr "Пропускать документы, категория которых не совпадает"
+
+msgid "Some categories has dependent ones."
+msgstr "Некоторые из категорий имеют зависимые категории."
+
+msgid "Some messages were not sent due to errors."
+msgstr "Некоторые сообщения не были отправлены из-за ошибок."
+
+msgid "Some necessary addons are broken or absent"
+msgstr "Отсутствуют либо неисправны некоторые необходимые модули расширения"
+
+msgid "Some objects were not deleted. Possibly they are locked."
+msgstr "Не все выбранные объекты удалены. Возможно, они используются."
+
+msgid "Sorry, you can not create the document using template"
+msgstr "Извините, Вы не можете создать документ используя шаблон"
+
+msgid "Sorry, you can not create subordinate document, because no subordinate category"
+msgstr "Извините, Вы не можете создать подчиненный документ, потому что нет подчиненных категорий"
+
+msgid "Sorry, your browser does not support frames"
+msgstr "Извините, ваш браузер не поддерживает фреймы"
+
+msgid "Source"
+msgstr "Источник"
+
+msgid "Special counter value, where nn - optional parameter, number of digits of the counter. This counter starts from 1 each new day"
+msgstr "Значение специального счетика, где nn - число цифр (необязательный параметр). Нумерация этого счетчика начинается с 1 каждый новый день"
+
+msgid "Special search"
+msgstr "Специальный поиск"
+
+msgid "Specify the document title"
+msgstr "Пожайлуста, укажите заголовок документа"
+
+msgid "Specify the folder path"
+msgstr "Пожайлуста, укажите путь к папке"
+
+msgid "Specify the folder title"
+msgstr "Пожайлуста, укажите заголовок папки"
+
+msgid "Specify the site title"
+msgstr "Пожайлуста, укажите название сайта"
+
+msgid "StaffList.associate_user"
+msgstr "Пользователь"
+
+msgid "StaffList.department_list_directory"
+msgstr "Отделы"
+
+msgid "StaffList.deputy"
+msgstr "Заместитель"
+
+msgid "StaffList.disable_for_permissions"
+msgstr "Не доступен для прав доступа"
+
+msgid "StaffList.disable_for_properties"
+msgstr "Не доступен для реквизитов"
+
+msgid "StaffList.disable_for_task"
+msgstr "Не доступен для заданий"
+
+msgid "StaffList.division"
+msgstr "Подразделение"
+
+msgid "StaffList.employee"
+msgstr "Сотрудник"
+
+msgid "StaffList.employee_f"
+msgstr "Фамилия"
+
+msgid "StaffList.employee_i"
+msgstr "Имя"
+
+msgid "StaffList.employee_list_directory"
+msgstr "ФИО сотрудников"
+
+msgid "StaffList.employee_o"
+msgstr "Отчество"
+
+msgid "StaffList.position"
+msgstr "Должность"
+
+msgid "StaffList.post_list_directory"
+msgstr "Должности"
+
+msgid "StaffList.staff_list_directory"
+msgstr "Справочник оргструктуры"
+
+msgid "Staff list"
+msgstr "Оргструктура"
+
+msgid "Standard Resource Metadata"
+msgstr "Описание объекта"
+
+msgid "Standard attributes"
+msgstr "Стандартные реквизиты"
+
+msgid "Start"
+msgstr "Начало"
+
+msgid "Start message delivery"
+msgstr "Начать доставку сообщения"
+
+msgid "Start working on the task"
+msgstr "Принять к исполнению"
+
+msgid "State"
+msgstr "Состояние"
+
+msgid "State added"
+msgstr "Состояние добавлено"
+
+msgid "State changed"
+msgstr "Состояние изменено"
+
+msgid "State history"
+msgstr "Журнал состояний"
+
+msgid "State permissions"
+msgstr "Полномочия в состоянии"
+
+msgid "State permissions changed"
+msgstr "Полномочия в состоянии изменены"
+
+msgid "State properties"
+msgstr "Свойства состояния"
+
+msgid "State properties changed"
+msgstr "Свойства состояния изменены"
+
+msgid "States"
+msgstr "Состояния"
+
+msgid "State(s) removed"
+msgstr "Состояние удалено"
+
+msgid "Statistics"
+msgstr "Статистика"
+
+msgid "Statistics Pages"
+msgstr "Статистика по страницам"
+
+msgid "Statistics for today"
+msgstr "Статистика за сегодня"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Step"
+msgstr "Шаг"
+
+msgid "Step added"
+msgstr "Шаг добавлен"
+
+msgid "Step changed"
+msgstr "Шаг изменен"
+
+msgid "Step moved down to the queue"
+msgstr "Шаг перемещен вниз очереди"
+
+msgid "Step moved up to the queue"
+msgstr "Шаг перемещен вверх очереди"
+
+msgid "Step options changed"
+msgstr "Настройки шага сохранены"
+
+msgid "Storage folder name"
+msgstr "Хранилище документов"
+
+msgid "Store members"
+msgstr "Хранить пользователей"
+
+msgid "Store no more than"
+msgstr "хранить не более"
+
+msgid "Storefront"
+msgstr "Витрина"
+
+msgid "Strikethrough"
+msgstr "Зачеркнутый"
+
+msgid "Style"
+msgstr "Стиль"
+
+msgid "Su"
+msgstr "Вс"
+
+msgid "Subfolder"
+msgstr "Подпапка"
+
+msgid "Subject"
+msgstr "Тема"
+
+msgid "Subordinate documents"
+msgstr "Подчиненные документы"
+
+msgid "Subscribe"
+msgstr "Подписаться"
+
+msgid "Subscribe selected users for this topic"
+msgstr "Подписать выбранных пользователей на текущую тему"
+
+msgid "Subscribe user"
+msgstr "Новый подписчик"
+
+msgid "Subscribed users"
+msgstr "Подписчики"
+
+msgid "Subscribed users to folder updates"
+msgstr "Подписавшиеся на обновления в папке"
+
+msgid "Subscribers"
+msgstr "Подписчики"
+
+msgid "Subscript"
+msgstr "Нижний регистр"
+
+msgid "Subscription Folder"
+msgstr "Папка с рассылками"
+
+msgid "Subscription Root"
+msgstr "Корень рассылок"
+
+msgid "Subscription data has been changed."
+msgstr "Данные подписки изменены."
+
+msgid "Subscription folder added."
+msgstr "Папка для рассылки добавлена."
+
+msgid "Subscription root added."
+msgstr "Корень рассылок добавлен."
+
+msgid "Subscription root not found."
+msgstr "Корень рассылок не найден."
+
+msgid "Subscription to document updates"
+msgstr "Подписка на обновления документа"
+
+msgid "Subscription to folder updates"
+msgstr "Подписка на обновления папки"
+
+msgid "Subtask"
+msgstr "Подзадание"
+
+msgid "Subtask #"
+msgstr "Подзадание №"
+
+msgid "Suggested file"
+msgstr "Файл предложения"
+
+msgid "Summary report"
+msgstr "Общий отчет"
+
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgid "Superscript"
+msgstr "Верхний регистр"
+
+msgid "Supervised tasks"
+msgstr "Необходимо проконтролировать задания"
+
+msgid "Supervisor"
+msgstr "Контролер"
+
+msgid "Supervisor mark"
+msgstr "Отметка контролера"
+
+msgid "Supported formats are"
+msgstr "Поддерживаемые форматы"
+
+msgid "Switch step"
+msgstr "Следующее состояние"
+
+msgid "System field"
+msgstr "Системное поле"
+
+msgid "System folders"
+msgstr "Системные папки"
+
+msgid "System login name"
+msgstr "Под этим именем пользователь будет зарегистрирован в системе "
+
+msgid "System specifies user email at the footer of all his(her) documents"
+msgstr "Адрес электронной почты пользователя будет указываться во всех созданных им документах "
+
+msgid "Table align center"
+msgstr "Выравнивание таблицы по центру"
+
+msgid "Table align left"
+msgstr "Выравнивание таблицы по левому краю"
+
+msgid "Table align right"
+msgstr "Выравнивание таблицы по правому краю"
+
+msgid "Table properties"
+msgstr "Свойства таблицы"
+
+msgid "Tabular Report"
+msgstr "Табличный отчет"
+
+msgid "Tabular report"
+msgstr "Табличный отчет"
+
+msgid "Take ownership"
+msgstr "Изменить владельца"
+
+msgid "Target"
+msgstr "Цель"
+
+msgid "Task"
+msgstr "Задание"
+
+msgid "Task Item"
+msgstr "Задание"
+
+msgid "Task closed"
+msgstr "Задание завершено"
+
+msgid "Task control"
+msgstr "Присвоенные задания"
+
+msgid "Task description"
+msgstr "Описание"
+
+msgid "Task elaboration form"
+msgstr "Форма детализации задания"
+
+msgid "Task has been finalized by"
+msgstr "Задание завершено пользователем"
+
+msgid "Task info"
+msgstr "Параметры задания"
+
+msgid "Task is closed"
+msgstr "Задание завершено"
+
+msgid "Task item added"
+msgstr "Задание добавлено"
+
+msgid "Task item removed"
+msgstr "Задание удалено"
+
+msgid "Task properties to display"
+msgstr "Отображаемые параметры заданий"
+
+msgid "Task removed"
+msgstr "Задание удалено"
+
+msgid "Task result"
+msgstr "Результат выполнения"
+
+msgid "Task status changed"
+msgstr "Задание изменено"
+
+msgid "Task structure"
+msgstr "Структура задания"
+
+msgid "Task template '%(task)s' is not configured properly."
+msgstr "Шаблон действия '%(task)s' неверно настроен."
+
+msgid "Task title"
+msgstr "Название"
+
+msgid "Task type"
+msgstr "Тип задания"
+
+msgid "Tasks"
+msgstr "Задания"
+
+msgid "tasks of"
+msgstr "заданий из"
+
+msgid "Tasks assigned"
+msgstr "Назначено заданий"
+
+msgid "Tasks progress report"
+msgstr "Статистика выполнения"
+
+msgid "Tasks report"
+msgstr "Отчет по заданиям"
+
+msgid "Task revision is needed"
+msgstr "Необходимо проконтролировать задание"
+
+msgid "Tasks to include into the general report"
+msgstr "Задания, необходимые для включения в общий отчет"
+
+msgid "Tasks type"
+msgstr "Тип заданий"
+
+msgid "Tasks you are involved in"
+msgstr "Вы участник следующих заданий"
+
+msgid "Technologist manual"
+msgstr "Руководство технолога"
+
+msgid "Template"
+msgstr "Форма отчета"
+
+msgid "Template(s) deleted"
+msgstr "Шаблоны удалены"
+
+msgid "Template fields"
+msgstr "Поля шаблона"
+
+msgid "Template list"
+msgstr "Сохраненные шаблоны"
+
+msgid "Template name"
+msgstr "Имя шаблона"
+
+msgid "Template title"
+msgstr "Заголовок шаблона"
+
+msgid "Template with such name already exist"
+msgstr "Шаблон с таким именем уже существует"
+
+msgid "Templates"
+msgstr "Шаблоны"
+
+msgid "Templates for the documents"
+msgstr "Шаблоны для документов"
+
+msgid "Test"
+msgstr "Тестирование"
+
+msgid "Test delivery"
+msgstr "Пробная доставка"
+
+msgid "Test patterns"
+msgstr "Шаблоны"
+
+msgid "Test script"
+msgstr "Тестировать сценарий"
+
+msgid "Test type"
+msgstr "Тип проверки"
+
+msgid "Text"
+msgstr "Текст"
+
+msgid "Th"
+msgstr "Чт"
+
+msgid "Thank you for choosing NauDoc!"
+msgstr "Благодарим Вас за выбор NauDoc!"
+
+msgid "Thank you. Your vote have accounted."
+msgstr "Спасибо. Ваш голос учтен."
+
+msgid "The 'nomenclative number' property in the folder not specified."
+msgstr "В папке не указано свойство 'номенклатурный номер'."
+
+msgid "The 'postfix' property in the document's category not specified."
+msgstr "В категории документа не указано свойство 'постфикс'."
+
+msgid "The 'postfix' property in the folder not specified."
+msgstr "В папке не указано свойство 'постфикс'."
+
+msgid "The association with attachment has been added."
+msgstr "Создана ассоциация с вложением."
+
+msgid "The association with attachment has been removed."
+msgstr "Ассоциация с вложением удалена."
+
+msgid "The attachment has been removed."
+msgstr "Вложенный файл удален."
+
+msgid "The attribute %(name)s already exists."
+msgstr "Реквизит %(name)s уже существует."
+
+msgid "The attribute values in all existing objects will be reset whenever the realm is changed."
+msgstr "Значения реквизита во всех существующих объектах будут сброшены в случае изменения области."
+
+msgid "The branch contains no entries."
+msgstr "Узел не содержит элементов."
+
+msgid "The current value of counter - %(value)s (leave without modification)"
+msgstr "Текущее значение счётчика - %(value)s (оставить без изменения)"
+
+msgid "The difference between saved data and your data"
+msgstr "Различия между сохраненными и Вашими данными"
+
+msgid "The directory contains no entries."
+msgstr "Справочник не содержит элементов."
+
+msgid "The document becomes visible only to the author"
+msgstr "Чтение документа станет доступно только автору"
+
+msgid "The document contains text"
+msgstr "Документ содержит текст"
+
+msgid "The document depends on current"
+msgstr "Документ зависит от текущего"
+
+msgid "The document is associated with MSWord attachment"
+msgstr "Документ ассоциирован с вложением в формате MsWord"
+
+msgid "The document is associated with attached file"
+msgstr "Документ ассоциирован с вложенным файлом"
+
+msgid "The document is distributed"
+msgstr "Документ разослан"
+
+msgid "The email is sent."
+msgstr "Письмо отправлено."
+
+msgid "The file has been attached."
+msgstr "Файл добавлен во вложения."
+
+msgid "The file has been locked."
+msgstr "Файл зафиксирован."
+
+msgid "The file has not been locked."
+msgstr "Файл не был зафиксирован."
+
+msgid "The filtering is off"
+msgstr "Фильтр отображения не используется"
+
+msgid "The first thing you should do is to visit %(1)sthe portal configuration form%(2)s. %(3)s Then open %(4)sthe users management interface%(5)s and define portal users."
+msgstr "Для того, чтобы начать работу с системой, Вам необходимо посетить %(1)sстраницу настройки портала%(2)s. %(3)s После этого откройте %(4)sинтерфейс управления пользователями%(5)s и задайте пользователей системы."
+
+msgid "The following tasks will be assigned"
+msgstr "Следующие задачи будут назначены"
+
+msgid "The following tasks will be assigned on initial transition"
+msgstr "Следующие задачи будут назначены на начальном переходе"
+
+msgid "The following users are allowed to access this object"
+msgstr "Следующие пользователи имеют доступ к данному объекту"
+
+msgid "The following users are subscribed for document changes notifications"
+msgstr "Следующие пользователи подписались на уведомления об обновлениях документа"
+
+msgid "The help document"
+msgstr "Справочный документ"
+
+msgid "The login name you selected is already in use or is not valid. Please choose another."
+msgstr "Введенное Вами имя пользователя уже существует или неверно. Пожалуйста, укажите другое."
+
+msgid "The new user's home folder already exists."
+msgstr "Личная папка нового пользователя уже существует."
+
+msgid "The object %(object)s cannot by linked to itself using relation "%(relation)s"."
+msgstr "Объект %(object)s не может ссылаться на самого себя, используя отношение "%(relation)s"."
+
+msgid "The object shortcut is referenced to cannot be found. This object has probably been deleted or transferred."
+msgstr "Объект, на который ссылается ярлык, не может быть найден. Возможно, этот объект был удален или перемещен."
+
+msgid "The parameter's value will be obtained from context variable"
+msgstr "Значение параметра будет получено из переменной контекста"
+
+msgid "The script is tested successfully."
+msgstr "Тестирование сценария прошло успешно."
+
+msgid "The selected permissions are managed by this workflow. The role to permission mappings for an object in this workflow depend on its state."
+msgstr "Выбранными правами доступа вы сможете оперировать в настройках категорий. Зависимость имеющихся полномочий от ролей определяется состоянием объекта."
+
+msgid "The user account will be placed into the selected group. This membership is permanent and cannot be changed later."
+msgstr "Учетная запись будет помещена в выбранную группу. Принадлежность к этой группе постоянна и не может быть изменена."
+
+msgid "The user will be a member of the selected groups. This list can be changed at any time."
+msgstr "Группы, в которые будет входить пользователь. В дальнейшем этот список может быть изменен."
+
+msgid "The version you are editing is outdated. This document has a newer version %s. Press OK to edit the newer version. Press Cancel to continue editing current version."
+msgstr "Версия, которую вы редактируете, устарела. Документ имеет более новую версию %s. Нажмите ОК для редактирования более новой версии. Нажмите Отмена чтобы продолжить редактирование текущей версии."
+
+msgid "There are idle users. Every user must have a task assigned."
+msgstr "Есть ответственные пользователи не задействованные в назначаемых заданиях."
+
+msgid "There are linked documents"
+msgstr "Имеются связанные документы"
+
+msgid "There are no available versions."
+msgstr "Нет доступных версий."
+
+msgid "There are no documents matching your query"
+msgstr "Не найдено документов, удовлетворяющих вашему запросу"
+
+msgid "There are no documents yet"
+msgstr "Документы отсутствуют"
+
+msgid "There are no entries matching your query"
+msgstr "По вашему запросу записей не найдено"
+
+msgid "There are no entries yet"
+msgstr "Записи отсутствуют"
+
+msgid "There are no groups yet"
+msgstr "Группы отсуствуют"
+
+msgid "There are no old version registries available"
+msgstr "Не найдено доступных журналов старого образца"
+
+msgid "There are no registered users"
+msgstr "Зарегистрированные пользователи отсутствуют"
+
+msgid "There are no registries available for you"
+msgstr "Доступные для записи журналы отсутствуют"
+
+msgid "There are no reports matching your query"
+msgstr "По вашему запросу отчетов не найдено"
+
+msgid "There are no reports yet"
+msgstr "Отчеты отсутствуют"
+
+msgid "There are no rollback steps defined"
+msgstr "Откат данного шага не предусмотрен"
+
+msgid "There are no subscribed users to updates in this folder"
+msgstr "На обновления в данной папке подписанных пользователей нет"
+
+msgid "There are no subtasks assigned"
+msgstr "Назначенные подзадания отсутствуют"
+
+msgid "There are no tasks assigned"
+msgstr "Назначенные задания отсутствуют"
+
+msgid "There are no transactions that can be undone."
+msgstr "Нет действий, которые могут быть отменены."
+
+msgid "There are no transitions you may subscribe"
+msgstr "Отсутствуют переходы, на которые можно подписаться"
+
+msgid "There are no users allowed to access this object"
+msgstr "Документ не доступен ни одному пользователю"
+
+msgid "There are no users subscribed for document changes notifications"
+msgstr "Ни один пользователь не подписан на уведомления об изменениях документа"
+
+msgid "There are tasks with no users involved!"
+msgstr "Некоторые задания не имеют участников!"
+
+msgid "These links will be broken"
+msgstr "Следующие ссылки будут нарушены"
+
+msgid "These links will be removed"
+msgstr "Следующие ссылки будут удалены"
+
+msgid "Third"
+msgstr "Третий"
+
+msgid "This address is the canonical URL for the portal Web-server."
+msgstr "Этот адрес является основным URL для веб-сервера портала."
+
+msgid "This application's transactional feature allows you to easily undo changes made to the application's settings or data. You can revert the application to a 'snapshot' of it's state at a previous point in time."
+msgstr "Вы можете отменить любое действие, когда-либо выполненное Вами в данном приложении."
+
+msgid "This content is filtered by"
+msgstr "При отображении используется фильтр"
+
+msgid "This document has been locked because it is being edited by another user."
+msgstr "Документ заблокирован, его в данный момент редактирует другой пользователь."
+
+msgid "This folder contains DTML templates for messaging."
+msgstr "Эта папка содержит DTML-шаблоны сообщений."
+
+msgid "This folder contains document templates for categories."
+msgstr "Эта папка содержит шаблоны для категорий документов."
+
+msgid "This folder contains documents added to the new user folders."
+msgstr "Эта папка содержит документы, копируемые в папки новых пользователей."
+
+msgid "This folder contains personal folders of the users."
+msgstr "Эта папка содержит личные папки пользователей."
+
+msgid "This folder contains portal directory objects."
+msgstr "Эта папка содержит справочники портала."
+
+msgid "This folder contains scripts."
+msgstr "Эта папка содержит сценарии."
+
+msgid "This group has no members."
+msgstr "В этой группе нет пользователей."
+
+msgid "This identifier is already in use."
+msgstr "Этот идентификатор уже используется."
+
+msgid "This identifier is not valid."
+msgstr "Этот идентификатор недопустим."
+
+msgid "This identifier is reserved."
+msgstr "Этот идентификатор зарезервирован."
+
+msgid "This is the address of your local IMAP4 (incoming mail) server."
+msgstr "Адрес вашего сервера IMAP4 (для входящей почты)."
+
+msgid "This is the address of your local POP3 (incoming mail) server."
+msgstr "Адрес вашего сервера POP3 (для входящей почты)."
+
+msgid "This is the address of your local SMTP (outgoing mail) server."
+msgstr "Адрес вашего сервера SMTP (для исходящей почты)."
+
+msgid "This is the title which appears at the top of every portal page."
+msgstr "Эта строка появится в заголовке каждой страницы."
+
+msgid "This object cannot be pasted into itself"
+msgstr "Объект не может быть перемещён сам в себя"
+
+msgid "This program is a licensed software.\n Terms and conditions of its copying, distribution and modification are covered by the %(license)s license as published by %(company)s company."
+msgstr "Эта программа является лицензируемым программным обеспечением.\n Условия её копирования, распространения и модифицикации определяются лицензионным соглашением %(license)s компании %(company)s."
+
+msgid "This program is free software; you can redistribute it and/or modify it under the terms of the %(license)s as published by %(company)s company."
+msgstr "Эта программа является свободным программным обеспечением; Вы можете распространять и/или модифицировать её согласно условиям %(license)s компании %(company)s."
+
+msgid "This task"
+msgstr "Текущее задание"
+
+msgid "This will find text in items' contents, title and description."
+msgstr "Поиск производится в заголовке, описании и теле документа."
+
+msgid "Thursday"
+msgstr "Четверг"
+
+msgid "Till date"
+msgstr "По"
+
+msgid "Till:"
+msgstr "По:"
+
+msgid "TimeStamp"
+msgstr "Дата создания"
+
+msgid "Title"
+msgstr "Заголовок"
+
+msgid "Title template"
+msgstr "Шаблон заголовка"
+
+msgid "To"
+msgstr "До"
+
+msgid "To edit the attachment follow this link"
+msgstr "Для редактирования перейдите по этой ссылке"
+
+msgid "To view all results at one page you can enter 0 value"
+msgstr "Для просмотра всех результатов на одной странице вы можете ввести 0"
+
+msgid "Today"
+msgstr "Сегодня"
+
+msgid "Toggle navigation panel"
+msgstr "Панель навигации"
+
+msgid "Tools"
+msgstr "Сервис"
+
+msgid "Top level contains"
+msgstr "Верхний уровень содержит"
+
+msgid "Topic"
+msgstr "Тема"
+
+msgid "Total"
+msgstr "Всего"
+
+msgid "Total object size is"
+msgstr "Общий размер:"
+
+msgid "Total objects"
+msgstr "Всего объектов"
+
+msgid "Total votes"
+msgstr "Всего голосов"
+
+msgid "Trackable pages"
+msgstr "Отслеживаемые страницы"
+
+msgid "Trackable users"
+msgstr "Отслеживаемые пользователи"
+
+msgid "Transaction(s) undone"
+msgstr "Действие отменено"
+
+msgid "Transition"
+msgstr "Переход"
+
+msgid "Transition added"
+msgstr "Переход добавлен"
+
+msgid "Transition(s) removed"
+msgstr "Переход удален"
+
+msgid "Transition properties changed"
+msgstr "Свойства перехода изменены"
+
+msgid "Transitions"
+msgstr "Переходы"
+
+msgid "Trigger workflow method"
+msgstr "Выполняется автоматически при вызове метода"
+
+msgid "Try to associate document with file text"
+msgstr "Попытаться ассоциировать документ с текстом файла"
+
+msgid "Try to send again later"
+msgstr "Попытайтесь отослать позже"
+
+msgid "Tu"
+msgstr "Вт"
+
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgid "Turn Off"
+msgstr "Выключить"
+
+msgid "Turn On"
+msgstr "Включить"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Type of the return value"
+msgstr "Тип возвращаемого значения"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Unable to create Favorites folder"
+msgstr "Ошибка создания папки Избранное"
+
+msgid "Underline"
+msgstr "Подчеркнутый"
+
+msgid "Undo"
+msgstr "Отмена"
+
+msgid "Undo Transactions"
+msgstr "Отмена изменений"
+
+msgid "Unidirectional dependence"
+msgstr "Однонаправленная зависимость"
+
+msgid "Union"
+msgstr "Объединение"
+
+msgid "Unique ID"
+msgstr "Уникальный ID"
+
+msgid "Uniqueness"
+msgstr "Уникальность"
+
+msgid "Unknown document"
+msgstr "Неизвестный документ"
+
+msgid "Unlock"
+msgstr "Разблокировать"
+
+msgid "Unlock document"
+msgstr "Разблокировать документ"
+
+msgid "Unordered list"
+msgstr "Маркеры"
+
+msgid "Unpublish"
+msgstr "Снять с публикации"
+
+msgid "Unread"
+msgstr "Непрочитанный документ"
+
+msgid "Unregister selected documents"
+msgstr "Отменить регистрацию выбранных документов"
+
+msgid "unsetInitialTransition"
+msgstr "Cнять начальный переход"
+
+msgid "Unset Initial State"
+msgstr "Cнять начальное состояние"
+
+msgid "Unsubscribe"
+msgstr "Отписаться"
+
+msgid "Up"
+msgstr"Вверх"
+
+msgid "Update remote site"
+msgstr "Обновить внешний сайт"
+
+msgid "Update role mappings immediately"
+msgstr "Обновить зависимости ролей немедленно"
+
+msgid "Update this page"
+msgstr "Обновить страницу"
+
+msgid "Upload File"
+msgstr "Отправить файл"
+
+msgid "Usage"
+msgstr "Использование"
+
+msgid "Use LDAP authentication"
+msgstr "Использовать аутентификацию LDAP"
+
+msgid "Use LDAP groups"
+msgstr "Использовать группы LDAP"
+
+msgid "Use SMTP authentication"
+msgstr "Использовать SMTP аутентификацию"
+
+msgid "Use allowed categories list from the parent folder"
+msgstr "Использовать список допустимых категорий из родительской папки"
+
+msgid "Use as main filter"
+msgstr "Основной фильтр"
+
+msgid "use confirmation queue"
+msgstr "запрашивать согласование по маршруту"
+
+msgid "Use confirmation queue"
+msgstr "Запрашивать согласование по маршруту"
+
+msgid "Use inheritance"
+msgstr "Использовать наследование"
+
+msgid "Use of this option slows down folder contents displaying"
+msgstr "Использование этой опции замедляет отображение содержимого папки"
+
+msgid "Use permission settings from parents"
+msgstr "Использовать настройки прав доступа родителей"
+
+msgid "Use template on document creation"
+msgstr "Использовать шаблон при создании документов"
+
+msgid "Use type defaults"
+msgstr "Параметры журнала по умолчанию"
+
+msgid "User"
+msgstr "Пользователь"
+
+msgid "User '%s' has changed the document '%s'"
+msgstr "Пользователь '%s' изменил документ '%s'"
+
+msgid "User '%s' has performed transition '%s' on the document '%s'"
+msgstr "Пользователь '%s' выполнил переход '%s' на документе '%s'"
+
+msgid "User can edit only additional fields values"
+msgstr "Пользователь может редактировать только дополнительные поля"
+
+msgid "User folder name"
+msgstr "Название личной папки "
+
+msgid "User groups"
+msgstr "Группы пользователей"
+
+msgid "User has been added"
+msgstr "Пользователь добавлен в систему"
+
+msgid "User info"
+msgstr "Информация о пользователе"
+
+msgid "User info is empty"
+msgstr "Нет информации о пользователе"
+
+msgid "User manual"
+msgstr "Руководство пользователя"
+
+msgid "User manual. Part %(part)d"
+msgstr "Руководство пользователя. Часть %(part)d"
+
+msgid "User object classes"
+msgstr "Классы записей пользователей"
+
+msgid "User registration"
+msgstr "Регистрация пользователя"
+
+msgid "User tasks list"
+msgstr "Список заданий пользователя"
+
+msgid "User with such email exists."
+msgstr "Пользователь с таким адресом уже существует."
+
+msgid "User with such email not found."
+msgstr "Пользователя с заданным адресом не найдено."
+
+msgid "User(s) accepted the task"
+msgstr "Приняли к исполнению"
+
+msgid "User(s) committed to a task"
+msgstr "Выполнили задание"
+
+msgid "User(s) deleted"
+msgstr "Пользователи удалены"
+
+msgid "User(s) failed to commit task"
+msgstr "Не справились с заданием"
+
+msgid "User(s) familiarized with the document"
+msgstr "Ознакомились с заданием"
+
+msgid "User(s) finalized a task"
+msgstr "Отчеты о завершении"
+
+msgid "User(s) finalized the request"
+msgstr "Отчеты о завершении"
+
+msgid "User(s) locked"
+msgstr "Пользователи заблокированы"
+
+msgid "User(s) published the document"
+msgstr "Опубликовали документ"
+
+msgid "User(s) rejected a task"
+msgstr "Отказались от выполнения"
+
+msgid "User(s) rejected the publication"
+msgstr "Отказали в публикации"
+
+msgid "User(s) rejected the request"
+msgstr "Отклонили запрос"
+
+msgid "User(s) rejected to sign"
+msgstr "Отказались подписывать"
+
+msgid "User(s) reviewed a task"
+msgstr "Отчеты контролера"
+
+msgid "User(s) satisfied the request"
+msgstr "Удовлетворили запрос"
+
+msgid "User(s) signed the document"
+msgstr "Подписали документ"
+
+msgid "User(s) unlocked"
+msgstr "Пользователи разблокированы"
+
+msgid "User(s) working on the task"
+msgstr "Приняли к исполнению"
+
+msgid "Users"
+msgstr "Пользователи"
+
+msgid "Users are not selected"
+msgstr "Не выбраны пользователи"
+
+msgid "Users base DN"
+msgstr "Базовое имя пользователей (DN)"
+
+msgid "Users conflict"
+msgstr "Конфликт пользователей"
+
+msgid "Users search filter"
+msgstr "Фильтр поиска пользователей"
+
+msgid "Users search scope"
+msgstr "Область поиска пользователей"
+
+msgid "Using dates list"
+msgstr "По списку дат"
+
+msgid "Valid Sender"
+msgstr "Допустимый отправитель"
+
+msgid "Value"
+msgstr "Значение"
+
+msgid "Value of '%(attr_title)s' attribute is empty. Transition not permitted."
+msgstr "Значение реквизита '%(attr_title)s' пусто. Переход не допустим."
+
+msgid "Value of the derived attribute"
+msgstr "Значение производного реквизита"
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "VersionOwner"
+msgstr "Владелец версии"
+
+msgid "Versions"
+msgstr "Версии"
+
+msgid "Vertical align bottom"
+msgstr "Вертикальное выравнивание в ячейке по нижнему краю"
+
+msgid "Vertical align middle"
+msgstr "Вертикальное выравнивание в ячейке по центру"
+
+msgid "Vertical align top"
+msgstr "Вертикальное выравнивание в ячейке по верхнему краю"
+
+msgid "Vertical space"
+msgstr "Отступ по вертикали"
+
+msgid "View"
+msgstr "Вид"
+
+msgid "View as default"
+msgstr "Вид по умолчанию"
+
+msgid "View as list"
+msgstr "В виде списка"
+
+msgid "View as outgoing"
+msgstr "Вид сквозной"
+
+msgid "View as table"
+msgstr "Вид как таблица"
+
+msgid "View as tree"
+msgstr "В виде дерева"
+
+msgid "View attributes"
+msgstr "Просмотр реквизитных полей"
+
+msgid "View error log entry"
+msgstr "Просмотреть запись в протоколе ошибок"
+
+msgid "View filter"
+msgstr "Фильтр отображения"
+
+msgid "View report"
+msgstr "Просмотреть отчет"
+
+msgid "View reports"
+msgstr "Просмотр"
+
+msgid "View subscribed users"
+msgstr "Подписанные пользователи"
+
+msgid "View task"
+msgstr "Просмотреть задание"
+
+msgid "View this entry as text"
+msgstr "Просмотреть эту запись в текстовом виде"
+
+msgid "Viewing order"
+msgstr "Порядок просмотра"
+
+msgid "Virtual Document"
+msgstr "Виртуальный документ"
+
+msgid "Visible"
+msgstr "Показывать"
+
+msgid "Vote"
+msgstr "Голосовать"
+
+msgid "Voting"
+msgstr "Голосование"
+
+msgid "Voting choices"
+msgstr "Варианты ответов"
+
+msgid "Warning! The document is pending for confirmation. State change will cancel all confirmation requests"
+msgstr "Внимание! Документ ожидает согласования. Изменение статуса приведет к отзыву Ваших запросов на согласование"
+
+msgid "We"
+msgstr "Ср"
+
+msgid "We apologize for inconvenience."
+msgstr "Приносим свои извинения за доставленные неудобства."
+
+msgid "Document management system"
+msgstr "Система электронного документооборота"
+
+msgid "Web presentation"
+msgstr "Отображение на сайте"
+
+msgid "WebDAV Lock items"
+msgstr "Установить WebDAV блокировку"
+
+msgid "WebDAV Unlock items"
+msgstr "Снять WebDAV блокировку"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "Weekly at %(time)s every %(week_days)s"
+msgstr "Еженедельно в %(week_days)s в %(time)s"
+
+msgid "When the portal generates mail, it uses this address as its (apparent) return address."
+msgstr "При создании почтовых сообщений портал будет использовать указанный адрес в качестве обратного адреса."
+
+msgid "When the portal generates mail, it uses this name as its (apparent) sender."
+msgstr "При создании почтовых сообщений портал будет использовать указанное имя в качестве имени отправителя."
+
+msgid "Width"
+msgstr "Ширина"
+
+msgid "With no user selected the document will be fixed immediately"
+msgstr "При отсутствии отмеченных пользователей документ будет зафиксирован без согласования"
+
+msgid "With response"
+msgstr "С ответом"
+
+msgid "Work template"
+msgstr "Рабочий шаблон"
+
+msgid "Work template selected"
+msgstr "Рабочий шаблон установлен"
+
+msgid "Workflow history chart"
+msgstr "История движения документа"
+
+msgid "Workshop"
+msgstr "Цех"
+
+msgid "Write"
+msgstr "Запись"
+
+msgid "Writer"
+msgstr "Писатель"
+
+msgid "Writers are able to modify group document"
+msgstr "Групповой документ может изменяться всеми писателями текущей темы"
+
+msgid "Year with century as a decimal number"
+msgstr "Год (4 цифры)"
+
+msgid "Year without century as a decimal number"
+msgstr "Год (2 последних цифры)"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "Yes/No"
+msgstr "Да/Нет"
+
+msgid "Yesterday"
+msgstr "Вчера"
+
+msgid "You already receive announcements from either this or parent topic."
+msgstr "Вы уже получаете сообщения из этой или одной из тем верхнего уровня."
+
+msgid "You are a supervisor of the following tasks:"
+msgstr "Вы назначены контролером следующих заданий:"
+
+msgid "You are able to create one of the following tasks"
+msgstr "Вы можете создать следующие виды заданий"
+
+msgid "You are able to register this document in the following registries"
+msgstr "Вы можете зарегистрировать документ в следующих журналах"
+
+msgid "You are assigned to participate in this task."
+msgstr "Вы являетесь участником данного задания."
+
+msgid "You are involved into the following tasks:"
+msgstr "Вы ответственны за следующие задания:"
+
+msgid "You are logged in outside the portal."
+msgstr "Ваш сеанс зарегистрирован вне портала."
+
+msgid "You are logged out of the portal."
+msgstr "Ваш сеанс работы в системе завершен."
+
+msgid "You are not allowed to change your own access rights."
+msgstr "Вы не можете изменить собственные права доступа."
+
+msgid "You are not allowed to edit the attachment"
+msgstr "Вы не можете редактировать вложенный файл"
+
+msgid "You are not allowed to edit this field"
+msgstr "У вас нет прав на изменение этого поля"
+
+msgid "You are not allowed to paste '%(type)s' objects here"
+msgstr "У вас нет прав для вставки объектов '%(type)s' в данную папку"
+
+msgid "You are not allowed to read this field"
+msgstr "У вас нет прав на чтение этого поля"
+
+msgid "You are not allowed to remove your own access rights."
+msgstr "Вы не можете удалить собственные права доступа."
+
+msgid "You are not authorized to view members of this group."
+msgstr "У Вас недостаточно прав для просмотра состава этой группы."
+
+msgid "You are not subscribed to this folder."
+msgstr "Вы не подписаны на обновления этой папки."
+
+msgid "You are not subscribed."
+msgstr "Вы не подписаны."
+
+msgid "You are pasting objects that were copied from the file system folder. Every object will be attached to the newly created document. Hence, it is required to specify the id, title and category attributes for each document. You are able to stop pasting operation at every moment by pressing the 'Cancel' button."
+msgstr "Вы вставляете объекты, скопированные из папки файловой системы. Каждый объект будет присоединен к отдельному документу. Для каждого документа требуется указать идентификатор, заголовок и реквизиты категории. Вы можете прервать процесс вставки в любой момент нажатием кнопки 'Завершить'."
+
+msgid "You can grant personalized access to this object by assigning the local roles to the users."
+msgstr "Персональный доступ позволяет создавать индивидуальные настройки безопасности."
+
+msgid "You can save a file in the document and associate the text of the document with this file"
+msgstr "Вы можете сохранить файл в документе и ассоциировать текст документа с этим файлом"
+
+msgid "You can use in value date field:%(1)s {date_now} will be replaced to today date"
+msgstr "Вы можете использовать в поле типа дата:%(1)s {date_now} будет заменено на текущую дату"
+
+msgid "You cannot edit this document now because it is being edited by another user"
+msgstr "Вы не можете редактировать сейчас этот документ, потому что он редактируется другим пользователем"
+
+msgid "You cannot vote because this poll already finished"
+msgstr "Вы не можете голосовать так как данный опрос уже закончен"
+
+msgid "You didn't specify what to include in the letter."
+msgstr "Вы не указали, что включить в письмо."
+
+msgid "You have accepted this task"
+msgstr "Вы приняли к исполнению данное задание"
+
+msgid "You have been subscribed."
+msgstr "Оформление подписки успешно завершено."
+
+msgid "You have been unsubscribed."
+msgstr "Ваша подписка прекращена."
+
+msgid "You have changed the list of allowed content types"
+msgstr "Список допустимых объектов изменен"
+
+msgid "You have changed the list of base categories"
+msgstr "Список базовых категорий изменен"
+
+msgid "You have changed the primary category"
+msgstr "Главная категория изменена"
+
+msgid "You have committed to a task"
+msgstr "Вы совершили действие по заданию"
+
+msgid "You have committed to this task"
+msgstr "Вы доложили о выполнении данного задания"
+
+msgid "You have failed to commit this task"
+msgstr "Вы доложили о невыполнении данного задания"
+
+msgid "You have familiarized with the document"
+msgstr "Вы ознакомились с документом"
+
+msgid "You have finalized a task"
+msgstr "Задание завершено"
+
+msgid "You have finalized this request"
+msgstr "Вы завершили данный запрос"
+
+msgid "You have finalized this task"
+msgstr "Вы завершили данное задание"
+
+msgid "You have no access to the requested resource. You may try to repeat the action that caused the error, or if this doesn't help, report the error to the portal administrator."
+msgstr "У Вас отсутствует доступ к запрошенному ресурсу. Вы можете попробовать повторить действие, которое вызвало ошибку, или, если это не помогает, сообщить об ошибке администратору портала."
+
+msgid "You have no configured e-mail address yet. Please specify it in your account preferences."
+msgstr "Вы не задали адрес электронной почты. Пожалуйста, укажите его в настройках Вашей учетной записи."
+
+msgid "You have not been signed up for the topic updates mailing. Try to subscribe again."
+msgstr "Вы не были подписаны на получение обновлений темы. Попробуйте подписаться еще раз."
+
+msgid "You have not been signed up. Try to subscribe again."
+msgstr "Вы не были подписаны. Попробуйте еще раз."
+
+msgid "You have not enough permissions to create a Site."
+msgstr "У Вас недостаточно прав для создания объекта 'Сайт'."
+
+msgid "You have not selected at least one task"
+msgstr "Укажите хотя бы одно задание"
+
+msgid "You have not selected user(s)"
+msgstr "Вы не указали пользователей"
+
+msgid "You have published the document"
+msgstr "Вы опубликовали документ"
+
+msgid "You have rejected a task"
+msgstr "Вы отказались от выполнения задания"
+
+msgid "You have rejected to sign"
+msgstr "Вы отказались подписать"
+
+msgid "You have rejected the publication"
+msgstr "Вы отказали в публикации"
+
+msgid "You have rejected this request"
+msgstr "Вы отклонили данный запрос"
+
+msgid "You have rejected this task"
+msgstr "Вы отказались от выполнения данного задания"
+
+msgid "You have reviewed this task"
+msgstr "Вы визировали данное задание"
+
+msgid "You have satisfied this request"
+msgstr "Вы удовлетворили данный запрос"
+
+msgid "You have sent notification to the users"
+msgstr "Вы отправили уведомления пользователям"
+
+msgid "You have signed the document"
+msgstr "Вы подписали документ"
+
+msgid "You have subscribed for notifications about document changes"
+msgstr "Вы подписались на уведомления об изменениях документа"
+
+msgid "You have to specify at least one report"
+msgstr "Укажите хотя бы один отчет"
+
+msgid "You have to specify at least one report field"
+msgstr "Укажите хотя бы одно поле отчета"
+
+msgid "You have to specify site parameters"
+msgstr "Укажите параметры сайта"
+
+msgid "You have to specify the folder"
+msgstr "Укажите папку"
+
+msgid "You have unsubscribed from notifications about document changes"
+msgstr "Вы отписались от уведомлений об изменениях документа"
+
+msgid "You have voted already"
+msgstr "Вы уже проголосовали"
+
+msgid "You have working on this task"
+msgstr "Вы приняли к исполнению данное задание"
+
+msgid "You may adjust your subscription by visiting the following link"
+msgstr "Вы можете изменить параметры подписки, открыв страницу по адресу"
+
+msgid "You may need to log out of the Zope management interface."
+msgstr "Вам необходимо завершить работу в интерфейсе управления Zope."
+
+msgid "You must choose questionnaire, which will be filled by user making the order, and fill e-mail adresses, where the orders will be sent."
+msgstr "Вы должны выбрать анкету, которую будет заполнять пользователь, делая заказ, и заполнить адреса электронной почты, на которые будет приходить информация о заказах."
+
+msgid "You must be logged in to subscribe."
+msgstr "Для того, чтобы подписаться, Вам необходимо зарегистрироваться."
+
+msgid "You must be logged in to unsubscribe."
+msgstr "Для того, чтобы отписаться, Вам необходимо зарегистрироваться."
+
+msgid "You must enter a valid email address."
+msgstr "Введите правильный электронный адрес."
+
+msgid "You should specify at least one column to manage the steps queue"
+msgstr "Чтобы определить шаги очереди, задайте хотя бы одну колонку записи"
+
+msgid "You will no longer receive notifications by e-mail."
+msgstr "Вы больше не будете получать уведомления по почте."
+
+msgid "You will receive notifications about this document updates by e-mail."
+msgstr "Вы будете получать уведомления об обновлениях этого документа по почте."
+
+msgid "You will receive notifications about this folder updates by e-mail."
+msgstr "Вы будете получать уведомления об обновлениях этой папки по почте."
+
+msgid "You won't be able to revert the folder to the editable state"
+msgstr "Вы не сможете перевести папку обратно в редактируемое состояние. "
+
+msgid "Your confirmation required"
+msgstr "Требуется Ваше подтверждение"
+
+msgid "Your opinion"
+msgstr "Ваше мнение"
+
+msgid "Your password and confirmation did not match. Please try again."
+msgstr "Ваш пароль не совпадает с подтверждением. Попытайтесь еще раз."
+
+msgid "Your password must contain at least 5 characters."
+msgstr "Ваш пароль должен содержать хотя бы 5 символов."
+
+msgid "Your report has been saved with name"
+msgstr "Ваш отчет сохранен под именем"
+
+msgid "Your request processed. Check your e-mail and confirm subscription to start receiving announcements from this folder."
+msgstr "Ваш запрос обработан. Пожалуйста, проверьте Ваш почтовый ящик и подтвердите подписку, чтобы получать сообщения из этой папки."
+
+msgid "Your request processed. Check your e-mail and confirm subscription."
+msgstr "Ваш запрос обработан. Проверьте Вашу почту и подтвердите подписку."
+
+msgid "Your request processed. Now user have to confirm subscription."
+msgstr "Ваш запрос обработан. Теперь пользователь должен сам подтвердить подписку."
+
+msgid "Your shopping cart is empty"
+msgstr "Ваша корзина пуста!"
+
+msgid "a single branch which is a common ancestor"
+msgstr "один узел, являющийся общим корнем"
+
+msgid "abandoned"
+msgstr "прервано"
+
+msgid "according to registration book settings"
+msgstr "в соответствии с настройкой журнала регистрации"
+
+msgid "accusative.Fr"
+msgstr "пятницу"
+
+msgid "accusative.Mo"
+msgstr "понедельник"
+
+msgid "accusative.Sa"
+msgstr "субботу"
+
+msgid "accusative.Su"
+msgstr "воскресенье"
+
+msgid "accusative.Th"
+msgstr "четверг"
+
+msgid "accusative.Tu"
+msgstr "вторник"
+
+msgid "accusative.We"
+msgstr "среду"
+
+msgid "acquired"
+msgstr "унаследовано"
+
+msgid "action.external_message.assigned_user"
+msgstr "Ответственный пользователь внешней системы"
+
+msgid "action.external_message.external_username"
+msgstr "Имя пользователя внешней системы"
+
+msgid "action.external_message.folder_editor"
+msgstr "Редактор папки"
+
+msgid "action.external_message.incoming_mail"
+msgstr "Уведомление о новой почте"
+
+msgid "action.external_message.object_owner"
+msgstr "Владелец объекта"
+
+msgid "action.external_message.title"
+msgstr "Отправить сообщение пользователю внешней системы"
+
+msgid "action.external_message.unknown_recipient"
+msgstr "Получатель сообщения "%(name)s" неизвестен системе."
+
+msgid "active"
+msgstr "активно"
+
+msgid "adapters.status.active"
+msgstr "Активен"
+
+msgid "adapters.status.inaccessible"
+msgstr "Недоступен"
+
+msgid "adapters.status.inactive"
+msgstr "Отключен"
+
+msgid "addons.status.active"
+msgstr "Активен"
+
+msgid "addons.status.broken"
+msgstr "Неисправен"
+
+msgid "addons.status.trial"
+msgstr "Демо"
+
+msgid "addons.status.disabled"
+msgstr "Отключен"
+
+msgid "addons.status.inactive"
+msgstr "Отключен"
+
+msgid "addons.used_by_objects"
+msgstr "Модуль %(name)s используется %(count)s объектами и поэтому не может быть деактивирован."
+
+msgid "after"
+msgstr "через"
+
+msgid "allows to import data from old version registry and re-register documents at this registry"
+msgstr "позволяет импортировать данные из журнала старого образца и перерегистрировать документы в этом журнале"
+
+msgid "and"
+msgstr "и"
+
+msgid "and exclude version by follow transition"
+msgstr "в этом случае выполнять для предыдущей версии переход"
+
+msgid "and registration number forming rule is"
+msgstr "и правило формирования регистрационного номера задано"
+
+msgid "any category"
+msgstr "любая категория"
+
+msgid "any number of entries and branches"
+msgstr "любое количество элементов и узлов"
+
+msgid "any state"
+msgstr "любое состояние"
+
+msgid "at"
+msgstr "в"
+
+msgid "attribute"
+msgstr "реквизитное поле"
+
+msgid "author"
+msgstr "автор"
+
+msgid "auto_any_user"
+msgstr "при получении отчета любого пользователя"
+
+msgid "auto_every_user"
+msgstr "при получении отчета каждого пользователя"
+
+msgid "awaiting_publication"
+msgstr "Ожидает публикации"
+
+msgid "beforeexpiration"
+msgstr "Истекает срок выполнения!"
+
+msgid "boolean"
+msgstr "да/нет"
+
+msgid "branch"
+msgstr "узел"
+
+msgid "broken link"
+msgstr "сломанная ссылка"
+
+msgid "by days"
+msgstr "по дням"
+
+msgid "by hours"
+msgstr "по часам"
+
+msgid "by months"
+msgstr "по месяцам"
+
+msgid "by:"
+msgstr "пользователь:"
+
+msgid "cancel"
+msgstr "отменил(а)"
+
+msgid "cancelled"
+msgstr "отменено"
+
+msgid "Object cannot be deleted because dependent objects found."
+msgstr "Объект не может быть удален, так как обнаружены зависимые объекты."
+
+msgid "categories.category_disallowed"
+msgstr "Установка категории %(category)s запрещена."
+
+msgid "categories.transition_actions"
+msgstr "Выбранные действия будут вызваны сразу после выполнения перехода в указанном порядке."
+
+msgid "categories.empty_attribute_type"
+msgstr "Необходимо выбрать тип реквизита."
+
+msgid "categories.invalid_attribute_id"
+msgstr "Указан недопустимый идентификатор реквизита."
+
+msgid "categories.invalid_attribute_title"
+msgstr "Заголовок реквизита не может быть пустым."
+
+msgid "categories.transition_actions"
+msgstr "Выбранные действия будут вызваны сразу после выполнения перехода в указанном порядке."
+
+msgid "collection"
+msgstr "набор"
+
+msgid "common.copy_title_prefix"
+msgstr "Копия"
+
+msgid "commit"
+msgstr "выполнил(а)"
+
+msgid "confirm password"
+msgstr "подтвердите пароль"
+
+msgid "create"
+msgstr "создать"
+
+msgid "currency"
+msgstr "денежный"
+
+msgid "current"
+msgstr "текущий"
+
+msgid "daily"
+msgstr "ежедневно"
+
+msgid "date"
+msgstr "дата"
+
+msgid "date_day"
+msgstr "число"
+
+msgid "day"
+msgstr "день"
+
+msgid "day(s)"
+msgstr "дней"
+
+msgid "day.plural"
+msgstr "дня"
+
+msgid "days"
+msgstr "дней"
+
+msgid "days at"
+msgstr "дней в"
+
+msgid "dd/mm/yy"
+msgstr "дд/мм/гг"
+
+msgid "defined in this category"
+msgstr "Определены в этой категории"
+
+msgid "depends on"
+msgstr "зависит от"
+
+msgid "description"
+msgstr "описание"
+
+msgid "directive"
+msgstr "директива"
+
+msgid "division"
+msgstr "подразделение"
+
+msgid "document"
+msgstr "документ"
+
+msgid "document published"
+msgstr "документ опубликован"
+
+msgid "document signed"
+msgstr "документ подписан"
+
+msgid "document was not signed"
+msgstr "документ не подписан"
+
+msgid "document_not_signed"
+msgstr "отказано в подписи"
+
+msgid "document_signed"
+msgstr "документ подписан"
+
+msgid "documents"
+msgstr "документов"
+
+msgid "documents of"
+msgstr "документов из"
+
+msgid "edit"
+msgstr "изменить"
+
+msgid "editable"
+msgstr "Редактируемая"
+
+msgid "editable during state change"
+msgstr "позволить редактировать во время изменения состояния"
+
+msgid "email not specified."
+msgstr "Не указан email."
+
+msgid "enabled"
+msgstr "активно"
+
+msgid "entries of"
+msgstr "записей из"
+
+msgid "entries will be automatically numbered if the rule is filled"
+msgstr "элементы будут автоматически пронумерованы, если правило заполнено"
+
+msgid "entry"
+msgstr "элемент"
+
+msgid "equal"
+msgstr "равно"
+
+msgid "evolutive"
+msgstr "Развиваемый"
+
+msgid "expired"
+msgstr "Просрочено"
+
+msgid "expires"
+msgstr "Окончание"
+
+msgid "failed"
+msgstr "неверно"
+
+msgid "failure"
+msgstr "не выполнил(а)"
+
+msgid "field '%s' was removed from document category"
+msgstr "поле '%s' было удалено из категории документа"
+
+msgid "file"
+msgstr "файл"
+
+msgid "finalize"
+msgstr "завершил(а)"
+
+msgid "finalized"
+msgstr "Завершено"
+
+msgid "fixed"
+msgstr "Фиксированный"
+
+msgid "fixed_reviewed"
+msgstr "Согласован"
+
+msgid "float"
+msgstr "дробный"
+
+msgid "folder template"
+msgstr "шаблон папки"
+
+msgid "for"
+msgstr "для"
+
+msgid "for document version"
+msgstr "к версии документа"
+
+msgid "for header tests only"
+msgstr "только для проверки заголовков"
+
+msgid "for 'list' and 'user' types"
+msgstr "для типов 'список' и 'пользователь'"
+
+msgid "frame%(number)s"
+msgstr "кадр %(number)s"
+
+msgid "from"
+msgstr "с"
+
+msgid "frozen"
+msgstr "Замороженная"
+
+msgid "full backup copies"
+msgstr "полных резервных копий"
+
+msgid "greater than"
+msgstr "больше"
+
+msgid "group"
+msgstr "Групповой"
+
+msgid "has a field value"
+msgstr "имеет поле со значением"
+
+msgid "has a property value"
+msgstr "имеет свойство со значением"
+
+msgid "has an attribute value"
+msgstr "имеет реквизит со значением"
+
+msgid "help"
+msgstr "справка"
+
+msgid "hour"
+msgstr "час"
+
+msgid "hour(s)"
+msgstr "часов"
+
+msgid "hour.plural"
+msgstr "часа"
+
+msgid "hours"
+msgstr "часов"
+
+msgid "join.active_user"
+msgstr "Активный пользователь. Число активных пользователей не может превышать максимальное количество пользователей, разрешенных вашей лицензией NauDoc."
+
+msgid "if not specified flag 'User can edit only additional fields values'"
+msgstr "если не указан флаг 'Пользователь может редактировать только дополнительные поля'"
+
+msgid "in"
+msgstr "входящий"
+
+msgid "in reply to"
+msgstr "в ответ на"
+
+msgid "in the department"
+msgstr "в отделе"
+
+msgid "inaccessible"
+msgstr "недоступен"
+
+msgid "include attachments"
+msgstr "включить прикрепленные файлы"
+
+msgid "include document body"
+msgstr "включить тело письма"
+
+msgid "include link to the document"
+msgstr "включить ссылку на документ"
+
+msgid "include registration card"
+msgstr "включить регистрационную карточку"
+
+msgid "information"
+msgstr "информация"
+
+msgid "informed"
+msgstr "ознакомился(ась)"
+
+msgid "inherited"
+msgstr "Наследованные"
+
+msgid "inprogress"
+msgstr "Выполняется"
+
+msgid "int"
+msgstr "целый"
+
+msgid "integer"
+msgstr "целочисленный"
+
+msgid "interval"
+msgstr "интервал"
+
+msgid "is selected twice"
+msgstr "выбран дважды"
+
+msgid "is selected two times in succession"
+msgstr "выбран два раза подряд"
+
+msgid "is subordinated to"
+msgstr "подчинен"
+
+msgid "key"
+msgstr "ключ"
+
+msgid "large"
+msgstr "большой"
+
+msgid "left"
+msgstr "слева"
+
+msgid "legal department"
+msgstr "юридический отдел"
+
+msgid "less than"
+msgstr "меньше"
+
+msgid "licensing.header"
+msgstr "Укажите количество пользователей, имеющих право на вход в систему. Ваша лицензия NauDoc позволяет выбрать до %(max_active_users)s активных пользователей. Сейчас в системе %(active_users_cont)s активных пользователей."
+
+msgid "lines"
+msgstr "cписок"
+
+msgid "link"
+msgstr "cсылка"
+
+msgid "links.cannot_remove_target"
+msgstr "На объект %(target)s имеются ссылки, которые не могут быть удалены."
+
+msgid "list"
+msgstr "список"
+
+msgid "mail.duplicate_account"
+msgstr "Учетная запись "%(name)s" уже используется в папке "%(folder)s" (редактор %(folder.getEditor)s)."
+
+msgid "mail.filter_action.copy"
+msgstr "Скопировать"
+
+msgid "mail.filter_action.default"
+msgstr "Нет"
+
+msgid "mail.filter_action.delete"
+msgstr "Удалить"
+
+msgid "mail.filter_action.move"
+msgstr "Переместить"
+
+msgid "mail.filter_action_to"
+msgstr "в"
+
+msgid "mail.filter_operation.+"
+msgstr "содержит"
+
+msgid "mail.filter_operation.-"
+msgstr "не содержит"
+
+msgid "mail.filter_type.header"
+msgstr "Заголовок"
+
+msgid "mail.filter_type.message"
+msgstr "Сообщение"
+
+msgid "mail.filter_type.recipient"
+msgstr "Получатель"
+
+msgid "mail.filter_type.sender"
+msgstr "Отправитель"
+
+msgid "mail.filter_type.subject"
+msgstr "Тема"
+
+msgid "mail.filter_type.text"
+msgstr "Текст"
+
+msgid "mail.incoming_category_not_allowed"
+msgstr "Выбранная категория для полученной почты %(category)s не входит в список допустимых в папке %(folder)s."
+
+msgid "mail.invalid_folder_name"
+msgstr "Недопустимое имя почтовой папки - "%(name)s"."
+
+msgid "mail.pop_cannot_login"
+msgstr "Ошибка при подключении к POP серверу под именем "%(login)s" (ответ сервера: "%(response)s")."
+
+msgid "mail.server_not_configured"
+msgstr "Не настроен почтовый сервер."
+
+msgid "mail.smtp_cannot_login"
+msgstr "Ошибка при подключении к SMTP серверу под именем "%(login)s" (ответ сервера: "%(response)s")."
+
+msgid "mail.smtp_delivery_error"
+msgstr "Ошибка SMTP сервера при доставке почтового сообщения (ответ сервера: "%(response)s")."
+
+msgid "mail.smtp_recipients_refused"
+msgstr "SMTP сервером обнаружены ошибки в адресах получателей: %(recipients)s."
+
+msgid "mail.smtp_sender_refused"
+msgstr "SMTP сервером обнаружена ошибка в адресе отправителя "%(sender)s" (ответ сервера: "%(response)s")."
+
+msgid "manual_creator"
+msgstr "вручную автором задания"
+
+msgid "medium"
+msgstr "средний"
+
+msgid "metadata"
+msgstr "описание"
+
+msgid "minute"
+msgstr "минута"
+
+msgid "minute(s)"
+msgstr "минут"
+
+msgid "minute.plural"
+msgstr "минуты"
+
+msgid "minutes"
+msgstr "минут"
+
+msgid "month"
+msgstr "месяц"
+
+msgid "monthly"
+msgstr "ежемесячно"
+
+msgid "months"
+msgstr "месяцев"
+
+msgid "more"
+msgstr "далее"
+
+msgid "n/a"
+msgstr "нет"
+
+msgid "never"
+msgstr "никогда"
+
+msgid "no"
+msgstr "нет"
+
+msgid "no attributes defined"
+msgstr "нет доступных реквизитов"
+
+msgid "no code"
+msgstr "без кода"
+
+msgid "no name"
+msgstr "без имени"
+
+msgid "no subject"
+msgstr "без темы"
+
+msgid "none"
+msgstr "нет"
+
+msgid "notify every"
+msgstr "уведомлять всех"
+
+msgid "normal"
+msgstr "нормальный"
+
+msgid "not created"
+msgstr "не удалось создать"
+
+msgid "not selected"
+msgstr "не выбрано"
+
+msgid "number of characters"
+msgstr "число символов"
+
+msgid "number of lines"
+msgstr "число строк"
+
+msgid "number of rows"
+msgstr "число строк"
+
+msgid "objects left"
+msgstr "объектов осталось"
+
+msgid "objects pasted"
+msgstr "объектов вставлено"
+
+msgid "of"
+msgstr "от"
+
+msgid "optional"
+msgstr "необязательно"
+
+msgid "or inherited from it"
+msgstr "или унаследованных от нее"
+
+msgid "out"
+msgstr "исходящий"
+
+msgid "owner"
+msgstr "владелец"
+
+msgid "pages"
+msgstr "страницы"
+
+msgid "paused"
+msgstr "остановлено"
+
+msgid "pending"
+msgstr "Ожидает согласования"
+
+msgid "periodical"
+msgstr "периодическое"
+
+msgid "personal folder"
+msgstr "личная папка"
+
+msgid "position"
+msgstr "должность"
+
+msgid "points to"
+msgstr "указывает на"
+
+msgid "prepositional.Jan"
+msgstr "Январе"
+
+msgid "prepositional.Feb"
+msgstr "Феврале"
+
+msgid "prepositional.Mar"
+msgstr "Марте"
+
+msgid "prepositional.Apr"
+msgstr "Апреле"
+
+msgid "prepositional.May"
+msgstr "Мае"
+
+msgid "prepositional.Jun"
+msgstr "Июне"
+
+msgid "prepositional.Jul"
+msgstr "Июле"
+
+msgid "prepositional.Aug"
+msgstr "Августе"
+
+msgid "prepositional.Sep"
+msgstr "Сентябре"
+
+msgid "prepositional.Oct"
+msgstr "Октябре"
+
+msgid "prepositional.Nov"
+msgstr "Ноябре"
+
+msgid "prepositional.Dec"
+msgstr "Декабре"
+
+msgid "principal"
+msgstr "основная"
+
+msgid "private"
+msgstr "Скрытый"
+
+msgid "private_rejected"
+msgstr "Скрытый"
+
+msgid "publication rejected"
+msgstr "отказано в публикации"
+
+msgid "publish"
+msgstr "опубликовал(а)"
+
+msgid "published"
+msgstr "Опубликованный"
+
+msgid "references"
+msgstr "ссылается на"
+
+msgid "reject"
+msgstr "отклонил(а)"
+
+msgid "release"
+msgstr "высвободить"
+
+msgid "report closed"
+msgstr "окончательный отчет"
+
+msgid "request"
+msgstr "запрос"
+
+msgid "request_confirmed"
+msgstr "запрос удовлетворен"
+
+msgid "request_rejected"
+msgstr "запрос отклонен"
+
+msgid "resumed"
+msgstr "выполняется"
+
+msgid "review_reason.audition_list"
+msgstr "по результатам аудита"
+
+msgid "review_reason.changed"
+msgstr "появилось пять или более изменений"
+
+msgid "review_reason.doc_in_plan"
+msgstr "внесен в план пересмотра"
+
+msgid "review_reason.expired"
+msgstr "истек срок действия"
+
+msgid "review_reason.expired_by_link"
+msgstr "устарел"
+
+msgid "review"
+msgstr "визировал(а)"
+
+msgid "right"
+msgstr "справа"
+
+msgid "rollback"
+msgstr "откат"
+
+msgid "runnable"
+msgstr "готов к запуску"
+
+msgid "satisfy"
+msgstr "удовлетворил(а)"
+
+msgid "scheduler.daemon"
+msgstr "Сервис"
+
+msgid "scheduler.daemon.autostart"
+msgstr "Автоматический запуск сервиса"
+
+msgid "scheduler.daemon.autostart_disable"
+msgstr "Отключить"
+
+msgid "scheduler.daemon.autostart_disabled"
+msgstr "отключен"
+
+msgid "scheduler.daemon.autostart_enable"
+msgstr "Включить"
+
+msgid "scheduler.daemon.autostart_enabled"
+msgstr "включен"
+
+msgid "scheduler.daemon.explain"
+msgstr "Сервис планировщика осуществляет запуск заданий в определенное время согласно расписанию. Каждому экземпляру планировщика соответстует отдельный поток сервиса."
+
+msgid "scheduler.daemon.explain_autostart"
+msgstr "Для того, чтобы сервис планировщика автоматически запускался при старте Zope, необходимо его зарегистрировать в реестре планировщиков."
+
+msgid "scheduler.daemon.restart"
+msgstr "Перезапуск"
+
+msgid "scheduler.daemon.start"
+msgstr "Запустить"
+
+msgid "scheduler.daemon.started"
+msgstr "запущен"
+
+msgid "scheduler.daemon.status"
+msgstr "Состояние сервиса"
+
+msgid "scheduler.daemon.stop"
+msgstr "Остановить"
+
+msgid "scheduler.daemon.stopped"
+msgstr "остановлен"
+
+msgid "scheduler.queue"
+msgstr "Очередь запуска"
+
+msgid "scheduler.queue.expiration_time"
+msgstr "Время следующего обновления"
+
+msgid "scheduler.queue.explain"
+msgstr "Планировщик периодически опрашивает элементы расписания и составляет список событий на ближайший промежуток времени. После истечения определенного срока, а также при добавлении и удалении заданий из расписания, список автоматически обновляется."
+
+msgid "scheduler.queue.items"
+msgstr "Очередь содержит %(count)s элементов."
+
+msgid "scheduler.queue.refresh"
+msgstr "Обновить"
+
+msgid "scheduler.queue.refresh_interval"
+msgstr "Период обновления очереди"
+
+msgid "scheduler.queue.start_time"
+msgstr "Время запуска"
+
+msgid "scheduler.queue.system_time"
+msgstr "Текущее время"
+
+msgid "scheduler.schedule"
+msgstr "Расписание"
+
+msgid "scheduler.schedule.empty"
+msgstr "Заданий нет"
+
+msgid "scheduler.schedule.next_occurence"
+msgstr "Следующий запуск"
+
+msgid "scheduler.schedule.remove"
+msgstr "Удалить"
+
+msgid "scheduler.schedule.resume"
+msgstr "Возобновить"
+
+msgid "scheduler.schedule.state"
+msgstr "Состояние"
+
+msgid "scheduler.schedule.suspend"
+msgstr "Приостановить"
+
+msgid "scheduler.schedule.temporal_expression"
+msgstr "Параметры запуска"
+
+msgid "search documents for revision"
+msgstr "поиск документов подлежащих пересмотру"
+
+msgid "search.syntax_tip"
+msgstr "Допускается использовать в запросе выражения AND, OR, AND NOT, '*', '?', '(', ')'.\n'*' заменяет любое количество символов (0 или более).\n'?' заменяет один символ.\nСкобки используются для группирования выражений и распределения приоритетов."
+
+msgid "second(s)"
+msgstr "секунд"
+
+msgid "selected folder"
+msgstr "выбранная папка"
+
+msgid "show nested entries"
+msgstr "показывать вложенные элементы"
+
+msgid "sign"
+msgstr "подписал(а)"
+
+msgid "signature_request"
+msgstr "Запрос на подпись"
+
+msgid "since"
+msgstr "с"
+
+msgid "small"
+msgstr "маленький"
+
+msgid "specify category title"
+msgstr "укажите заголовок категории"
+
+msgid "state"
+msgstr "состояние"
+
+msgid "step"
+msgstr "шаг"
+
+msgid "step_cancelled"
+msgstr "результаты заполнения этапа отменены"
+
+msgid "step_passed"
+msgstr "этап пройден"
+
+msgid "step_query"
+msgstr "текущий этап"
+
+msgid "string"
+msgstr "строка"
+
+msgid "subfolder in the current folder with template"
+msgstr "папку в текущей папке, используя шаблон"
+
+msgid "subtask"
+msgstr "подзадание"
+
+msgid "success"
+msgstr "успешно"
+
+msgid "suspended"
+msgstr "выполнение отложено"
+
+msgid "task_cancelled"
+msgstr "отменено"
+
+msgid "task_failed"
+msgstr "неудовлетворительно"
+
+msgid "task_start"
+msgstr "принял(а) к исполнению"
+
+msgid "task.request_ordered"
+msgstr "по маршруту"
+
+msgid "task_success"
+msgstr "успешно"
+
+msgid "tasks.tabs.closed"
+msgstr "С закрывающим отчетом"
+
+msgid "tasks.tabs.current"
+msgstr "В процессе выполнения"
+
+msgid "tasks.tabs.current_and_closed"
+msgstr "Текущие и с закрывающим отчетом"
+
+msgid "tasks.tabs.finalized"
+msgstr "Завершенные"
+
+msgid "tasks.tabs.new"
+msgstr "Новые"
+
+msgid "templates"
+msgstr "шаблоны"
+
+msgid "text"
+msgstr "текст"
+
+msgid "the counter value is 123 (what is usually corresponds with 122 registered documents)"
+msgstr "значение счетчика равно 123 (что обычно соответствует 122-м зарегистрированным в журнале документам)"
+
+msgid "then registration number will be rendered as follows"
+msgstr "тогда регистрационный номер документа будет следующим"
+
+msgid "thumbnail_frame%(number)s"
+msgstr "иконка кадра %(number)s"
+
+msgid "till"
+msgstr "по"
+
+msgid "time_left"
+msgstr "до окончания"
+
+msgid "to"
+msgstr "до"
+
+msgid "to end"
+msgstr "в конец"
+
+msgid "today"
+msgstr "сегодня"
+
+msgid "transitivity"
+msgstr "транзитивность"
+
+msgid "unauthorized"
+msgstr "нет доступа"
+
+msgid "unknown"
+msgstr "неизвестен"
+
+msgid "unknown link '%(id)s'"
+msgstr "неизвестная ссылка '%(id)s'"
+
+msgid "unknown object '%(uid)s'"
+msgstr "неизвестный объект '%(uid)s'"
+
+msgid "unknown user '%(name)s'"
+msgstr "неизвестный пользователь '%(name)s'"
+
+msgid "usage:"
+msgstr "отображать:"
+
+msgid "use 0 for no specific limit, 1 for flat directory"
+msgstr "используйте 0 при отсутствии ограничения, 1 для плоского справочника"
+
+msgid "user_committed"
+msgstr "Получено подтверждение"
+
+msgid "user_pending"
+msgstr "Нет ответа"
+
+msgid "user_rejected"
+msgstr "Отказал в выполнении"
+
+msgid "userlist"
+msgstr "Список пользователей"
+
+msgid "users"
+msgstr "пользователи"
+
+msgid "using dates list"
+msgstr "по списку дат"
+
+msgid "value is inaccessible"
+msgstr "значение недоступно"
+
+msgid "valuetype.None"
+msgstr "неизвестный тип"
+
+msgid "valuetype.advanced_userlist"
+msgstr "динамический список пользователей"
+
+msgid "valuetype.computed"
+msgstr "вычисляемый"
+
+msgid "valuetype.currency"
+msgstr "денежный"
+
+msgid "valuetype.boolean"
+msgstr "да/нет"
+
+msgid "valuetype.date"
+msgstr "дата"
+
+msgid "valuetype.derived"
+msgstr "производный"
+
+msgid "valuetype.float"
+msgstr "дробный"
+
+msgid "valuetype.int"
+msgstr "целый"
+
+msgid "valuetype.lines"
+msgstr "список"
+
+msgid "valuetype.link"
+msgstr "ссылка"
+
+msgid "valuetype.object"
+msgstr "объект"
+
+msgid "valuetype.splitter"
+msgstr "разделитель"
+
+msgid "valuetype.string"
+msgstr "строка"
+
+msgid "valuetype.subordinate"
+msgstr "подчиненный"
+
+msgid "valuetype.text"
+msgstr "текст"
+
+msgid "valuetype.time_period"
+msgstr "временной отрезок"
+
+msgid "valuetype.userlist"
+msgstr "пользователь"
+
+msgid "valuetype.unknown_value"
+msgstr "неизвестный тип"
+
+msgid "vdocument_entry_disabled"
+msgstr "заполнение записи завершено"
+
+msgid "vdocument_entry_enabled"
+msgstr "запись в стадии заполнения"
+
+msgid "week"
+msgstr "неделю"
+
+msgid "weekly"
+msgstr "еженедельно"
+
+msgid "xlarge"
+msgstr "очень большой"
+
+msgid "xsmall"
+msgstr "очень маленький"
+
+msgid "yes"
+msgstr "да"
+
+msgid "year"
+msgstr "год"
+
+msgid "year.plural"
+msgstr "года"
+
+msgid "years"
+msgstr "лет"
+
+msgid "yearly"
+msgstr "ежегодно"
+
+msgid "you are not allowed to read field '%s'"
+msgstr "у вас нет прав на чтение поля '%s'"
+
+msgid "zombie"
+msgstr "ждет удаления"

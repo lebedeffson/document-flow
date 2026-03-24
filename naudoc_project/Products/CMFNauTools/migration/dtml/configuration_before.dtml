@@ -1,0 +1,17 @@
+<dtml-var migration_html_header>
+
+<h2>Migration settings</h2>
+
+<dtml-with getMigrationContext>
+<form name="start_form" method="POST" onsubmit="disableForm(this);">
+
+<p>Now you have to alter migration options.</p>
+
+<p>There are <dtml-var "_.len(configuration_queue)"> configuration screens.</p>
+
+<input type="submit" name="configure_next" value="Start configuration &gt;&gt;">
+
+</form>
+</dtml-with>
+
+<dtml-var migration_html_footer>

@@ -1,0 +1,196 @@
+<dtml-comment>
+$Id: followup_stat.dtml,v 1.31 2007/10/02 08:21:33 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+  function validate( form ) {
+    if (!validateRange( 'datetime', form.created_date_field.value, form.expires_date_field.value )) {
+      alert('<dtml-msg "Creation date must be smaller than Expiration date">');
+      return false;
+    }
+    return true;
+  }
+//-->
+</script>
+
+<dtml-let created="REQUEST.get('apply_filter') and REQUEST.get('created_date')
+                   or _.DateTime(REQUEST.get('cookie_created', _.str(_.DateTime()-7.0)))"
+          expires="REQUEST.get('apply_filter') and REQUEST.get('expires_date')
+                   or _.DateTime(REQUEST.get('cookie_expires', _.str(_.DateTime()+7.0)))"
+          default_brains_type="'directive'"
+          brains_type="REQUEST.get('brains_type', REQUEST.get('cookie_brains_type', default_brains_type))"
+          mode_name="'incoming_member_tasks'"
+          filter_id="'followup%s_' % mode_name"
+          filter_query="{ 'created':(created, expires+0.99999)
+                        , 'expires':(created, expires+0.99999)
+                        , 'created_usage':'range:min:max'
+                        , 'expires_usage':'range:min:max'
+                        , 'BrainsType':brains_type
+                        }"
+          filter="{'query': filter_query
+                  ,'conditions':[]
+                  ,'columns': []
+                  }"
+          session="REQUEST.SESSION"
+>
+
+<dtml-call "session.get('%s_filter' % filter_id) != filter and session.set('%s_filter' % filter_id, filter)">
+
+<dtml-call "REQUEST['RESPONSE'].setCookie('cookie_brains_type', brains_type, path='/' + absolute_url(1), expires='Wed, 19 Feb 2020 14:28:00 GMT')">
+<dtml-call "REQUEST['RESPONSE'].setCookie('cookie_expires', expires, path='/' + absolute_url(1), expires='Wed, 19 Feb 2020 14:28:00 GMT')">
+<dtml-call "REQUEST['RESPONSE'].setCookie('cookie_created', created, path='/' + absolute_url(1), expires='Wed, 19 Feb 2020 14:28:00 GMT')">
+
+<dtml-call "REQUEST.set('created', created)">
+<dtml-call "REQUEST.set('expires', expires)">
+
+<h1><dtml-msg "Followup tasks progress statistics"></h1>
+
+<dtml-in "portal_followup.listTaskTypes()">
+<dtml-if sequence-start>
+<form method="POST">
+<table align="right">
+ <tr>
+   <td>
+     <dtml-msg "Tasks type">:
+   </td>
+   <td>
+      <select name="brains_type">
+</dtml-if>
+        <option value="&dtml-id;" <dtml-var "brains_type==id" fmt=selected> >
+          <dtml-msg expr=title>
+        </option>
+<dtml-if sequence-end>
+      </select>
+      <input type="submit" value="<dtml-msg Ok>"/>
+   </td>
+</tr>
+</table>
+</form>
+</dtml-if>
+</dtml-in>
+
+<dtml-let tti="portal_followup.getTaskType(brains_type)"
+          responses="tti.listResponses()"
+          brains_type="tti.getId()"
+          kw="{ 'created':{'query':created, 'range':'min'}
+              , 'expires':{'query':expires+0.99999, 'range':'max'}
+              , 'task_type':brains_type
+              , 'supervised':True
+              }"
+          results="portal_followup.getStatistics(REQUEST=REQUEST, **kw)"
+>
+<h2><dtml-msg expr="tti.Title()"></h2>
+<dtml-in "results.items()" prefix="result">
+<dtml-if sequence-start>
+  <table cellspacing="1" cellpadding="3">
+  <tr class="row_title">
+    <td class="small" valign="middle" align="center">
+       <dtml-msg "User">
+    </td>
+    <td class="small" valign="middle" align="center">
+       <dtml-msg "Tasks assigned">
+    </td>
+    <td class="small" valign="middle" align="center">
+       <dtml-msg "Expired tasks">
+    </td>
+    <td class="small" valign="middle" align="center">
+       <dtml-msg "Pending tasks">
+    </td>
+<dtml-in responses mapping>
+    <td class="small" valign="middle" align="center">
+       <dtml-msg "With response">: <em><dtml-msg expr=title></em>
+    </td>
+</dtml-in>
+    <td class="small" valign="middle" align="center">
+       <dtml-msg "Processed tasks, %'">
+    </td>
+  </tr>
+</dtml-if>
+
+  <tr class="row_even">
+    <td class="small" nowrap>
+       <b><dtml-var result_key fmt=member></b>
+       <a class="navigate" href="<dtml-var "relative_url( action='followup_member_in',
+                                                          params={ 'member_id': result_key,
+                                                                   'brains_type': brains_type,
+                                                                   'created': created,
+                                                                   'created_usage': 'range:min',
+                                                                   'expires': expires+0.99999,
+                                                                   'expires_usage': 'range:max'},)" html_quote>" alt="<dtml-msg "User tasks list">">&gt;&gt;</a>
+    </td>
+    <td class="small">
+       <dtml-var "result_item[0]">
+    </td>
+    <td class="small">
+       <dtml-var "result_item[1]">
+    </td>
+    <td class="small">
+       <dtml-var "result_item[2]">
+    </td>
+
+<dtml-in "result_item[4]">
+    <td class="small">
+        <dtml-var sequence-item>
+    </td>
+</dtml-in>
+
+    <td class="small">
+       <dtml-var "'%d' % result_item[3]">
+    </td>
+
+  </tr>
+<dtml-if sequence-end>
+  </table>
+</dtml-if>
+
+</dtml-in>
+
+</dtml-let>
+
+
+  <form method="POST" onSubmit="return validate(this)">
+  <table>
+  <tr>
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "List tasks effective">
+    </td>
+  </tr>
+  <tr>
+    <td class="small" align="right">
+       <dtml-msg "since">:
+    </td>
+    <td>
+       <dtml-var "datetime_form( this()
+                               , prefix='created_date'
+                               , date=created
+                               , fast_input=1
+                               , date_only=1
+                               )">
+    </td>
+  </tr>
+  <tr>
+    <td  class="small" align="right">
+       <dtml-msg "till">:
+    </td>
+    <td>
+       <dtml-var "datetime_form( this()
+                               , prefix='expires_date'
+                               , date=expires
+                               , fast_input=1
+                               , date_only=1
+                               )">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+       <input type="submit" name="apply_filter" value="<dtml-msg Apply>">
+    </td>
+  </tr>
+  </table>
+  </form>
+
+</dtml-let>
+<dtml-var simple_html_footer>

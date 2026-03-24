@@ -1,0 +1,71 @@
+<dtml-comment>
+
+$Editor: oevsegneev $
+$Id: switch_member_form.dtml,v 1.1 2009/02/17 15:04:22 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+
+function validateSwitchMemberForm( form ){
+    if( !(form.old_member.value && form.new_member.value )){
+        alert('<dtml-msg "Please specify members to switch">');
+        return false;
+    }
+    return true;
+}
+
+// -->
+</script>
+
+<h2><dtml-var "msg('Switch member')"></h2>
+<dtml-msg "maintenance_pack.switch_member_warning">
+
+<form name="switch_member_form" method="POST"
+      action="<dtml-var "relative_url( action='switch_member' )" html_quote>"
+      onSubmit="javascript: return validateSwitchMemberForm(this)">
+
+<table cellpadding=3 border="0">
+<tr>
+ <td class="smallHeader">
+  <dtml-msg "from member">
+ </td>
+ <td>&nbsp;</td>
+ <td class="smallHeader">
+  <dtml-msg "to member">
+ </td>
+</tr>
+<tr>
+ <td align=left valign="top">
+  <div class="form-element">
+    <dtml-var "user_list(this(), name='old_member', list_size=15, multiple=0)">
+  </div>
+ </td>
+ <td>&mdash;&gt;</td>
+ <td align=left valign="top">
+  <div class="form-element">
+    <dtml-var "user_list(this(), name='new_member', list_size=15, multiple=0)">
+  </div>
+ </td>
+</tr>
+
+<tr>
+ <td colspan=3>
+   <input type="checkbox" name="switch_opened" checked><dtml-msg "maintenance_pack.switch_opened">
+ </td>
+</tr>
+
+<tr>
+ <td colspan=3>
+   <input type="submit"  value=" <dtml-msg Apply> ">
+   <input type="submit"  name="cancel" value=" <dtml-msg Cancel> ">
+ </td>
+</tr>
+</table>
+</form>
+
+<dtml-var simple_html_footer>

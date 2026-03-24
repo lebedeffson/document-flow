@@ -1,0 +1,17 @@
+<dtml-var migration_html_header>
+
+<h2>Configuration finished</h2>
+
+<form name="start_form" method="POST" onsubmit="disableForm(this);">
+
+<p>The configuration process is over. Click the 'Migration' button to begin
+migration process.</p>
+
+<p>Warning! This operation may take a considerable amount of time depending on
+the number of documents in the database.</p>
+
+<input type="submit" name="next" value="Migration &gt;&gt;">
+
+</form>
+
+<dtml-var migration_html_footer>

@@ -1,0 +1,24 @@
+<dtml-comment>
+Shortcut icon template.
+
+Template params:
+  'view_url' -- url of shortcut. Default value is absolute_url.
+  
+  'target' -- target frame of shortcut. Default value is 'workspace'.
+
+$Id: content_icon.dtml,v 1.5 2004/05/24 11:45:10 ypetrov Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-let view_url="_.has_key('view_url') and view_url or absolute_url"
+          target="_.has_key('target') and target or 'workspace'"
+          is_shortcut="'isShortcut' in _['implements']"
+>
+
+<a class="icon" href="&dtml-view_url;" target="&dtml-target;"
+   title="<dtml-msg expr="is_shortcut and 'Shortcut' or Type">"
+   style="background: url('&dtml-portal_url;/&dtml-getIcon;')"
+><dtml-if is_shortcut><div class="shortcut"></div></dtml-if></a>
+
+</dtml-let>

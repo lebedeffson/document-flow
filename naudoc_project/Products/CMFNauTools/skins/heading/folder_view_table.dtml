@@ -1,0 +1,99 @@
+<dtml-comment>
+Subtemplate for displaying folder contents using tabular viewing format.
+
+$Editor: vpastukhov $
+$Id: folder_view_table.dtml,v 1.9 2006/01/18 11:09:39 ishabalin Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.9 $>
+
+<table class="ContentsList" cellspacing="2" cellpadding="2" width="100%" border="0">
+  <tr>
+    <td class="cell_title">&nbsp;</td>
+    <td class="cell_title" align=center colspan="2">
+     <dtml-if "portal_membership.getCurrFolderViewParam('sort_by')=='Title'">
+       <dtml-if "portal_membership.getCurrFolderViewParam('reverse')">
+         <img src="&dtml-portal_url;/sort_up.gif" align="absmiddle">
+           <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=reverse" class="button">
+       <dtml-else>
+         <img src="&dtml-portal_url;/sort_down.gif" align="absmiddle">
+           <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=reverse&param_value=1" class="button">
+       </dtml-if>
+       <dtml-msg "Title">
+     <dtml-else>
+       <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=sort_by&param_value=Title" class="button">
+         <dtml-msg "Title">
+     </dtml-if>
+     </a>
+    </td>
+    <td class="cell_title" align=center>
+      <dtml-if "portal_membership.getCurrFolderViewParam('sort_by')=='Creator'">
+        <dtml-if "portal_membership.getCurrFolderViewParam('reverse')">
+          <img src="&dtml-portal_url;/sort_up.gif" align="absmiddle">
+            <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=reverse" class="button">
+        <dtml-else>
+          <img src="&dtml-portal_url;/sort_down.gif" align="absmiddle">
+            <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=reverse&param_value=1" class="button">
+        </dtml-if>
+        <dtml-msg "Creator">
+      <dtml-else>
+        <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=sort_by&param_value=Creator" class="button">
+          <dtml-msg "Creator">
+      </dtml-if>
+      </a>
+    </td>
+    <td class="cell_title" align=center><dtml-msg "Type"></td>
+    <td class="cell_title" align=center><dtml-msg "State"></td>
+    <td class="cell_title" align=center><dtml-msg "Size"></td>
+    <td class="cell_title" align=center>
+      <dtml-if "portal_membership.getCurrFolderViewParam('sort_by')=='modified'">
+        <dtml-if "portal_membership.getCurrFolderViewParam('reverse')">
+          <img src="&dtml-portal_url;/sort_up.gif" align="absmiddle">
+            <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=reverse" class="button">
+        <dtml-else>
+          <img src="&dtml-portal_url;/sort_down.gif" align="absmiddle">
+            <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=reverse&param_value=1" class="button">
+        </dtml-if>
+        <dtml-msg "Modified">
+      <dtml-else>
+        <a href="&dtml-absolute_url;/portal_membership/setCurrFolderViewParam?param_name=sort_by&param_value=modified" class="button">
+          <dtml-msg "Modified">
+      </dtml-if>
+      </a>
+    </td>
+    <td class="cell_title">&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td colspan=8 align="center"><img src="spacer.gif" height="5"></td>
+  </tr>
+
+  <dtml-if directives>
+    <dtml-let is_directive="1" hide_buttons="1" documents=directives>
+      <tr>
+        <td colspan=8 align="center"><img src="spacer.gif" height="5"></td>
+      </tr>
+      <tr class="Title">
+        <td colspan=8 align="center" class="small"><dtml-msg "Directive documents"></td>
+      </tr>
+      <tr>
+        <td colspan=8 align="center"><img src="spacer.gif" height="5"></td>
+      </tr>
+      <dtml-var folder_item_table>
+    </dtml-let>
+  </dtml-if>
+  <dtml-if "documents and directives">
+    <tr>
+      <td colspan=8 align="center"><img src="spacer.gif" height="5"></td>
+    </tr>
+    <tr class="Title">
+      <td colspan=8 align="center" class="small"><dtml-msg "Folder content"></td>
+    </tr>
+    <tr>
+      <td colspan=8 align="center"><img src="spacer.gif" height="5"></td>
+    </tr>
+  </dtml-if>
+  <dtml-let is_directive="0">
+    <dtml-var folder_item_table>
+  </dtml-let>
+ </table>

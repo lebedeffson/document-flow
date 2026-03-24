@@ -1,0 +1,43 @@
+<dtml-comment>
+jungle inside code.
+
+$Id: explorer_directory_tree_item.dtml,v 1.5 2006/03/20 14:28:04 vsafronovich Exp $
+$Editor: vpastukhov $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-let link_target="_.has_key('link_target') and link_target or '_self'"
+          link_url="_.has_key('link_url') and link_url or
+                    explorer_context.relative_url(
+                        action='explorer_frame',
+                        params={ 'explorer_id':explorer_id, 'item':_['tree-item']},
+                    )">
+
+<table cellpadding="0" cellspacing="0" class="tree_item">
+<tr>
+
+<td valign="top" style="padding-right:0.25em">
+  <a class="tree" target="&dtml-link_target;" href="&dtml-link_url;">
+    <dtml-if tree-item>
+      <img src="&dtml-portal_url;/<dtml-var "getIcon( open=_['tree-item-expanded'] )">" width="16" height="16" border="0" />
+    <dtml-else>
+      <img src="&dtml-portal_url;/&dtml-getIcon;" width="16" height="16" border="0" />
+    </dtml-if>
+  </a>
+</td>
+
+<td>
+  <a class="tree" target="&dtml-link_target;" href="&dtml-link_url;"
+     <dtml-unless tree-item>style="font-weight: bold"</dtml-unless> >
+    <dtml-if tree-item>
+      <dtml-var "title() or code() or '(%s)' % msg('no name')" html_quote>
+    <dtml-else>
+      &dtml-Title;
+    </dtml-if>
+  </a>
+</td>
+
+</tr>
+</table>
+
+</dtml-let>

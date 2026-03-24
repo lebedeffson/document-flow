@@ -1,0 +1,38 @@
+<dtml-comment>
+Toolbar menus rendering.
+
+$Editor: vpastukhov $
+$Id: actions_box.dtml,v 1.36 2005/04/21 11:37:55 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.36 $>
+
+<dtml-let uname="portal_membership.isAnonymousUser() and 'Guest'
+                 or portal_membership.getAuthenticatedMember().getUserName()"
+          isPrincipalVersion="implements('isVersionable') and isCurrentVersionPrincipal()"
+          actions="portal_actions.listFilteredActionsFor( this(), object_url=relative_url( frame='inFrame' ) )"
+          isPortalRoot="implements('isPortalRoot') or parent().implements('isPortalRoot')"
+          object_type="portal_types.getTypeInfo( this() )"
+>
+
+<form name="actform" style="margin: 0">
+
+<dtml-in "[('folder', 'Folder')] +
+          [('object', object_type and object_type.title or 'Object')] + 
+          (not isPortalRoot and [('workflow', 'Status')] or [])" prefix="group">
+  <dtml-in "actions.get( group_key, () )" mapping>
+    <dtml-if sequence-start>
+      <select onChange="openUrl(value, target='workspace')">
+        <option value=""> <dtml-msg expr="group_item"> </option>
+        <option value=""> &mdash;&mdash;&mdash;&mdash;&mdash;&mdash; </option>
+    </dtml-if>
+        <option value="<dtml-var "url.strip()">"><dtml-msg expr="name"></option>
+    <dtml-if sequence-end>
+      </select>
+    </dtml-if>
+  </dtml-in>
+</dtml-in>
+
+</form>
+
+</dtml-let>

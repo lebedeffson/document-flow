@@ -1,0 +1,49 @@
+<dtml-comment>
+$Id: category_bases_form.dtml,v 1.8 2005/08/21 12:53:07 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.8 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Base categories"></h2>
+
+<dtml-msg "Base categories provide their attributes and workflow states to the current category.">
+
+<form action="category_bases" method="post" onSubmit="selectAll(bases);">
+
+<table>
+ <tr class="row_title" align="center">
+   <td class="small" width="40%"><dtml-msg "Available categories">
+   </td>
+   <td >&nbsp;</td>
+   <td class="small" width="40%" nowrap><dtml-msg "Base categories">
+   </td>
+ </tr>
+ <tr class="row_even" align="center"> 
+ <dtml-let 
+   dependent_ids="[ cat.getId() for cat in listDependentCategories()] + [ getId() ]"
+   left_options="[ ( cat.getId(), cat.Title() ) for cat in listCategories()
+                   if cat.getId() not in dependent_ids ]"
+   right_options="[ ( cat.getId(), cat.Title() ) for cat in listBases() ]"
+ >
+   <dtml-var "dual_selectbox_template( None, _
+                                     , left_name='available_categories'
+                                     , right_name='bases'
+                                     , left_options=left_options
+                                     , right_options=right_options
+                                     , multiple=True
+                                     , size=20
+                                     )">
+ </dtml-let>
+ </tr>
+ <tr>
+    <td colspan="2"><input type="submit" value="<dtml-msg "Apply">">
+        <input type="submit" name="cancel" value="<dtml-msg "Cancel">">
+
+    </td>
+ </tr>
+</table>
+
+</form>
+
+<dtml-var simple_html_footer>

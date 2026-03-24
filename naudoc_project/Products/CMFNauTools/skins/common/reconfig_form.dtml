@@ -1,0 +1,205 @@
+<dtml-comment>
+Global portal settings form.
+
+$Editor: vpastukhov $
+$Id: reconfig_form.dtml,v 1.24 2004/03/22 12:14:45 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.24 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1><dtml-msg "Configure the Portal"></h1>
+
+<dtml-with portal_properties only>
+<dtml-let form_name="'portal_properties_form'">
+
+<form name="portal_properties_form" action="&dtml.url-reconfig;" method="POST">
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2">
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Portal title"></th>
+    <td>
+      <input name="title" value="&dtml-title;" size="40" /><br />
+      <dtml-msg "This is the title which appears at the top of every portal page.">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Portal description"></th>
+    <td>
+      <textarea cols="40" rows="6" name="description" style="width: 100%">&dtml-description;</textarea>
+      <br />
+      <dtml-msg "Brief description of the portal.">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Default language"></th>
+    <td>
+      <select name="language">
+	<dtml-in "msg.get_languages_map()" mapping>
+	<option value="&dtml-id;" <dtml-var "msg.default_language(id)" fmt=selected> >
+	        <dtml-msg expr=title></option>
+	</dtml-in>
+      </select>
+      <br />
+      <dtml-msg "Default language for new users of the portal.">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Server address"></th>
+    <td>
+      <input name="server_url" value="&dtml-server_url;" size="40" /><br />
+      <dtml-msg "This address is the canonical URL for the portal Web-server.">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Portal 'From' name"></th>
+    <td>
+      <input name="email_from_name" value="&dtml-email_from_name;" size="40" /><br />
+      <dtml-msg "When the portal generates mail, it uses this name as its (apparent) sender.">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Portal 'From' address"></th>
+    <td>
+      <input name="email_from_address" value="&dtml-email_from_address;" size="40" /><br />
+      <dtml-msg "When the portal generates mail, it uses this address as its (apparent) return address.">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "SMTP server"></th>
+    <td>
+      <input name="smtp_server" value="&dtml-smtp_server;" size="40" /><br />
+      <dtml-msg "This is the address of your local SMTP (outgoing mail) server.">
+    </td>
+  </tr>
+
+  <tr>
+    <td>&nbsp;</td>
+    <td>
+      <input type="checkbox" <dtml-var smtp_login fmt=checked>
+	     onClick="toggleSMTPAuth( this.form, this.checked )">
+      <dtml-msg "Use SMTP authentication">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Login"></th>
+    <td class="small">
+      <input type="text" name="smtp_login" value="&dtml.null-smtp_login;" size="25" <dtml-var "not smtp_login()" fmt=disabled> />
+      <input type="hidden" name="smtp_login:default" value="" />
+    </td>
+  </tr>
+
+  <tr>
+   <th valign="top" align="left"><dtml-msg "Password"></th>
+   <td class="small">
+     <input type="password" name="smtp_password" value="*****" size="25" <dtml-var "not smtp_login()" fmt=disabled> />
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"> <dtml-msg "POP3 server"></th>
+    <td>
+      <input name="mail_pop" value="&dtml-mail_pop;" size="40" /><br />
+      <dtml-msg "This is the address of your local POP3 (incoming mail) server.">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "IMAP server"></th>
+    <td>
+      <input name="mail_imap" value="&dtml-mail_imap;" size="40" /><br />
+      <dtml-msg "This is the address of your local IMAP4 (incoming mail) server.">
+    </td>
+  </tr>
+  
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Personal folders container"></th>
+    <td>
+      <dtml-var "entry_field_edit( None, _, type='link', link='folder', name='members_folder', value=members_folder,
+                 comment='This folder contains personal folders of the users.' )">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Default content folder"></th>
+    <td>
+      <dtml-var "entry_field_edit( None, _, type='link', link='folder', name='defaults_folder', value=defaults_folder,
+                 comment='This folder contains documents added to the new user folders.' )">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Document templates folder"></th>
+    <td>
+      <dtml-var "entry_field_edit( None, _, type='link', link='folder', name='templates_folder', value=templates_folder,
+                 comment='This folder contains document templates for categories.' )">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Message templates folder"></th>
+    <td>
+      <dtml-var "entry_field_edit( None, _, type='link', link='folder', name='messages_folder', value=messages_folder,
+                 comment='This folder contains DTML templates for messaging.' )">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Scripts folder"></th>
+    <td>
+      <dtml-var "entry_field_edit( None, _, type='link', link='folder', name='scripts_folder', value=scripts_folder,
+                 comment='This folder contains scripts.' )">
+    </td>
+  </tr>
+
+  <tr>
+    <th valign="top" align="left"><dtml-msg "Directory objects folder"></th>
+    <td>
+      <dtml-var "entry_field_edit( None, _, type='link', link='folder', name='directories_folder', value=directories_folder,
+                 comment='This folder contains portal directory objects.' )">
+    </td>
+  </tr>
+
+  <tr>
+   <td>&nbsp;</td>
+   <td colspan="2"><input type="Submit" value="<dtml-msg "Apply">"></td>
+  </tr>
+
+</table>
+
+<script type="text/javascript">
+<!--
+
+function toggleSMTPAuth( form, checked )
+{
+    if (checked) {
+        form.smtp_login.disabled = false;
+        form.smtp_password.disabled = false;
+
+    } else {
+        form.smtp_login.disabled = true;
+        form.smtp_password.disabled = true;
+    }
+}
+
+// -->
+</script>
+
+</form>
+
+</dtml-let>
+</dtml-with>
+
+</div>
+
+<dtml-var simple_html_footer>

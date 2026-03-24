@@ -1,0 +1,47 @@
+<dtml-comment>
+$Id $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+<dtml-let _msg_lang="lang"
+          charset="portal_properties.getConfig('Languages')[lang]['http_charset']"
+          sms="_.has_key('msg_format') and msg_format == 'sms'"
+          >
+Content-Type: text/plain; charset=&dtml.-charset;
+<dtml-unless sms>
+Subject: <dtml-var over_subject fmt=untaint>
+</dtml-unless>
+
+
+<dtml-msg "Id">: &dtml.-getId;
+<dtml-msg "Title">: &dtml.-Title;
+<dtml-msg "Creator">: <dtml-var "portal_membership.getMemberName(Creator())">
+<dtml-if "expiration_date.isFuture()">
+<dtml-let time_left="expiration_date - _.DateTime()"
+          percents="_.int(100 * time_left / (expiration_date - effective_date))"
+          >
+<dtml-msg "Expiration date">: <dtml-with expiration_date>
+<dtml-unless isCurrentDay>&dtml-dd; <dtml-msg expr=Mon> </dtml-unless>
+<dtml-unless isCurrentYear>&dtml-year; </dtml-unless>
+<dtml-var "strftime('%H:%M')">
+</dtml-with>
+<dtml-msg "Time left">: <dtml-var "dateperiod(time_left * 86400, short=1)"> (&dtml.-percents;%)
+</dtml-let>
+<dtml-else>
+<dtml-msg "Expiration date">: <dtml-msg "Task expired">
+</dtml-if>
+<dtml-msg "URL">: <dtml-var "absolute_url(canonical = 1, action = 'view')">
+
+<dtml-if alarm_settings>
+<dtml-with alarm_settings mapping>
+<dtml-if include_descr>
+<dtml-msg "Task description">:
+&dtml.-Description;
+</dtml-if>
+<dtml-if note>
+<dtml-msg "Note">:
+&dtml.-note;
+</dtml-if>
+</dtml-with>
+</dtml-if>
+
+</dtml-let>

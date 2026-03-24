@@ -1,0 +1,65 @@
+<dtml-comment>
+$Id: document_link_form.dtml,v 1.41 2004/04/20 11:14:25 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.41 $>
+
+<dtml-let can_modify="_.SecurityCheckPermission( 'Modify portal content', this() ) 
+                      and not ( implements('isLockable') and isLocked() )"
+          form_name="'link_selection_form'"
+>
+<dtml-var simple_html_header>
+
+<h3><dtml-msg "Current document">: &dtml-title_or_id; </h3>
+
+<dtml-var document_links_embedded>
+
+<dtml-if can_modify>
+<hr>
+<h3><dtml-msg "Create link to another document">:</h3>
+<script type="text/javascript">
+function callbackFunctionLink( form, uid, title, version_id, uid_field, title_field){
+    document.forms[form]['target_uid'].value = uid;
+    document.forms[form]['target_title'].value = title + (version_id ? ' / ' + version_id : '');
+    document.forms[form]['target_ver_id'].value = version_id;
+}
+</script>
+
+<form name="&dtml-form_name;" action="document_link_add" target="workfield" method="POST">
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2">
+  <tr>
+    <th valign="top" align="right"><dtml-msg "Associated object"></th>
+    <td>
+      <input type="hidden" name="target_uid">
+      <input type="hidden" name="target_ver_id">
+      <input type="text" size="40" name="target_title" readonly>
+      <input type="button"
+             value="<dtml-msg "Browse...">"
+             onClick="return OpenDocumentSelectionWnd( this.form.name, 'callbackFunctionLink' )"><br/>
+      <dtml-msg "Choose the document to creat link to">
+    </td>
+  </tr>
+  <tr>
+    <th valign="top" align="right"><dtml-msg "Relation type"></th>
+    <td>
+      <select id="relation" name="relation">
+        <dtml-let relations="portal_links.listRelations()"
+                  relation_ids="relations.keys()">
+        <dtml-in relation_ids>
+          <option value="&dtml-sequence-item;"><dtml-msg expr="relations[_['sequence-item']]"></option>
+        </dtml-in>
+        </dtml-let>
+      </select>
+    </td>
+  </tr>
+  <tr valign="top" align="left">
+    <th valign="top" align="left"></th>
+    <td><br/>
+      <input type="submit" name="create" value="<dtml-msg "Create">" >
+    </td>
+  </tr>
+</table>
+</form>
+
+</dtml-if>
+</dtml-let>
+<dtml-var simple_html_footer>

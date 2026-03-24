@@ -1,0 +1,325 @@
+<dtml-comment>
+New object construction form.
+
+$Editor: vpastukhov $
+$Id: invoke_factory_form.dtml,v 1.93 2008/07/22 11:28:49 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.93 $>
+
+<dtml-var simple_html_header>
+
+<dtml-comment>--------[ Dynamic metadata loading hack ]--------</dtml-comment>
+<dtml-unless "REQUEST.get( '_datetime_form' )">
+<dtml-call "REQUEST.set( '_datetime_form', True )">
+
+<link id="calendar_css" rel="stylesheet" type="text/css" href="&dtml-portal_url;/calendar-win2k-cold-1.css" />
+
+<script type="text/javascript" src="&dtml-portal_url;/calendar.js"></script>
+<script type="text/javascript" src="&dtml-portal_url;/calendar-<dtml-var "msg.get_selected_language()">.js"></script>
+<script type="text/javascript" src="&dtml-portal_url;/calendar-setup.js"></script>
+
+<script type="text/javascript">
+<!--
+
+fieldEditHandler.calendar_params = new Array();
+
+// -->
+</script>
+</dtml-unless>
+<dtml-comment>--------[ /Dynamic metadata loading hack ]--------</dtml-comment>
+
+<div class="Desktop">
+<dtml-if message>
+ <p>&dtml-message;</p>
+ <hr>
+</dtml-if>
+
+<div class="Metadata">
+
+<dtml-let batch_mode="_.has_key('batch_mode') and batch_mode or 0"
+          fsobjects="batch_mode and REQUEST.SESSION.get('fsobjects', None) or []"
+          fsob_curr_num="batch_mode and REQUEST.SESSION.get('fsob_curr_num', None) or 0"
+          fsob_left_num="batch_mode and REQUEST.SESSION.get('fsob_left_num', None) or 0"
+          fsobject_id="batch_mode and fsobjects[0][0]"
+          fsobject_title="batch_mode and fsobjects[0][1]"
+          type_info="portal_types.getTypeInfo(type_name)"
+          categories="type_info.typeImplements('isCategorial') and listAllowedCategories( type_name, construction=1 ) or None"
+          initial_transitions="categories and [[cat.getId(), _.str(cat.getWorkflow().getInitialTransition())] for cat in categories]"       
+          id="batch_mode and fsobject_id or _.has_key('use_default_values') and id or ''"
+          title="batch_mode and fsobject_title or _.has_key('use_default_values') and title or ''"
+          description="_.has_key('use_default_values') and description or ''"
+          form_name="'invoke_factory_form'"
+>
+
+<h2><dtml-msg "New object metadata"></h2>
+
+<dtml-if batch_mode>
+  <h1>&dtml-fsob_curr_num;&nbsp;<dtml-msg "objects pasted">&nbsp;,&nbsp;&dtml-fsob_left_num;&nbsp;<dtml-msg "objects left"></h1>
+</dtml-if>
+
+<form id="invoke_factory_form" name="invoke_factory_form" action="<dtml-var "batch_mode and 'fsobjects_paste' or relative_url( action='invoke_factory' )">"
+      target="workfield" method="POST" enctype="multipart/form-data">
+
+<script type="text/javascript">
+<!--
+
+window.onload = function()
+{
+    var form = document.forms['invoke_factory_form'];
+
+    focusForm(form);
+<dtml-if categories>
+    form.elements['cat_id'].onchange();
+</dtml-if>
+}
+
+function Validate()
+{
+    frm = document.forms['invoke_factory_form'];
+    if ( !validateForm(frm, 1, 1) )
+        return false;
+
+    disableForm(frm);
+    return true;
+}
+
+<dtml-if categories>
+var initialTransitions = new Array();
+<dtml-in initial_transitions>
+    initialTransitions[<dtml-var sequence-index>] = <dtml-var sequence-item>;
+</dtml-in>
+
+function loadMetadata( select ){
+    var cat_id = select.value;
+    var transition;
+    for( var i=0; i < initialTransitions.length; i++ ){
+        if( initialTransitions[i][0] == cat_id )
+            transition = initialTransitions[i][1];
+    }
+
+    var category_data = document.getElementById('category_data');
+    var templates_data = document.getElementById('templates_data');
+
+    disableForm( select.form );
+    displayElements(['loading'], ['category_data', 'templates_data']);
+
+    clearFormCallbacks( 'invoke_factory_form' );
+
+    category_data.innerHTML = userAgent.downloadURL('default_category_metadata?category_id='+escape(cat_id)+'&type_name=&dtml.url_quote-type_name;');
+    fixScripts( category_data );
+    templates_data.innerHTML = userAgent.downloadURL('list_activated_action_templates?transition='+escape(transition)+'&form_name=&dtml.url_quote-form_name;&category_id='+escape(cat_id));
+    fixScripts( templates_data );
+
+    enableForm( select.form );
+    displayElements(['category_data', 'templates_data'], ['loading']);
+    select.form.elements['id:id_'].parentNode.parentNode.style.display = document.forms[0].display_id.value;
+
+    registerFormCallback( 'invoke_factory_form', Validate, true );
+}
+
+function changeTemplate( url ){
+    var category_data = document.getElementById('category_data');
+    category_data.innerHTML = userAgent.downloadURL( url );
+    fixScripts( category_data );
+}
+
+
+</dtml-if>
+//-->
+</script>
+
+<input type="hidden" name="type_name" value="&dtml-type_name;" />
+<dtml-if type_args>
+<dtml-in "type_args.items()">
+<input type="hidden" name="type_args.&dtml-sequence-key;:record" value="&dtml-sequence-item;" />
+</dtml-in>
+</dtml-if>
+
+<table class="FormLayout">
+
+ <tr valign="top">
+  <th align="right"> <dtml-msg "URL"> </th>
+  <td> <dtml-var Identifier> </td>
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> <dtml-msg "Object type"> </th>
+  <td> <dtml-msg expr=type_name> </td>
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> <dtml-msg "Id"> </th>
+  <td>
+<dtml-if "type_name=='Subscription Root'">
+   <input type="hidden" name="id" value="subscriptions">
+   subscriptions
+<dtml-else>
+   <input type="text"
+          name="id:id_"
+          value="&dtml-id;"
+          size="35">
+</dtml-if>
+  </td>
+
+ </tr>
+
+ <tr valign="top">
+
+  <th align="right"> <dtml-msg "Title"> </th>
+  <td>
+   <input type="text"
+          name="title:required:string"
+          value="&dtml-title;"
+          validation_message="<dtml-msg "Specify the document title">"
+          size="65">
+  </td>
+
+ </tr>
+
+ <tr valign="top">
+
+  <th align="right"><dtml-msg "Description"></th>
+  <td>
+   <textarea name="description:text" rows="5"
+             cols="65">&dtml-description;</textarea>
+  </td>
+
+ </tr>
+
+<dtml-if categories>
+<dtml-let sel_cat="(_.has_key('use_default_values') and cat_id) or
+                   (type_name in ('HTMLDocument', 'DTMLDocument'))
+                    and ( (getSubscription() and 'MailingItem') or
+                          (implements('isOutgoingMailFolder') and 'OutgoingMail') or
+                          (implements('isStorefront') and getDefaultCategory()) ) or
+                   (getSite()
+                    and (type_name == 'HTMLDocument' and 'Publication' or 'SimplePublication')) or
+                   (categories[0].getId())">
+
+<tr>
+  <th class="TextField"><dtml-msg "Category"></th>
+  <td class="TextField">
+
+    <select name="cat_id"
+            onChange="loadMetadata( this );">
+      <dtml-in categories>
+      <option value="&dtml-getId;" <dtml-var "getId() == sel_cat" fmt=selected>
+              ><dtml-msg expr=Title></option>
+      </dtml-in>
+    </select>
+
+    <br />
+    <div id="loading">
+      <dtml-msg "Loading...">
+    </div>
+    <div id="category_data" style="display: none"></div>
+  </td>
+</tr>
+
+<tr>
+  <th class="TextField">&nbsp;</th>
+  <td class="TextField">
+    <dtml-let transitions_list="[ i for cat_id, i in initial_transitions if cat_id == sel_cat]"
+              initial_transition="transitions_list and transitions_list[0] or None"
+              form_name="'invoke_factory_form'"
+    >
+    <div id="templates_data" style="display: none"></div>
+    </dtml-let>
+  </td>
+</tr>
+
+</dtml-let>
+</dtml-if>
+
+<dtml-if "type_name == 'HTMLDocument' and not fsobjects">
+ <tr>
+  <td>&nbsp;</td>
+  <td  width="100%">
+    <dtml-msg "You can save a file in the document and associate the text of the document with this file"> (<dtml-msg "if not specified flag 'User can edit only additional fields values'">).
+    <br><br>
+    <dtml-msg "Supported formats are">: <dtml-var "', '.join(portal_catalog.attachmentSearchEnabled())">.
+  </td>
+
+ </tr>
+
+<dtml-var "file_upload_form(this(), upload_name='upload', id_='upload_id:id_')">
+
+ <tr>
+  <td><br></td>
+  <td align=left><dtml-msg "Note: if a file is being attached, category template will not be used"> (<dtml-msg "if not specified flag 'User can edit only additional fields values'">)
+  </td>
+ </tr>
+<dtml-elif "type_name == 'Script'">
+ <dtml-var "file_upload_form(this(), upload_name='upload')">
+</dtml-if>
+ <tr valign="top">
+  <td><br></td>
+  <td align=left>
+  <br> <dtml-if batch_mode>
+         <input type="submit" name="next" value=" <dtml-msg "Next"> ">
+         <input type="submit" name="finish" value=" <dtml-msg "Finish"> ">
+       <dtml-else>
+         <input type="submit" name="create" value=" <dtml-msg "Apply"> ">
+         <input type="button" onClick="location.href='&dtml-absolute_url;';" value=" <dtml-msg "Cancel"> ">
+       </dtml-if>
+  </td>
+
+ </tr>
+</table>
+
+<dtml-let cb_objects="portal_links.listClipboardObjects()">
+<dtml-if "cb_objects and (type_name in ['HTMLDocument',])">
+
+  <dtml-in cb_objects sort=Title skip_unauthorized>
+  <dtml-if sequence-start>
+   <hr>
+   <h3><dtml-msg "Create link to a document in the clipboard">:</h3>
+
+    <table class="SearchResults" border="0">
+
+    <tr class="row_title">
+      <td>&nbsp;</td>
+      <td width="16"><br></td>
+      <td><dtml-msg "Title"></td>
+      <td><dtml-msg "Type"></td>
+      <td><dtml-msg "Date"></td>
+      <td><dtml-msg "Relation type"></td>
+    </tr>
+   </dtml-if>
+    <tr>
+      <td><input type="checkbox" name="links_to.uid:records" value="&dtml-getUid;"></td>
+      <td>
+        <dtml-var "content_icon(None, _, target = '_blank')">
+      </td>
+      <td>
+   <a href="&dtml-absolute_url;" target="_blank"><dtml-var
+       Title size="75" html_quote></a>
+      </td>
+      <td><dtml-msg expr=Type></td>
+      <td><dtml-var Date></td>
+      <td>
+         <select name="links_to.relation:records">
+           <dtml-in "portal_links.listRelations().items()">
+           <option value="&dtml-sequence-key;"><dtml-msg expr=sequence-item></option>
+           </dtml-in>
+         </select>
+      </td>
+    </tr>
+  <dtml-if sequence-end>
+   </table>
+   <input type="button" name="selectAll" value="<dtml-msg "Select All">" onClick="toggleSelect(this.form['links_to.uid:records'], this)">
+  </dtml-if>
+  </dtml-in>
+
+</dtml-if>
+</dtml-let>
+
+</form>
+
+</dtml-let>
+
+</div>
+</div>
+
+<dtml-var simple_html_footer>

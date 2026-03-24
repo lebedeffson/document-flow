@@ -1,0 +1,158 @@
+<dtml-comment>
+$Id: task_reportwizard_step1.dtml,v 1.13 2006/02/06 11:10:54 vsafronovich Exp $
+</dtml-comment>
+<dtml-var simple_html_header>
+
+<dtml-let selected_tasks="REQUEST.get('selected_tasks', [])">
+
+<script language="javascript"><!--
+
+function switchItems(element, list )
+{
+    var new_state = element.checked;
+    var form = element.form;
+    
+    for(var i = 0; i < list.length; i++) {
+        form['i_' + list[i]].checked = new_state;
+    }
+}
+
+function Validate(frm)
+{
+   var task_ids = <dtml-var "followup.getBoundTaskIds(recursive=1) + [getId()]">;
+   var selected = 0;
+   for( var i = 0; i < task_ids.length; i++ )
+     if(frm['i_' + task_ids[i]] && frm['i_' + task_ids[i]].type=='checkbox' && frm['i_' + task_ids[i]].checked )
+        return true;
+
+   alert('<dtml-msg "You have not selected at least one task">');
+   return false;
+
+
+}
+
+function selectByType( frm, type )
+{
+    var task_types = new Array;
+    var tt = frm['task_types'];
+    task_types = tt[0] && tt || [tt];
+    for ( i = 0; i < task_types.length; i++ ) {
+        var cb = document.getElementById( 'i_' + task_types[i].id );
+        cb.checked = false;
+        if ( task_types[i].value == type )
+            cb.checked = true;
+    }
+}
+//--></script>
+  
+<div class="Desktop">
+
+<h1> <dtml-var aboveInThread> </h1>
+<h1> <dtml-msg "Report wizard">, <dtml-msg "step"> 1</h1>
+
+<form method="post" action="&dtml-absolute_url;" onSubmit="return Validate(this);">
+<table>
+ <tr>
+   <td class="smallHeader">
+      <dtml-msg "Tasks to include into the general report">:
+   </td>
+ </tr>
+ <tr>
+   <td class="small">
+    <dtml-if "implements('isTaskItem')">
+       <input onClick="return switchItems(this, <dtml-var "followup.getBoundTaskIds(recursive=1)">);" 
+              type="checkbox" 
+              id="i_&dtml-getId;" 
+              name="selected_tasks:list" 
+              value="&dtml-getId;"
+              <dtml-var "getId() in selected_tasks and 'checked'">
+       />
+       <dtml-msg "This task">
+    </dtml-if>
+
+    <dtml-let expand_all="1">
+    <dtml-forest branches_expr="followup.getBoundTasks()"
+                 security_expr="validate()"
+                 sort="expires">
+       <table>
+       <tr>
+          <td>
+             <input type="hidden" name="task_types" id="&dtml-getId;" value="&dtml-BrainsType;">
+             <input onClick="JavaScript:switchItems(this, <dtml-var "followup.getBoundTaskIds(recursive=1)">)" 
+                    type="checkbox" 
+                    id="i_&dtml-getId;" 
+                    name="selected_tasks:list" 
+                    value="&dtml-getId;"
+                    <dtml-var "getId() in selected_tasks and 'checked' or ''">
+             />
+         </td>
+         <td class="small">
+             <a target="_blank" href="&dtml-absolute_url;">&dtml-Title;</a>,
+        
+             <dtml-var Creator fmt=member>
+        
+             <dtml-if "isEffective(_.DateTime())">
+                (<dtml-msg "expires"> <dtml-var "expiration_date.ISO()">)
+             <dtml-else>
+               <b><dtml-msg "expired"></b>
+             </dtml-if>
+         </td>
+       </tr>
+       </table>
+    </dtml-forest>
+    </dtml-let>
+    </td>
+  </tr>
+  <tr>
+     <td>
+        <br>
+     </td>
+  </tr>
+  <tr>
+    <td class="smallHeader">
+      <dtml-msg "Task type">:
+      <select id="task_type" onChange="selectByType( this.form, this.value )">
+        <option value="no" selected><dtml-msg "No">
+      <dtml-in "portal_followup.listAllowedTaskTypes(this())">
+        <option value="&dtml-getId;"><dtml-msg expr=Title>
+      </dtml-in>
+      </select>
+    </td>
+  </tr>
+  <tr>
+     <td>
+        <br>
+     </td>
+  </tr>
+  <tr>
+    <td class="smallHeader">
+      <dtml-msg "Template">:
+      <dtml-var task_reportwizard_templates>
+    </td>
+  </tr>
+  <tr>
+    <td>
+       <br>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input type="button" 
+             onClick="location.href='&dtml-absolute_url;/document_follow_up_form'" 
+             value=" <dtml-msg "Cancel"> "
+      />
+      <input type="submit" 
+             name="task_reportwizard_step2:method" 
+             value=" <dtml-msg "Next"> &gt;&gt; "
+      />
+    </td>
+  </tr>
+
+</table>
+</form>
+
+</div>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

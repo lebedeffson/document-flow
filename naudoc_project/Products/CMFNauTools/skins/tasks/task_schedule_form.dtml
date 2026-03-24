@@ -1,0 +1,414 @@
+<dtml-comment>
+$Id: task_schedule_form.dtml,v 1.14 2007/01/31 14:58:27 oevsegneev Exp $
+$Editor$
+</dtml-comment>
+<dtml-revision $Revision: 1.14 $>
+
+<script type="text/javascript">
+<!--
+
+function validateSheduleForm(frm) {
+
+   if( !(document.getElementById('duration_time_days').selectedIndex ||
+         document.getElementById('duration_time_hours').selectedIndex ||
+         document.getElementById('duration_time_minutes').selectedIndex )) {
+       alert('<dtml-msg "Please specify duration time">');
+       return false;
+   }
+
+    var select = frm['repeat_type'].value;
+    var valid = false;
+
+    switch (select) {
+        case 'daily_repeat':
+            break;
+        case 'weekly_repeat':
+            valid = false;
+            var days = frm.elements['weekly_repeat_day:int:list'];
+            for (var i = 0; i < days.length; i++)
+                if (days[i].checked)
+                    valid = true;
+            if (!valid) {
+                alert('<dtml-msg "Please specify day of week">');
+                return false;
+            }
+            break;
+        case 'monthly_repeat':
+            break;
+        case 'yearly_repeat':
+            valid = false;
+            var years = frm.elements['yearly_repeat_month:int:list'];
+            for (var i = 0; i < years.length; i++)
+                if (years[i].checked)
+                    valid = true;
+            if (!valid) {
+                alert('<dtml-msg "Please specify year">');
+                return false;
+            }
+            break;
+        case 'custom_repeat':
+            if ( !frm.elements['custom_dates:list'].options.length ) {
+                alert('<dtml-msg "Please specify the dates">');
+                return false;
+            }
+            custom_dates = frm.elements['custom_dates:list']
+            if ( custom_dates )
+              selectAll( custom_dates );
+            break;
+    }
+    return true;
+}
+
+function showDialog(select) {
+    // Show only selected dialog
+    for (var i = select.options.length; i-- > 0;) {
+        var dialog = document.getElementById(select.options[i].value);
+        if (i == select.selectedIndex) {
+            var current_dialog = dialog;
+            current_dialog.style.display = '';
+        } else
+            dialog.style.display = 'none';
+    }
+
+    var el = select.form.elements;
+
+    // Parse effective date
+    var effective_date;
+    if (validationRegexp['datetime'].test(el['effective_date_field'])
+        && validateDate(RegExp.$3, RegExp.$2, RegExp.$1))
+        effective_date = new Date(RegExp.$3, RegExp.$2-1, RegExp.$1);
+
+    // Initialize dialog controls accoring to the effective date
+    if (effective_date && typeof current_dialog._initialized == 'undefined') {
+        // TODO: Store changed state instead of initialized
+        switch (current_dialog.id) {
+            case 'daily_repeat':
+                break;
+            case 'weekly_repeat':
+                el['weekly_repeat_day:int:list'][effective_date.getDayMF()].checked = true;
+                break;
+            case 'monthly_repeat':
+                el['monthly_repeat_day:int'].value = effective_date.getDate();
+                el['monthly_repeat_week:int'].selectedIndex = effective_date.getWeekWithDay();
+                el['monthly_repeat_dow:int'].selectedIndex = effective_date.getDayMF();
+                break;
+            case 'yearly_repeat':
+                el['yearly_repeat_month:int:list'][effective_date.getMonth()].checked = true;
+                break;
+        }
+        current_dialog._initialized = true;
+    }
+
+<dtml-comment>
+    // Refresh state of "If the task occurs on a weekend" select
+    switch (current_dialog.id) {
+        case 'weekly_repeat':
+            el['move_weekends'].disabled = true;
+            break;
+        case 'monthly_repeat':
+            if (el['monthly_repeat_by'][1].checked) {
+                el['move_weekends'].disabled = true;
+                break;
+            }
+        default:
+            el['move_weekends'].disabled = false;
+    }
+</dtml-comment>
+
+    // Focus on first input from dialog
+    if (current_dialog.id != 'custom_repeat')
+        current_dialog.getElementsByTagName('INPUT')[0].focus();
+}
+
+function filterInput(event) {
+    // Checks that numeric key was pressed inside int input
+
+    if  ( _isTextIntInput(event.target || event.srcElement) ) {
+        var code = event.charCode || event.keyCode;
+        return (47 < code && code < 58);
+    }
+
+    return true;
+}
+
+function checkRadioGroups(container) {
+    // TODO: Explain what it does ;)
+
+    if (container._checked) return;
+
+    var containers = container.parentNode.getElementsByTagName(container.tagName);
+
+    for (var i = containers.length; i-- > 0;) {
+        var current_container = containers[i];
+        var disable = (current_container != container);
+        current_container._checked = !disable;
+
+        //if (i) document.forms['followup'].elements['move_weekends'].disabled = !disable;
+
+        for (var j = current_container.childNodes.length; j-- > 0;) {
+            var element = current_container.childNodes[j];
+
+            if (element.tagName == 'INPUT' && element.type == 'radio')
+                element.checked = !disable;
+            else if (element.tagName == 'INPUT' || element.tagName == 'SELECT')
+                element.disabled = disable;
+        }
+    }
+
+    if (window.event) // XXX: made only for IE because Mozilla doesn't handle clicks on disabled inputs
+        window.event.srcElement.focus();
+}
+
+var customDates_select = null;
+function getCustomDatesSelect() {
+    customDates_select = customDates_select ||
+                         document.forms['followup'].elements['custom_dates:list'];
+
+    return customDates_select;
+}
+
+var customDate_calendar = null;
+function getCustomDateCalendar() {
+    customDate_calendar = customDate_calendar ||
+                          document.getElementById('calendar_container')
+                                  .getElementsByTagName('TABLE')[0].calendar;
+
+    return customDate_calendar;
+}
+
+function addCustomDate(calendar) {
+    // adds custom date from calendar to select
+
+    if (typeof calendar == 'undefined') {
+        // '>>' button was clicked
+        calendar = getCustomDateCalendar();
+        if (customDateDisabled(calendar.date)) return;
+    }
+    else
+        // calendar date was changed or clicked
+        if (!calendar.dateClicked)
+            // TODO: Act only on doubleclicks
+            return;
+
+    var sel = getCustomDatesSelect();
+    var date = calendar.date.valueOf();
+
+    // sel._dates = [].concat(sel._dates.slice(0, index), new Date(date), sel._dates.slice(index));
+
+    // finds the position and insert patched date option into it
+    for (var index = 0; index < sel.options.length; index++)
+        if (sel.options[index].date_value > date) break;
+
+    var date_option = document.createElement('OPTION');
+    date_option.text = calendar.date.print('dd.mm.y');
+    date_option.date_value = date;
+    if (userAgent.IE) sel.add(date_option, index);
+    else              sel.add(date_option, sel.options[index]); // W3C DOM
+
+    calendar.refresh();
+}
+
+function deleteCustomDates() {
+    // removes selected custom dates from select
+
+    deleteSelectionFromList(getCustomDatesSelect());
+    getCustomDateCalendar().refresh();
+}
+
+function customDateDisabled(date) {
+    // checks that date have been added already
+
+    var sel = getCustomDatesSelect();
+
+    if (!sel) return false;
+
+    for (var i = sel.options.length; i-- > 0;) {
+        var option_date = new Date(sel.options[i].date_value);
+        if ((option_date.getDate() == date.getDate()) &&
+            (option_date.getMonth() == date.getMonth()) &&
+            (option_date.getFullYear() == date.getFullYear())) return true;
+    }
+
+    return false;
+}
+
+/*
+onChange="filterChange(event)"
+
+function filterChange(event) {
+    var ob = event.target || event.srcElement;
+    if  ( _isTextIntInput(ob) )
+        ob.value = parseInt(ob.value) || '0'; // TODO: Save previous value in onFocus handler and place it instead of zero
+}
+*/
+
+function _isTextIntInput(object) {
+    return ( object.tagName == 'INPUT' && object.type == 'text' &&
+             object.name && object.name.endswith(':int') );
+}
+
+//-->
+</script>
+
+<dtml-let dows="('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')"
+          weeks="((1, 'First'), (2, 'Second'), (3, 'Third'), (4, 'Fourth'), (-1, 'Last'))"
+          months="('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')"
+
+          expression="default.get('temporal_expr')"
+          expression_type="expression and expression.expression_type or ''"
+>
+
+<tbody id="schedule_dialog" onKeyPress="return filterInput(event)" <dtml-unless "default.get('periodical')">style="display: none"</dtml-unless>>
+
+<tr class="row_even">
+  <td class="small"><dtml-msg "Repeat"></td>
+  <td class="small">
+    <select name="repeat_type" onChange="showDialog(this)">
+      <option value="daily_repeat" <dtml-var "expression_type == 'Daily'" fmt="selected">><dtml-msg "daily">
+      <option value="weekly_repeat" <dtml-var "expression_type == 'Weekly'" fmt="selected">><dtml-msg "weekly">
+      <option value="monthly_repeat" <dtml-var "expression_type.startswith('Monthly')" fmt="selected">><dtml-msg "monthly">
+      <option value="yearly_repeat" <dtml-var "expression_type == 'Yearly'" fmt="selected">><dtml-msg "yearly">
+      <option value="custom_repeat" <dtml-var "expression_type == 'Union'" fmt="selected">><dtml-msg "using dates list">
+    </select>
+  </td>
+</tr>
+
+<dtml-let hide="expression_type != 'Daily'"
+          period="not hide and expression and expression.days or 1">
+<tr id="daily_repeat" class="row_even" <dtml-if hide>style="display: none"</dtml-if>>
+  <td class="small"><dtml-msg "For every"></td>
+  <td class="small"><input type="text" name="daily_repeat:int" size="2" value="&dtml-period;"> <dtml-msg "day"></td>
+</tr>
+</dtml-let>
+
+<dtml-let hide="expression_type != 'Weekly'"
+          period="not hide and expression.weeks_period or 1"
+          weekdays="not hide and expression.week_days or []"
+>
+<tr id="weekly_repeat" class="row_even" <dtml-if hide>style="display: none"</dtml-if>>
+  <td class="small" valign="top">
+    <dtml-msg "For every (f)"> <input type="text" name="weekly_repeat:int" size="2" value="&dtml-period;"> <dtml-msg "week">
+  </td>
+  <td class="small">
+    <dtml-in dows prefix="dow">
+      <dtml-if "dow_start or dow_index==4">
+      <div class="column">
+      </dtml-if>
+      <input type="checkbox" id="wr_&dtml-dow_index;"
+             name="weekly_repeat_day:int:list" value="&dtml-dow_index;"
+             <dtml-var "dow_index in weekdays" fmt="checked">>
+      <label for="wr_&dtml-dow_index;"><dtml-msg expr=dow_item></label><br>
+      <dtml-if "dow_end or dow_index==3">
+      </div>
+      </dtml-if>
+    </dtml-in>
+  </td>
+</tr>
+</dtml-let>
+
+<dtml-let hide="not expression_type.startswith('Monthly')"
+          period="not hide and expression.months_period or 1"
+          repeat_by_day="not hide and expression_type == 'Monthly by day'"
+          date="not (hide or repeat_by_day) and expression.days[0] or 0"
+          dow="not hide and repeat_by_day and expression.weekdays[0] or 0"
+          week="not hide and repeat_by_day and expression.weeks[0] or 1"
+>
+<tr id="monthly_repeat" class="row_even" <dtml-if hide>style="display: none"</dtml-if>>
+  <td class="small" valign="top">
+    <dtml-msg "For every"> <input type="text" name="monthly_repeat:int" size="2" value="&dtml-period;"> <dtml-msg "month">
+  </td>
+  <td class="small">
+    <div onClick="checkRadioGroups(this)">
+      <input type="radio" name="monthly_repeat_by" value="date" <dtml-var "not repeat_by_day" fmt="checked">>
+      <input type="text" name="monthly_repeat_day:int" value="&dtml-date;" <dtml-var repeat_by_day fmt="disabled">>
+      <dtml-msg "date_day">
+    </div>
+
+    <div onClick="checkRadioGroups(this)">
+      <input type="radio" name="monthly_repeat_by" value="day" <dtml-var repeat_by_day fmt="checked">>
+      <select name="monthly_repeat_week:int" <dtml-var "not repeat_by_day" fmt="disabled">>
+      <dtml-in weeks prefix="w">
+        <option value="&dtml-w_key;" <dtml-var "w_key == week" fmt="selected">><dtml-msg expr=w_item>
+      </dtml-in>
+      </select>
+      <select name="monthly_repeat_dow:int" <dtml-var "not repeat_by_day" fmt="disabled">>
+      <dtml-in dows prefix="dow">
+        <option value="&dtml-dow_index;" <dtml-var "dow_index == dow" fmt="selected">><dtml-msg expr=dow_item>
+      </dtml-in>
+      </select>
+    </div>
+
+    <dtml-comment>
+    TODO
+    <input type="checkbox" id="mr_reverse" name="monthly_repeat_reverse">
+    <label for="mr_reverse"><dtml-msg "Count from the end of month"></label>
+    </dtml-comment>
+  </td>
+</tr>
+</dtml-let>
+
+<dtml-let hide="expression_type != 'Yearly'"
+          period="not hide and expression.years_period or 1"
+          month="not hide and expression.months or []"
+>
+<tr id="yearly_repeat" class="row_even" <dtml-if hide>style="display: none"</dtml-if>>
+  <td class="small" valign="top">
+    <dtml-msg "For every"> <input type="text" name="yearly_repeat:int" size="2" value="&dtml-period;"> <dtml-msg "year">
+  </td>
+  <td class="small">
+    <dtml-in months prefix="month">
+      <dtml-if "month_start or month_index==6">
+      <div class="column">
+      </dtml-if>
+      <input type="checkbox" id="yr_&dtml-month_index;"
+             name="yearly_repeat_month:int:list" value="&dtml-month_number;"
+             <dtml-var "month_number in month" fmt="checked">>
+      <label for="yr_&dtml-month_index;"><dtml-msg expr=month_item></label><br>
+      <dtml-if "month_end or month_index==5">
+      </div>
+      </dtml-if>
+    </dtml-in>
+  </td>
+</tr>
+</dtml-let>
+
+<dtml-let hide="expression_type != 'Union'"
+          date_list="not hide and expression.elements and [e.date_time for e in expression.elements] or []"
+>
+<tr id="custom_repeat" class="row_even" align="center" <dtml-if hide>style="display: none"</dtml-if>>
+  <td colspan="2" class="small" valign="middle">
+    <dtml-var "dates_list(None, _, name = 'custom_dates', value = date_list)">
+  </td>
+</tr>
+
+</dtml-let>
+
+<tr id="repeat_duration" class="row_even">
+  <td class="small"><dtml-msg "Duration"></td>
+  <td class="small">
+    <dtml-var "dateperiod_form( this()
+                              , prefix='duration_time'
+                              , period=default.get('duration_time') or 0
+                              )">
+  </td>
+</tr>
+
+<dtml-comment>
+TODO
+<tr id="repeat_exceptions" class="row_even">
+  <td class="small"><dtml-msg "If the task occurs on a weekend"></td>
+  <td class="small">
+    <select name="move_weekends">
+      <option><dtml-msg "Do not move it">
+      <option value="to_friday"><dtml-msg "Move it to friday">
+      <option value="to_monday"><dtml-msg "Move it to monday">
+      <option value="to_closest"><dtml-msg "Move it to the closest week-day">
+      <option value="to_null"><dtml-msg "Delete">
+    </select>
+  </td>
+</tr>
+</dtml-comment>
+
+</tbody>
+
+</dtml-let>

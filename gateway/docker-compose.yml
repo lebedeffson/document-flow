@@ -1,0 +1,26 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: naudoc_gateway_test
+    environment:
+      SERVER_NAME: localhost
+      EXTERNAL_HTTPS_PORT: "18443"
+      TLS_CN: localhost
+      RUKOVODITEL_UPSTREAM: host.docker.internal:18081
+      BRIDGE_UPSTREAM: host.docker.internal:18082
+      NAUDOC_UPSTREAM: host.docker.internal:18080
+      NAUDOC_UPSTREAM_ESCAPED: host.docker.internal%3A18080
+      ONLYOFFICE_UPSTREAM: host.docker.internal:18083
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "18090:80"
+      - "18443:443"
+    volumes:
+      - gateway_certs:/etc/nginx/certs
+    restart: unless-stopped
+
+volumes:
+  gateway_certs:

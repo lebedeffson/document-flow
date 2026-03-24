@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# $Editor: vpastukhov $
+# $Id: stop_zeo,v 1.2 2004/02/08 14:01:37 vpastukhov Exp $
+# $Revision: 1.2 $
+
+reldir=`dirname "$0"`
+reldir=`cd "$reldir" ; pwd`
+
+INSTANCE_HOME="$reldir"
+
+PID=`cat "$INSTANCE_HOME/var/ZEO_SERVER.pid" 2> /dev/null`
+if [ "$PID" ]; then
+    kill $PID 2> /dev/null
+fi

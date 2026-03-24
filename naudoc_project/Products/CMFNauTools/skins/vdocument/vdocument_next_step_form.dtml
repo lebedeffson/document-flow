@@ -1,0 +1,61 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_next_step_form.dtml,v 1.18 2004/09/02 12:12:30 ypetrov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.18 $>
+
+<dtml-let entry=this
+          next_step="getStep( getStepId() + 1 )"
+>
+
+<dtml-if "next_step">
+<dtml-var simple_html_header>
+<dtml-let next_step_members="next_step.listAllowedMembers()">
+
+
+<h1><dtml-msg "Next step">:<dtml-var "next_step.Title()" html_quote></h1>
+
+
+<form method="POST"
+      action="<dtml-var "relative_url( action='vdocument_next_step')" html_quote>" />
+<table cellspacing="1" cellpadding="3">
+<dtml-if "_.len(next_step_members) > 1">
+  <tr>
+    <td valign="top">
+      <dtml-msg "Choose the responsible user for the next processing step">: <br>
+      <dtml-var "user_list(None, _, name='chief_user', list_size=8, user_ids=next_step_members)">
+    </td>
+  </tr>
+  <tr class="row_title">
+    <td class="small" colspan="2">
+      <dtml-msg "Comment"><br>
+      <textarea name="comment:text" rows="4" cols="80"></textarea>
+    </td>
+  </tr>
+<dtml-elif next_step_members>
+  <tr>
+    <td>
+     <dtml-msg "Chief user">:<dtml-var "next_step_members[0]" fmt=member>
+     <input type="hidden" name="chief_user" value="<dtml-var "next_step_members[0]">">
+    </td>
+  </tr>
+</dtml-if>
+  <tr>
+    <td>
+      <input type="submit" value="<dtml-msg "Apply">"/>
+      <input type="button"
+             onClick="location.href='<dtml-var "absolute_url(action='vdocument_view')" html_quote fmt=jscript>';"
+             value="<dtml-msg "Cancel">"/>
+    </td>
+  </tr>
+</table>
+</form>
+
+</dtml-let>
+<dtml-var simple_html_footer>
+<dtml-else>
+   <dtml-var "nextEntryStep( getId(), comment=comment, REQUEST=REQUEST)">
+</dtml-if>
+
+</dtml-let>

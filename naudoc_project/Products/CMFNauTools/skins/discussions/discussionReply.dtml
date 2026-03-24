@@ -1,0 +1,91 @@
+<dtml-comment>
+Discussion add.
+
+$Editor: oevsegneev $
+$Id: discussionReply.dtml,v 1.5 2004/04/30 07:14:19 ypetrov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-if "this().meta_type == 'HTMLDocument'">
+  <dtml-call "REQUEST['SESSION'].set('doc_ver', this().implements('isVersionable') and this().getVersion().getVersionNumber())">
+</dtml-if>
+
+<dtml-if expr="not _.hasattr(this(), 'talkback') and this().meta_type != 'Discussion Item'">
+  <dtml-call expr="portal_discussion.getDiscussionFor(this())">
+</dtml-if>
+
+<dtml-let isAnon="portal_membership.isAnonymousUser()"
+          member="portal_membership.getAuthenticatedMember()"
+>
+<dtml-comment>
+<form action="<dtml-var "relative_url( action='talkback' )" >" method="post">
+</dtml-comment>
+
+<form id="reply" name="reply_form" method="POST" action="<dtml-var expr="absolute_url() + '/talkback'">">
+
+<input type="hidden" name="Creator" value="&dtml-member;">
+
+<table cellpadding="0" border="0" width="100%">
+ <tr class="row_title">
+  <td class="smallHeader" colspan="2">
+   <dtml-var "msg('Add a comment')">
+  </td>
+ </tr>
+
+ <tr class="row_even">
+  <td class="small" width="10%"><dtml-var "msg('Topic')"></td>
+  <td><input name="title" size="50" style="width: 100%"
+             value="<dtml-if title_override><dtml-var title_override><dtml-else><dtml-var title></dtml-if>"></td>
+ </tr>
+
+ <dtml-if isAnon>
+ <tr>
+  <th> <dtml-var "msg('Name')">  </th>
+  <td> <input type="text" name="fullname" size=35 value="<dtml-var "REQUEST.get('fullname',member)">"> </td>
+ </tr>
+ <tr>
+  <th> <dtml-var "msg('E-mail address')"> </th>
+  <td> <input type="text" name="email" size=35 value="<dtml-var "REQUEST.get('email','')">"> </td>
+ </tr>
+ <dtml-else>
+  <input type="hidden" name="fullname" value="<dtml-var "REQUEST.get('fullname',member)">">
+
+ </dtml-if>
+ <tr class="row_even">
+  <td class="small" valign="top"><dtml-var "msg('Text')"></td>
+  <td><textarea name="text" cols="50" rows="10" wrap="soft" style="width: 100%"
+    ><dtml-if text_override><dtml-var text_override
+    ></dtml-if></textarea>
+  </td>
+ </tr>
+ <tr class="row_even">
+  <dtml-if expr="_.hasattr(this(),'comment_type')">
+   <dtml-if comment_type>
+    <dtml-if "_.hasattr(this(),'parentsInThread')==0">
+     <td>Статус: <select name="status:int">
+      <option value=1 selected>Открыт</option>
+      <option value=2 >Принят</option>
+      <option value=3 >Закрыт</option>
+      <option value=4 >Отклонен</option>
+      </select>
+     </td>
+    </dtml-if>
+    <dtml-else>
+    <td>&nbsp;</td>
+   </dtml-if>
+  <dtml-else>
+   <td></td>
+  </dtml-if>
+  <td>
+   <dtml-if expr="_.hasattr(this(),'last_comment')">
+    <input type="hidden" name="last_comment:int" value=<dtml-var last_comment> />
+   <dtml-else>
+    <input type="hidden" name="last_comment:int" value=1 />
+   </dtml-if>
+   <input type="submit" value="<dtml-var "msg('Add a comment')">" name="discussion_reply:method">
+  </td>
+ </tr>
+</table>
+</form>
+</dtml-let>

@@ -1,0 +1,148 @@
+<dtml-comment>
+$Id: test_delivery.dtml,v 1.2 2004/06/16 11:40:21 kfirsov Exp $
+
+$Editor: kfirsov $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-call "REQUEST.set( 'noCache', 1 )">
+<dtml-var simple_html_header>
+
+
+<dtml-if "_.SecurityCheckPermission( 'Use MailServer services', this() )">
+
+  <form method="POST" action="&dtml-absolute_url;" target="workfield">
+
+  <dtml-msg "Available documents in this folder">:<br>
+
+  <table>
+  <dtml-in "listDocuments(REQUEST=REQUEST, sort_on='Date', sort_order='reverse', implements='isHTMLDocument')" prefix="q">
+    <dtml-with "getObject()">
+    <tr>
+      <td><input type="checkbox" name="test_doc_ids:list" value="&dtml-id;" ></td>
+      <td><dtml-var title html_quote> 
+      <dtml-if description>(<dtml-var description html_quote>)</dtml-if></td>
+      <td><dtml-msg expr="portal_workflow.getInfoFor(this(), 'state', '')"></td>
+    </tr>
+    </dtml-with>
+  </dtml-in>
+  </table>
+
+<br>
+<dtml-msg "Deliver to">:<br>
+
+<dtml-let sort_field="_.has_key('sort_field') and sort_field or ''"
+          context="this()"
+          table_columns="[ { 'id'     : '',
+                             'title'  : '',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'email',
+                             'title'  : 'Email',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'lname',
+                             'title'  : 'Last name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'fname',
+                             'title'  : 'First name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'mname',
+                             'title'  : 'Middle name',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'company_name',
+                             'title'  : 'Company',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'company_business_activity',
+                             'title'  : 'Company business activity',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'account_manager',
+                             'title'  : 'Account manager',
+                             'type'   : 'string',
+                           },
+                         ]">
+
+<table> <!--  class="List" -->
+  <tr class="row_title">
+
+    <dtml-in table_columns prefix="hdr" mapping>
+    
+    <td>
+      <a href="&dtml-absolute_url;/&dtml-document_id;?sort_field=&dtml-id;">
+          <dtml-var "sort_field==id and '<strong>' or ''">
+          	<dtml-msg expr="title">
+          <dtml-var "sort_field==id and '</strong>' or ''">
+      </a>
+    </td>
+    
+    </dtml-in>
+  </tr>
+
+<dtml-in "listSubscribedUsers()" prefix="su"  mapping sort_expr="sort_field">
+
+  <tr class="<dtml-if su_odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td align="center">
+      <dtml-if "_.SecurityCheckPermission('Subscribe users', context) and not aborted">
+    	<input type="checkbox" name="test_users:list" value="<dtml-var "email">">
+      <dtml-elif "aborted">
+        <font color="red" >--</font>
+      </dtml-if>
+    </td>
+    <td>
+      <dtml-if "_.SecurityCheckPermission('Subscribe users', context)">
+        <a href="<dtml-var "relative_url( 
+                action=context.getTypeInfo().getActionById( 'edit_user' ), 
+                params={'email' : email})">">
+          &dtml-email;
+        </a>
+      <dtml-else>
+        &dtml-email;
+      </dtml-if>
+    </td>
+
+    <dtml-in "table_columns[2:]" mapping>
+    <td><dtml-var "su_item.get(id, '&nbsp;') or '&nbsp;'"></td>
+    </dtml-in>
+  </tr>
+
+<dtml-else>
+  <tr>
+    <td colspan="2"><dtml-msg "No subscribed users">
+  </tr>
+</dtml-in>
+
+</table>
+<input type="submit" name="testDelivery:method" value="<dtml-msg "Test delivery">">
+</dtml-let>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</form>
+</dtml-if>
+
+
+
+</div>
+<dtml-var simple_html_footer>

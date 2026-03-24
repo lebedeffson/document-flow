@@ -1,0 +1,17 @@
+<dtml-comment>
+$Editor: mbernatski $
+$Id: task_definition_script_info_emb.dtml,v 1.6 2004/04/09 18:03:12 mbernatski Exp $
+
+showing action template 'script', in info mode
+called from list_activated_action_templates_emb.dtml
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+
+<table cellspacing="2" cellpadding="2"> 
+  <tr class="row_even">
+    <td class="smallHeader"><dtml-msg "Following script will be executed">:</td>
+    <td>
+       <dtml-var "task_definition['script'].Title()">&nbsp;<b>(<dtml-var "task_definition['script'].getId()">)</b>
+    </td>
+  </tr>
+</table>

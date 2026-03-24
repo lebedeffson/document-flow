@@ -1,0 +1,64 @@
+<dtml-comment>
+$Id: member_favorites.dtml,v 1.11 2006/01/18 11:09:37 ishabalin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-unless home_call>
+  <dtml-var simple_html_header>
+</dtml-unless home_call>
+
+<dtml-let favorites_url="portal_membership.getPersonalFolderUrl('favorites')"
+          favorites_path="portal_membership.getPersonalFolderPath('favorites')"
+          my_favorites="favorites_path and portal_catalog.searchResults( path=favorites_path
+                                                                       , meta_type='Shortcut'
+                                                                       , sort_on='modified'
+                                                                       , sort_order='reverse'
+                                                                       , sort_limit=20) or []"
+>
+  <dtml-in my_favorites>
+  <dtml-let view_url="getURL()+'/inFrame?link=view'">
+  <dtml-if sequence-start>
+  <dtml-msg "Total">: <dtml-var "my_favorites and my_favorites.actual_result_count or 0">
+
+  <table width="100%" border="0" cellspacing="1" cellpadding="1">
+  <tr class="row_title">
+    <td colspan="2">
+      <strong><dtml-msg "Title"></strong>
+    </td>
+  </tr>
+  </dtml-if>
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td width="16">
+      <dtml-var content_icon>
+    </td>
+    <td nowrap width="99%">
+      <a class="navigate"
+         href="&dtml-view_url;"
+         target="workspace"
+         title="&dtml-Description;"
+      ><dtml-var Title size="25" html_quote></a>
+    </td>
+  </tr>
+  <dtml-if sequence-end>
+    <dtml-if favorites_url>
+    <tr>
+      <td colspan="2">
+        <span class="Navigation">
+          <a target="workspace"
+             href="&dtml-favorites_url;/folder_contents"
+          ><dtml-msg "more"> &gt;&gt;</a>
+        </span>
+      </td>
+    </tr>
+    </dtml-if>
+  </table>
+  </dtml-if>
+  </dtml-let>
+  <dtml-else>
+    <dtml-msg "No favorites were found">
+  </dtml-in>
+</dtml-let>
+
+<dtml-unless home_call>
+  <dtml-var simple_html_footer>
+</dtml-unless home_call>

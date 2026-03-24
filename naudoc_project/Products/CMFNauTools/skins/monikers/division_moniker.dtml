@@ -1,0 +1,17 @@
+<dtml-comment>
+Moniker view of the member position object.
+
+$Id: division_moniker.dtml,v 1.2 2006/03/22 15:51:10 ikuleshov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-if "moniker_object">
+<dtml-let division="portal_membership.getStaffListAttribute( this(), 'division' )">
+<a href="javascript: OpenPositionInfoWnd( '&dtml-absolute_url;' );"><dtml-msg expr="division"></a>
+</dtml-let>
+<dtml-elif moniker_id>
+
+<dtml-msg "unknown division '%(name)s'" name="moniker_id.uid">
+
+</dtml-if>

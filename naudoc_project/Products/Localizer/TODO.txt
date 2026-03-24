@@ -1,0 +1,256 @@
+
+Things to do for release, when code is frozen
+---------------------------------------------
+
+  - Update help screens
+
+  - Update translations
+
+  - Update tutorial
+
+
+
+Things to do to be "beta"
+-------------------------
+
+  - Test cases for everything that should have a test case
+
+  - Fix known bugs (BUGS.txt)
+
+  - Complete documentation
+
+
+
+Planned changes for 0.9.0 (end of March)
+-------------------------
+
+  - Remove the too much complex locale folders of the Localizer class
+
+  - Simplify the default building of USER_PREF_LANGUAGES, keep only the
+    browser configuration
+
+  - Remove changeLanguage* from LanguageManager, move to the Localizer class
+
+  - Let to customize the policy for language negotiation through the Localizer,
+    by default add selection of the language in the url and with a cookie.
+
+  - Rewrite the documentation, five sections:
+
+     1. Quick start
+
+     2. Introduction to internationalization
+
+     3. Tutorial
+
+     4. Localizer for Python programmers
+
+     5. Credits, succes stories and future developements
+
+  ? Milos Prudek wants:
+
+      "When I save LocalContent, there is no framed message "Content changed.
+       (2002-02-08 15:26)" that is common in ZMI in other Zope items like DTML
+       document."
+
+  ? Work on locale information: dates, money, etc..
+
+  ???
+
+
+
+Planned changes for 0.9.1 (???)
+-------------------------
+
+  ???
+
+
+Planned changes for 0.10.0 (???)
+--------------------------
+
+  Unicode
+
+    - Look at the Toby's patch. Possible things to do:
+
+        1. Add the patch or parts of it to Localizer itself.
+
+        2. Autodetect if the patch has been applied.
+
+      As a consequence new features could be added:
+
+        - New local properties "unicode string" and "unicode text".
+
+        - Unicode support in the 'MessageCatalog' class.
+
+      Perhaps some of these features could be added without the patch.
+
+
+  CMFLocalizer integration
+
+    The product CMFLocalizer, developed by Kim Nokolay, extends Localizer
+    adding two new features, one for the CMF and another one for the ZPT.
+
+    I want to invite Kim to join me in the development of Localizer and
+    to work together to merge Localizer and CMFLocalizer.
+
+
+  Unitests
+
+    Test cases for everything.
+
+
+  Documentation
+
+    Tutorial completed, explaining:
+
+      - how to use Localizer (with examples),
+
+      - the design decissions
+
+      - the implementation decissions
+
+
+  Language negotiation
+
+    - Finish the API cleaning, move lang_negotiator to LanguageManager?
+
+
+
+New features/refactoring for future releases
+--------------------------------------------
+
+
+  Language negotiation
+
+    - Set the 'Vary' header.
+
+      The problem is: which value should it have?
+
+      This could allow to remove the patch to Zope for images, if UA
+      take care of the 'Vary' header.
+
+    - Rework 'changeLanguageForm' to support browsers without javascript.
+
+    - Allow developers to easily override the default algorithms?
+
+
+  Documentation
+
+    - Tutorial
+
+        - Add explanations for the implementation decisions
+
+        - Add examples
+
+    - Help screens
+
+        - Improve them, look at the help screens done by Andres for LLEU
+
+    - Sources
+
+      Use the python doc strings to document the code and distribute the
+      automatically generated documentation in the "doc" subdirectory.
+
+      Put comments where they should be.
+
+    - Misc files
+
+      Comply with the standard documentation files as explained in the
+      Zope Developers Guide?? For example: split CHANGES.txt into
+      CHANGES.txt and HISTORY.txt.
+
+
+  Message Catalogs
+
+    - Let to implement ZClasses that inherite from 'MessageCatalog'
+
+    - The "import/export" management screen should allow to import and
+      export any language, not only the ones already available in the
+      message catalog.
+
+    - When importing a message catalog, should be done something with
+      the header? When managing the message catalog through FTP, should
+      the header also be editable?
+
+    - Improve interfaces to manage long messages.
+
+    - Think something about garbage management.
+
+
+  LocalPropertyManager
+
+    - Add property sheets. A property sheet would appear as a tab in the
+      Zope management screens.
+
+    - Let to extend the web interface adding a holes which could be filled
+      with user templates. This could be used to add links for automatic
+      translation or preview (as was done in LLEU).
+
+    - The web interfaces could be used 
+
+    - Build user management interfaces similar to the ZMI. BTW:
+      standard_html_header/footer instead of manage_page_header/footer
+      and manage_tabs.
+
+    - Implement a new kind of Index for the catalog, to index local
+      properties?
+
+    - Add new multilingual property types: lines, tokens, etc..
+
+    - Allow to developers to implement custom property types.
+
+    - Add non-multilingual property types? Then LocalPropertyManager
+      could make the PropertyManager unneeded.
+
+  Translation Memories
+
+    Study them and the available standards (i.e. TMX). See what can
+    be done.
+
+
+  Localizer class
+
+    - When a language is added or removed the language folders are not added
+      or removed, should this be done to make it more user friendly?
+
+  Python products
+
+    - Add the ability to manage localized versions of standard files
+      in a product: the on-line help system, README.txt, etc..
+
+    - Work more on zgettext, look at pygettxt, perhaps use it.
+
+  Security
+
+    - Rethink security, which permissions are needed?
+
+  Examples
+
+    - Create a directory "examples" and move "localizer_tutorial"
+      to it.
+
+    - Add a ZClass product based on LocalPropertyManager for a
+      very simple Weblog.
+
+  Others
+
+    - Localize to other languages.
+
+    - Test performance and optimize as much as possible, develop
+      benchmarks.
+
+    - Look for better solutions for dates, numbers, etc.. (see
+      what other software does).
+
+    - What to do with multiline messages in ZPT?
+
+    - Test Localizer with ZClasses, ZPatterns and CMF, be sure that
+      work right, provide documentation and examples. 
+
+
+Other products/software/technology to look at
+---------------------------------------------
+(still not covered in the the tutorial)
+
+  - intltool (from GNOME)
+
+  - Mozilla

@@ -1,0 +1,487 @@
+msgid ""
+msgstr "Project-Id-Version: Messages\n"
+"POT-Creation-Date: 2003-04-04 06:04+YEKT\n"
+"PO-Revision-Date: 2003-04-04 06:04+YEKT\n"
+"Last-Translator:  <>\n"
+"Language-Team: en <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+# generated from xml
+
+
+msgid "category.CorrespondDocument.title"
+msgstr "Correspondence"
+
+msgid "category.CorrespondDocument.metadata.RefIndoc"
+msgstr "RefIndoc"
+
+msgid "category.CorrespondDocument.metadata.Addressee"
+msgstr "Addressee"
+
+msgid "category.CorrespondDocument.metadata.HeaderDoc"
+msgstr "HeaderDoc"
+
+msgid "category.CorrespondDocument.metadata.IspMarkDoc"
+msgstr "IspMarkDoc"
+
+msgid "category.CorrespondDocument.state.archive"
+msgstr "archive"
+
+msgid "category.CorrespondDocument.state.plan"
+msgstr "plan"
+
+msgid "category.CorrespondDocument.state.approved"
+msgstr "approved"
+
+msgid "category.CorrespondDocument.state.confirmation"
+msgstr "confirmation"
+
+msgid "category.CorrespondDocument.state.agreement"
+msgstr "agreement"
+
+msgid "category.CorrespondDocument.transition.revise"
+msgstr "revise"
+
+msgid "category.CorrespondDocument.transition.ToArchive"
+msgstr "ToArchive"
+
+msgid "category.CorrespondDocument.transition.ToApprove"
+msgstr "ToApprove"
+
+msgid "category.CorrespondDocument.transition.ToAgreement"
+msgstr "ToAgreement"
+
+msgid "category.CorrespondDocument.transition.ToApproved"
+msgstr "ToApproved"
+
+msgid "category.FBDocument.title"
+msgstr "FBDocument"
+
+msgid "category.FBDocument.metadata.HeaderDoc"
+msgstr "HeaderDoc"
+
+msgid "category.InDocument.title"
+msgstr "InDocument"
+
+msgid "category.InDocument.metadata.RefIndoc"
+msgstr "RefIndoc"
+
+msgid "category.InDocument.metadata.FromDoc"
+msgstr "FromDoc"
+
+msgid "category.InDocument.metadata.ShortTitle"
+msgstr "ShortTitle"
+
+msgid "category.InDocument.metadata.ListBE"
+msgstr "ListBE"
+
+msgid "category.InDocument.metadata.ResolDoc"
+msgstr "ResolDoc"
+
+msgid "category.InDocument.metadata.NumAnsDoc"
+msgstr "NumAnsDoc"
+
+msgid "category.InDocument.metadata.AnsDateDoc"
+msgstr "AnsDateDoc"
+
+msgid "category.InDocument.state.receip"
+msgstr "receip"
+
+msgid "category.InDocument.state.archive"
+msgstr "archive"
+
+msgid "category.InDocument.state.resolution"
+msgstr "resolution"
+
+msgid "category.InDocument.state.execution"
+msgstr "execution"
+
+msgid "category.InDocument.state.consideration"
+msgstr "consideration"
+
+msgid "category.InDocument.state.registration"
+msgstr "registration"
+
+msgid "category.InDocument.state.realized"
+msgstr "realized"
+
+msgid "category.InDocument.state.notrealized"
+msgstr "notrealized"
+
+msgid "category.InDocument.transition.ToRegistration"
+msgstr "ToRegistration"
+
+msgid "category.InDocument.transition.ToRealized"
+msgstr "ToRealized"
+
+msgid "category.InDocument.transition.ToConsideration"
+msgstr "ToConsideration"
+
+msgid "category.InDocument.transition.ToResolution"
+msgstr "ToResolution"
+
+msgid "category.InDocument.transition.ToArchive"
+msgstr "ToArchive"
+
+msgid "category.InDocument.transition.ToNotRealized"
+msgstr "ToNotRealized"
+
+msgid "category.InDocument.transition.ToExecution"
+msgstr "ToExecution"
+
+msgid "category.ISDocument.title"
+msgstr "ISDocument"
+
+msgid "category.ISDocument.metadata.NaimDoc"
+msgstr "NaimDoc"
+
+msgid "category.ISDocument.metadata.HeaderDoc"
+msgstr "HeaderDoc"
+
+msgid "category.ISDocument.metadata.NaimStrPodr"
+msgstr "NaimStrPodr"
+
+msgid "category.ISDocument.metadata.Addressee"
+msgstr "Addressee"
+
+msgid "category.ISDocument.state.archive"
+msgstr "archive"
+
+msgid "category.ISDocument.state.plan"
+msgstr "plan"
+
+msgid "category.ISDocument.state.approved"
+msgstr "approved"
+
+msgid "category.ISDocument.state.confirmation"
+msgstr "confirmation"
+
+msgid "category.ISDocument.state.agreement"
+msgstr "agreement"
+
+msgid "category.ISDocument.transition.revise"
+msgstr "revise"
+
+msgid "category.ISDocument.transition.ToArchive"
+msgstr "ToArchive"
+
+msgid "category.ISDocument.transition.ToApprove"
+msgstr "ToApprove"
+
+msgid "category.ISDocument.transition.ToAgreement"
+msgstr "ToAgreement"
+
+msgid "category.ISDocument.transition.ToApproved"
+msgstr "ToApproved"
+
+msgid "category.NormativeDocument.title"
+msgstr "Normative Document"
+
+msgid "category.NormativeDocument.metadata.dv"
+msgstr "Effective date"
+
+msgid "category.NormativeDocument.metadata.sd_from"
+msgstr "period of validity from"
+
+msgid "category.NormativeDocument.metadata.ds"
+msgstr "Effective date till"
+
+msgid "category.NormativeDocument.metadata.dp"
+msgstr "Revision date"
+
+msgid "category.NormativeDocument.metadata.sd"
+msgstr "Duration, month"
+
+msgid "category.NormativeDocument.metadata.NaimTextDoc"
+msgstr "NaimTextDoc"
+
+msgid "category.NormativeDocument.metadata.MotiveAnnDoc"
+msgstr "MotiveAnnDoc"
+
+msgid "category.NormativeDocument.metadata.DetachItDoc"
+msgstr "DetachItDoc"
+
+msgid "category.NormativeDocument.metadata.ItDetachDoc"
+msgstr "ItDetachDoc"
+
+msgid "category.NormativeDocument.metadata.ImplementationDocNo"
+msgstr "ImplementationDocNo"
+
+msgid "category.NormativeDocument.metadata.ImplementationDocDate"
+msgstr "ImplementationDocDate"
+
+msgid "category.NormativeDocument.metadata.RevokeDocNo"
+msgstr "RevokeDocNo"
+
+msgid "category.NormativeDocument.metadata.RevokeDocDate"
+msgstr "RevokeDocDate"
+
+msgid "category.NormativeDocument.metadata.CodeDoc"
+msgstr "CodeDoc"
+
+msgid "category.NormativeDocument.metadata.FuncDocSystem"
+msgstr "FuncDocSystem"
+
+msgid "category.NormativeDocument.metadata.KategoryDoc"
+msgstr "KategoryDoc"
+
+msgid "category.NormativeDocument.metadata.TypeDoc"
+msgstr "TypeDoc"
+
+msgid "category.NormativeDocument.metadata.DocInPlan"
+msgstr "DocInPlan"
+
+msgid "category.NormativeDocument.metadata.ResponsAuthor"
+msgstr "ResponsAuthor"
+
+msgid "category.NormativeDocument.metadata.OriginalHolder"
+msgstr "OriginalHolder "
+
+msgid "category.NormativeDocument.metadata.ResponsDivision"
+msgstr "Responsible Division"
+
+msgid "category.NormativeDocument.metadata.OriginalHolderDivision"
+msgstr "Original Holder Division"
+
+msgid "category.NormativeDocument.metadata.Added2PlanByAudit"
+msgstr "Added2PlanByAudit"
+
+msgid "category.NormativeDocument.metadata.countOfChanges"
+msgstr "OriginalHolder "
+
+msgid "category.NormativeDocument.metadata.notes"
+msgstr "notes"
+
+msgid "category.NormativeDocument.state.annulment"
+msgstr "Annulment"
+
+msgid "category.NormativeDocument.state.archive"
+msgstr "Archive"
+
+msgid "category.NormativeDocument.state.agreement"
+msgstr "Agreement"
+
+msgid "category.NormativeDocument.state.effective"
+msgstr "Effective"
+
+msgid "category.NormativeDocument.state.plan"
+msgstr "Plan"
+
+msgid "category.NormativeDocument.state.confirmation"
+msgstr "Confirmation"
+
+msgid "category.NormativeDocument.state.ReeditionPrepare"
+msgstr "Reedition Prepare"
+
+msgid "category.NormativeDocument.transition.annulment"
+msgstr "Annulment document"
+
+msgid "category.NormativeDocument.transition.revise"
+msgstr "Revise document"
+
+msgid "category.NormativeDocument.transition.agreement"
+msgstr "Agreement"
+
+msgid "category.NormativeDocument.transition.effective"
+msgstr "effective"
+
+msgid "category.NormativeDocument.transition.reconsideration"
+msgstr "Reconsideration"
+
+msgid "category.NormativeDocument.transition.confirmation"
+msgstr "Confirmation document"
+
+msgid "category.NormativeDocument.transition.archive"
+msgstr "Archive"
+
+msgid "category.NormativeDocument.transition.CreateChild"
+msgstr "CreateChild"
+
+msgid "category.NormativeDocument.transition.RePublish"
+msgstr "RePublish"
+
+msgid "category.NormativeDocument.transition.Revision"
+msgstr "Revision"
+
+msgid "category.ExternalNormativeDocument.title"
+msgstr "External Normative Document"
+
+msgid "category.ExternalNormativeDocumentEdit.title"
+msgstr "External Normative Document Edit"
+
+msgid "category.ExternalNormativeDocumentEdit.state.PrepareChange"
+msgstr "PrepareChange"
+
+msgid "category.OPDocument.title"
+msgstr "OPDocument"
+
+msgid "category.OPDocument.metadata.OrgAvtor"
+msgstr "OrgAvtor"
+
+msgid "category.OPDocument.metadata.NaimDoc"
+msgstr "NaimDoc"
+
+msgid "category.OPDocument.metadata.ResolDoc"
+msgstr "ResolDoc"
+
+msgid "category.OPDocument.metadata.HeaderDoc"
+msgstr "HeaderDoc"
+
+msgid "category.OPDocument.state.annulment"
+msgstr "annulment"
+
+msgid "category.OPDocument.state.archive"
+msgstr "archive"
+
+msgid "category.OPDocument.state.agreement"
+msgstr "agreement"
+
+msgid "category.OPDocument.state.approved"
+msgstr "approved"
+
+msgid "category.OPDocument.state.effective"
+msgstr "effective"
+
+msgid "category.OPDocument.state.plan"
+msgstr "plan"
+
+msgid "category.OPDocument.state.confirmation"
+msgstr "confirmation"
+
+msgid "category.OPDocument.transition.revise"
+msgstr "revise"
+
+msgid "category.OPDocument.transition.ToAnnulment"
+msgstr "ToAnnulment"
+
+msgid "category.OPDocument.transition.ToEffective"
+msgstr "ToEffective"
+
+msgid "category.OPDocument.transition.ToAgreement"
+msgstr "ToAgreement"
+
+msgid "category.OPDocument.transition.ToApprove"
+msgstr "ToApprove"
+
+msgid "category.OPDocument.transition.ToArchive"
+msgstr "ToArchive"
+
+msgid "category.OPDocument.transition.ToApproved"
+msgstr "ToApproved"
+
+msgid "category.PrikazBasic.title"
+msgstr "PrikazBasic"
+
+msgid "category.PrikazBasic.state.plan"
+msgstr "plan"
+
+msgid "category.RDocument.title"
+msgstr "RDocument"
+
+msgid "category.RDocument.metadata.OrgAvtor"
+msgstr "OrgAvtor"
+
+msgid "category.RDocument.metadata.NaimDoc"
+msgstr "NaimDoc"
+
+msgid "category.RDocument.metadata.ResolDoc"
+msgstr "ResolDoc"
+
+msgid "category.RDocument.metadata.IspMarkDoc"
+msgstr "IspMarkDoc"
+
+msgid "category.RDocument.metadata.IspedMarkDok"
+msgstr "IspedMarkDok"
+
+msgid "category.RDocument.state.notrealized"
+msgstr "notrealized"
+
+msgid "category.RDocument.state.archive"
+msgstr "archive"
+
+msgid "category.RDocument.state.execution"
+msgstr "execution"
+
+msgid "category.RDocument.state.agreement"
+msgstr "agreement"
+
+msgid "category.RDocument.state.plan"
+msgstr "plan"
+
+msgid "category.RDocument.state.confirmation"
+msgstr "confirmation"
+
+msgid "category.RDocument.state.realized"
+msgstr "realized"
+
+msgid "category.RDocument.transition.revise"
+msgstr "revise"
+
+msgid "category.RDocument.transition.ToRealized"
+msgstr "ToRealized"
+
+msgid "category.RDocument.transition.ToArchive"
+msgstr "ToArchive"
+
+msgid "category.RDocument.transition.ToApprove"
+msgstr "ToApprove"
+
+msgid "category.RDocument.transition.ToAgreement"
+msgstr "ToAgreement"
+
+msgid "category.RDocument.transition.ToNotRealized"
+msgstr "ToNotRealized"
+
+msgid "category.RDocument.transition.ToExecution"
+msgstr "ToExecution"
+
+msgid "category.SimpleDocs.title"
+msgstr "Basic Document"
+
+msgid "category.SimpleDocs.metadata.DocDate"
+msgstr "DocDate"
+
+msgid "category.SimpleDocs.metadata.RegNo"
+msgstr "RegNo"
+
+msgid "category.UPDocument.title"
+msgstr "UPDocument"
+
+msgid "category.UPDocument.metadata.HeaderDoc"
+msgstr "HeaderDoc"
+
+msgid "category.UPDocument.state.archive"
+msgstr "archive"
+
+msgid "category.UPDocument.state.plan"
+msgstr "plan"
+
+msgid "category.UPDocument.state.approved"
+msgstr "approved"
+
+msgid "category.UPDocument.state.confirmation"
+msgstr "confirmation"
+
+msgid "category.UPDocument.state.agreement"
+msgstr "agreement"
+
+msgid "category.UPDocument.transition.revise"
+msgstr "revise"
+
+msgid "category.UPDocument.transition.ToArchive"
+msgstr "ToArchive"
+
+msgid "category.UPDocument.transition.ToApprove"
+msgstr "ToApprove"
+
+msgid "category.UPDocument.transition.ToAgreement"
+msgstr "ToAgreement"
+
+msgid "category.UPDocument.transition.ToApproved"
+msgstr "ToApproved"
+
+msgid "category.NormativeDocumentEdit.title"
+msgstr "Normative Document Edit"

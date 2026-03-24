@@ -1,0 +1,50 @@
+<dtml-comment>
+$Editor: ypetrov $
+$Id: voting_view.dtml,v 1.3 2004/03/18 07:09:32 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+<dtml-var simple_html_header>
+
+<table width="100%">
+<tr>
+  <td><h1><dtml-msgtext>&dtml-meta_type;</dtml-msgtext></h1></td>
+  <td align="right"><dtml-var content_byline></td>
+</tr>
+<tr>
+  <td colspan="2">
+    <h2>&dtml-title_or_id;</h2>
+
+    <dtml-if haveVotes>
+      <dtml-in listChoices prefix="c" mapping>
+        <dtml-let ratio="_.round(100.*count/_['total-count'], 2)">
+        <dtml-if c_start>
+          <table cellspacing="3" cellpadding="0" border="0">
+        </dtml-if>
+        <tr>
+          <td>&dtml-title;</td>
+          <td><span class="voteBar" style="background: green; width:<dtml-var "_.int(ratio+1)">px;"></span>&nbsp;&dtml-ratio;% (&dtml-count;)
+          </td>
+        </tr>
+        <dtml-if c_end>
+          <tr><td colspan="2">&nbsp;</td></tr>
+          <tr>
+            <td><dtml-msg "Total votes">:</td>
+            <td><dtml-var total-count></td>
+          </tr>
+          </table>
+        </dtml-if>
+        </dtml-let>
+      <dtml-else>  
+        <dtml-msgtext>
+          No choices to vote, please <a href="&dtml-relative_url;/voting_edit_form">configure this poll</a>.
+        </dtml-msgtext>
+      </dtml-in>
+    <dtml-else>
+      <dtml-msg "No votes submitted yet">
+    </dtml-if>
+  </td>
+</tr>
+</table>
+
+<dtml-var simple_html_footer>

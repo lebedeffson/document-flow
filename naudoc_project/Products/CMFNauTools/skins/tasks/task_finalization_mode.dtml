@@ -1,0 +1,24 @@
+<dtml-comment>
+$Id: task_finalization_mode.dtml,v 1.2 2005/10/03 06:42:39 ikuleshov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-let modes="portal_followup.listFinalizationModes()"
+          selected_mode="_.has_key('finalization_mode') and finalization_mode or modes and modes[0]"
+>
+
+<dtml-msg "Finalization condition">: <br>
+
+<dtml-in modes>
+
+<input id="finalization_mode_&dtml-sequence-item;"
+       type="radio"
+       name="finalization_mode" 
+       value="&dtml-sequence-item;"
+       <dtml-var "selected_mode==_['sequence-item']" fmt=checked>
+/>
+<label for="finalization_mode_&dtml-sequence-item;"><dtml-msg expr=sequence-item></label>
+
+<br>
+</dtml-in>
+</dtml-let>

@@ -1,0 +1,27 @@
+<dtml-var site_html_header>
+<dtml-let container="this()">
+
+<div class="Desktop">
+
+<ul class="txt_news">
+
+<dtml-in publishedItems size="15" reverse mapping>
+  <li>
+     [<dtml-var "date( this(), REQUEST, **_['sequence-item'] ).strip()">]
+     <br>
+     <a class="big_menu_txt" href="&dtml-absolute_url;">&dtml-Title_or_id;</a>
+     <br><br>
+  </li>
+<dtml-else>
+  <h4>
+    Публикации отсутствуют
+  </h4>
+</dtml-in>
+
+</ul>
+
+</dtml-let>
+
+</div>
+
+<dtml-var site_html_footer>

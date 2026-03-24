@@ -1,0 +1,65 @@
+<dtml-comment>
+$Id: list_activated_action_templates_emb.dtml,v 1.5 2006/02/03 11:47:23 vsafronovich Exp $
+
+show list of action templates, which will be activated
+after making transition.
+
+also showing field allowed for editing in templates.
+
+called from change_state.dtml (changin state)
+
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<p>
+
+<dtml-in "portal_metadata.taskTemplateContainerAdapter.getTaskTemplates( Category(), transition )">
+  <dtml-if sequence-start>
+   <dtml-msg "The following tasks will be assigned">:<p>
+  </dtml-if>
+
+  <table border="0" cellpadding="10" cellspacing="1" bgcolor="#cccccc">
+    <tr>
+      <td bgcolor="#ffffff">
+        <dtml-let template_id="_['sequence-item']['template_id']"
+                  task_definition="portal_metadata.taskTemplateContainerAdapter.getTaskDefinitionById( Category(), template_id, '1' )">
+          <table>
+            <tr>
+              <td class="smallHeader"><dtml-msg "Action type">:</td>
+              <td>
+                <dtml-msg expr="portal_metadata.taskDefinitionFactory.getTaskDefinitionTypeTitle(task_definition['type'])">
+              </td>
+            </td>
+            <tr>
+              <td class="smallHeader"><dtml-msg Name>:</td>
+              <td><dtml-var "task_definition['name']"></td>
+            </tr>
+          </table>
+
+          <dtml-comment>
+
+          <dtml-if "task_definition['type'] in ['followup_request', 'followup_directive', 'followup_information', 'followup_signature_request']">
+             <dtml-var "task_definition_followup_info_emb(this(),template_id=template_id,task_definition=task_definition)">
+          </dtml-if>
+
+          <dtml-if "task_definition['type'] in ['message']">
+             <dtml-let dtml_name="'task_definition_message_info_emb'">
+             [dtml-var "task_definition_message_info_emb(this(),template_id=template_id,task_definition=task_definition)"]
+             <dtml-var "_.getitem(dtml_name)( this(), template_id=template_id, task_definition=task_definition )">
+             </dtml-let>
+          </dtml-if>
+
+          </dtml-comment>
+
+          <dtml-let dtml_name="portal_metadata.taskDefinitionFactory.getDtmlNameForInfoByType(task_definition['type'])">
+            <dtml-if dtml_name>
+              <dtml-var "_.getitem(dtml_name)( None, _, template_id=template_id, task_definition=task_definition )">
+            </dtml-if>
+          </dtml-let>
+        </dtml-let>
+      </td>
+    </tr>
+  </table>
+  <br><br>
+</dtml-in>
+

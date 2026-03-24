@@ -1,0 +1,55 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: attr_construction_derived.dtml,v 1.4 2004/09/08 09:40:15 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-let current_id=id
+          primary_uid="properties.get('primary_attr')"
+          primary_value="primary_uid and primary_uid.moniker()"
+          derived_uid="properties.get('derived_attr')"
+          derived_attrs="primary_value and primary_value(_).listDerived() or []"
+>
+
+<tr>
+  <td><dtml-msg "Primary attribute"></td>
+  <td>
+    <dtml-in listAttributeDefinitions>
+      <dtml-if sequence-start>
+        <select name="properties.primary_attr:uid:record" onChange="updatePropertiesForm(this)">
+          <option value="">(<dtml-msg "not selected">)</option>
+      </dtml-if>
+      <dtml-if "getId() != current_id and hasDerived()">
+          <option value="&dtml-getResourceUid;" <dtml-var "getResourceUid() == primary_uid" fmt=selected> >
+                  <dtml-msg expr=Title> </option>
+      </dtml-if>
+      <dtml-if sequence-end>
+        </select>
+      </dtml-if>
+    <dtml-else>
+      (<dtml-msg "no attributes defined">)
+    </dtml-in>
+  </td>
+</tr>
+
+<dtml-in derived_attrs mapping>
+
+<dtml-if sequence-start>
+<tr>
+  <td><dtml-msg "Value of the derived attribute"></td>
+  <td>
+    <select name="properties.derived_attr:uid:record">
+      <option value="">(<dtml-msg "not selected">)</option>
+</dtml-if>
+      <option value="&dtml-uid;" <dtml-var "uid == derived_uid" fmt=selected> >
+              <dtml-msg expr=title></option>
+<dtml-if sequence-end>
+    </select>
+  </td>
+</tr>
+</dtml-if>
+
+</dtml-in>
+
+</dtml-let>

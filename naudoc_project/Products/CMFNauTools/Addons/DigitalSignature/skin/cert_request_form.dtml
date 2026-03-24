@@ -1,0 +1,82 @@
+<dtml-comment>
+$Id: cert_request_form.dtml,v 1.1.1.1 2007/03/23 13:46:13 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<dtml-with portal_signature only>
+
+<div class="Desktop">
+
+<h1><dtml-var "msg('Запрос сертификата')"></h1>
+
+<form name="portal_properties" action="&dtml.url-reconfig_crypto;" method="POST">
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2">
+  <tr>
+    <th><dtml-msg "Имя"></th>
+    <td>
+      <input type="text" name="" value="Иван">
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "Отчество"></th>
+    <td>
+      <input type="text" name="" value="Иванович">
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "Фамилия"></th>
+    <td>
+      <input type="text" name="" value="Иванов">
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "Адрес электронной почты"></th>
+    <td>
+      <input type="text" name="" value="iivanov@naumen.ru">
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "Компания"></th>
+    <td>
+      <input type="text" name="" value="Naumen">
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "Подразделение"></th>
+    <td>
+      <input type="text" name="" value="NauDoc">
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "Город"></th>
+    <td>
+      <input type="text" name="" value="Екатеринбург">
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "Область"></th>
+    <td>
+      <input type="text" name="" value="66">
+    </td>
+  </tr>
+  <tr>
+   <td></td>
+   <td colspan="2"><input type="Submit" name="submit" value="<dtml-msg "Заказать">"></td>
+  </tr>
+</table>
+
+</form>
+
+</div>
+
+</dtml-with>
+
+</body>
+</html>
+
+
+<dtml-comment>
+<dtml-var standard_html_footer>
+</dtml-comment>

@@ -1,0 +1,19 @@
+<dtml-if "msg.default_language('ru')">Content-Type: text/plain; charset=windows-1251
+</dtml-if>Subject: <dtml-var "msg('Document \'%s\' has been changed') % doc_title">
+
+<dtml-if transition>
+<dtml-var "msg('User \'%s\' has performed transition \'%s\' on the document \'%s\'') % (user, msg(transition), doc_title)">.
+<dtml-else>
+<dtml-var "msg('User \'%s\' has changed the document \'%s\'') % (user, doc_title)">.
+</dtml-if>
+
+<dtml-if description>
+<dtml-var "msg('Document description')">:
+&dtml-doc_descr;
+
+</dtml-if>
+<dtml-var "msg('URL')">:
+&dtml-url;
+
+<dtml-var "msg('You may adjust your subscription by visiting the following link')">:
+&dtml-subscription_url;

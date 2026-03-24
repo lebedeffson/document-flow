@@ -1,0 +1,23 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: attr_construction_computed.dtml,v 1.4 2004/09/08 09:40:15 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-let script_uid="properties.get('script_object')"
+          script_value="script_uid and script_uid.moniker()">
+
+<tr>
+  <td><dtml-msg "Script"></td>
+  <td nowrap="1">
+    <dtml-var "entry_field_edit( None, _,
+                                 type='link',
+                                 name='properties.script_object:record',
+                                 value=script_value,
+                                 properties={'allowed_features':['isScript']},
+                               )">
+  </td>
+</tr>
+
+</dtml-let>

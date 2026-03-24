@@ -1,0 +1,130 @@
+<dtml-comment>
+Server error page.
+
+$Editor: vpastukhov $
+$Id: standard_error_message.dtml,v 1.10 2008/12/19 10:46:48 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.10 $>
+
+<dtml-let error_id="portal_errorlog.getLastEntryId()"
+	  error_url="error_id and portal_errorlog.absolute_url( action='error_log_entry', params={'id':error_id} )"
+	  unauthorized="_.str(error_type) == 'Unauthorized'"
+	  portal_status_message="''" >
+<dtml-if "portal_membership.isAnonymousUser()">
+
+<html>
+<head>
+<title>Error</title>
+</head>
+<body>
+
+<p>
+<dtml-if error_id>
+<dtml-msg "Error ID">: &dtml-error_id;<br />
+</dtml-if>
+<dtml-msg "Error type">: &dtml-error_type;<br />
+<dtml-msg "Error value">: &dtml-error_value;<br />
+</p>
+
+</body>
+</html>
+
+<dtml-else>
+
+<dtml-call "REQUEST.set( 'OpenInFrame', '' )">
+<dtml-call "portal_url.getPortalObject().setupCurrentSkin( REQUEST )">
+
+<dtml-var simple_html_header>
+
+<dtml-if unauthorized>
+
+<h1><img src="&dtml-portal_url;/unauthorized_icon.gif" alt="" width="16" height="16">
+    <dtml-msg "Access denied"></h1>
+
+<p>
+<dtml-msg "You have no access to the requested resource.
+You may try to repeat the action that caused the error,
+or if this doesn't help, report the error to the portal administrator.">
+</p>
+
+<dtml-if error_url>
+<p><a href="&dtml-error_url;" target="_blank"><dtml-msg "View error log entry"></a></p>
+</dtml-if>
+
+<dtml-else>
+
+<h1><img src="&dtml-portal_url;/error_icon.gif" alt="" width="16" height="16">
+    <dtml-msg "Internal server error"></h1>
+
+<p>
+<dtml-msg "An internal server error occured during processing of your operation.
+You may try to repeat the action that caused the error,
+or if this doesn't help, report the error to the portal administrator.">
+</p>
+
+<p><dtml-msg "We apologize for inconvenience."></p>
+
+<p>
+<dtml-if error_message>
+<dtml-msg "Error message">:
+<strong class="error"><dtml-msg expr=error_message></strong><br />
+<br />
+</dtml-if>
+
+<dtml-msg "Error type">:
+<span class="error">&dtml-error_type;</span><br />
+
+<dtml-msg "Error value">:
+<span class="error">&dtml-error_value;</span><br />
+</p>
+
+<dtml-if error_url>
+<p><a href="&dtml-error_url;" target="_blank"><dtml-msg "View error log entry"></a></p>
+</dtml-if>
+
+<h2><dtml-msg "Repeat action that caused the error"></h2>
+
+<form name="error_retry_form">
+<input type="button" name="retry" value=" <dtml-msg "Retry"> " onclick="javascript: window.location.reload(1)"/>
+</form>
+
+<dtml-comment>
+<h2><dtml-msg "Report error to the portal administrator"></h2>
+
+<form name="error_report_form" action="&dtml-portal_url;/portal_errorlog/sendErrorReport" method="post">
+
+<input type="hidden" name="id" value="&dtml-error_id;" />
+<input type="hidden" name="admin:boolean" value="1" />
+
+<p>
+<strong><dtml-msg "Comment">:</strong><br />
+<textarea name="comment:text" tabindex="1" wrap="soft" rows="5" style="width: 100%"></textarea><br />
+
+<dtml-if "_.SecurityCheckPermission( 'Log Site Errors', this() )">
+<input type="checkbox" name="support:boolean" id="support_box" tabindex="2"><label for="support_box"><dtml-msg "Notify NauDoc support service"></label><br />
+</dtml-if>
+</p>
+
+<p><input type="submit" name="report" value=" <dtml-msg "Send"> " tabindex="3" /></p>
+
+</form>
+</dtml-comment>
+</dtml-if>
+
+<hr size="1">
+
+<h2><dtml-msg "Return to the previous page"></h2>
+
+<form name="error_back_form">
+<input type="button" name="back" value=" <dtml-msg "Back"> " onclick="window.history.back();" />
+<input type="button" 
+       name="close" 
+       value=" <dtml-msg "Close"> " 
+       onclick="if (window.top) window.top.close(); else window.close();" />
+</form>
+
+<dtml-var simple_html_footer>
+
+</dtml-if>
+</dtml-let>

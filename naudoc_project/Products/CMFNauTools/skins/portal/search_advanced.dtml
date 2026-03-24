@@ -1,0 +1,305 @@
+<dtml-comment>
+Inline form for advanced object search.
+
+$Editor: vpastukhov $
+$Id: search_advanced.dtml,v 1.39 2008/08/21 11:37:37 oevsegneev Exp $
+
+</dtml-comment>
+
+<dtml-revision $Revision: 1.39 $>
+
+<dtml-let query_id="_.has_key('query_id') and query_id or None"
+	  profile_id="_.has_key('profile_id') and profile_id or None"
+	  query="portal_catalog.getQuery( query_id, profile=profile_id, REQUEST=REQUEST )"
+	  folder="query.location and restrictedTraverse( query.location )"
+          type_items="portal_types.listTypeInfo()"
+          batch_items="_.has_key('batch_items') and batch_items or [10,25,50,100]"
+	  batch_length="_.has_key('batch_length') and batch_length or _.int( portal_membership.getInterfacePreferences('viewing_document_number') )"
+
+>
+
+<dtml-var search_scripts>
+
+<dtml-call "type_items.sort( lambda a,b: _.cmp( msg(a.Title(),add=0), msg(b.Title(),add=0) ) )">
+<dtml-call "batch_length in batch_items or batch_items.append( batch_length ) or batch_items.sort()">
+
+<dtml-with query>
+
+<dtml-let hasnt_nd="not portal_metadata.getCategoryById('NormativeDocument')"
+          implements_query="implements and (_.same_type(implements, {}) and implements['query'] or implements) or []"
+          otype_on="'isHTMLDocument' in implements_query or 'bodies' in objects"
+          category_on="category"
+          standard_on="oid or title or description or creation[0] or creation[1]"
+          special_on="'normative_filter' in filters or doc_in_plan or transitivity"
+          normative_on="'normative_filter' in filters or doc_in_plan or transitivity"
+          ctrl_attributes_on="_.hasattr(query, 'attributes') and attributes['query'] or standard_on or special_on or normative_on"
+          scope_on="scope!='global'"
+
+	  on_img="portal_url()+'/bull_down.gif'"
+	  off_img="portal_url()+'/bull_right.gif'"
+          ctrl_attributes_img="ctrl_attributes_on and on_img or off_img"
+          standard_img="standard_on and on_img or off_img"
+          special_img="special_on and on_img or off_img"
+          normative_img="normative_on and on_img or off_img"
+          scope_img="scope_on and on_img or off_img"
+>
+
+<form id="search_form" name="search_form" action="<dtml-var "relative_url( action='search_query' )">"
+      method="POST" class="SearchFormLayout"
+      <dtml-unless from_explorer>target="workspace"</dtml-unless>
+      onSubmit="return validateSearchForm(this);">
+
+<input type="hidden" name="batch_length:int" value="&dtml-batch_length;">
+
+<dtml-if action>
+<input type="hidden" name="action" value="&dtml-action;" />
+</dtml-if>
+<dtml-if profile_id>
+<input type="hidden" name="profile_id" value="&dtml-profile_id;" />
+</dtml-if>
+<dtml-if from_explorer>
+<input type="hidden" name="from_explorer" value="1" />
+</dtml-if>
+
+<style type="text/css">
+<!--
+
+.SearchFormLayout h4, .SearchFormLayout p {
+    font-size: 11px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.SearchFormLayout h4, .SearchFormLayout th {
+    color: #000000;
+    font-size: 11px;
+}
+
+.SearchFormLayout table {
+    border: 0px;
+    border-spacing: 0px;
+}
+
+.SearchFormLayout th {
+    text-align: left;
+}
+
+.SearchFormLayout .expanded {
+    width: 100%;
+}
+
+//-->
+</style>
+
+<h4><dtml-msg "Search text"></h4>
+
+<input type="hidden" name="objects:list" value="">
+
+<p>
+<input type="text" class="expanded" name="text" size="30" value="&dtml-text;"
+       title="<dtml-msg "search.syntax_tip">" />
+<input type="submit" name="search" value="<dtml-msg "Search">" style="float: right;" />
+<dtml-msg "This will find text in items' contents, title and description.">
+</p>
+
+<br />
+
+<h4><dtml-msg "Search object"></h4>
+<select id="otype" name="otype" onChange="checkDiv( this.form, this.id, this.value, 0 ); checkDiv( this.form, 'attrs', this.value, 0 );">
+  <option value="any" ><dtml-msg "Any"></option>
+  <dtml-in type_items>
+    <option value="&dtml-getId;" <dtml-var "types and getId() in types or otype_on and getId()=='HTMLDocument'" fmt="selected">><dtml-msg expr="Title()"></option>
+  </dtml-in>
+  <dtml-if "portal_catalog.attachmentSearchEnabled()">
+    <option value="Attachments"  <dtml-var "'attachments' in objects" fmt="selected">><dtml-msg "Attachments"></option>
+  </dtml-if>
+</select>
+
+<DIV id="ctrl_attributes" onClick="checkDiv(this.parentNode, this.id, '', 0);" style="cursor: Pointer; margin-top: 5pt;" onselectstart="return false;">
+  <img src="&dtml-ctrl_attributes_img;" id="ctrl_attributes_img">
+  <dtml-msg "Search in attributes">
+</DIV>
+<input type='hidden' id="ctrl_attributes_trigger" name="ctrl_attributes_trigger" value='&dtml-ctrl_attributes_on;'>
+
+<DIV id="ctrl_attributes__div" style="display: <dtml-var "not ctrl_attributes_on and 'none' or ''">; margin-left: 10pt;">
+  <dtml-in "portal_metadata.listCategories()">
+    <dtml-let attrs="_['sequence-item'].listAttributeDefinitions()"
+              cat_id="_['sequence-item'].getId()"
+    >
+      <dtml-if attrs>
+        <DIV id="attrs_&dtml-cat_id;_div" style="display: none"></DIV>
+      </dtml-if>
+    </dtml-let>
+  </dtml-in>
+  <DIV id="standard" onClick="checkDiv(this.parentNode, this.id, '', 0)" style="cursor: Pointer; margin-top: 5pt;" onselectstart="return false;">
+    <img src="&dtml-standard_img;" id="standard_img">
+    <dtml-msg "Standard attributes">
+  </DIV>
+  <input type='hidden' id="standard_trigger" name="standard_trigger" value='&dtml-standard_on;'>
+
+  <DIV id="standard__div" style="display: <dtml-var "not standard_on and 'none' or ''">;">
+    <table width="90%">
+      <tr>
+        <th><dtml-msg "Id"></th>
+        <td width="100%">
+          <input type="text" class="expanded" name="oid" value="&dtml-oid;" size="20" />
+        </td>
+      </tr>
+
+      <tr>
+        <th><dtml-msg "Title"></th>
+        <td width="100%">
+          <input type="text" class="expanded" name="title" value="&dtml-title;" size="20" />
+        </td>
+      </tr>
+
+      <tr>
+        <th><dtml-msg "Description"></th>
+        <td width="100%">
+          <input type="text" class="expanded" name="description" value="&dtml-description;" size="20" />
+        </td>
+      </tr>
+    </table>
+    <table width="90%">
+      <tr>
+        <th rowspan="2" width="100%"><dtml-msg "Modified"></th>
+        <td><dtml-msg "since"></td>
+        <td align="right" nowrap="1"><dtml-var "datetime_form( this(), REQUEST, prefix='created_from', date=creation[0] )"></td>
+      </tr>
+
+      <tr>
+        <td><dtml-msg "till"></td>
+        <td align="right" nowrap="1"><dtml-var "datetime_form( this(), REQUEST, prefix='created_till', date=creation[1] )"></td>
+      </tr>
+    </table>
+  </DIV>
+</DIV>
+
+<DIV id="otype_HTMLDocument_div" style="display: <dtml-var "not otype_on and 'none' or ''">; margin-top: 5pt;">
+  <h4><dtml-msg "Category"></h4>
+  <select id="category" name="category" onChange="checkDiv( this.form, this.id, this.value, 1 );checkDiv( this.form, 'attrs', this.value, 0 );">
+    <option value="any" ><dtml-msg "Any"></option>
+    <dtml-in "portal_metadata.listCategories('HTMLDocument')">
+      <option value="&dtml-getId;" <dtml-var "getId()==category" fmt="selected">><dtml-msg expr="Title()"></option>
+    </dtml-in>
+  </select>
+
+  <DIV id="category_any_div" style="display: <dtml-var "not category_on and 'none' or ''">; margin-top: 5pt;">
+
+    <h4><dtml-msg "State"></h4>
+    <dtml-in "portal_metadata.listCategories('HTMLDocument')" prefix="cat">
+      <DIV id="category_&dtml-getId;_div" style="display: none"></DIV>
+    </dtml-in>
+
+    <DIV id="special" onClick="checkDiv(this.parentNode, this.id, '', 0)" style="cursor: Pointer; margin-top: 5pt; display: <dtml-var "hasnt_nd and 'none' or ''">;" onselectstart="return false">
+      <img src="&dtml-special_img;" id="special_img">
+      <dtml-msg "Special search">
+    </DIV>
+    <input type='hidden' id="special_trigger" name="special_trigger" value='&dtml-special_on;'>
+
+    <DIV id="special__div" style="display: <dtml-var "not normative_on and 'none' or ''">; margin-left: 10pt; cursor: Pointer;" onselectstart="return false;">
+      <DIV id="normative" onClick="checkDiv(this.parentNode, this.id, '', 0)" style="cursor: Pointer;" onselectstart="return false;">
+        <img src="&dtml-normative_img;" id="normative_img">
+        <dtml-msg "Normative Documents">
+      </DIV>
+      <input type='hidden' id="normative_trigger" name="normative_trigger" value='&dtml-normative_on;'>
+
+      <DIV id="normative__div" style="display: <dtml-var "not normative_on and 'none' or ''">; margin-left: 10pt;" >
+        <input type="checkbox" name="filters:list" id="filters" value="normative_filter" <dtml-var "'normative_filter' in filters" fmt="checked">>
+        <label for="filters">
+          <dtml-msg "Search documents for revision">
+        </label>
+        <br />
+        <input type="checkbox" name="doc_in_plan" id="doc_in_plan" value="1" <dtml-var doc_in_plan fmt="checked">>
+        <label for="doc_in_plan">
+          <dtml-msg "category.NormativeDocument.metadata.DocInPlan">
+        </label>
+        <br />
+        <input type="checkbox" name="transitivity" id="transitivity" value="1" <dtml-var transitivity fmt="checked">>
+        <label for="transitivity">
+          <dtml-msg "transitivity">
+        </label>
+      </DIV>
+    </DIV>
+  </DIV>
+  <DIV style="margin-top: 5pt;">
+    <input type="checkbox" name="is_versions" <dtml-var "'isVersion' in implements_query and 'checked' or ''"> />
+    <label for="objects" onselectstart="return false;">
+      <dtml-msg "Search in versions of documents">
+    </label>
+  </DIV>
+</DIV>
+
+<hr size="1" />
+
+<DIV id="scope" onClick="checkDiv(this.parentNode, this.id, '', 0)" style="cursor: Pointer;" onselectstart="return false;">
+  <img src="&dtml-portal_url;/&dtml-scope_img;" id="scope_img">
+  <dtml-msg "Search scope">
+</DIV>
+<input type='hidden' id="scope_trigger" name="scope_trigger" value='&dtml-scope_on;'>
+
+<DIV id="scope__div" style="display: <dtml-var "not scope_on and 'none' or ''">;">
+  <input type="hidden" name="location" value="&dtml.null-location;" />
+
+  <dtml-if "folder">
+  <dtml-with "folder">
+
+  <input type="radio" name="scope_value" id="scope_preserved" value="preserved" checked="1" />
+  <label for="scope_preserved" onselectstart="return false;">
+    <dtml-msg "Folder">
+  </label>
+  <a href="&dtml-absolute_url;/folder_contents" target="workspace">&dtml-title_or_id;</a>
+  <br />
+  </dtml-with>
+  </dtml-if>
+
+  <p>
+  <input type="radio" name="scope_value" id="scope_global" value="global"
+         <dtml-var "not folder and scope == 'global'" fmt="checked"> />
+  <label for="scope_global" onselectstart="return false;">
+    <dtml-msg "Global search">
+  </label>
+  <br />
+
+  <input type="radio" name="scope_value" id="scope_local" value="local"
+         <dtml-var "not folder and scope == 'local'" fmt="checked"> />
+  <label for="scope_local" onselectstart="return false;">
+    <dtml-msg "Current folder only">
+  </label>
+  <br />
+
+  <input type="radio" name="scope_value" id="scope_recursive" value="recursive"
+         <dtml-var "not folder and scope == 'recursive'" fmt="checked"> />
+  <label for="scope_recursive" onselectstart="return false;">
+    <dtml-msg "Current folder with subfolders">
+  </label>
+
+  </p>
+</DIV>
+<br />
+
+<p>
+<input type="submit" name="save" value="<dtml-msg "Save query">">
+</p>
+
+</form>
+
+<script type="text/javascript">
+<!--
+
+<dtml-unless from_explorer>
+  document.search_form.text.focus();
+</dtml-unless from_explorer>
+
+<dtml-if "category and category!='any'">
+  setupForm( document.forms['search_form'], '&dtml-category;' );
+</dtml-if>
+
+//-->
+</script>
+
+
+</dtml-let>
+</dtml-with>
+
+</dtml-let>

@@ -1,0 +1,41 @@
+<dtml-var migration_html_header>
+
+<h2>Welcome to the NauDoc &dtml-productVersion; product version migration tool.</h2>
+
+<form name="start_form" method="POST" onsubmit="disableForm(this);">
+
+Previous installed version: 
+
+<dtml-if product_version>
+  &dtml-product_version;
+<dtml-else>
+  unknown
+</dtml-if>
+
+<p>
+Version migration process consists of several steps. First of all, it is required
+to scan your product instance for outdated objects and settings. No 
+changes to the portal objects will be done during this stage.  After the system
+analysis is complete, migration tool may also prompt you to specify some
+additional options, thus providing you with ability to take control over the
+version changing operations. Finally, you will be able to start the actual
+portal updating process.
+</p>
+
+<p>
+In case you are not willing to proceed, just install the old version of the
+NauDoc product into the Zope products directory. Note that it is the only way
+to access your portal content without starting the migration procedure.
+</p>
+
+<p>Warning! This operation may take a considerable amount of time depending on
+the number of documents in the database.</p>
+
+<p><strong>It is strongly recommended to make a backup copy of the database before you 
+proceed.</strong></p>
+
+<input type="submit" name="next" value="Analyse objects and settings &gt;&gt;">
+
+</form>
+
+<dtml-var migration_html_footer>

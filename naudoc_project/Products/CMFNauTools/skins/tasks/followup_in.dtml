@@ -1,0 +1,37 @@
+<dtml-comment>
+$Editor: ikuleshov $
+$Id: followup_in.dtml,v 1.21 2005/11/03 06:07:03 vsafronovich Exp $
+</dtml-comment>
+<dtml-var simple_html_header>
+
+<dtml-let
+  modeName="REQUEST.get('showTaskMode') or 'showCurrent'"
+  show_filter="portal_followup.getShowFilter( modeName )"
+>
+
+<table width="100%">
+<tr>
+  <td>
+     <h1><dtml-msg expr="show_filter.getParentTitle()"> "<dtml-msg expr="show_filter.title">"</h1>
+  </td>
+</tr>
+<dtml-if "show_filter.implements('canCreateTasks')">
+<tr>
+  <td>
+     <dtml-var task_factory_form><br />
+  </td>
+</tr>
+</dtml-if>
+<tr>
+  <td>
+    <dtml-var "task_list_embedded( None, _
+                                 , mode_name=modeName
+                                 , header=show_filter.header
+                                 , show_filter=True
+                                 )"
+    >
+  </td>
+</tr>
+</table>
+</dtml-let>
+<dtml-var simple_html_footer>

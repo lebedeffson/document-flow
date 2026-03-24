@@ -1,0 +1,243 @@
+<dtml-comment>
+Normative Document report
+TODO: choosing beggining folder gui code, must replace with entry_field_edit( type='link', link='folder')
+$Id: followup_ndreport.dtml,v 1.10 2005/12/04 14:58:04 vsafronovich Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+<dtml-revision $Revision: 1.10 $>
+
+<dtml-if "not REQUEST.get('hide_filter_head','')">
+<dtml-var simple_html_header>
+<dtml-else>
+
+<html>
+<head>
+<title><dtml-msg Report></title>
+
+<link rel="stylesheet" type="text/css" href="&dtml-portal_url;/styles.css">
+
+</head>
+<body lang="<dtml-var "msg.get_default_language()">">
+
+</dtml-if>
+
+<center><h1><dtml-msg "List of normative documents"></h1></center>
+
+<dtml-let session="REQUEST['SESSION']"
+          hide_filter_head="REQUEST.get('hide_filter_head','')"
+          filter_category="REQUEST.get('view_category', session.get('nd_filter_category','NormativeDocument'))"
+          filter_state="REQUEST.get('view_state', session.get('nd_filter_state','effective'))"
+          filter_state="filter_state!='_all' and filter_state or None"
+          folder_uid="REQUEST.get('folder_uid', session.get('nd_folder_uid',''))"
+          folder_title="portal_catalog.getMetadataByUid(folder_uid) and portal_catalog.getMetadataByUid(folder_uid)['Title'] or REQUEST.get('folder_title','')"
+          with_copies="REQUEST.has_key('with_copies')"
+          results="( REQUEST.has_key('apply_filter') or hide_filter_head) and followup_ndreport_results(folder_uid, filter_category, filter_state)"
+          effective_date="REQUEST.get('effective_date', session.get('nd_effective_date',''))"
+          expiration_date="REQUEST.get('expiration_date', session.get('nd_expiration_date',''))"
+          >
+<dtml-call "session.set( 'nd_folder_uid', folder_uid)">
+<dtml-call "session.set( 'nd_filter_category', filter_category)">
+<dtml-call "session.set( 'nd_filter_state', filter_state)">
+<dtml-call "session.set( 'nd_effective_date', effective_date)">
+<dtml-call "session.set( 'nd_expiration_date', expiration_date)">
+
+<dtml-unless "hide_filter_head">
+<form name="apply_filter_form" target="_self" method="POST">
+<input type="hidden" name="hide_filter_head" value="">
+
+<table>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "New report details">
+    </td>
+  </tr>
+<tr class="row_even">
+  <td class="small">
+    <dtml-msg "Beginning Folder">:
+  </td>
+  <td>
+    <input type="text" size=50 name="folder_title" value="<dtml-var folder_title html_quote>" readonly="1">
+    <input type="hidden" name="folder_uid" value="<dtml-var folder_uid>" >
+    <input type="button" value="<dtml-msg "Browse...">" onClick="return open_folders_wnd();">
+  </td>
+</tr>
+<script type="text/javascript">
+function open_folders_wnd()
+{
+    registerWindow( 'NDReport'
+                  , '&dtml-absolute_url;/task_reportwizard_folders'
+                  , 'toolbar=no,scrollbars=yes,width=300,height=400,resizable=yes'
+                  );
+}
+
+function setFolderUrl(  folder_uid, title )
+{
+    document.forms[0].folder_title.value = title;
+    document.forms[0].folder_uid.value = folder_uid;
+}
+</script>
+<tr class="row_even">
+  <td class="small">
+    <dtml-msg "Category">:
+  </td>
+  <td>
+    <select name="view_category" onchange="location.href='?view_category='+this.value+'&view_state=_all'<dtml-if "with_copies">+'&with_copies=1'</dtml-if>" size="8" multiple>
+    <dtml-let NDcategory="portal_metadata.getCategoryById('NormativeDocument')"
+              availablecats="NDcategory and ([NDcategory] + NDcategory.listDependentCategories() + NDcategory.listSubordinateCategories()) or []"
+              >
+    <dtml-in availablecats>
+      <option value="&dtml-getId;" <dtml-var "getId()==filter_category" fmt=selected> >  <dtml-var "msg(Title(), add=None)"> </option>
+    </dtml-in>
+    </dtml-let>
+    </select>
+  </td>
+</tr>
+<tr class="row_even">
+  <td class="small">
+    <dtml-msg "State">:
+  </td>
+  <td>
+    <dtml-var "selectstate( None, _,
+                            name='view_state',
+                            category_id=filter_category,
+                            state_id=filter_state,
+                            use_any_state=1
+              )">
+  </td>
+</tr>
+<tr class="row_even" >
+  <td class="small">
+    <dtml-msg "Effective document">
+  </td>
+  <td>
+    <dtml-var "daterange_template( None, _
+                                 , mindate_name='effective_date'
+                                 , mindate_value=effective_date
+                                 , maxdate_name='expiration_date'
+                                 , maxdate_value=expiration_date
+                                 , date_only=True)">
+  </td>
+</tr>
+
+<tr class="row_even">
+  <td class="small">
+    <dtml-msg "Show copyholders">:
+  </td>
+  <td>
+    <input name="with_copies" type="checkbox" <dtml-var "with_copies" fmt=checked>>
+  </td>
+
+</tr>
+<tr>
+    <td colspan="2">
+       <input type="submit" name="apply_filter" value="<dtml-msg "Apply">">
+    </td>
+</tr>
+</table>
+</form>
+</dtml-unless>
+
+<dtml-if "REQUEST.has_key('apply_filter') or hide_filter_head">
+
+<dtml-in results mapping>
+<dtml-if sequence-start>
+<dtml-if "REQUEST.has_key('apply_filter')">
+<input type="button" class="button" value="<dtml-msg "Print preview">"onclick="javascript: return printPreview();">
+<script type="text/javascript">
+var form = document.apply_filter_form;
+
+function printPreview(){
+    form.hide_filter_head.value = 'Yes';
+    form.target="_blank";
+    form.submit();
+    form.hide_filter_head.value = '';
+    form.target="_self";
+}
+
+</script>
+</dtml-if>
+<table border="1" cellspacing="1" cellpadding="3" width="100%">
+  <tr class="row_title" align="center">
+    <td class="smallHeader" colspan="<dtml-var "4-with_copies">" style="font-size:medium;">
+      <dtml-msg "Folder name">
+    </td>
+  </tr>
+  <tr class="row_title" align="center">
+    <td class="small"> <dtml-msg "ND label">
+    </td>
+    <td class="small"> <dtml-msg "ND name">
+    </td>
+    <td class="small"> <dtml-msg "Effective document">
+    </td>
+  <dtml-unless "with_copies"> 
+    <td class="small"> <dtml-msg "Copies">
+    </td>
+  </dtml-unless>
+  </tr>
+ <dtml-if "with_copies">
+  <tr class="row_title" align="center">
+    <td class="small" colspan="2">
+      <dtml-msg "Center of location">
+    </td>
+    <td class="small"> <dtml-msg "Copies">
+    </td>
+  </tr>
+  </dtml-if>
+</dtml-if>
+  <dtml-if Folder>
+  <tr><td colspan="<dtml-var "4-with_copies">">&nbsp;</td></tr>
+  <tr class="row_even" align="center">
+    <td class="smallHeader" colspan="<dtml-var "4-with_copies">" style="font-size:medium;">
+      <dtml-var Folder html_quote>
+    </td>
+  </tr>
+  </dtml-if>
+  <tr class="row_even" align="center">
+    <td class="smallHeader" valign="top">
+      <dtml-var Title html_quote null="&nbsp;">
+    </td>
+    <td class="smallHeader" align="left">
+      <dtml-var Description html_quote null="&nbsp;">
+    </td>
+    <td class="smallHeader">
+      <dtml-var dv html_quote null="&nbsp;">
+      <dtml-in subordinate_docs_titles>
+        <br>&dtml-sequence-item;
+      </dtml-in>
+    </td>
+<dtml-unless "with_copies">
+    <td class="smallHeader"> <dtml-var copies_nums null="&nbsp;">
+    </td>
+</dtml-unless>
+  </tr>
+<dtml-if "with_copies">
+  <dtml-in copies mapping>
+  <tr class="row_even" >
+    <td colspan="2" class="small">
+      &nbsp;&nbsp;
+      <dtml-if workshop>&dtml-workshop;</dtml-if>
+      <dtml-if department> / &dtml-department;</dtml-if>
+      <dtml-if position> / &dtml-position;</dtml-if>
+    </td>
+    <td class="small" align="center">
+      <dtml-var number null="&nbsp;">
+    </td>
+  </tr>
+  </dtml-in>
+</dtml-if>
+
+<dtml-if sequence-end>
+</table>
+</dtml-if>
+<dtml-else>
+  <center><dtml-msg "n/a"></center>
+</dtml-in>
+</dtml-if>
+
+</dtml-let>
+<dtml-if "not REQUEST.get('hide_filter_head','')">
+  <dtml-var simple_html_footer>
+<dtml-else>
+  </body>
+</html>
+</dtml-if>

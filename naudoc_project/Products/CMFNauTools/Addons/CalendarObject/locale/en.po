@@ -1,0 +1,55 @@
+msgid ""
+msgstr "Project-Id-Version: Messages\n"
+"POT-Creation-Date: 2004-05-12 14:05+YEKT\n"
+"PO-Revision-Date: 2004-05-12 14:05+YEKT\n"
+"Last-Translator:  <>\n"
+"Language-Team: ru <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CP1251\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+msgid "directories.add_branch"
+msgstr "Add branch"
+
+msgid "directories.add_entry"
+msgstr "Add entry"
+
+msgid "directories.column_scope.directory"
+msgstr "in directory"
+
+msgid "directories.column_scope.none"
+msgstr "none"
+
+msgid "directories.column_scope.owner"
+msgstr "in ownership"
+
+msgid "directories.column_scope.parent"
+msgstr "in parentage"
+
+msgid "directories.column_usage.all"
+msgstr "for all"
+
+msgid "directories.column_usage.branches"
+msgstr "for branches"
+
+msgid "directories.column_usage.entries"
+msgstr "for entries"
+
+msgid "directories.confirm_columns_deletion"
+msgstr "WARNING\nAttribute values in all existing entries will be permanently cleared.\nPlease confirm that you really want to proceed with deletion."
+
+msgid "directories.confirm_entries_deletion"
+msgstr "Please confirm that you really want to proceed with deletion."
+
+msgid "directories.column_value_exists"
+msgstr "There already exists value "%(value)s" for the attribute "%(column.title)s" in the directory."
+
+msgid "directories.full_code"
+msgstr "Full code"
+
+msgid "directories.full_title"
+msgstr "Full title"
+
+msgid "directories.parent_branch"
+msgstr "Parent branch"

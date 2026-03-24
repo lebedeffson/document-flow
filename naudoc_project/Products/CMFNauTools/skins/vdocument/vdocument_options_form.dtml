@@ -1,0 +1,345 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_options_form.dtml,v 1.19 2004/06/05 09:18:41 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.19 $>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+
+function EnableList(elem)
+{
+    var is_lines = elem.options[elem.selectedIndex].value == 'lines';
+    document.getElementById('listrow').style.display = is_lines ? '' : 'none';
+}
+
+//-->
+</script>
+
+<h1> &dtml-title_or_id; </h1>
+
+<table>
+<form name='manage_vdocument_metadata_form' 
+      action="<dtml-var "relative_url(action='vdocument_options')" url_quote>" >
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "Document options">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg Title>
+    </td>
+    <td>
+       <input name="title" size="50"
+        value="&dtml-title;"
+       />
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small" width="20%">
+       <dtml-msg Description>
+    </td>
+    <td>
+      <textarea name="description" rows="10" cols="50">&dtml-description;</textarea>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2"> 
+      <input type="submit" name="apply" value="<dtml-msg Save>">
+    </td>
+  </tr>
+</form>
+
+<form name="add_del_templates_form"
+      method="POST"
+      enctype="multipart/form-data"
+      action="<dtml-var "relative_url(action='vdocument_options')" url_quote>" >
+
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "Attached files"> (<dtml-msg templates>)
+    </td>
+  </tr>
+
+  <input type="hidden" name="deletefile">
+  <dtml-in listAttachments>
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td class="small" colspan="2">
+      <a href="&dtml-getId;" target="_blank">&dtml-title_or_id;</a>
+      (<dtml-var "'%.1f' % (get_size() / 1024.0)"> Kb)
+      <input type="image" 
+             name="delete" 
+             onClick="deletefile.value = '&dtml-getId;';" 
+             alt="<dtml-msg "Remove">" 
+             src="<dtml-var "portal_url(action='delete.gif')">" hspace=2 border=0>
+    </td>
+  </tr>
+  </dtml-in>
+  <tr class="row_even">
+    <td colspan="2">
+      <input type="file" name="attach"><br/>
+      <input type="submit" name="add_attach" value="<dtml-msg "Insert file">">
+    </td>
+  </tr>
+
+</form>
+<form name="delete_columns_form"
+      action="<dtml-var "relative_url(action='vdocument_options')" url_quote>" >
+
+  <tr class="row_title">
+    <td colspan="2" class="smallHeader">
+      <dtml-msg "Record columns">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2" class="small">
+      <dtml-in listColumns>
+        <input type="checkbox" name="selected_columns:list" value="&dtml-getId;">
+        &dtml-Title; - &dtml-getId; (<dtml-msg expr=Type>) <dtml-if "getId() in listKeyColumns()"><b><dtml-msg "key"></b></dtml-if><br>
+
+        <dtml-if sequence-end>
+          <input type="submit" name="del_columns" value="<dtml-msg "Delete">">
+          <input type="submit" name="set_key_columns" value="<dtml-msg "Set key columns">">
+          <input type="submit" name="reset_key_columns" value="<dtml-msg "Reset key columns">">
+        </dtml-if>
+      </dtml-in>
+    </td>
+  </tr>
+
+</form>
+<form name="add_column_form"
+      action="<dtml-var "relative_url(action='vdocument_options')" url_quote>"
+      onSubmit="return validateForm( this, 1);" >
+
+  <tr class="row_even">
+    <td colspan="2" class="small"> <br>
+      <dtml-msg "Id">: <input type="text" 
+                              name="column_id:id_" 
+                              size="10"
+                              validation_message="<dtml-msg "Column id is invalid">" />
+      <dtml-msg "Title">: <input type="text" 
+                                 name="column_title:required" 
+                                 size="30"
+                                 validation_message="<dtml-msg "Please specify the column title">" />
+      <dtml-msg "Type">: 
+      <dtml-in listColumnTypes>
+        <dtml-if sequence-start>
+          <select name="column_type" onChange="EnableList(this);">
+        </dtml-if>
+          <option value="&dtml-sequence-item;"
+                  <dtml-var "_['sequence-item']==getDefaultColumnType()" fmt=selected> >
+            <dtml-msg expr=sequence-item>
+          </option>
+        <dtml-if sequence-end></select></dtml-if>
+      </dtml-in>
+    </td>
+  </tr>
+  <tr class="row_even" id="listrow" style="display:none">
+    <td class="small">
+      <dtml-msg "Options of select">:
+    </td>
+    <td>
+      <textarea name="value_list:lines" rows="5" cols="20"></textarea>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <input type="submit" name="add_column" value="<dtml-msg "Add column">">
+    </td>
+  </tr>
+
+</form>
+<form name="manage_step_options_form"
+      action="<dtml-var "relative_url(action='vdocument_options')" url_quote>" >
+
+  <tr class="row_title">
+    <td colspan="2" class="smallHeader">
+        <dtml-msg "Queue options">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2" class="small">
+
+    <dtml-in listStepValues>
+      <dtml-if sequence-start>
+      <table>
+      </dtml-if>
+        <dtml-let step=sequence-item
+                  step_id=sequence-number
+        >
+           <tr>
+             <td class="smallHeader">
+                 <dtml-msg "Step"> &dtml-step_id;:
+             </td>
+             <td class="small">
+                &dtml-Title;
+             </td>
+           </tr>
+           <tr>
+             <td class="small">
+                 <dtml-msg "Allowed members">:
+             </td>
+             <td>
+                <dtml-in "step.allowed_members">
+                <dtml-if sequence-start>
+                   <table width="100%" cellpadding="2" cellspacing="0">
+                    <tr>
+                     <td class="small">
+                </dtml-if>
+                      <dtml-var sequence-item fmt=member><br />
+                      <dtml-if "(_['sequence-length'] > 10) and _['sequence-index'] == _['sequence-length'] / 2">
+                        <dtml-comment> End of first column </dtml-comment>
+                        </td>
+	                <td width="1"><dtml-var spacer.gif></td>
+                        <td class="small">
+                      </dtml-if>
+
+                <dtml-if sequence-end>
+                    </td>
+                   </tr>
+                  </table>
+                </dtml-if>
+                </dtml-in>
+             </td>
+           </tr>
+                <dtml-in "step.listRollbackSteps()">
+                <dtml-if sequence-start>
+           <tr>
+             <td class="small">
+                 <dtml-msg "Possible rollback steps">:
+             </td>
+             <td>
+                   <table width="100%" cellpadding="2" cellspacing="0">
+                    <tr>
+                     <td class="small">
+                </dtml-if>
+                   <dtml-var "getStepById(_['sequence-item']).Title()" html_quote><br>
+                <dtml-if sequence-end>
+                    </td>
+                   </tr>
+                  </table>
+             </td>
+           </tr>
+                </dtml-if>
+                </dtml-in>
+                <dtml-in allowed_groups>
+                  <dtml-if sequence-start>
+           <tr>
+             <td class="small">
+               <dtml-msg "Allowed groups">:
+             </td>
+             <td>
+                   <table width="100%" cellpadding="2" cellspacing="0">
+                    <tr>
+                     <td class="small">
+                  </dtml-if>
+
+                      <dtml-var "portal_membership.getGroup(_['sequence-item']).Title()" html_quote> <br>
+                      <dtml-if "(_['sequence-length'] > 10) and _['sequence-index'] == _['sequence-length'] / 2">
+                        <dtml-comment> End of first column </dtml-comment>
+                        </td>
+	                <td width="1"><dtml-var spacer.gif></td>
+                        <td class="small">
+                      </dtml-if>
+
+                  <dtml-if sequence-end>
+                    </td>
+                   </tr>
+                   </table>
+             </td>
+           </tr>
+                  </dtml-if>
+                </dtml-in>
+           <tr>
+             <td class="small">
+               <dtml-msg "Duration">:
+             </td>
+             <td>
+                 <dtml-var "dateperiod(getDuration())">
+             </td>
+           </tr>
+           <tr>
+             <td class="small">
+                 <dtml-msg "Permissions">:
+             </td>
+             <td>
+                 <dtml-let columns=listColumns>
+                 <dtml-in columns>
+                   <dtml-if sequence-start>
+                     <table width="100%">
+                     <tr class="row_title">
+                   </dtml-if>
+                      <td class="small" align="center">
+                         &nbsp; &dtml-Title; &nbsp;
+                      </td>
+                   <dtml-if sequence-end>
+                    </tr>
+                    <tr>
+                   </dtml-if>
+                 </dtml-in>
+                 <dtml-in columns prefix=col>
+                    <dtml-let perms="[]"
+                              readable="getId() in step.listReadableColumnIds() and perms.append(msg('Read')) or ''"
+                              writable="getId() in step.listWritableColumnIds() and perms.append(msg('Write')) or ''"
+                    >
+                      <td class="small" align="center">
+                         <dtml-var "_.string.join(perms, '/') or '-'">
+                      </td>
+                    </dtml-let>
+                   <dtml-if sequence-end>
+                    </tr>
+                    </table>
+                   </dtml-if>
+                 </dtml-in>
+                 </dtml-let>
+             </td>
+           </tr>
+           <tr>
+             <td class="small">
+             </td>
+             <td>
+                <input type="submit" name="modify_step_&dtml-step_id;" value=" <dtml-msg "Modify"> ">
+                <input type="submit" name="delete_step_&dtml-step_id;" value=" <dtml-msg "Delete"> ">
+                <input type="submit" name="moveup_step_&dtml-step_id;" value=" <dtml-msg "Move up"> ">
+                <input type="submit" name="movedown_step_&dtml-step_id;" value=" <dtml-msg "Move down"> ">
+             </td>
+           </tr>
+
+        </dtml-let>
+
+      <dtml-if sequence-end>
+      </table>
+      <dtml-else>
+           <tr>
+             <td class="small" colspan="2">
+                 <hr>
+             </td>
+           </tr>
+      </dtml-if>
+    </dtml-in>
+
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2" class="small"> <br>
+      <dtml-if listColumns>
+        <dtml-msg "Title">: <input type="text"
+                                   name="step_title"
+                                   size="30">
+        <input type="submit"
+               name="add_step"
+               value=" <dtml-msg "Add step"> "
+        >
+      <dtml-else>
+        <em><dtml-msg "You should specify at least one column to manage the steps queue"></em>
+      </dtml-if>
+    </td>
+  </tr>
+</form>
+</table>
+
+<dtml-var simple_html_footer>

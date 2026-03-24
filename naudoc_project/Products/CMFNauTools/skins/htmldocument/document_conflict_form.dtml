@@ -1,0 +1,52 @@
+<dtml-comment>
+Shows changing between original document and edited document.
+
+$Editor: oevsegneev $
+$Id: document_conflict_form.dtml,v 1.7 2006/05/16 11:12:46 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.7 $>
+
+<dtml-var simple_html_header>
+
+<form name="document_conflict_form" action="document_conflict" method="post" target="workfield">
+  <table cellpadding="2" cellspacing="2">
+    <tr>
+      <td>
+        <input type="hidden" name="id" value="&dtml-id;">
+        <input type="hidden" name="title" value="&dtml-title;">
+        <input type="hidden" name="description" value="&dtml-description;">
+        <h3><dtml-msg "Users conflict"></h3>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h5><dtml-msg "During editing, the document was changed by other user."></h5><br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <dtml-if "REQUEST.has_key('show_diff')">
+          <b><dtml-msg "The difference between saved data and your data">:</b>
+          <div class="diff"><dtml-var "REQUEST.get('diff')"></div>
+        <dtml-else>
+          <b><dtml-msg "Show the difference between saved data and your data"></b>&nbsp;&nbsp;
+          <input type="submit" name="show" value=" <dtml-msg "Show"> ">
+        </dtml-if>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="submit" name="create_version" value=" <dtml-msg "Create new version"> ">
+        <input type="submit" name="save" value=" <dtml-msg "Save anyway"> ">
+        <input type="submit" name="cancel" value=" <dtml-msg "Cancel"> ">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <textarea name='text' style="display: none"><dtml-var "REQUEST.get('text')"></textarea>
+      </td>
+    </tr>
+  </table>
+</form>
+
+<dtml-var simple_html_footer>

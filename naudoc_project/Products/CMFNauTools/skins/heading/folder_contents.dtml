@@ -1,0 +1,21 @@
+<dtml-comment>
+Main folder page template (workspace).
+
+$Editor: vpastukhov $
+$Id: folder_contents.dtml,v 1.22 2004/03/09 17:17:07 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.22 $>
+
+<dtml-var standard_html_header>
+
+<dtml-let path="REQUEST.get( 'action', 'folder' )">
+<iframe src="&dtml-absolute_url;/&dtml-path;/?portal_status_message=<dtml-var "REQUEST.get('portal_status_message','')">"
+	width="100%" height="100%" scrolling="auto" frameborder="0" name="workfield">
+    Unfortunately your browser does not support frames.<br />
+    We are sorry for inconvenience.
+</iframe>
+
+</dtml-let>
+
+<dtml-var standard_html_footer>

@@ -1,0 +1,245 @@
+<dtml-comment>
+Page template for viewing the folder contents.
+
+$Editor: vpastukhov $
+$Id: folder.dtml,v 1.81 2006/05/16 10:04:58 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.81 $>
+
+<dtml-var simple_html_header>
+
+<table width="100%" border="0">
+<tr>
+ <td valign="top">
+   <img src="gray_of.gif" alt=""/>
+   <dtml-if "implements('isPortalRoot') or parent().implements('isPortalRoot')">
+     <h1><dtml-msg "Recent documents"></h1>
+     <dtml-let member="portal_membership.getAuthenticatedMember()">
+      <dtml-try>
+       <dtml-call "member.setProperties(login_time=_.DateTime())">
+      <dtml-except>
+        <dtml-comment>
+           You are not registered inside NauSite
+        </dtml-comment>
+      </dtml-try>
+     </dtml-let>
+   <dtml-else>
+    <h1>&dtml-title_or_id;</h1>
+     <dtml-if "portal_membership.getInterfacePreferences('contents_size')">
+       <dtml-msg "Accessible documents">:&nbsp;
+       <dtml-var "portal_catalog.searchResults( implements={'query':['isHTMLDocument', 'isPortalContent'],
+                                                            'operator':'and'},
+                                                parent_path = physical_path())"
+                 fmt=collection-length>
+       <br/>
+     </dtml-if>
+   </dtml-if>
+<dtml-if Description>
+ &dtml-Description;
+</dtml-if>
+ </td>
+ <td class="small" align="right">
+   <dtml-let editor=editor
+             state="portal_workflow.getInfoFor(this(), 'state', '')"
+   >
+   <dtml-msg expr=state> <br />
+
+   <dtml-if user_roles>
+     <dtml-msg "Role">:
+      <b>
+      <dtml-in user_roles>
+         <dtml-msg expr=sequence-item><dtml-unless sequence-end>,</dtml-unless>
+      </dtml-in>
+      </b> <br>
+   </dtml-if>
+
+    <dtml-in editor>
+      <dtml-if sequence-start>
+         <dtml-msg "Editor">:
+      </dtml-if>
+      <dtml-var sequence-item fmt=member><dtml-unless sequence-end>,</dtml-unless>
+    </dtml-in>
+
+   </dtml-let>
+
+ </td>
+</tr>
+
+<dtml-comment>
+  New object creation box
+</dtml-comment>
+
+<dtml-if "_.int(REQUEST.get('arch_cookie', 0))==0 and implements('isContentStorage')">
+<dtml-let types="allowedContentTypes( construction=1 )"
+          container="this()"
+>
+<dtml-if types>
+
+<tr>
+  <td colspan="2" align="right">
+    <form name='factory' METHOD="POST" class="inline">
+      <table>
+        <tr>
+          <td align="right" class="smallHeader"><dtml-msg "New object">: </td>
+          <td>
+            <select name="factory_url">
+              <dtml-in types sort="sort_order">
+                <option value="<dtml-var "container.absolute_url(action=getFactoryForm(), params={'type_name': getId()})">"
+                /><dtml-msg expr="title_or_id"></option>
+              </dtml-in>
+            </select>
+            <input type="button"
+                  value="<dtml-msg "Create">"
+                  onClick="javascript:openUrl(this.form.factory_url.value, target='workfield')"
+            />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </td>
+</tr>
+
+</dtml-if>
+</dtml-let>
+</dtml-if>
+
+<!-- This is the desktop area -->
+<div class="Desktop">
+
+<dtml-comment>
+   Display state change comments
+</dtml-comment>
+
+<dtml-let comments="portal_workflow.getInfoFor(this(), 'comments', None)">
+  <dtml-if comments>
+     <p>&dtml-comments;</p>
+  </dtml-if>
+</dtml-let>
+
+<dtml-comment>
+   List folder contents according to the filter settings
+</dtml-comment>
+
+<dtml-let context=this
+          content_filter=getFolderFilter
+          view_type="(parent().implements('isPortalRoot') and not content_filter.get('Root', None)) and 'outgoing' or portal_membership.getCurrentFolderView()"
+          hide_buttons="view_type == 'outgoing'"
+          uid=getUid
+          session="REQUEST['SESSION']"
+          batch_size="_.int(portal_membership.getInterfacePreferences('viewing_document_number'))"
+          viewer="_.getitem('folder_view_%s' % view_type)"
+          disable_controls="1"
+          qs_new="_.int(REQUEST.get('qs', session.get('%s_qs' % uid, 1)))"
+          qs="qs_new / batch_size * batch_size + 1"
+          sort_on="view_type == 'table' and portal_membership.getCurrFolderViewParam('sort_by') or 'created'"
+          sort_order="view_type == 'table' and portal_membership.getCurrFolderViewParam('reverse') or 'reverse'"
+          documents_results="listDocuments( REQUEST=REQUEST, sort_on=sort_on, sort_order=sort_order, sort_limit=qs + batch_size-1 )"
+          documents="documents_results[0]"
+          documents_count="documents_results[1]"
+          directives_results="listDirectives( REQUEST=REQUEST, sort_on=sort_on, sort_order=sort_order, sort_limit=qs + batch_size-1 )"
+          directives="directives_results[0]"
+          directives_count="directives and directives_results[1] or 0"
+          results_count="documents_count + directives_count"
+          >
+<dtml-call "session.get('%s_qs' % uid, 1) != qs and session.set('%s_qs' % uid, qs)">
+<tr>
+  <td colspan="2">
+<form name="objectItems" action="&dtml-absolute_url;" method="POST" target="workfield">
+
+
+<table cellspacing="1" cellpadding="0" width="100%" border="0">
+
+<dtml-if "results_count > batch_size"> 
+  <tr>
+    <td><dtml-var table_pages_list></td>
+  </tr>
+</dtml-if>
+  <tr>
+    <td>
+      <dtml-if "results_count">
+        <dtml-var viewer>
+      <dtml-else>
+        <h4><dtml-msg "Folder is empty"></h4>
+      </dtml-if>
+    </td>
+  </tr>
+<dtml-if "results_count > batch_size"> 
+  <tr>
+    <td><dtml-var table_pages_list></td>
+  </tr>
+</dtml-if>
+
+<dtml-comment> End of listing table </dtml-comment>
+
+<dtml-unless hide_buttons>
+<tr>
+  <td>
+
+<dtml-if "documents and _.SecurityCheckPermission( 'Add portal content', this() )">
+<input type="submit" name="folder_cut:method" value="<dtml-msg "Cut">" >
+</dtml-if>
+
+<dtml-if documents>
+<input type="submit" name="folder_copy:method" value="<dtml-msg "Copy">">
+</dtml-if>
+
+<dtml-if "_.SecurityCheckPermission( 'Add portal content', this() )">
+<input type="submit" name="folder_paste:method" value="<dtml-msg "Paste">"
+  <dtml-unless cb_dataValid>disabled</dtml-unless> />
+</dtml-if>
+
+<dtml-if documents>
+
+<dtml-if "not implements('isStatic') and _.SecurityCheckPermission( 'Delete objects', this() )">
+<input type="submit" name="confirm_delete:method" value="<dtml-msg "Delete">">
+</dtml-if>
+
+<dtml-if expr="implements('isOutgoingMailFolder') and _.SecurityCheckPermission( 'Use mailhost services', this() )">
+<input type="submit" name="confirm_dispatch:method" value="<dtml-msg "Send">">
+</dtml-if>
+
+<dtml-if "getSite() and _.SecurityCheckPermission( 'Publish portal content', this() )">
+<input type="submit" name="publish_confirm:method" value="<dtml-msg "Publish">">
+</dtml-if>
+
+</dtml-if>
+
+<dtml-if "results_count">
+<input type="button" 
+       name="selectAll" 
+       value="<dtml-msg "Select All">" 
+       onClick="toggleSelect( this.form['ids:list'], this )"
+       onDblClick="toggleSelect( this.form['ids:list'], this )">
+</dtml-if>
+
+ </td>
+</tr>
+</dtml-unless>
+
+</table>
+</form>
+
+<br />
+
+<dtml-if "REQUEST.get( 'show_filter_form' )">
+  <dtml-var heading_filter_form>
+<dtml-elif content_filter>
+  <small><dtml-msg "This content is filtered by">:
+    <a href="&dtml-absolute_url;/portal_membership/processFilterActions?open_filter_form=1">
+      <dtml-var "content_filter['name'] or '(%s)' % msg('no name')" html_quote>
+    </a>
+  </small>
+<dtml-else>
+  <a href="&dtml-absolute_url;/portal_membership/processFilterActions?open_filter_form=1">
+    <dtml-msg "The filtering is off">
+  </a>
+</dtml-if>
+
+  </td>
+</tr>
+</table>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

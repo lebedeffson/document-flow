@@ -1,0 +1,34 @@
+<dtml-let traverse_len="_.len(traverse_subpath)"
+          current_len="_.len(subpath)"
+
+          currentId="(traverse_len == current_len + 1) and traverse_subpath[-1] or None"
+          openedId="(traverse_len > current_len) and traverse_subpath[current_len] or None"
+>
+
+<dtml-in "go.listSubFolders(subpath)" mapping>
+  <dtml-let opened="id == openedId">
+
+  <table cellspacing=2 cellpadding=0 border=0>
+  <tr>
+    <td width="20" hight="15" align="left" valign="top"><img src="&dtml-portal_url;/<dtml-var "opened and 'mfopen.gif' or 'mfclosed.gif'">"></td>
+    <td>
+
+    <dtml-if "id == currentId">
+      <div class="menu_selected"><b>&dtml-title;</b></div>
+    <dtml-else>
+      <a href="&dtml-absolute_url;">&dtml-title;</a>
+    </dtml-if>
+
+    <dtml-if opened>
+      <dtml-var "folders_list(this(), REQUEST, subpath=subpath + [id])">
+      <dtml-var "documents_list(this(), REQUEST, subpath=subpath + [id])">
+    </dtml-if>
+
+    </td>
+  </tr>
+  </table>
+
+  </dtml-let>
+</dtml-in>
+
+</dtml-let>

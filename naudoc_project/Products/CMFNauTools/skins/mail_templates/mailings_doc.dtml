@@ -1,0 +1,18 @@
+<dtml-if "text_type=='html'">
+    <dtml-if topic_title>
+<P align="left"><B>[ <dtml-var topic_title html_quote> ]</B></P>
+    </dtml-if>
+    <dtml-if doc_title>
+<P align="left"><B><dtml-var doc_title html_quote>:</B></P>
+    </dtml-if>
+<dtml-else>
+    <dtml-if topic_title>
+[ <dtml-var topic_title> ]
+    </dtml-if>
+    <dtml-if doc_title>
+<dtml-var doc_title >:
+    </dtml-if>
+</dtml-if>
+<dtml-if doc_text>
+<dtml-var doc_text>
+</dtml-if>

@@ -1,0 +1,162 @@
+<dtml-comment>
+Document attachments listing page.
+
+$Editor: vpastukhov $
+$Id: document_attaches.dtml,v 1.49 2007/01/10 13:34:41 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.49 $>
+
+<dtml-var simple_html_header>
+
+<h1><dtml-msg "Attached files"></h1>
+
+<dtml-let l_context=this
+          l_category=getCategory
+          l_associated=getAssociatedAttachment
+          l_modify="getVersion().isEditable() and not isLocked()" >
+
+<script type="text/javascript">
+function confirmDelete(form)
+{
+    if ( getCheckedRadioButton(form.elements['ids:list']) )
+        return confirm("<dtml-msg "Do you really want to delete these objects?">")
+    else {
+        alert("<dtml-msg "Please select object">")
+        return false
+    }
+}
+</script>
+
+<form name="attachments"
+      action="<dtml-var "relative_url( action='document_edit' )" html_quote>"
+      method="POST"
+      enctype="multipart/form-data"
+      onSubmit="return validateForm(this, 1) && disableForm(this);"
+      target="workfield">
+
+<input type="hidden" name="pastefile">
+<input type="hidden" name="associatefile">
+<input type="hidden" name="rm_associate">
+
+<dtml-in listAttachments>
+  <dtml-if sequence-start>
+    <table class="attachments" cellpadding="2" cellspacing="0">
+  </dtml-if>
+    <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+      <td>
+        <dtml-if l_modify>
+          <input type="checkbox" name="ids:list" value="&dtml-getId;">
+        </dtml-if>
+        <img src="&dtml-portal_url;/&dtml-getIcon;" alt="<dtml-msg expr=meta_type>" title="<dtml-msg expr=meta_type>" 
+             align="absmiddle" border="0" />
+        &dtml-title_or_id; (<dtml-var "'%.1f' % (get_size() / 1024.0)"> Kb)
+      </td>
+
+      <td align="right" valign="middle" nowrap>
+        <dtml-comment> View </dtml-comment>
+        <a class="toolbar-button" target="_blank"
+           href="<dtml-var "implements('isAttachment') and relative_url()
+                            or relative_url(action = getId(),
+                                            params = _.hasattr(this(), 'wasTIFF') and {'display': 'tiff'} or None)">">
+          <img src="&dtml-portal_url;/view.gif" alt="<dtml-msg "View">" align="absmiddle" width="16" height="16"></a>
+
+        <dtml-if l_modify>
+          <dtml-comment> Edit with external editor </dtml-comment>
+          <dtml-if isLocked>
+            <span class="resolution"><dtml-msg "Editing by">&nbsp;<dtml-var getLockCreator fmt=member></span>
+          <dtml-else>
+            <dtml-var external_edit_link>
+          </dtml-if>
+
+          <dtml-comment> Associate/diassociate with document </dtml-comment>
+          <dtml-if "this() == l_associated">
+            <input type="image" src="&dtml-portal_url;/del_assoc.gif" hspace="2" border="0" align="absmiddle"
+                   onClick="document.attachments.rm_associate.value = '&dtml-getId;'"
+                   alt="<dtml-msg "Remove association">">
+          <dtml-elif "not l_associated and isTextual() and not l_category.isContentFixed()">
+            <input type="image" src="&dtml-portal_url;/assoc.gif" hspace="2" border="0" align="absmiddle"
+                   onClick="document.attachments.associatefile.value = '&dtml-getId;'<dtml-var "text and '; document.attachments.action=\''+l_context.relative_url( action='document_confirm_association' )+'\'; document.attachments.submit();'">"
+                   alt="<dtml-msg "Set association">">
+          </dtml-if>
+
+          <dtml-comment> Paste image in document text </dtml-comment>
+          <dtml-if "implements('isImageAttachment')">
+            <select name="&dtml-id;_size">
+              <dtml-unless isTIFF><option value=''><dtml-msg "normal"></option></dtml-unless>
+              <dtml-in displayIds prefix="dispid">
+                <dtml-let findframe="dispid_item.find('frame')"
+                          orig_text="findframe<>-1 and dispid_item[:findframe+5] or dispid_item"
+                          rendered_text="findframe<>-1 and orig_text+'%(number)s' or orig_text"
+                          number="dispid_item[_.len(orig_text):]">
+                <option value='&dtml-sequence-item;'><dtml-msg expr="rendered_text" number="number"></option>
+                </dtml-let>
+              </dtml-in>
+            </select>
+          </dtml-if>
+
+          <dtml-comment> Paste link in document text </dtml-comment>
+          <dtml-unless "l_associated or l_category.isContentFixed() and not _.SecurityCheckPermission('Manage portal', this())">
+            <input type="image" src="&dtml-portal_url;/paste.gif" alt="<dtml-msg "Paste into text">"
+                   hspace="2" border="0" align="absmiddle" onClick="document.attachments.pastefile.value = '&dtml-getId;'">
+          </dtml-unless>
+        </dtml-if>
+      </td>
+    </tr>
+  <dtml-if sequence-end>
+    </table>
+    <dtml-if l_modify>
+      <div style="padding: 1em 0; text-align: right">
+        <input type="submit" name="delete" value="<dtml-msg "Delete">" onclick="return confirmDelete(this.form)">
+      </div>
+    </dtml-if>
+  </dtml-if>
+<dtml-else>
+<h1><dtml-msg "No files attached"></h1>
+</dtml-in>
+
+<dtml-if l_modify>
+<h3><dtml-msg "Add an attachment">:</h3>
+
+<table class="FormLayout">
+
+<tr>
+  <th align="right"><dtml-msg "File">:</th>
+  <td width="100%"><input type="file" name="upload" size="35"></td>
+</tr>
+
+<tr>
+  <th align="right"><dtml-msg "Id">:</th>
+  <td width="100%"><input type="text" name="id:id_" value="" size="35"> (<dtml-msg "optional">)</td>
+</tr>
+
+<dtml-unless "l_category.isContentFixed() or listAttachments() or this().text">
+<tr>
+  <th align="right">&nbsp;</th>
+  <td width="100%">
+    <input type="checkbox" name="try_to_associate" value="1" checked >
+    <dtml-msg "Associate version with the file text">. <br>
+    <dtml-msg "Supported formats are">: <dtml-var "', '.join(portal_catalog.attachmentSearchEnabled())">.
+  </td>
+</tr>
+</dtml-unless>
+
+<tr>
+  <td>&nbsp;</td>
+  <td width="100%"><input type="submit" name="attachfile" value="<dtml-msg "Insert file">"></td>
+</tr>
+
+</table>
+
+<dtml-elif isLocked><br>
+
+  <dtml-msg "This document has been locked because it is being edited by another user.">.
+
+</dtml-if>
+</form>
+
+<dtml-var document_links_embedded>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

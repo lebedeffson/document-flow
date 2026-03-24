@@ -1,0 +1,50 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: edit_service_form.dtml,v 1.4 2004/04/27 05:56:12 vpastukhov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Edit service settings"></h2>
+
+<form name="edit_service_form" method="post"
+      action="<dtml-var "relative_url( action='manage_adapters_handler' )" html_quote>">
+
+<table width="90%">
+
+<tr>
+  <td><dtml-msg "Title">:</td>
+  <td><input type="text" name="title" value="&dtml-Title;" size="66" /></td>
+</tr>
+
+<dtml-in listEditableProperties mapping>
+
+<tr>
+  <td><dtml-msg expr=title>:</td>
+  <td>
+    <dtml-var "entry_field_edit( None, _,
+                                 name=id,
+                                 type=type,
+                                 value=value,
+                                 options=(_.has_key('options') and _.getitem('options') or []),
+                               )">
+  </td>
+</tr>
+
+</dtml-in>
+
+<tr>
+  <td>&nbsp;</td>
+  <td>
+    <input type="submit" name="save_service" value="<dtml-msg "Save">" />
+    &nbsp;&nbsp;&nbsp;
+    <input type="submit" name="cancel" value="<dtml-msg "Cancel">" />
+  </td>
+</tr>
+
+</table>
+
+</form>
+
+<dtml-var simple_html_footer>

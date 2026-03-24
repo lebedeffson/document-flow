@@ -1,0 +1,129 @@
+status_dictionary:
+  draft:
+    label: "Черновик"
+    owner_role: employee
+  on_review:
+    label: "На согласовании"
+    owner_role: manager
+  on_approval:
+    label: "На утверждении"
+    owner_role: manager
+  signed:
+    label: "Подписан"
+    owner_role: manager
+  on_familiarization:
+    label: "На ознакомлении"
+    owner_role: office
+  on_registration:
+    label: "На регистрации"
+    owner_role: office
+  registered:
+    label: "Зарегистрирован"
+    owner_role: office
+  archived:
+    label: "Архивирован"
+    owner_role: office
+
+integration_statuses:
+  pending_document: "Ожидает документ"
+  linked: "Связано"
+  draft: "Черновик"
+  on_review: "На согласовании"
+  on_approval: "На утверждении"
+  signed: "Подписан"
+  on_familiarization: "На ознакомлении"
+  registered: "Зарегистрирован"
+  archived: "Архивирован"
+  sync_error: "Ошибка синхронизации"
+
+document_types:
+  incoming_document:
+    label: "Входящий документ"
+    required_fields:
+      - "Наименование документа"
+      - "Тип документа"
+      - "Дата документа"
+      - "Регистрационный номер"
+      - "Ответственный"
+    route:
+      - draft
+      - on_registration
+      - registered
+      - on_familiarization
+      - archived
+  outgoing_document:
+    label: "Исходящий документ"
+    required_fields:
+      - "Наименование документа"
+      - "Тип документа"
+      - "Дата документа"
+      - "Регистрационный номер"
+      - "Ответственный"
+    route:
+      - draft
+      - on_review
+      - on_approval
+      - signed
+      - on_registration
+      - registered
+      - archived
+  internal_document:
+    label: "Внутренний документ"
+    required_fields:
+      - "Наименование документа"
+      - "Тип документа"
+      - "Дата документа"
+      - "Ответственный"
+    route:
+      - draft
+      - on_review
+      - on_approval
+      - signed
+      - on_familiarization
+      - archived
+  service_note:
+    label: "Служебная записка"
+    required_fields:
+      - "Наименование документа"
+      - "Тип документа"
+      - "Ответственный"
+    route:
+      - draft
+      - on_review
+      - on_approval
+      - signed
+      - on_familiarization
+      - archived
+  order:
+    label: "Приказ"
+    required_fields:
+      - "Наименование документа"
+      - "Тип документа"
+      - "Дата документа"
+      - "Регистрационный номер"
+      - "Ответственный"
+    route:
+      - draft
+      - on_review
+      - on_approval
+      - signed
+      - on_familiarization
+      - on_registration
+      - registered
+      - archived
+  contract:
+    label: "Договор"
+    required_fields:
+      - "Наименование документа"
+      - "Тип документа"
+      - "Дата документа"
+      - "Регистрационный номер"
+      - "Ответственный"
+    route:
+      - draft
+      - on_review
+      - on_approval
+      - signed
+      - on_registration
+      - registered
+      - archived

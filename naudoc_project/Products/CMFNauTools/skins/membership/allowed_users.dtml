@@ -1,0 +1,60 @@
+<dtml-comment>
+$Id: allowed_users.dtml,v 1.12 2007/06/21 14:19:42 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.12 $>
+
+<dtml-let has_users="False"
+          object_uid="REQUEST.get('uid', None)"
+          category_id="REQUEST.get('category', None)"
+          container="object_uid and portal_catalog.getObjectByUid(object_uid)
+                     or category_id and portal_metadata.getCategoryById(category_id)
+                     or this()"
+>
+<dtml-with container>
+<dtml-in "['Editor', 'Writer', 'Author', 'Reader']" prefix="role">
+  <dtml-in "portal_membership.listSortedUserNames(portal_membership.listAllowedUsers( this(), role_item, all=True ))" mapping>
+
+    <dtml-if sequence-start>
+
+      <dtml-unless "has_users">
+
+        <dtml-call "_.set( 'has_users', True )">
+        <h1><dtml-msg "The following users are allowed to access this object">:</h1>
+
+      </dtml-unless>
+
+      <table cellspacing="1" cellpadding="3">
+        <tr>
+          <td class="col_odd" width="1%"><b><dtml-msg expr=role_item></b></td>
+          <td class="col_even">
+            <table width="100%" cellpadding="2" cellspacing="0">
+              <tr>
+                <td>
+    </dtml-if>
+                   <dtml-var user_id fmt=member><br />
+    <dtml-if "(_['sequence-length'] > 10) and _['sequence-index'] == _['sequence-length'] / 2">
+      <dtml-comment> End of first column </dtml-comment>
+                </td>
+                    <td width="1"><img src="&dtml-portal_url;/spacer.gif"/></td>
+                <td class="col_even">
+    </dtml-if>
+
+    <dtml-if sequence-end>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </dtml-if>
+
+  </dtml-in>
+</dtml-in>
+</dtml-with>
+
+<dtml-unless has_users>
+  <h1><dtml-msg "There are no users allowed to access this object"></h1>
+</dtml-unless>
+
+</dtml-let>

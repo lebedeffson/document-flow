@@ -1,0 +1,46 @@
+Message Catalog - Manage messages.
+
+  Description
+
+    This view displays the messages stored in the catalog and
+    allows to manage them (to add, remove and translate).
+
+    View messages
+
+      The main part of the interface is a table where few messages
+      are shown at a time. If there're lots of messages there will
+      be two links, 'Next' and 'Previous', that let to browse the
+      message catalog.
+
+      It's also possible to show only the set of messages that match
+      a pattern, to do so enter the regular expression in the input
+      box and click the 'Filter' button.
+
+      The table has one column per language, if the background color
+      of the cell of a language is white means that the message don't
+      has translation in that language, if it's gray means it has.
+
+    Add messages
+
+      To add a new message enter it in the input box and click the
+      'Add' button.
+
+    Delete messages
+
+      To delete one or more messages check the checkboxes that are
+      at the left side of the messages to be removed and click the
+      'Delete' button.
+
+    Translate messages
+
+      There're two ways two translate messages.
+
+      The first way is to provide translations to all the displayed
+      messages for one language. To do so click at the language to
+      edit, then the table will show an input box for each message,
+      just enter the translations and click the 'Save changes' button.
+
+      The second way is to edit a message and provide its translations
+      to all the languages. To do so click on the message, then a new
+      view will appear with one input box per language, just add the
+      translations ad click the 'Save changes button'.

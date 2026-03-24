@@ -1,0 +1,178 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_entry_form.dtml,v 1.12 2004/07/23 07:23:30 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.12 $>
+
+<dtml-var simple_html_header>
+
+<h1> <dtml-var "parent().title_or_id()" html_quote> </h1>
+
+<dtml-let step=getStep
+          enabled=isEnabled
+          chief_user=getChiefUser
+          rollback_steps="step.listRollbackSteps()"
+          parent_url="parent().absolute_url()"
+          entry=this
+          form_name="'entry_edit_form'"
+>
+<dtml-comment>
+  Edit entry form
+</dtml-comment>
+
+<form name="entry_edit_form" 
+      action="<dtml-var "relative_url(action='vdocument_edit')" html_quote>" 
+      method="POST"
+      onsubmit="return validateForm(this,1) ? disableForm(this) : false;"
+      enctype="multipart/form-data" >
+
+  <table cellspacing="1" cellpadding="3">
+    <tr class="row_title">
+      <td class="smallHeader" colspan="2">
+        <dtml-var "step.Title()">
+        <dtml-if isAbandoned>
+          - <dtml-msg "Abandoned">
+        <dtml-elif isFinalized>
+          - <dtml-msg "Finalized">
+        </dtml-if>
+      </td>
+    </tr>
+    <dtml-if chief_user>
+    <tr class="row_title">
+      <td class="small"><dtml-msg "Chief user">:</td>
+      <td><dtml-var chief_user fmt=member></td>
+    </tr>
+    </dtml-if>
+    <tr class="row_title">
+      <td class="small"><dtml-msg "Duration">:</td>
+      <td><dtml-var "dateperiod(step.getDuration())"></td>
+    </tr>
+
+    <dtml-in "parent().listColumns()">
+    <tr class="row_even">
+      <td class="smallHeader">&dtml-Title;</td>
+      <td>
+        <dtml-let name=getId
+        >
+         <dtml-var "entry_field_edit( None, _
+                                    , descriptor=getColumnDescriptor(
+                                        modify=enabled and isSetAllowed(name),
+                                        view=isGetAllowed(name)
+                                        )
+                                    , value=entry.get(name, moniker=1),
+                                    )" >
+
+        </dtml-let>
+      </td>
+    </tr>
+    </dtml-in>
+
+    <dtml-if "enabled and getStep().isUserAllowed()">
+    <tr class="row_title">
+      <td class="small" colspan="2">
+        <dtml-msg "Comment"><br>
+        <textarea name="comment:text" rows="4" cols="80"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <input type="submit"
+               name="save"
+               value="<dtml-msg "Save entry">"
+        />
+        <input type="button" 
+               value="<dtml-msg "Cancel">"
+               onClick="JavaScript:location.href='&dtml-parent_url;'"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+         <br/>
+         <input type="submit"
+                name="rollback"
+                value="&lt;&lt; <dtml-msg "Rollback">"
+                <dtml-var "not rollback_steps" fmt=disabled>
+         />
+         <input type="submit"
+                name="abandon"
+                value="<dtml-msg "Abandon">"
+         />
+         <input type="submit"
+                name="next_step"
+                value="<dtml-msg "Next step"> &gt;&gt;"
+         />
+      </td>
+    </tr>
+   <dtml-else>
+    <tr>
+      <td>
+        <input type="button" 
+               value="<dtml-msg "Back">"
+               onClick="JavaScript:location.href='&dtml-parent_url;'" />
+
+      </td>
+    </tr>
+   </dtml-if>
+  </table>
+</form>
+
+<dtml-in "parent().listAttachments()">
+<dtml-if sequence-start>
+<form method="POST" action="<dtml-var "entry.absolute_url()" html_quote>">
+  <table>
+    <tr>
+      <td class="small">
+        <dtml-msg "MS Word template">:
+        <select name="doc_template">
+</dtml-if>
+          <option value="&dtml-id;">&dtml-title;</option>
+<dtml-if sequence-end>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="small">
+        <input type="submit"
+               name="vdocument_report_form:method"
+               value="<dtml-msg "Preview">">
+     </td>
+    </tr>
+  </table>
+</form>
+</dtml-if>
+</dtml-in>
+
+<dtml-in "portal_catalog.searchResults(parent_path=parent().parent_path(),
+                                       meta_type='DTMLDocument')">
+<dtml-if sequence-start>
+<form method="POST" action="<dtml-var "entry.absolute_url()" html_quote>">
+  <table>
+    <tr>
+      <td class="small">
+        <dtml-msg "DTML template">:
+        <select name="template">
+</dtml-if>
+          <option value="&dtml-id;">&dtml-Title;</option>
+<dtml-if sequence-end>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td class="small">
+        <input type="submit" name="vdocument_report_form:method" value="<dtml-msg "Preview">">
+      </td>
+    </tr>
+  </table>
+</form>
+</dtml-if>
+</dtml-in>
+
+<dtml-var viewTasksTree>
+
+<dtml-var viewModificationLog>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

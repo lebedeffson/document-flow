@@ -1,0 +1,12 @@
+<tr class="row_even">
+  <td><dtml-msg "Set version state">:</td>
+  <td>
+    <select name="version_state" size="1">
+      <dtml-let states="getWorkflow().states">
+        <dtml-in "['keep_state']+states.objectIds()" prefix="st">
+          <option value="&dtml-st_item;" <dtml-var "st_item==taskDefinitionArray['version_state'] and 'selected'">><dtml-var "st_item=='keep_state' and msg('Keep state') or msg(states[st_item].title)"></option>
+        </dtml-in>
+      </dtml-let>
+    </select>
+  </td>
+</tr>

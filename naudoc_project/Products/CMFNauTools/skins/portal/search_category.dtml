@@ -1,0 +1,24 @@
+<dtml-comment>
+$Id: search_category.dtml,v 1.1 2004/06/15 12:28:11 oevsegneev Exp $
+
+'ctrl_value'   -  
+'profile_id'   - 
+'query_id'     - 
+
+</dtml-comment>
+
+<dtml-let cat_id="ctrl_value"
+          cat="portal_metadata.getCategoryById(cat_id)"
+          states="cat.getWorkflow().states"
+          wf_id="cat.getWorkflow().getId()"
+          query="portal_catalog.getQuery( query_id, REQUEST=REQUEST )"
+          state="query and _.hasattr(query, 'state') and query.state"
+>
+  <select name="state.&dtml-cat_id;:record">
+    <option value="any" ><dtml-msg "Any"></option>
+    <dtml-in "states.objectIds()" prefix="st">
+      <option value="&dtml-st_item;" <dtml-var "st_item==state" fmt="selected">><dtml-msg expr="portal_workflow.getStateTitle(wf_id, st_item)"></option>
+    </dtml-in>
+  </select>
+</dtml-let>
+

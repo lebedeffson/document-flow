@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ app_title }}</title>
+  <style>
+    :root {
+      --bg: #f4efe7;
+      --card: #fffaf4;
+      --ink: #1f2c3a;
+      --muted: #5b6b79;
+      --line: #d7c6ad;
+      --brand: #214f8b;
+      --accent: #d07d1f;
+      --ok: #287a52;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(33,79,139,0.10), transparent 26%),
+        radial-gradient(circle at top right, rgba(208,125,31,0.12), transparent 30%),
+        linear-gradient(180deg, #f7f1e9 0%, var(--bg) 100%);
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 20px 48px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      margin-top: 28px;
+    }
+
+    .card {
+      background: rgba(255,250,244,0.92);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 14px 40px rgba(31,44,58,0.08);
+      backdrop-filter: blur(6px);
+    }
+
+    .systems {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .system-box {
+      border-radius: 16px;
+      padding: 18px;
+      min-height: 150px;
+    }
+
+    .system-box.blue {
+      background: linear-gradient(180deg, #dcebff 0%, #bdd7f6 100%);
+      border: 1px solid #85aee1;
+    }
+
+    .system-box.orange {
+      background: linear-gradient(180deg, #ffeccf 0%, #ffd89b 100%);
+      border: 1px solid #e0a24b;
+    }
+
+    .system-box.dark {
+      background: linear-gradient(180deg, #335e9b 0%, #1e467b 100%);
+      border: 1px solid #17365b;
+      color: #fff;
+    }
+
+    .system-box h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .system-box ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      line-height: 1.55;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.75);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    input, textarea {
+      width: 100%;
+      margin-top: 6px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fffdf9;
+      font: inherit;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 16px;
+      background: linear-gradient(135deg, var(--brand), #2f6db8);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-top: 1px solid #e6d7c3;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(40,122,82,0.12);
+      color: var(--ok);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .status.pending {
+      background: rgba(208,125,31,0.14);
+      color: #9a5a0f;
+    }
+
+    .status.empty {
+      background: rgba(91,107,121,0.12);
+      color: #5b6b79;
+    }
+
+    .empty {
+      margin-top: 12px;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.65);
+      border: 1px dashed var(--line);
+      color: var(--muted);
+    }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      background: rgba(31,44,58,0.07);
+      padding: 1px 5px;
+      border-radius: 6px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.72);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .pill.active {
+      background: linear-gradient(135deg, var(--brand), #2f6db8);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .warning-card {
+      background: linear-gradient(180deg, rgba(255,236,207,0.9), rgba(255,250,244,0.92));
+    }
+
+    details {
+      margin-top: 10px;
+    }
+
+    details summary {
+      cursor: pointer;
+      color: var(--brand);
+      font-weight: 600;
+      list-style: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .inline-form {
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .inline-form input,
+    .inline-form textarea {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .inline-form button {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .grid,
+      .systems,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>{{ app_title }}</h1>
+    <p>Тестовый middleware между <strong>Rukovoditel</strong> и <strong>NauDoc</strong>: хранит ссылки на документы, статусы синхронизации и служит точкой дальнейшей интеграции.</p>
+
+    <div class="systems">
+      <section class="system-box blue">
+        <h2>Rukovoditel</h2>
+        <ul>
+          <li>Задачи и проекты</li>
+          <li>Карточки, заявки, процессы</li>
+          <li>Операционная работа пользователей</li>
+        </ul>
+      </section>
+      <section class="system-box dark">
+        <h2>Middleware</h2>
+        <ul>
+          <li>Хранение связей</li>
+          <li>Healthcheck двух систем</li>
+          <li>Подготовка к синхронизации статусов</li>
+        </ul>
+      </section>
+      <section class="system-box orange">
+        <h2>NauDoc</h2>
+        <ul>
+          <li>Документы и версии</li>
+          <li>Согласование и регистрация</li>
+          <li>Архив и ссылки на файлы</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="links">
+      <a class="pill" href="{{ rukovoditel_url }}" target="_blank" rel="noreferrer">Открыть Rukovoditel</a>
+      <a class="pill" href="{{ naudoc_url }}" target="_blank" rel="noreferrer">Открыть NauDoc</a>
+      <a class="pill" href="{{ url_for('health') }}" target="_blank" rel="noreferrer">JSON healthcheck</a>
+      <a class="pill" href="{{ url_for('list_links') }}" target="_blank" rel="noreferrer">JSON links</a>
+    </div>
+
+    <div class="stats">
+      <section class="stat">
+        <strong>{{ summary_counts.total_count }}</strong>
+        <span>Всего связей</span>
+      </section>
+      <section class="stat">
+        <strong>{{ summary_counts.pending_count }}</strong>
+        <span>Ждут документа</span>
+      </section>
+      <section class="stat">
+        <strong>{{ summary_counts.attention_count }}</strong>
+        <span>Требуют внимания</span>
+      </section>
+      <section class="stat">
+        <strong>{{ summary_counts.signed_count }}</strong>
+        <span>Подписаны</span>
+      </section>
+    </div>
+
+    <div class="filters">
+      <a class="pill {% if selected_filters.view == 'all' %}active{% endif %}" href="{{ url_for('index') }}">Все связи</a>
+      <a class="pill {% if selected_filters.view == 'pending' %}active{% endif %}" href="{{ url_for('index', view='pending') }}">Ждут документа</a>
+      <a class="pill {% if selected_filters.view == 'problem' %}active{% endif %}" href="{{ url_for('index', view='problem') }}">Проблемные</a>
+      <a class="pill {% if selected_filters.view == 'signed' %}active{% endif %}" href="{{ url_for('index', view='signed') }}">Подписанные</a>
+      <a class="pill {% if selected_filters.external_entity == 'service_requests' %}active{% endif %}" href="{{ url_for('index', external_entity='service_requests') }}">Только заявки</a>
+      <a class="pill {% if selected_filters.external_entity == 'projects' %}active{% endif %}" href="{{ url_for('index', external_entity='projects') }}">Только проекты</a>
+      <a class="pill {% if selected_filters.external_entity == 'document_cards' %}active{% endif %}" href="{{ url_for('index', external_entity='document_cards') }}">Только карточки</a>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Создать связь</h2>
+        <p>Связываем запись из Rukovoditel с документом или карточкой документа в NauDoc. Теперь можно сохранять и промежуточные связи, когда карточка уже создана, а ссылка на NauDoc появится позже.</p>
+        <form action="{{ url_for('create_link') }}" method="post">
+          <label>
+            Внешняя система
+            <input name="external_system" value="rukovoditel" required>
+          </label>
+          <label>
+            Сущность/раздел
+            <input name="external_entity" placeholder="projects, service_requests, crm_cards" required>
+          </label>
+          <label>
+            ID записи
+            <input name="external_item_id" placeholder="например 101" required>
+          </label>
+          <label>
+            Название записи
+            <input name="external_title" placeholder="Заявка на обслуживание #101" required>
+          </label>
+          <label>
+            Ссылка на документ NauDoc
+            <input name="naudoc_url" placeholder="http://localhost:18080/docs/... или оставить пустым до создания документа">
+          </label>
+          <label>
+            Название документа NauDoc
+            <input name="naudoc_title" placeholder="Договор поставки №15 или оставить пустым для автоподстановки">
+          </label>
+          <label>
+            Статус синхронизации
+            <input name="sync_status" value="pending_nau_doc">
+          </label>
+          <label>
+            Комментарий
+            <textarea name="notes" placeholder="Что связываем и на каком этапе процесса находится документ"></textarea>
+          </label>
+          <label>
+            Доп. метаданные JSON
+            <textarea name="metadata_json">{}</textarea>
+          </label>
+          <button type="submit">Сохранить связь</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Что уже работает</h2>
+        <table>
+          <tbody>
+            <tr>
+              <th>Контур</th>
+              <td><code>{{ rukovoditel_url }}</code> и <code>{{ naudoc_url }}</code></td>
+            </tr>
+            <tr>
+              <th>Хранение</th>
+              <td>SQLite внутри middleware, можно потом перенести в PostgreSQL/MariaDB</td>
+            </tr>
+            <tr>
+              <th>Сценарий</th>
+              <td>Связка записи Rukovoditel с карточкой/документом NauDoc, включая промежуточный статус ожидания</td>
+            </tr>
+            <tr>
+              <th>Следующий шаг</th>
+              <td>Автоматическое создание связей и обмен статусами по целевым сущностям</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="card warning-card" style="margin-top: 22px;">
+      <h2>Проблемные и незавершенные связи</h2>
+      <p>Здесь собраны связи, которые еще ждут документ или требуют ручной проверки. Это быстрый журнал для администратора и руководителя процесса.</p>
+      {% if attention_links %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Сущность</th>
+            <th>Статус</th>
+            <th>Комментарий</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for link in attention_links %}
+          <tr>
+            <td>#{{ link.id }}</td>
+            <td>
+              <strong>{{ link.external_title }}</strong><br>
+              <span>{{ link.external_entity }} / {{ link.external_item_id }}</span>
+            </td>
+            <td><span class="status {% if link.sync_status.startswith('pending') %}pending{% endif %}">{{ link.sync_status }}</span></td>
+            <td>{{ link.notes or 'Без комментария' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Сейчас проблемных и незавершенных связей нет. Это хороший признак: контур синхронизации в актуальном состоянии.</div>
+      {% endif %}
+    </section>
+
+    <section class="card" style="margin-top: 22px;">
+      <h2>Текущие связи</h2>
+      {% if selected_filters.view != 'all' or selected_filters.external_entity or selected_filters.sync_status %}
+      <p>Применен фильтр: <code>{{ selected_filters.view }}</code>{% if selected_filters.external_entity %}, сущность <code>{{ selected_filters.external_entity }}</code>{% endif %}{% if selected_filters.sync_status %}, статус <code>{{ selected_filters.sync_status }}</code>{% endif %}</p>
+      {% endif %}
+      {% if links %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Rukovoditel</th>
+            <th>NauDoc</th>
+            <th>Статус</th>
+            <th>Обновлено</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for link in links %}
+          <tr>
+            <td>#{{ link.id }}</td>
+            <td>
+              <strong>{{ link.external_title }}</strong><br>
+              <span>{{ link.external_system }} / {{ link.external_entity }} / {{ link.external_item_id }}</span>
+            </td>
+            <td>
+              {% if link.naudoc_url %}
+              <a href="{{ link.naudoc_url }}" target="_blank" rel="noreferrer">{{ link.naudoc_title }}</a>
+              {% else %}
+              <span style="color: var(--muted);">{{ link.naudoc_title or 'Ссылка на NauDoc еще не назначена' }}</span>
+              {% endif %}
+              {% if link.notes %}
+              <div style="margin-top: 6px; color: var(--muted);">{{ link.notes }}</div>
+              {% endif %}
+            </td>
+            <td><span class="status {% if link.sync_status.startswith('pending') %}pending{% elif not link.sync_status %}empty{% endif %}">{{ link.sync_status or 'n/a' }}</span></td>
+            <td>{{ link.updated_at }}</td>
+            <td>
+              <details>
+                <summary>Обновить связь</summary>
+                <form class="inline-form" action="{{ url_for('update_link_form', link_id=link.id) }}" method="post">
+                  <label>
+                    Ссылка на NauDoc
+                    <input name="naudoc_url" value="{{ link.naudoc_url }}" placeholder="http://localhost:18080/docs/...">
+                  </label>
+                  <label>
+                    Название документа
+                    <input name="naudoc_title" value="{{ link.naudoc_title }}">
+                  </label>
+                  <label>
+                    Статус
+                    <input name="sync_status" value="{{ link.sync_status }}">
+                  </label>
+                  <label>
+                    Комментарий
+                    <textarea name="notes">{{ link.notes }}</textarea>
+                  </label>
+                  <button type="submit">Сохранить</button>
+                </form>
+              </details>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Пока связей нет. После первой записи таблица начнет показывать связку заявок/проектов из Rukovoditel с документами NauDoc.</div>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>

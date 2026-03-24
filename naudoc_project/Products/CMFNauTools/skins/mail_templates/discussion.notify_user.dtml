@@ -1,0 +1,29 @@
+<dtml-comment>
+Notify on discussion adding.
+
+$Editor: oevsegneev $
+$Id: discussion.notify_user.dtml,v 1.3 2004/10/14 07:22:19 mbernatski Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+<dtml-if "lang=='en'">
+Subject: New comment for document <dtml-var doc_title>
+
+User <dtml-var comment_autor> has added a comment for document <dtml-var doc_title>:
+Title: <dtml-var comment_title>
+Comment:
+<dtml-var comment_text>
+
+Location: <dtml-var comment_link>
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Новый комментарий к документу <dtml-var doc_title>
+
+<dtml-var comment_autor> добавил комментарий к документу <dtml-var doc_title>:
+Тема: <dtml-var comment_title>
+Комментарий:
+<dtml-var comment_text>
+
+Ссылка: <dtml-var comment_link>
+
+</dtml-if>

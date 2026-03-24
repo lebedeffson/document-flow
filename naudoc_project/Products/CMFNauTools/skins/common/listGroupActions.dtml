@@ -1,0 +1,45 @@
+<dtml-var simple_html_header>
+
+<dtml-comment>
+  Actions menu in left frame
+</dtml-comment>
+
+<dtml-let actions="portal_actions.listFilteredActionsFor( this() ).get( type, () )"
+>
+
+<style>
+
+ul { 
+  list-style-image: url("bull.gif");
+  margin: 0px 0px 0px 20px;
+  padding: 0px;           
+}
+
+ul li {
+  padding: 3px 0;
+}
+
+</style>
+
+<span class="Navigation">
+
+<dtml-in actions mapping sort="name/msg">
+<dtml-if sequence-start>
+<ul>
+</dtml-if>
+  <li>
+    <a href="<dtml-var url fmt=strip>" target="workspace">
+      <dtml-msg expr=name>
+    </a>
+  </li>
+<dtml-if sequence-end>
+</ul>
+</dtml-if>
+</dtml-in>
+
+</span>
+
+</dtml-let>
+
+</body>
+</html>

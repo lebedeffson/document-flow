@@ -1,0 +1,36 @@
+<dtml-comment>
+Main manuals view/download page.
+
+$Editor: vpastukhov $
+$Id: index_html.dtml,v 1.11 2009/02/19 12:17:12 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-var simple_html_header>
+
+<h1><dtml-msg "User manual"></h1>
+
+<dtml-let manuals="('technologist.pdf', ('Technologist manual',)),
+                   ('manual1.pdf', ('User manual. Part %(part)d', {'part': 1})),
+                   ('manual2.pdf', ('User manual. Part %(part)d', {'part': 2})),
+                   ('box.pdf', ('Box manual',)),
+                   ('modules.pdf', ('Modules manual',))"
+>
+<div class="Desktop">
+
+<dtml-in "[manual for manual in manuals if _.has_key(manual[0])]" prefix="m">
+  <dtml-if sequence-start><ul></dtml-if>
+
+  <li><a href="&dtml-portal_url;/manual/&dtml-m_key;"
+         target="_blank"><dtml-msg expr="m_item[0]" msgparams="_.len(m_item) > 1 and m_item[1] or {}"></a></li>
+
+  <dtml-if sequence-end></ul></dtml-if>
+<dtml-else>
+  <p align="center"><dtml-msg "No manuals installed"></p>
+</dtml-in>
+
+</div>
+</dtml-let>
+
+<dtml-var simple_html_footer>

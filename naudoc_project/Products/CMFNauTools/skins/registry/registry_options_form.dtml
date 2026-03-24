@@ -1,0 +1,264 @@
+<dtml-comment>
+$Editor: kfirsov$
+$Id: registry_options_form.dtml,v 1.21 2004/03/27 15:50:52 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.21 $>
+
+<dtml-var simple_html_header>
+
+<h1> &dtml-title_or_id; </h1>
+
+<script type="text/javascript">
+
+function Validate(form)
+{
+    if ( ! validateIdentifier(form.elements['fname'], '<dtml-var "msg('Column id is invalid')">', true) )
+        return false;
+
+    return validateForm( form, true);
+}
+
+function showHint(){
+
+  window.open('<dtml-var absolute_url>/registry_options_help', 'wnd_popup_menu', 'toolbar=no,scrollbars=yes,width=635,height=475,resizable=yes');
+
+}
+</script>
+<form name='registry_options_form' 
+      method="POST" 
+      action="&dtml-absolute_url;/registry_options" 
+      onsubmit="return Validate(this);">
+  <table>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "Registry options">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Title">
+    </td>
+    <td>
+       <input name="title" size="50"
+        value="&dtml-title;"
+       />
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Description">
+    </td>
+    <td>
+       <textarea name="description" rows="6" cols="80">&dtml-description;</textarea>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Department">
+    </td>
+    <td>
+       <input name="department" size="50"
+        value="&dtml-department;"
+       />
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Registration number forming rule">
+    </td>
+    <td>
+       <input name="reg_num_forming_rule" size="50"
+        value="&dtml-reg_num_forming_rule;"
+        />
+       <a href="javascript: showHint();"><dtml-msg "Help"></a>
+    </td>
+  </tr>
+
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Parent registry">
+    </td>
+    <td>
+      <dtml-let parent_reg="this().getParentRegistry()"
+                registries="portal_catalog.searchResults( meta_type='Registry', sort_on='Title' )"
+                container="this()">
+       <select name="parent_registry">
+         <option value=""></option>
+         <dtml-in registries>
+           <dtml-with getObject>
+             <dtml-if "_.SecurityCheckPermission('Add portal content', container) and container.id !=_['sequence-item'].id">
+               <option value="<dtml-var "this().getUid()">"
+               <dtml-var "parent_reg==this().getUid() and 'selected' or ''">
+                 >&dtml-title_or_id; <dtml-var "department and '('+department+')' or ''"></option>
+             </dtml-if>
+           </dtml-with>
+         </dtml-in>
+       </select>
+      </dtml-let><br>
+       <dtml-msg "Registration number for a document will be retrieved from selected registry.">
+    </td>
+  </tr>
+
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Permit the author of entry to delete it">
+    </td>
+    <td>
+      <input type="checkbox" 
+             value="1" 
+             name="author_can_delete_entry:boolean" 
+             <dtml-var isDelEntryAuthorAllowed fmt=checked> >
+    </td>
+  </tr>
+
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Internal counter">
+    </td>
+    <td>
+       <input type="text" name="last_id:int" value="&dtml-getLastSequenceNumber;">
+    </td>
+  </tr>
+
+  <tr class="row_even">
+    <td colspan="2"> <br>
+      <input type=submit name="apply" value="<dtml-msg "Save">">
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2">&nbsp;
+    </td>
+  </tr>
+
+  <tr class="row_title">
+    <td colspan="2" class="smallHeader">
+        <dtml-msg "Registry fields">
+    </td>
+  </tr>
+
+<dtml-comment>
+   Fields list with 'Delete' button
+</dtml-comment>
+
+  <tr class="row_even">
+    <td colspan="2">
+  <dtml-in listColumns>
+    <dtml-if sequence-start>
+       <table>
+    </dtml-if>
+    <dtml-let cell_style="(not allowsInput() and 'font-style: italic;' or '')">
+       <tr style="&dtml-cell_style;">
+         <td>
+           <dtml-if "isMandatory()">&nbsp;
+           <dtml-else>
+            <input type="checkbox" name="selected_fields:list" value="&dtml-getId;">
+           </dtml-if>
+         </td>
+         <td>
+            <dtml-unless sequence-start>
+            <a href="<dtml-var "relative_url(action='moveColumn', params={'column_id':getId(), 'direction':1})">"><dtml-var sort_up.gif></a>
+            </dtml-unless>
+            <dtml-unless sequence-end>
+            <a href="<dtml-var "relative_url(action='moveColumn', params={'column_id':getId(), 'direction':-1})">"><dtml-var sort_down.gif></a>
+            </dtml-unless sequence-end>
+         </td>
+         <td>
+            <dtml-var "isEditableAfterReg() and '<B>' or ''">
+                <dtml-msg expr=Title>, <dtml-msg "id">: &dtml-getId; (<dtml-msg expr=Type>)
+            <dtml-var "isEditableAfterReg() and '</B>' or ''">
+              <a href="<dtml-var "relative_url( action='registry_columns_form',
+                                                params={'column_id':getId()}
+                                              )" html_quote>"
+              >[<dtml-msg "edit">]</a>
+         </td>
+       </tr>
+    </dtml-let>
+    <dtml-if sequence-end>
+       <tr>
+         <td colspan="3">
+            <dtml-msg "Note: columns in italic do not allow input, columns in bold allow edit entries">.
+         </td>
+       </tr>
+
+       <tr>
+         <td colspan="3">
+            <input type="submit" name="del_fields" value="<dtml-msg "Delete">">
+         </td>
+       </tr>
+       </table>
+    </dtml-if>
+  </dtml-in>
+    </td>
+  </tr>
+
+<dtml-comment>
+   Add field form
+</dtml-comment>
+  <tr class="row_even">
+    <td colspan="2" class="small">
+      <table border="0" width="100%">
+        <tr>
+          <td>
+            <dtml-msg "Id">: <input name="fname" type="text" size="10">
+          </td>
+          <td>
+            <dtml-msg "Title">: <input name="ftitle" type="text" size="30">
+          </td>
+        </tr>
+        <tr>
+          <td><dtml-msg "System field">:
+              <select name="system_field" onChange="setType(this);">
+                <option value="" selected><dtml-msg "None"></option>
+                <option value="Creator"><dtml-msg "Author"></option>
+                <option value="CreationDate"><dtml-msg "Creation date"></option>
+                <option value="ModificationDate"><dtml-msg "Modification date"></option>
+                <option value="state"><dtml-msg "Status"></option>
+                <option value="category"><dtml-msg "Category"></option>
+                <option value="Title"><dtml-msg "Title"></option>
+              </select>
+<script type="text/javascript">
+function setType(select) 
+{
+    var value = select.options[select.selectedIndex].value;
+    type = <dtml-var "listColumnTypes().index('string')">; 
+    if (value=='CreationDate' || value=='ModificationDate')
+        type = <dtml-var "listColumnTypes().index('date')">;
+
+    if (value){
+        select.form.elements['ftype'].options.selectedIndex = type;
+        select.form.elements['fedit'].disabled = true;
+    } else 
+        select.form.elements['fedit'].disabled = false;
+}
+</script>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <dtml-msg "Type">: 
+            <select name="ftype">
+            <dtml-in listColumnTypes>
+              <option value="&dtml-sequence-item;"
+                      <dtml-var "_['sequence-item']==getDefaultColumnType()" fmt=selected> >
+                <dtml-msg expr=sequence-item>
+              </option>
+            </dtml-in>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" name="fedit"><dtml-msg "Allows modification">
+          </td>
+        </tr>
+      </table>
+      <input type="submit" name="add_field" value="<dtml-msg "Add field">">
+    </td>
+  </tr>
+
+  </table>
+</form>
+
+<dtml-var simple_html_footer>

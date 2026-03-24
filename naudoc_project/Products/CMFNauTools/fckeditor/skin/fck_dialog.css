@@ -1,0 +1,124 @@
+/*
+ * FCKeditor - The text editor for internet
+ * Copyright (C) 2003-2004 Frederico Caldeira Knabben
+ * 
+ * Licensed under the terms of the GNU Lesser General Public License:
+ * 		http://www.opensource.org/licenses/lgpl-license.php
+ * 
+ * For further information visit:
+ * 		http://www.fckeditor.net/
+ * 
+ * File Name: fck_dialog.css
+ * 	Styles used by the dialog boxes.
+ * 
+ * Version:  2.0 RC3
+ * Modified: 2005-02-10 13:10:27
+ * 
+ * File Authors:
+ * 		Frederico Caldeira Knabben (fredck@fckeditor.net)
+ */
+
+body
+{
+	margin: 0px;
+	padding: 10px;
+}
+
+body, td, input, select, textarea
+{
+	font-size: 11px;
+	font-family: 'Microsoft Sans Serif' , Arial, Helvetica, Verdana;
+}
+
+body, .BackColor
+{
+	background-color: #EAEAFF;
+}
+
+.PopupBody
+{
+	margin: 0px;
+	padding: 0px;
+}
+
+.PopupTitle
+{
+	font-weight: bold;
+	font-size: 14pt;
+	color: black;
+	background-color: #D5D6FF;
+	padding: 3px 10px 3px 10px;
+}
+
+.PopupButtons
+{
+	border-top: #B9BAFF 1px solid;
+	background-color: #D5D6FF;
+	padding: 7px 10px 7px 10px;
+}
+
+.Button
+{
+	border-right: #8A8BD9 1px solid;
+	border-top: #8A8BD9 1px solid;
+	border-left: #8A8BD9 1px solid;
+	color: black;
+	border-bottom: #8A8BD9 1px solid;
+	background-color: #ABACFF;
+}
+
+.DarkBackground
+{
+	background-color: #BBBCFF;
+}
+
+.LightBackground
+{
+	background-color: #DEDFFF;
+}
+
+.PopupTitleBorder
+{
+	border-bottom: #B9BAFF 1px solid;
+}
+
+.PopupTabArea
+{
+	color: black;
+	background-color: #D5D6FF;
+}
+
+.PopupTabEmptyArea
+{
+	padding-left: 10px ;
+	border-bottom: #B9BAFF 1px solid;
+}
+
+.PopupTab, .PopupTabSelected
+{
+	border-right: #B9BAFF 1px solid;
+	border-top: #B9BAFF 1px solid;
+	border-left: #B9BAFF 1px solid;
+	padding-right: 5px;
+	padding-left: 5px;
+	padding-bottom: 3px;
+	padding-top: 3px;
+	color: black;
+}
+
+.PopupTab
+{
+	margin-top: 1px;
+	border-bottom: #B9BAFF 1px solid;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.PopupTabSelected
+{
+	font-weight:bold;
+	cursor: default;
+	padding-top: 4px;
+	border-bottom: #EAEAFF 1px solid;
+	background-color: #EAEAFF;
+}

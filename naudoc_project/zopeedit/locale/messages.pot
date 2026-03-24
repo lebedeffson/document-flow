@@ -1,0 +1,101 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: Tue Jun 15 14:35:04 2004\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: zopeedit.py:171
+msgid "SSL support is not available on this system. Make sure openssl is installed and reinstall Python."
+msgstr ""
+
+#: zopeedit.py:291
+msgid "Zope External Editor"
+msgstr ""
+
+#: zopeedit.py:292
+msgid "Enter the command to launch the default editor"
+msgstr ""
+
+#: zopeedit.py:301
+msgid ""
+"No editor was found for that object.\n"
+"Specify an editor in the configuration file:\n"
+"(%s)"
+msgstr ""
+
+#: zopeedit.py:313
+msgid ""
+"This object is already locked by you in another session.\n"
+" Do you want to borrow this lock and continue?"
+msgstr ""
+
+#: zopeedit.py:387
+msgid ""
+"Editor did not launch properly.\n"
+"External editor lost connection to editor process.\n"
+"(%s)"
+msgstr ""
+
+#: zopeedit.py:393
+msgid ""
+"File not saved to Zope.\n"
+"Reopen local copy?"
+msgstr ""
+
+#: zopeedit.py:402
+msgid "Could not acquire lock. Attempt to save to Zope anyway?"
+msgstr ""
+
+#: zopeedit.py:421
+msgid ""
+"Could not save to Zope.\n"
+"Error occurred during HTTP put"
+msgstr ""
+
+#: zopeedit.py:461
+msgid "object already locked"
+msgstr ""
+
+#: zopeedit.py:465
+msgid "Lock request failed"
+msgstr ""
+
+#: zopeedit.py:482
+msgid "Unlock request failed"
+msgstr ""
+
+#: zopeedit.py:584
+msgid ""
+"Error launching editor process\n"
+"(%s):\n"
+"%s"
+msgstr ""
+
+#: zopeedit.py:663
+msgid "FATAL ERROR: %s"
+msgstr ""
+
+#: zopeedit.py:745
+msgid ""
+"Zope External Editor %s\n"
+"By Casey Duncan, Zope Corporation\n"
+"http://www.zope.com/"
+msgstr ""
+
+#: zopeedit.py:756
+msgid ""
+"Input file name missing.\n"
+"Usage: zopeedit inputfile"
+msgstr ""
+

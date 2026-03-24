@@ -1,0 +1,9 @@
+<dtml-let date="_.DateTime(_['Date'])">
+  <dtml-unless "date.isCurrentDay()">
+    <dtml-var "date.dd()"> <dtml-msg expr="date.Mon()">
+  </dtml-unless>
+  <dtml-unless "date.isCurrentYear()">
+    <dtml-var "date.year()">
+  </dtml-unless>
+  <dtml-var date fmt="%H:%M">
+</dtml-let>

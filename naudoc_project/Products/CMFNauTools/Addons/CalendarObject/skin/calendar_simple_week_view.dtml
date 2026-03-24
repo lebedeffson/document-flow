@@ -1,0 +1,164 @@
+<dtml-comment>
+Viewer for one week in simple mode
+$Editor: spinagin $
+$Id: calendar_simple_week_view.dtml,v 1.2 2007/07/03 12:18:54 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-if "skin_version=='1.0'">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" height="1%">
+  <dtml-in "not show_holidays_together and week_info or week_info[:-1]">
+  <dtml-if sequence-even>
+  <tr valign="top" align="left">
+    <td width="50%">
+  <dtml-else>
+    <td width="50%">
+  </dtml-if>
+
+    <table cellpadding="2" cellspacing="2" border="0" width="100%" height="100%">
+    <tr class="row_odd">
+      <td width="100%">
+        <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "day()">&month=<dtml-var "month()">&year=<dtml-var "year()">" class="navigate">
+          <b>
+          <dtml-if "selected_month==month()"><dtml-else><font color="gray"></dtml-if>
+          <dtml-msg expr="Day()"></b>
+          &nbsp;(<dtml-var "day()"> <dtml-msg expr="Month().capitalize()"> <dtml-var "year()">)
+          </font>
+        </a>
+        <dtml-if "show_holidays_together and _['sequence-end']">
+        <dtml-with "week_info[-1]">
+        &nbsp;/&nbsp;
+        <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "day()">&month=<dtml-var "month()">&year=<dtml-var "year()">" class="navigate">
+          <b>
+          <dtml-if "selected_month==month()"><dtml-else><font color="gray"></dtml-if>
+          <dtml-msg expr="Day()"></b>
+          &nbsp;(<dtml-var "day()"> <dtml-msg expr="Month().capitalize()"> <dtml-var "year()">)
+          </font>
+        </a>
+        </dtml-with>
+        </dtml-if>
+      </td>
+    </tr>
+    <tr class="row_even" valign="top" align="left">
+      <td height="100%">
+      <dtml-in "listNotesForDate(year(), month(), day(), filter_topic)" mapping>
+        <span <dtml-if popup_full_text>title="<dtml-var "text[:300]">"</dtml-if>>
+        <dtml-if title><b>&dtml-title;</b>  <br></dtml-if>
+        <dtml-if "_.len(text)<len_of_text">
+          &dtml-text; 
+        <dtml-else>
+          <dtml-var "text[:len_of_text]"> ...
+        </dtml-if>
+        </span><br>  
+      <dtml-else>
+        &nbsp;
+      </dtml-in>
+
+      <dtml-if "show_holidays_together and _['sequence-end']">
+        <dtml-with "week_info[-1]">
+        <dtml-in "listNotesForDate(year(), month(), day(), filter_topic)" mapping>
+          <span <dtml-if popup_full_text>title="<dtml-var "text[:300]">"</dtml-if>>
+          <dtml-if title><b>&dtml-title;</b>  <br></dtml-if>
+          <dtml-if "_.len(text)<len_of_text">
+            &dtml-text; 
+          <dtml-else>
+            <dtml-var "text[:len_of_text]"> ...
+          </dtml-if>
+          </span><br>
+        </dtml-in>
+        </dtml-with>
+      </dtml-if>
+
+      </td>
+    </tr>
+    </table> 
+
+  <dtml-if sequence-even>
+    </td>
+  <dtml-else>
+    </td>
+  </tr>
+  </dtml-if>
+  </dtml-in>
+</table>
+<dtml-else>
+
+<dtml-comment>=======     simple view mode =============</dtml-comment>
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<dtml-in "week_info">
+  <dtml-if sequence-start>
+    <tr>
+  </dtml-if>
+  <dtml-if "_['sequence-index']/2.0==_['sequence-index']/2  ">
+    <tr>
+  </dtml-if>
+    <td width="50%" height="100%"
+     <dtml-if "_['sequence-index']==4 and show_holidays_together">rowspan="2"</dtml-if>
+    >
+
+     <dtml-var ramka_header>
+       <dtml-comment> ------------   date title -------------  </dtml-comment>
+       <table  cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+         <td>
+          <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "day()">&month=<dtml-var "month()">&year=<dtml-var "year()">" class="navigate">
+           <dtml-if "selected_month==month()"><font color="#3366CC"><b></dtml-if>
+            <dtml-msg expr="Day()"></b></font>
+          </a>       
+         <td align="right">
+            <a href="&dtml-absolute_url;/calendar_view?day=<dtml-var "day()">&month=<dtml-var "month()">&year=<dtml-var "year()">" class="navigate">
+            <dtml-var "day()"> <dtml-msg expr="Month().capitalize()"> <dtml-var "year()">
+            </a>        
+       </table>
+
+       <dtml-comment> ------------   list notes for it day -------------  </dtml-comment>    
+       <table  cellpadding="0" cellspacing="0" border="0" width="100%">
+       <tr>
+         <td height="1" colspan="2"> 
+           <dtml-if "isCurrentDay()">
+             <hr width="100%" align="center" size="1" color="blue"></td>
+           <dtml-else>
+             <hr width="100%" align="center" size="1"></td>
+           </dtml-if>
+        </td>
+        <dtml-in "listNotesForDate(year(), month(), day(), filter_topic)" mapping>
+        <tr>
+          <td <dtml-if popup_full_text>title="<dtml-var "text[:300]">"</dtml-if>>
+          <dtml-if title><b>&dtml-title;</b>  <br></dtml-if>
+          <dtml-if "_.len(text)<len_of_text">
+              &dtml-text; 
+          <dtml-else>
+            <dtml-var "text[:len_of_text]"> ...
+          </dtml-if>
+        <tr><td height="3"><img src="&dtml-portal_url;/spacer.gif" height="1"></td></tr>
+        </dtml-in>
+       </table>
+
+       <dtml-comment> ------------   list task for it day ------------- </dtml-comment>
+       <dtml-comment> it seems me doesn't work! </dtml-comment>
+        <table  cellpadding="0" cellspacing="0" border="0" width="100%">
+        <dtml-in "listTasksForDate(year(), month(), day())">
+          <dtml-if sequence-start>
+            <tr>
+            <td height="2" colspan="2"><hr width="100%" align="center" size="1"></td>
+          </dtml-if>
+          <tr>
+            <td>
+            <a href="<dtml-var "_['sequence-item'].getObject().absolute_url()">" target="blank" class="Navigate">
+                <dtml-if "now>=_['sequence-item']['expires'] and not _['sequence-item']['isFinalized']">
+                    <font color="red">
+                <dtml-else> 
+                    <font color="#3366CC">
+                </dtml-if>
+                <dtml-var "_['sequence-item']['Title']"></font>
+            </a><br>        
+        </dtml-in>
+        </table>
+
+    <dtml-var ramka_footer>
+    </td>
+
+</dtml-in>
+</table>
+
+</dtml-if>

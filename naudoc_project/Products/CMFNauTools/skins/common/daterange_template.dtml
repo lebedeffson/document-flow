@@ -1,0 +1,36 @@
+<dtml-comment>
+
+2 date input template
+$Editor: vsafronovich $
+$Id: daterange_template.dtml,v 1.1 2005/12/04 14:58:04 vsafronovich Exp $
+
+TODO: document template variables
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<table>
+<tr>
+  <td class="small" align="right">
+     <dtml-msg expr="_.get('mindate_title','since')">:
+  </td>
+  <td>
+     <dtml-var "datetime_form( None, _
+                             , prefix=mindate_name
+                             , date=mindate_value
+                             , date_only=date_only
+                             )">
+  </td>
+</tr>
+<tr>
+  <td  class="small" align="right">
+     <dtml-msg expr="_.get('maxdate_title','till')">:
+  </td>
+  <td>
+     <dtml-var "datetime_form( None, _
+                             , prefix=maxdate_name
+                             , date=maxdate_value
+                             , date_only=date_only
+                             )">
+  </td>
+</tr>
+</table>

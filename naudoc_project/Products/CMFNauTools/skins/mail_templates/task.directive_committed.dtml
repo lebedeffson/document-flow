@@ -1,0 +1,20 @@
+<dtml-comment>
+$Id: task.directive_committed.dtml,v 1.5 2004/01/16 16:46:24 vpastukhov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+<dtml-let membername="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='en'">
+Subject: Task "<dtml-var task_title>" committed
+
+User <dtml-var membername> commited to your task "<dtml-var task_title>".
+URL: &dtml-task_url;
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: «адание "<dtml-var task_title>" выполнено
+
+<dtml-var membername> доложил о выполнении задани€ "<dtml-var task_title>".
+URL: &dtml-task_url;
+
+</dtml-if>
+</dtml-let>

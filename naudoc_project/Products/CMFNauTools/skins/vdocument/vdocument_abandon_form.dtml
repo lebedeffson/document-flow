@@ -1,0 +1,36 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_abandon_form.dtml,v 1.6 2004/04/02 07:35:43 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+
+<dtml-var simple_html_header>
+  
+<div class="Desktop">
+
+<form method="post">
+ <table class="FormLayout">
+  <tr>
+   <td valign=top align=left colspan=2>
+    <strong><em><dtml-msg "Comment"></em></strong><br>
+    <textarea name="text" cols="60" rows="5" wrap="soft" style="width: 100%"></textarea>
+   </td>
+  </tr>
+   <tr>
+   <td></td>
+   <td>
+      <input type="submit" name="abandonEntry:method" value=" <dtml-msg "Abandon"> ">
+      <input type="button" 
+             onClick="JavaScript:location.href='<dtml-var "absolute_url(action='vdocument_view')" html_quote fmt=jscript>';" 
+             value="<dtml-msg "Cancel">" />
+                                                                                    
+   </td>
+  </tr>
+ </table>
+</form>
+
+</div>
+
+<dtml-var simple_html_footer>
+

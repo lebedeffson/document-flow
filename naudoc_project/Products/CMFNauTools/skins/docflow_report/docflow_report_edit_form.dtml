@@ -1,0 +1,196 @@
+<dtml-comment>
+$Id: docflow_report_edit_form.dtml,v 1.8 2005/11/27 17:06:11 vsafronovich Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.8 $>
+
+<dtml-var simple_html_header>
+<h1><dtml-var title_or_id></h1>
+
+<table border="0" cellpadding="0" cellspacing="0">
+
+  <tr>
+    <td>
+      <form name="settings" action="docflow_report_edit">
+      <table border="0" cellpadding="2" cellspacing="2" width="100%" class="FormLayout">
+
+        <tr class="row_title">
+          <td colspan="2" class="smallHeader"> <dtml-msg Metadata> </td>
+        </tr>
+
+        <tr class="row_even">
+          <td align="right" class="smallHeader"> <dtml-msg Title> </td>
+          <td> <input type="text" name="title" value="<dtml-var Title>" size="60"> </td>
+        </tr>
+
+        <tr class="row_even">
+          <td align="right" class="smallHeader"> <dtml-msg Description> </td>
+          <td> <textarea name="description" cols=60 rows=5><dtml-var Description></textarea> </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+  <tr><td>&nbsp;</td></tr>
+  <tr>
+    <td>
+
+<dtml-let cat_id="REQUEST.get('category', '') or getSearchableCategory() or portal_metadata.listCategories()[0].getId()"
+          object="this()"
+          >
+
+  <dtml-call "REQUEST.set('category', cat_id)">
+
+      <table border="0" cellpadding="2" cellspacing="0" width="100%" class="FormLayout">
+
+        <tr class="row_title">
+          <td colspan="2" class="smallHeader"><dtml-msg Settings></td>
+        </tr>
+
+        <tr class="row_even">
+          <td align="right" class="smallHeader"><dtml-msg "Document category"></td>
+          <td>
+            <select name="category" onChange="document.location.replace('docflow_report_edit_form?category='+this.options[this.selectedIndex].value);">
+              <dtml-in "portal_metadata.listCategories()">
+              <option value="<dtml-var getId>" <dtml-var "(getId()==cat_id) and 'selected' or ' '"> >
+                <dtml-msg expr=Title>
+              </option>
+              </dtml-in>
+            </select>
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td>
+          </td>
+          <td>
+            <input type="checkbox" name="include_inherited" <dtml-var "isIncludeInherited() and 'checked' or ' '"> >
+            &nbsp;<dtml-msg "Include inherited categories">
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td>
+          </td>
+          <td>
+            <input type="checkbox" name="search_all" <dtml-var "isSearchAll() and 'checked' or ' '"> >
+            &nbsp;<dtml-msg "Search in all accessible documents (otherwise only in current folder)">
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+
+  <dtml-let   wf="(portal_metadata.getCategoryById(cat_id)).getWorkflow()"
+              attr_ids="[x.getId() for x in portal_metadata.getCategoryById(cat_id).listAttributeDefinitions()]"
+              state_ids="wf.states.objectIds()"
+              >
+
+<tr class="row_even"><td><hr /></td></tr>
+
+<tr>
+  <td>
+    <dtml-var "reference_column_edit_form( None, _
+                                         , columns_title='Report columns')">
+  </td>
+</tr>
+
+<tr class="row_even"><td><hr /></td></tr>
+
+  <tr>
+    <td>
+      <table border="0" cellpadding="4" cellspacing="0" width="100%" class="FormLayout">
+
+    <dtml-in listMetaColumns>
+      <dtml-if sequence-start>
+        <tr class="row_even">
+          <td colspan="2" class="smallHeader"><dtml-msg Metadata></td>
+        </tr>
+        <tr class="row_even">
+          <td>
+            <select name="metadata">
+      </dtml-if>
+              <option value="<dtml-var sequence-item>"><dtml-msg expr=sequence-item></option>
+      <dtml-if sequence-end>
+            </select>
+          </td>
+          <td>
+            <input type="submit" name="add_column_meta" value="<dtml-msg Add>">
+          </td>
+        </tr>
+      </dtml-if>
+    </dtml-in>
+
+    <dtml-in "portal_metadata.getCategoryById(cat_id).listAttributeDefinitions()">
+      <dtml-if sequence-start>
+
+        <tr class="row_even">
+          <td colspan="2" class="smallHeader"><dtml-msg "Category attributes"></td>
+        </tr>
+        <tr class="row_even">
+          <td>
+            <select name="attribute">
+
+      </dtml-if>
+
+              <option value="<dtml-var getId>"><dtml-var Title></option>
+
+      <dtml-if sequence-end>
+
+            </select>
+          </td>
+          <td>
+            <input type="submit" name="add_column_attr" value="<dtml-msg Add>">
+          </td>
+        </tr>
+
+      </dtml-if>
+    </dtml-in>
+
+    <dtml-in state_ids>
+      <dtml-if sequence-start>
+
+        <tr class="row_even">
+          <td colspan="2" class="smallHeader"><dtml-msg States></td>
+        </tr>
+        <tr class="row_even">
+          <td>
+            <select name="state">
+
+      </dtml-if>
+
+              <option value="&dtml-sequence-item;"><dtml-msg expr="portal_workflow.getStateTitle(wf.getId(), _['sequence-item'])"></option>
+
+      <dtml-if sequence-end>
+
+            </select>
+          </td>
+          <td>
+            <input type="submit" name="add_column_state" value="<dtml-msg Add>">
+          </td>
+        </tr>
+
+      </dtml-if>
+    </dtml-in>
+
+      </table>
+    </td>
+  </tr>
+
+  </dtml-let>
+</dtml-let>
+
+  <tr class="row_even"><td><hr></td></tr>
+  <tr class="row_even" align="right">
+    <td>
+      <input type="submit" name="docflow_report_edit" value="<dtml-msg Save>">
+      </form>
+    </td>
+  </tr>
+</table>
+
+<dtml-if "REQUEST['SESSION'].has_key('%s_filter' % absolute_url())">
+  <dtml-call "REQUEST['SESSION'].delete('%s_filter' % absolute_url())">
+</dtml-if>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,25 @@
+<dtml-comment>
+$Editor: kfirsov$
+$Id: registry_ids_list.dtml,v 1.4 2004/03/18 13:36:06 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.4 $>
+
+<HTML>
+<HEAD>
+<TITLE><dtml-msg "Registration number"></TITLE>
+</HEAD>
+<BODY>
+<dtml-in "registry_data.items()" prefix="t">
+   <dtml-var t_key>:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;(
+       <dtml-in t_item prefix="reg">
+         <dtml-let registry="portal_catalog.getObjectByUid(reg_item)">
+	    <dtml-if "registry">
+          <a target="_blank" href="<dtml-var "registry.absolute_url()">"><dtml-var "registry.title"></a><dtml-var "not reg_end and ';' or''">
+	    </dtml-if registry>
+         </dtml-let>
+       </dtml-in>)<br>
+</dtml-in>
+<p align="center"><a href="javascript:window.close()"><dtml-msg "Close"></a></p>
+</BODY>
+</HTML>

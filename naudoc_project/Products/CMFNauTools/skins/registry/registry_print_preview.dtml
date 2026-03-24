@@ -1,0 +1,162 @@
+<dtml-comment>
+$Editor: kfirsov$
+$Id: registry_print_preview.dtml,v 1.5 2004/03/18 13:36:06 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<html>
+<head>
+<title>&dtml-title_or_id;</title>
+
+<link rel="stylesheet" type="text/css" href="&dtml-portal_url;/styles.css">
+
+</head>
+<body lang="<dtml-var "msg.get_default_language()">">
+
+<center><h2> &dtml-title_or_id; </h2></center>
+
+<p>&dtml-description;</p>
+
+<dtml-let uid=getUid
+          session="REQUEST['SESSION']"
+          container="this()"
+          table_columns="[ { 'id' : x.getId(),
+                             'title' : x.Title(),
+                             'type' : x.Type(),
+                           }
+                           for x in listColumns()
+                         ]"
+          sort_order="REQUEST.get('sort_order', session.get('%s_sort_order' % uid, ''))"
+          pre_sort_on="REQUEST.get('sort_on', session.get('%s_sort_on' % uid, None))"
+          sort_on="getColumnById(pre_sort_on) is not None and pre_sort_on or table_columns[0]['id']"
+          sort_type="getColumnById(sort_on).Type() in ['string', 'text'] and 'cmp' or 'cmp'"
+          batch_size="_.int(REQUEST.get('batch_size', session.get('%s_batch_size' % uid, 10)))"
+          default_filter="{ 'conditions': _.has_key('conditions') and conditions or [],
+                            'query': _.has_key('query') and query or {},
+                            'query_id': _.has_key('query_id') and query_id or '',
+                            'profile_id': _.has_key('profile_id') and profile_id or '',
+                            'columns': table_columns
+                          }"
+          filter_id=uid
+          filter="REQUEST['SESSION'].get('%s_filter' % filter_id, default_filter)"
+          query="filter.get('query')"
+          results="searchEntries(**query)"
+          sorted_results="_.sequence.sort([x.getObject() for x in results], ((sort_on, sort_type),))"
+          results_count="_.len(results)"
+          total_count="_.len(this())"
+          qs_old="_.int(REQUEST.get('qs', session.get('%s_qs' % uid, 1)))"
+          qs="qs_old - qs_old%batch_size + 1"
+          came_from="REQUEST.get('came_from', REQUEST['SESSION'].get('came_from'))"
+          came_version_id="REQUEST.get('came_version_id', REQUEST['SESSION'].get('came_version_id'))"
+          source_doc="came_from and portal_catalog.getObjectByUid(came_from)"
+          source="came_version_id and source_doc.getVersion(came_version_id) or source_doc"
+>
+  <dtml-call "session.set('%s_qs' % uid, qs)">
+  <dtml-call "session.set('%s_sort_on' % uid, sort_on)">
+  <dtml-call "session.set('%s_sort_order' % uid, sort_order)">
+  <dtml-call "session.set('%s_batch_size' % uid, batch_size)">
+
+  <dtml-call "came_from and session.set('came_from', came_from)">
+  <dtml-call "came_version_id and session.set('came_version_id', came_version_id)">
+
+  <dtml-in sorted_results reverse_expr="sort_order" size="batch_size" start=qs>
+    <dtml-if sequence-start>
+
+      <dtml-comment>
+        Entries table header
+      </dtml-comment>
+
+      <dtml-in table_columns mapping>
+        <dtml-if sequence-start>
+          <table class="report" cellspacing="1" cellpadding="3" width="99%">
+            <tr>
+        </dtml-if>
+              <td class="report" valign="middle" align="center">
+                  <dtml-msg expr=title>
+              </td>
+
+          <dtml-if sequence-end>
+              <dtml-comment>
+                  Add-on info fields
+              </dtml-comment>
+
+              <td class="report" valign="middle" align="center">
+                 <dtml-msg "Document">
+              </td>
+              <td class="report" valign="middle" align="center">
+                 <dtml-msg "Responsible members">
+              </td>
+            </tr>
+          </dtml-if>
+        </dtml-in>
+
+      </dtml-if>
+
+      <dtml-let entry=this>
+        <tr>
+          <dtml-in table_columns mapping>
+            <td class="report">&nbsp;
+              <dtml-if "getColumnById(id).getSystemFieldType()=='Creator' or id=='Creator'">
+                <dtml-var "portal_membership.getMemberBriefName( entry.get(id) )">
+              <dtml-else>
+                <dtml-var "entry_field_view( None, _, name=id, type=type, value=entry.get(id) )">
+              </dtml-if>
+            </td>
+          </dtml-in>
+
+          <dtml-let documents="portal_catalog.searchResults( registry_ids=entry.get('ID', ''),
+                                                             implements='isDocument'
+                                                           )">
+            <td class="report">&nbsp;
+               <dtml-in documents>
+                 <a target="_blank" href="<dtml-var getURL>">&dtml-Title>;/a>
+               <dtml-else>
+                 <dtml-if source>
+                   <a href="&dtml-absolute_url;/assign?registry_id=<dtml-var "entry.get('ID')" html_quote>&came_from=&dtml-came_from;&came_version_id=&dtml-came_version_id;">&lt;&lt;&lt;</a>
+                 </dtml-if>
+               </dtml-in>
+            </td>
+            <td class="report">&nbsp;
+              <dtml-in documents>
+                <dtml-with getObject>
+                  <dtml-if followup>
+
+                     <dtml-in "followup.getBoundTasks()">
+                       <b>&dtml-title;</b>:<br>
+                       <dtml-let involved_users="listInvolvedUsers() or []">
+                         <dtml-in involved_users sort="id" size="5">
+                           <dtml-var sequence-item fmt=member.brief>
+                           <dtml-unless sequence-end>,</dtml-unless>
+                         </dtml-in>
+                       </dtml-let>
+                       <dtml-unless sequence-end><br></dtml-unless>
+                     </dtml-in>
+
+                  </dtml-if>
+                </dtml-with>
+              </dtml-in>
+            </td>
+          </dtml-let>
+        </tr>
+        </dtml-let>
+
+    <dtml-if sequence-end>
+    </table>
+    </dtml-if>
+
+  <dtml-else>
+     <p>
+        <dtml-if total_count>
+          <dtml-msg "There are no documents matching your query">
+        <dtml-else>
+          <dtml-msg "There are no documents yet">
+        </dtml-if>
+     </p>
+  </dtml-in>
+
+
+
+</dtml-let>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<dtml-comment>
+$Id: task.expiration_alarm.dtml,v 1.5 2004/01/16 16:46:24 vpastukhov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+<dtml-if "lang=='en'">
+Subject: Task "<dtml-var task_title>" expiration warning
+
+<dtml-if "time_left > 60">
+Task "<dtml-var task_title>" expires in <dtml-var "dateperiod(time_left, short=1).strip()">!.
+<dtml-else>
+
+Task "<dtml-var task_title>" has expired.
+</dtml-if>
+URL: &dtml-task_url;
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Истекает срок выполнения задания "<dtml-var task_title>"
+
+<dtml-if "time_left > 60">
+До истечения срока выполнения задания "<dtml-var task_title>" остается <dtml-var "dateperiod(time_left, short=1).strip()">!
+<dtml-else>
+
+Выполнение задания "<dtml-var task_title>" просрочено.
+</dtml-if>
+
+URL: &dtml-task_url;
+
+</dtml-if>

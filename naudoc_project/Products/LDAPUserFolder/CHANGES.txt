@@ -1,0 +1,144 @@
+CHANGES.txt for the LDAPUserFolder
+
+  This file contains change information for the LDAPUserFolder product.
+  To see changes made to revisions prior to the latest version see
+  HISTORY.txt.
+
+    2.2
+
+      Features added:
+
+        * User attributes can now be declared "multi-valued" in the
+          LDAP Schema, thereby ensuring that all values for that 
+          attribute are stored on the user object (Feature request by
+          Jean Jordaan, JTracker issue 294).
+
+      Bugs fixed:
+
+        * While investigating JTracker issue 309 ("problem changing password")
+          it became apparent that previous fixes to correctly use mapped 
+          attributes during user creation were flawed. Also, _expireUser is
+          now more resilient against receiving invalid user information.
+
+
+    2.2beta4
+
+      Bugs fixed:
+
+        * LDAP Referrals are now chased for searches as well. (JTracker
+          issue 277 by Eric Brun) LDAP Referrals in general *require*
+          LDAP server support for version 3 of the LDAP protocol. Almost
+          all newer servers should be able to handle that.
+
+        * Removed non-existent "_expire" call from the interfaces file
+          for the LDAPUser class (JTracker issue 303 filed by Jean Jordaan)
+
+        * Added "clear" password encryption scheme to the choices 
+          available when adding a new LDAPUserFolder (JTracker issue
+          295, thanks to Andy Dustman)
+
+        * Added some (obviously missing) logging calls. Thanks to Jean
+          Jordaan for telling me about it (JTracker issue 300). Also,
+          added a missing message return from the LDAPDelegate modify
+          method.
+
+        * Revamped group handling a little bit so that the 
+          GROUP_MEMBER_MAP mapping in the utils module is the central
+          place where permissible groups and their member types are
+          stored. Fixed issue 289 by Eric Brun which was suffering from
+          a related problem at the same time.
+
+        * If a new user is created and the form fields are not named 
+          after the real LDAP attribute names but with mapped names
+          as specified on the LDAP schema tab the correct reverse
+          translation will now be done (JTracker issue 301, thanks to
+          Doug Winter)
+
+        * Cleaned out a bunch of unneeded imports
+
+        * Added some very interesting ActiveDirectory secrets uncovered
+          by Larry Prikockis to the ActiveDirectory README. This has the
+          potential of helping a lot of people who have difficulties
+          integrating Zope and ActiveDirectory.
+
+
+    2.2beta3
+
+      Bugs fixed:
+
+        * The routine used to create a crypt-style password string
+          did not take enough precautions to ensure that the salt value
+          used stays pure ASCII. This could prevent users from logging in.
+
+
+    2.2beta2
+
+      Features added:
+
+        * The list of LDAP servers will now respect the order in which
+          they were added and the connection process will go through the
+          servers in that same order, starting at the top of the list as
+          visible on the "Configure" tab. (JTracker issue 284 by Dirk
+          Datzert)
+
+        * Started a separate README for those hapless users who are stuck
+          on Active Directory with input from Philipp Kutter (JTracker 
+          issue 280), see README.ActiveDirectory.txt
+
+      Bugs fixed:
+
+        * If roles were stored locally and a user with locally stored 
+          roles had all roles removed that user would still show up in
+          the user listing, even if the user record itself was removed 
+          from LDAP. Now removal of all roles will clean the internal
+          roles storage mechanism correctly. Thanks go to Hans-Jürgen 
+          Sell for letting me know.
+
+        * When a user logs in the application will no longer construct
+          the user object with the name typed in by the user but will
+          look it up in the LDAP record itself. That way a user will
+          always be represented by the same username, regardless of what
+          capitalization was used upon login (JTracker issue 282, thanks
+          go to Ronan Amicel)
+
+        * Domain restrictions put on the emergency/init-users were not
+          respected, thanks to Dirk Datzert for pointing that out
+          in JTracker issue 283.
+
+        * Broke the Caches tab if and when the anonymous cache 
+          contained any users, the display for anonymous cache users
+          was calling a non-existing method. (JTracker issue 281, my
+          thanks go to Ronan Amicel)
+
+        * Logic error in getGroups corrected that could lead to binding 
+          with an invalid user/password pair. Now the decision what to
+          bind as is left completely up to the LDAPDelegate itself.
+        
+        * Added workaround for changed behavior of ldap.explode_dn
+          which will blow up now if the passed-in DN does not contain
+          at least one key=value pair.
+
+        * Removed superfluous argument to manage_setUserProperty 
+          (Tracker issue 270 by Dirk Datzert)
+
+        * Fixed manage_setUserProperty errors that crept in during
+          the last great code reorganization and also added a unit 
+          test to exercise this method. (Tracker issue 269, thanks to
+          Dirk Datzert again for pointing that out)
+
+
+    2.2beta1
+
+      Features added:
+
+        * Cache timeouts can now be set from the Caches tab in the ZMI
+          (Tracker issue 263 by Michael Lindig)
+
+      Bugs fixed:
+
+        * "Manager DN usage" set to "Always" would still bind as the user
+          itself after the initial bind, now it only uses the Manager
+          credentials. Had to insert a bind as the user to determine
+          password validity, though. (Tracker issue 266)
+
+

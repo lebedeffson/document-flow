@@ -1,0 +1,51 @@
+<dtml-with stylesheet_properties>
+
+<style type="text/css">
+<!--    
+table.CalendarTaskList {
+      border: 1px;
+      background-color: #EFEFEF;
+      border-color : #000000;
+      border-collapse: collapse;
+    }
+  
+table.CalendarTaskList td{
+      border-color : #000000;
+    }
+  
+table.CalendarTaskList tr.Title {
+    background-color: #999999;
+}
+
+td.red {
+    color: red;
+}
+
+td.blue {
+    color: #3366CC;
+}
+
+td.gray, td.gray p {
+    color: gray;
+    text-decoration: none;
+}
+
+td.roundborder {
+    border: 1px solid &dtml-secondary_accent_color;;    
+}
+
+a.navigate_blue:link, a.navigate_blue:visited, a.navigate_blue:active {
+    color: blue;
+    text-decoration: none;
+    font-size: xx-small;
+}
+
+a.navigate_blue:hover {
+    color: #666666;
+    text-decoration: none;
+    font-size: xx-small;
+}
+-->
+</style>
+
+</dtml-with>

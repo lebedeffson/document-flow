@@ -1,0 +1,300 @@
+<dtml-comment>
+$Id: document_confirmation_form.dtml,v 1.40 2009/02/09 13:41:50 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.40 $>
+
+<dtml-var simple_html_header>
+
+<dtml-if expr="not _.hasattr(this(), 'followup') and this().implements('isTaskItem')">
+  <dtml-call expr="portal_followup.getTasksFor(this())">
+</dtml-if>
+
+<form name="confirm" method="post" action="document_confirmation" onSubmit="return validateConfirm(this);">
+ <input type="hidden" name="brains_type" value="<dtml-var brains_type missing="request">">
+
+ <table class="FormLayout" border="0">
+  <tr>
+<script type="text/javascript">
+<!--
+
+    function validateConfirm(frm, save_template) {
+        /*
+        if ( !validateDate(frm.expiration_year.value, frm.expiration_month.value, frm.expiration_day.value)) {
+            alert('<dtml-var "msg('Invalid expiration date')">');
+            frm.expiration_day.focus()
+            return false;
+        }
+        */
+        if (save_template && ! frm['template_name'].value){
+          alert('<dtml-msg "Please specify template title">');
+          return false;
+        }
+
+        if (! frm['involved_users:list'].options.length) {
+          alert('<dtml-msg "Please specify responsible members">');
+          return false;
+        }
+	    
+        selectAll(frm['involved_users:list']);
+        return validateForm(frm);
+    }
+
+    function findInList(list, what)
+    {
+        for(var count = 0; count < list.length; count++) {
+            if (list.options[count] != null) {
+                if (what == list.options[count].value) {
+                    return [list.options[count].text, list.options[count].value];
+                }
+            }
+        }
+    }
+
+    function selectEditorInList()
+    {
+        var editors = &dtml-editor;
+        var destList  = window.document.forms['confirm']['involved_users:list'];
+        var srcList = window.document.forms['confirm'].all_users;
+
+        for(var i = 0; i < editors.length; i++) {
+            foundInDest = findInList(destList, editors[i]);
+            if (!foundInDest) {
+                  foundInSrc = findInList(srcList, editors[i]);
+                  if (foundInSrc) {
+                         destList.options[destList.length] = new Option(foundInSrc[0], foundInSrc[1]);
+                  }
+            }
+        }
+    }
+
+  function sendForm(action)
+  {
+    var form = document.forms['confirm']
+
+    if (action == 'create_new_template')
+    {
+        var options = form['template_list'].options;
+        var new_template = form['template_name'];
+        for (t = 0; t < options.length; t++)
+            if (options[t].text == new_template.value)
+            {
+                alert('<dtml-msg "Template with such name already exist">');
+                return;
+            }
+    }
+
+    if (action == 'delete_template' && !form['template_list'].options.length)
+      return;
+
+    form.action = 'portal_membership/processTemplateActions';
+    form.template_action.value = action
+    
+    if(action == 'delete_template' || validateConfirm(form,true))
+      form.submit();
+  }
+
+
+// XXX: This will not work for groups and user positions
+
+  function setTemplate(list_name) {
+    var form = document.forms['confirm']
+    var templates = new Array(
+      <dtml-in "portal_membership.listTaskTemplates().items()" prefix="t">
+        ['&dtml-t_key;', '<dtml-var "t_item['name']">', '<dtml-var "t_item['supervisor']">',
+         <dtml-var "t_item['responsible_users']">]<dtml-unless t_end>, </dtml-unless>
+      </dtml-in>
+                             )
+    var template_list = form[list_name]
+    if ( !template_list.options.length )
+      return;
+    var template_id = template_list.options[template_list.selectedIndex].value;
+ 
+    for (var i=0; i<templates.length; i++) {
+       if (templates[i][0] == template_id) {
+
+          form.template_name.value = templates[i][1]
+
+          destList = form['involved_users:list'];
+
+          //clear involved_users
+          clearList(form.involved_users);
+
+          //put into involved_members users exists in all_users && templates
+          var inv_usr_len = 0
+          for (var usr=0; usr < form['all_users'].options.length; usr++) {
+            for (var t_usr=0; t_usr < templates[i][3].length; t_usr++) {
+              if (templates[i][3][t_usr] == form['all_users'].options[usr].value) {
+                //create new option
+                destList.options[inv_usr_len] = new Option(templates[i][3][t_usr]);
+                destList.options[inv_usr_len].text = form['all_users'].options[usr].text;
+                destList.options[inv_usr_len].value = templates[i][3][t_usr];
+                inv_usr_len++;
+                break;
+              }
+            }
+          }
+       }
+    }
+  }
+
+//-->
+</script>
+
+   <td>&nbsp;</td>
+  </tr>
+  <tr class="row_odd">
+    <td class="smallHeader">
+    <dtml-if expr="REQUEST.get('brains_type')=='signature_request'" >
+      <dtml-msg "Request signature of the following users">: 
+      <dtml-else>
+      <dtml-msg "Request confirmation of the following users">:      
+    </dtml-if>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+         <input type="hidden" name="template_action" value="">
+         <input type="hidden" name="from_document_confirmation" value="yes">
+         <table cellpadding="0" width="100%">
+           <tr>
+             <td class="small" width="1%">
+               <nobr>
+               <dtml-msg "Template list">
+               <select name="template_list"
+                        <dtml-unless "portal_membership.listTaskTemplates().items()">disabled</dtml-unless> />
+            	    <dtml-in "portal_membership.listTaskTemplates().items()" prefix="t">
+            		<option value="<dtml-var "t_key">"><dtml-var "t_item['name']" ></option>
+    		    </dtml-in>
+        	   </select>
+        	 </nobr>
+        	 </td>
+        	 <td>
+                <a href="javascript: setTemplate('template_list')"><img
+                    name="load_template" src="&dtml-portal_url;/load_filter.gif" alt="<dtml-msg "Load template">"></a>
+                <a href="javascript: sendForm('delete_template')"><img
+                    name="delete_template" src="&dtml-portal_url;/delete.gif" alt="<dtml-msg "Delete template">"></a>
+                &nbsp;
+             </td>
+             <td class="small" align="right">
+               <nobr>
+                 <dtml-msg "Template name">
+                 <input type="text" name="template_name" value="">
+               </nobr>
+             </td>
+             <td>
+               <nobr>
+                <a href="javascript: sendForm('create_new_template')"><img
+                    name="create_new_template" src="&dtml-portal_url;/create_new_filter.gif" alt="<dtml-msg "Create template">"></a>
+                <a href="javascript: sendForm('save_template')"><img
+                    name="save_template" src="&dtml-portal_url;/save.gif" alt="<dtml-msg "Save template">"></a>
+               
+               </nobr>
+    	 </td>
+           </tr>
+          </table>
+    </td>
+  </tr>
+  <tr class="row_even">
+   <td align=left>
+     <dtml-let name="'involved_users'"
+               suppress_roles="1"
+     >
+       <dtml-var involved_users_emb>
+     </dtml-let>
+   </td>
+  </tr>
+  <tr class="row_odd">
+    <td class="small">
+       <b><dtml-msg "Expiration date"></b>
+    </td>
+  </td>
+  <tr class="row_even">
+    <td>
+       <table>
+       <tr>
+         <td class="small">
+            <dtml-var "datetime_form( this()
+                                    , prefix='expiration'
+                                    , date=_.DateTime() + 1.0
+                                    )"
+            >
+         </td>
+       </tr>
+       </table>
+    </td>
+  </tr>
+  <tr class="row_odd">
+    <td class="smallHeader">
+      <dtml-msg "Additional options">
+    </td>
+  </tr>
+  <tr class="row_even">
+   <td>
+     <input type="checkbox" name="confirm_by_turn" id="confirm_by_turn" value="1"/>
+     <strong><label for="confirm_by_turn"><dtml-msg "Use confirmation queue"></label></strong> <br>
+     <dtml-msg "Request the confirmation in the given order only">
+   </td>
+  </tr>
+  <tr class="row_even">
+   <td>
+     <input type="checkbox" name="notification_level:int" id="notification_level" value="1"/>
+     <strong><label for="notification_level"><dtml-msg "Notify every"></label></strong> <br>
+     <dtml-msg "Notify all involved users on every turn">
+   </td>
+  </tr>
+  <tr class="row_odd">
+    <td class="smallHeader">
+      <dtml-msg "Finalization condition">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+      <dtml-let modes="portal_followup.listFinalizationModes()"
+                selected_mode="_.get('finalization_mode', 'auto_every_user')"
+      >
+      <dtml-in modes>
+
+      <input id="finalization_mode_&dtml-sequence-item;"
+             type="radio"
+             name="finalization_mode" 
+             value="&dtml-sequence-item;"
+             <dtml-var "selected_mode==_['sequence-item']" fmt=checked>
+      />
+      <label for="finalization_mode_&dtml-sequence-item;"><dtml-msg expr=sequence-item></label>
+
+      <br>
+      </dtml-in>
+      </dtml-let>
+    </td>
+  </tr>
+  <tr class="row_odd">
+    <td class="smallHeader">
+       <dtml-msg "Comment"><br>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+    <dtml-var "comment_template( this(), title='Comment', form='confirm', field='comment', context=('task.assign.%s' % REQUEST.get('brains_type','request') ) )">
+    </td>
+  </tr>
+  <tr>
+   <td><input type="submit" value=" <dtml-msg "Assign to the selected users"> "></td>
+  </tr>
+  <tr>
+   <td><br><h1>&dtml-title_or_id;</h1></td>
+  </tr>
+  <tr>
+   <td><dtml-var CookedBody></td>
+  </tr>
+ </table>
+</form>
+
+<dtml-if sign>
+<script type="text/javascript">
+<!--
+     selectEditorInList()
+//-->
+</script>
+</dtml-if>
+
+<dtml-var simple_html_footer>

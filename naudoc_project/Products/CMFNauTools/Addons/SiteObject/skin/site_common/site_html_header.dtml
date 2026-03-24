@@ -1,0 +1,254 @@
+<dtml-call "RESPONSE.setHeader('Content-Type', 'text/html; charset=Windows-1251')">
+
+<html>
+ <head>
+  <meta name=keywords content="Naumen, Nauman, Noumen, информационные системы, NauSite, NauPhone, ERP - система, IP - телефония, разработка веб-сайтов, производство программного обеспечения, outsourcing, разработка ПО, Open Source, zope, python, linux, C++, java, apache, GPL, WCM, ERP, ERM, CRM, SIP">
+  <meta name=description content="Компания "Наумен" - производитель программного обеспечения и поставщик услуг в области информационных технологий на основе открытых кодов (Open Source). Основные виды деятельности компании: разработка ПО для web, для Light ERP - системы на основе Open Source, для IP - телефонии.">
+  <link rel="shortcut icon" href="favicon.ico">
+  <title><dtml-with portal_properties>&dtml-title;</dtml-with></title>
+
+<dtml-unless prn>
+  <link rel="stylesheet" href="&dtml-absolute_url;/default_stylesheet" type="text/css">
+</dtml-unless>
+
+  <dtml-if relative_to_content>
+   <!-- <base href="&dtml-absolute_url;" /> -->
+  </dtml-if>
+
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td>
+
+<dtml-unless prn>
+
+ <table width="100%" cellspacing="0" cellpadding="0" border="0">
+ <tr>
+  <td width="208" rowspan="2" align="center" class="blue">
+        <a href="&dtml-portal_url;">
+              <img src="&dtml-portal_url;/logon.gif" 
+                   width="196" height="31" border="0" 
+                   alt="логотип компании Наумен [переход на главную страницу]">
+        </a>
+  </td>
+  <td>
+    <table border="0" cellspacing="0" cellpadding="0">
+      <tr>
+         <td align="left" valign="top"><img src="&dtml-portal_url;/light_blue_grad_left.gif" width="25" height="25"></td>
+         <td valign="top" align="right" width="100%">
+
+
+           <table border="0" cellspacing="0" cellpadding="0">
+             <tr>
+               <dtml-comment>
+                 Display headers list
+               </dtml-comment>
+
+               <dtml-in "go.listSubFolders(subpath='')" mapping>
+                 <dtml-unless sequence-start>
+                   <td>&nbsp;<img src="&dtml-portal_url;/nav_delimeter.gif" width="15" height="20">&nbsp;</td>
+                 </dtml-unless>
+                <td valign="center">
+                    <dtml-if "_.hasattr(REQUEST, 'traverse_subpath') and _.len(traverse_subpath) and id == traverse_subpath[0]">
+                      <i class="big_menu_dark">&dtml-title;</i>
+                    <dtml-else>
+                      <a class="big_menu_dark" href="&dtml-absolute_url;"><dtml-var title></a>
+                    </dtml-if>
+                </td>
+               </dtml-in>
+
+               <dtml-comment>
+                   Installed plugins list
+
+
+               <dtml-in plugins>
+                <dtml-if "_.hasattr(this(), _['sequence-item'] + '_menu')">
+                <td>&nbsp;<img src="&dtml-portal_url;/nav_delimeter.gif" width="15" height="20">&nbsp;</td>
+                <td valign="center">
+                     <dtml-var "_.getitem(_['sequence-item'] + '_menu', 1) or ''">
+                </td>
+                </dtml-if>
+               </dtml-in>
+               </dtml-comment>
+             </tr>
+           </table>
+         </td>
+      </tr>
+    </table>
+  </td>
+ </tr>
+ <tr>
+    <td class="blue" colspan="2"><img src='&dtml-portal_url;/null.gif' width="100%" height="15"></td>
+ </tr>
+ <tr>
+    <td class="blue" align="right">
+
+        <dtml-comment>
+            Search box
+        </dtml-comment>
+
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <form method="POST" action="&dtml-portal_url;/go/search">
+            <tr>
+               <td align="right"><input type="text" name="SearchableText" size="15" value="">&nbsp;</td>
+               <td align="left">
+                   <input type="image" src="&dtml-portal_url;/search.gif" 
+                          width="59" height="19" border="0" alt="искать!">
+               </td>
+            </tr>
+        </form>
+        </table>
+    </td>
+    <td class="blue" width="100%"><img src="&dtml-portal_url;/null.gif" width="100%" height="1"></td>
+ </tr>
+ </table>
+
+<dtml-let container="this()">
+
+<!-- content table -->
+ <table width="100%" border="0" cellpadding="2" cellspacing="0">
+  <tr valign="top">
+   <td class="blue" align="left" valign="top" width="208">
+     <dtml-comment>
+        Display folders and documents bar
+     </dtml-comment>
+     <br>
+     <dtml-var site_actions_box>
+   </td>
+   <td class="blue" width="99%" valign="top" align="right">
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+       <tr>
+         <td valign="center" valign="top">
+             <dtml-comment>
+                Path box
+             </dtml-comment>
+
+             <dtml-in "_.hasattr(this(), 'getParents') and getParents()" mapping>
+               <dtml-if sequence-start>
+                  <a class="big_menu_dark" href="&dtml-portal_url;">главная страница</a>
+               </dtml-if>
+            <dtml-if sequence-end>
+                <dtml-if "_.hasattr(REQUEST, 'traverse_subpath') and traverse_subpath[-1] == id">
+                   <dtml-call "REQUEST.set('viewDoc_title', title_or_id)">
+                <dtml-else>
+                 / 
+                   <a class="big_menu_dark" href="&dtml-absolute_url;"><dtml-var title_or_id></a>
+                </dtml-if>                
+
+
+            <dtml-else>
+                 / 
+               <a class="big_menu_dark" href="&dtml-absolute_url;"><dtml-var title_or_id></a>
+            </dtml-if>
+             </dtml-in>
+
+              <dtml-comment>
+                    Virtual archive
+              </dtml-comment>
+            <dtml-call "REQUEST.set('bar', [])">
+            <dtml-if "(REQUEST.has_key('traverse_subpath') and traverse_subpath and traverse_subpath[-1] == 'viewArchive')
+                        or REQUEST.has_key('archive')">
+
+
+<dtml-if "not REQUEST.has_key('year')  and archiveProperty()!='None'">
+   <dtml-call "REQUEST.set('year', _.str(_.DateTime().year()))">
+</dtml-if>
+<dtml-if "not REQUEST.has_key('month') and REQUEST.has_key('year') and year==_.str(_.DateTime().year()) and archiveProperty()!='byYear' and archiveProperty()!='None'">
+   <dtml-call "REQUEST.set('month', _.str(_.DateTime().month()))">
+</dtml-if>
+
+
+
+                 <dtml-call "REQUEST['bar'].append({'title':'Archive', 'id':'viewArchive'})">
+             <dtml-if "REQUEST.has_key('year') and archiveProperty()!='byDay'">
+                  <dtml-call "REQUEST['bar'].append({'title':year, 'id':'viewArchive?year='+year})">
+             </dtml-if>
+             <dtml-if "REQUEST.has_key('month') and archiveProperty()!='byDay'">
+<dtml-let mo="['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']">
+                  <dtml-call "REQUEST['bar'].append({'title':mo[_.int(month)-1], 'id':'viewArchive?year='+year+'&month='+month})">
+</dtml-let>
+             </dtml-if>
+
+        <dtml-if "REQUEST.has_key('month') and REQUEST.has_key('year') and REQUEST.has_key('day') and archiveProperty()=='byDay'">
+                  <dtml-call "REQUEST['bar'].append({'title':year, 'id':'viewArchive?year='+year+'&month='+month})">
+<dtml-let mo="['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']">
+                  <dtml-call "REQUEST['bar'].append({'title':mo[_.int(month)-1], 'id':'viewArchive?year='+year+'&month='+month})">
+</dtml-let>
+                  <dtml-call "REQUEST['bar'].append({'title':day, 'id':'viewArchive?year='+year+'&month='+month+'&day='+day})">
+        </dtml-if>
+           </dtml-if>
+             <dtml-if "REQUEST.has_key('viewDoc_title')">
+                  <dtml-call "REQUEST['bar'].append({'title':viewDoc_title, 'id':''})">
+              </dtml-if>
+ 
+              <dtml-in bar prefix="element">
+                  /
+                   <dtml-if sequence-end>
+                        <i class="big_menu_dark"><dtml-var "msg(element_item['title'])"></i>
+                   <dtml-else>
+                         <a class="big_menu_dark" href="&dtml-heading_external_url;/<dtml-var "element_item['id']">"><dtml-var "msg(element_item['title'])"></a>
+                   </dtml-if>
+              </dtml-in>
+
+
+
+
+         &nbsp;
+         </td>
+    
+         <td align="right" width="200">
+           <table cellspacing=0 cellpadding=0 border=0>
+             <tr>
+               <td align="right"><img src="&dtml-portal_url;/user_arc_t_l.gif" width="11" height="11"></td>
+               <td align="right" background="&dtml-portal_url;/user_line_h_t.gif"><img src="&dtml-portal_url;/null.gif" width="10" height="11"></td>
+             </tr>
+             <tr>
+               <td background="&dtml-portal_url;/user_line_v.gif">
+                    <img src="&dtml-portal_url;/null.gif" width="11" height="1">
+               </td>
+               <td align="right"><a href='&dtml-internal_url;' class="enter">персональный вход</a></td>
+             </tr>
+             <tr>
+               <td align="right"><img src="&dtml-portal_url;/user_arc_b_l.gif"></td>
+               <td align="right" background="&dtml-portal_url;/user_line_h_b.gif"><img src="&dtml-portal_url;/null.gif" width="10" height="11"></td>
+             </tr>
+           </table>
+         </td>
+       </tr>
+      </table>
+
+    <table cellspacing="0" cellpadding="0" border="0">
+     <tr>
+        <td colspan="3"><img src='&dtml-portal_url;/null.gif' width="1" height="2"></td>
+     </tr>
+     <tr>
+        <td><img src="&dtml-portal_url;/content_arc_t_l.gif"></td>
+        <td background="&dtml-portal_url;/content_line_h_t.gif" width="99%"><img src="&dtml-portal_url;/null.gif" width="1" height="1"></td>
+        <td><img src="&dtml-portal_url;/content_arc_t_r.gif" width="12" height="12"></td>
+     </tr>
+     <tr>
+        <td background="&dtml-portal_url;/content_line_v_l.gif"><img src="&dtml-portal_url;/null.gif" width="1" height="1"></td>
+        <td class="white">
+          <table width="100%" border="0">
+            <tr>
+               <td align="right">
+                   <a href='&dtml-absolute_url;?prn=yes' target="_blank">
+                      <img src="&dtml-portal_url;/print.gif" border="0" alt="Версия для печати">
+                   </a>
+               </td>
+            </tr>
+          </table>
+
+         <dtml-if portal_status_message>
+           <p class="DesktopStatusBar"><dtml-var "msg(portal_status_message)"></p>
+         </dtml-if>
+
+         <dtml-if localHeader>
+           <dtml-var localHeader>
+         </dtml-if>
+</dtml-let>
+</dtml-unless>
+

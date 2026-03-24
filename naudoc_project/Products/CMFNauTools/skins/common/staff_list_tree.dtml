@@ -1,0 +1,63 @@
+<dtml-var simple_html_header>
+
+<dtml-let pre="REQUEST.get( 'pre', '' )"
+          mode="_.has_key( 'mode' ) and mode or ''"
+>
+
+<script type="text/javascript">
+  var selected, selected_code, selected_position, selected_division, selected_name;
+  var parent_document = getParentFrame( window ).ownerDocument;
+
+  parent_document.getElementById( '&dtml-pre;add_division_btn' ).disabled = true;
+  parent_document.getElementById( '&dtml-pre;add_employee_btn' ).disabled = true;
+
+  function switchSelection( fragment, code, position, division, name, is_branch )
+  {
+      parent_document.getElementById( '&dtml-pre;add_employee_btn' ).disabled = false;
+      if( is_branch )
+          parent_document.getElementById( '&dtml-pre;add_division_btn' ).disabled = false;
+      else
+          parent_document.getElementById( '&dtml-pre;add_division_btn' ).disabled = true;
+
+      if( selected )
+      { 
+          selected.style.background = 'white';
+          selected.style.color = 'black';
+      }
+      selected = fragment;
+      selected.style.background = 'black'; 
+      selected.style.color = 'white';
+
+      value = document.getElementById( "stafflist" );
+      selected_position = position;
+      selected_code = code;
+      selected_division = division;
+      selected_name = name;
+  }
+</script>
+<dtml-forest "portal_membership.getStaffList()" 
+             branches_expr="implements('IDirectoryNode') and listEntries( include_entries=True, include_nested=False ).listItems() or []"
+             urlparam_expr="'pre=' + REQUEST.get('pre', '')"
+>
+<dtml-let division="isBranch() and portal_membership.getStaffListAttribute( this(), 'division' )"
+          staff_attr="portal_membership.getStaffListAttribute"
+          position="staff_attr( this(), 'position' )"
+          employee="staff_attr( this(), 'employee', 1 )"
+          deputy="staff_attr( this(), 'deputy', 1 )"
+          name="staff_attr( this(), 'employee' ) and '(%s)' % employee or
+                staff_attr( this(), 'deputy' ) and '(%s)' % deputy or
+                '(%s)' % msg('No employee assigned')"
+          disabled="mode and getEntryAttribute( 'disable_for_' + mode )"
+>
+  <a style="cursor: hand; padding: 3px'" 
+     onSelectStart="javascript: return false;"
+<dtml-unless disabled>
+     onDblClick="javascript: parent_document.getElementById( '&dtml-pre;add_employee_btn' ).click();"
+     onClick="javscript: switchSelection( this, &dtml-getId;, '<dtml-var position fmt="jscript">', '<dtml-var division fmt="jscript">', '<dtml-var name fmt="jscript">', <dtml-var "_.int(isBranch())"> );"
+</dtml-unless>
+  ><dtml-var "division and '[%s]' % division or ''" html_quote> &dtml-position; &dtml-name;</a>
+</dtml-let>
+</dtml-forest>
+</dtml-let>
+
+<dtml-var simple_html_footer>

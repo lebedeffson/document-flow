@@ -1,0 +1,67 @@
+<dtml-comment>
+$Id: search_onpage_form.dtml,v 1.2 2005/09/20 09:55:52 oevsegneev Exp $
+$Editor: oevsegneev $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+
+function find() {
+  var parent_window = window.dialogArguments.Editor;
+  var search_string = document.getElementById('search_text').value;
+  var dir_up = document.getElementById('search_up').checked;
+  var search_scope = 1;
+  if (dir_up) search_scope = -1;
+  var search_flags = 0;
+  if (document.getElementById('search_mc').checked)
+    search_flags+=4;
+  if (document.getElementById('search_ww').checked)
+    search_flags+=2;
+  findOnPage( parent_window, search_string, search_scope, search_flags );
+}
+
+function CheckStat() {
+  if (document.getElementById('search_text').value != '')
+    document.getElementById('search_button').disabled = false;
+  else
+    document.getElementById('search_button').disabled = true;
+}
+
+</script>
+  <table cellSpacing="1" cellPadding="3" width="100%" border="0">
+    <tr class="row_title">
+      <td nowrap>
+        <dtml-msg "Search text">:
+      </td>
+      <td width="100%">
+        <input id="search_text" style="WIDTH: 100%" tabIndex="1" type="text" onKeyUp="CheckStat();">
+      </td>
+      <td>
+        <input type="button" name="search_button" value="<dtml-msg "Search">" onClick="find();" onDblClick="find();" disabled>
+      </td>
+    </tr>
+  </table>
+  <table cellSpacing="1" cellPadding="3" width="100%" border="0">
+    <tr class="row_even">
+      <td nowrap>
+        <input type="checkbox" id="search_mc"><dtml-msg "Match case">
+      </td>
+      <td>
+        <dtml-msg "Search direction"><br/>
+        <input type="radio" id="search_up" name="search_dir"><dtml-msg "Up">
+        <input type="radio" id="search_down" name="search_dir" checked><dtml-msg "Down">
+      </td>
+    </tr>
+    <tr class="row_even">
+      <td colspan="2">
+        <input type="checkbox" id="search_ww"><dtml-msg "Match whole words only">
+      </td>
+    </tr>
+  </table>
+
+<dtml-var simple_html_footer>

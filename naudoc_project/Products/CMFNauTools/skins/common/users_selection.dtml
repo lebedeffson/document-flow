@@ -1,0 +1,215 @@
+<dtml-comment>
+$Id: users_selection.dtml,v 1.7 2006/06/05 10:10:14 oevsegneev Exp $
+
+</dtml-comment>
+
+<dtml-revision $Revision: 1.7 $>
+
+<dtml-let pre="_.has_key('pre') and pre or ''"
+          mode="_.has_key('mode') and mode or ''"
+
+          options="users_selection_options( _.get('options', None) )"
+          role_options="options[0]"
+          group_options="options[1]"
+          user_options="options[2]"
+
+          preselected_users="_.has_key('preselected_users') and preselected_users or []"
+          name="_.has_key('name') and name or 'selected_users'"
+          ordered="_.has_key('ordered') and ordered"
+          selected_users_id="_.has_key('selected_users_id') and selected_users_id or 'selected_users'"
+          selected_users_title="_.has_key('selected_users_title') and selected_users_title or 'Selected users'"
+
+          suppress_roles="_.get('suppress_roles')"
+          suppress_groups="_.get('suppress_groups')"
+          layers="[]"
+>
+<table cellpadding="0" cellspacing="0">
+<tr>
+  <td class="small">
+<script type="text/javascript">
+  <dtml-call "user_options and layers.append('%sselection_users' % pre)">
+  <dtml-call "not suppress_groups and group_options and layers.append('%sselection_groups' % pre)">
+  <dtml-call "not suppress_roles and layers.append('%sselection_roles' % pre)">
+  <dtml-call "layers.extend(['%sselection_stafflist' % pre, '%sstafflist_controls' % pre, '%scommon_controls' % pre])">
+
+  var &dtml-pre;_layers = &dtml-layers;
+</script>
+   <dtml-if user_options>          	
+    <a href="javascript: displayElements( [ '&dtml-pre;selection_users', '&dtml-pre;common_controls' ], &dtml-pre;_layers );"
+    ><dtml-msg Users></a>
+   </dtml-if>
+
+   <dtml-unless suppress_groups>
+   <dtml-if group_options>
+    <dtml-if user_options> / </dtml-if>
+    <a href="javascript: displayElements( [ '&dtml-pre;selection_groups', '&dtml-pre;common_controls' ], &dtml-pre;_layers );"
+    ><dtml-msg Groups></a>
+   </dtml-if>
+   </dtml-unless>
+
+    <dtml-unless suppress_roles>
+    <dtml-if "user_options or group_options"> / </dtml-if>
+    <a href="javascript: displayElements( [ '&dtml-pre;selection_roles', '&dtml-pre;common_controls' ], &dtml-pre;_layers );"
+    ><dtml-msg Roles></a>
+    </dtml-unless>
+
+    /
+    <a href="javascript: displayElements( [ '&dtml-pre;selection_stafflist', '&dtml-pre;stafflist_controls' ], &dtml-pre;_layers );"
+    ><dtml-msg "Staff list"></a>
+
+    <br>
+  </td>
+  <td>&nbsp;</td>
+  <td class="small">
+    <dtml-var "msg( selected_users_title )">
+  </td>
+</tr>
+<tr>
+  <td class="small" valign="top">
+   <dtml-if user_options>
+    <div id="&dtml-pre;selection_users"
+         style="display: None"
+         onClick="&dtml-pre;current_selection = &dtml-pre;all_users;"
+    >
+      <dtml-var "user_list( this(), 
+                            user_ids=user_options,
+                            name=pre+'all_users', 
+                            multiple=1,
+                            on_dbl_click='javascript: addSelectionToList( %(pre)sall_users, %(pre)s%(id)s );'  % { 'pre': pre, 'id': selected_users_id }
+                          )"
+      >
+    </div>
+   </dtml-if>
+
+   <dtml-unless suppress_groups>
+   <dtml-if group_options>
+    <div id="&dtml-pre;selection_groups"
+         style="display: None"
+         onClick="&dtml-pre;current_selection = &dtml-pre;all_groups;"
+    >
+      <dtml-var "selectbox( this(), 
+                            name=pre+'all_groups',
+                            options=group_options,
+                            multiple=1,
+                            size=8,
+                            on_dbl_click='javascript: addSelectionToList( %(pre)sall_groups, %(pre)s%(id)s );'  % { 'pre': pre, 'id': selected_users_id }
+                          )"
+      >
+    </div>
+   </dtml-if>
+    </dtml-unless>
+
+   <dtml-unless suppress_roles>
+    <div id="&dtml-pre;selection_roles"
+         style="display: None"
+         onClick="&dtml-pre;current_selection = &dtml-pre;all_roles;"
+    >
+      <dtml-var "selectbox( this(), 
+                            name=pre+'all_roles',
+                            options=role_options,
+                            multiple=1,
+                            on_dbl_click='javascript: addSelectionToList( %(pre)sall_roles, %(pre)s%(id)s );'  % { 'pre': pre, 'id': selected_users_id }
+                          )"
+      >
+    </div>
+    </dtml-unless>
+
+
+    <div id="&dtml-pre;selection_stafflist"
+         style="display: None"
+    >
+      <iframe id="&dtml-pre;stafflist" 
+              height="100" 
+              src="<dtml-var "absolute_url( action='staff_list_tree', params={ 'pre': pre, 'mode': mode } )" html_quote>"
+      ></iframe>
+    </div>
+
+  </td>
+  <td valign="middle" align="center" style="padding: 5px;">
+
+    <div id="&dtml-pre;common_controls">
+        <input type="button"
+               id="&dtml-pre;add_selection_btn"
+               value=" &gt;&gt; "
+               onClick="addSelectionToList( &dtml-pre;current_selection, &dtml-pre;&dtml-selected_users_id; );" 
+        >
+        <br><br>
+        <input type="button"
+               value=" &lt;&lt; "
+               onClick="deleteSelectionFromList( &dtml-pre;&dtml-selected_users_id; );"
+        >
+    </div>
+
+    <div id="&dtml-pre;stafflist_controls">
+        <script type="text/javascript">
+            var &dtml-pre;stafflist_window = document.getElementById( '&dtml-pre;stafflist' ).contentWindow;
+        </script>
+        <input type="button"
+               id="&dtml-pre;add_employee_btn"
+               value=" <dtml-msg "Select employee"> &gt;&gt; "
+               onClick="addOptionTo( &dtml-pre;&dtml-selected_users_id;, &dtml-pre;stafflist_window.selected_position+' '+&dtml-pre;stafflist_window.selected_name, 'pos:' + &dtml-pre;stafflist_window.selected_code );" 
+               disabled
+        >
+        <br><br>
+        <input type="button"
+               id="&dtml-pre;add_division_btn"
+               value=" <dtml-msg "Select division"> &gt;&gt; "
+               onClick="addOptionTo( &dtml-pre;&dtml-selected_users_id;, &dtml-pre;stafflist_window.selected_division, 'div:' + &dtml-pre;stafflist_window.selected_code );" 
+               disabled
+        >
+        <br><br>
+        <input type="button"
+               value=" << "
+               onClick="deleteSelectionFromList( &dtml-pre;&dtml-selected_users_id; );"
+        >
+    </div>
+
+  </td>
+  <td class="small" valign="top">
+    <table>
+    <tr><td>
+    <select id="&dtml-pre;&dtml-selected_users_id;" 
+            name="&dtml-pre;&dtml-name;:list" 
+            size="8"
+            onDblClick="deleteSelectionFromList( &dtml-pre;&dtml-selected_users_id; );"
+            multiple
+    >
+    <dtml-in preselected_users>
+      <dtml-let item=sequence-item
+                staff_attr="portal_membership.getStaffListAttribute"
+                name="item.startswith( 'role:' ) and msg( 'Role: %s' ) % msg( item[5:] ) or
+                      item.startswith( 'group:' ) and msg( 'Group: %s' ) % portal_membership.getGroup( item[6:] ).Title() or
+                      item.startswith( 'pos:' ) and '%s (%s)' % ( staff_attr( item[4:], 'position' ),
+                          staff_attr( item[4:], 'employee' ) and staff_attr( item[4:], 'employee', 1 ) or
+                          staff_attr( item[4:], 'deputy' ) and staff_attr( item[4:], 'deputy', 1 ) or
+                          msg('No employee assigned')) or
+                      item.startswith( 'div:' ) and staff_attr( item[4:], 'division' ) or
+                      portal_membership.getMemberName( item )"
+      >          
+      <option value="&dtml-item;">&dtml-name;</option>
+      </dtml-let>
+    </dtml-in>
+    </select>
+    </td>
+<dtml-if ordered>
+  <td valign="top">
+      <a href="javascript: upSelectionInList( '&dtml-pre;&dtml-selected_users_id;' );"
+      ><img src="up.gif" title="<dtml-msg "Move up">"></a>
+      <br>
+      <a href="javascript: downSelectionInList( '&dtml-pre;&dtml-selected_users_id;' );"
+      ><img src="down.gif" title="<dtml-msg "Move down">"></a>
+  </td>
+</dtml-if>
+    </tr>
+    </table>
+    <script type="text/javascript">
+        var &dtml-pre;current_selection = document.getElementById('&dtml-pre;all_users');
+        displayElements( [ &dtml-pre;_layers[0], '&dtml-pre;common_controls' ], &dtml-pre;_layers );
+    </script>
+
+
+  </td>
+</tr>
+</table>
+</dtml-let>
+

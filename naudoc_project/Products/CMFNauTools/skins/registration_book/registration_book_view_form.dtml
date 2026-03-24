@@ -1,0 +1,224 @@
+<dtml-comment>
+$Id: registration_book_view_form.dtml,v 1.28 2007/10/01 08:46:12 oevsegneev Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.28 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let container=this
+          columns=listColumns
+          is_manager="portal_membership.checkPermission('Manage portal', this())">
+
+<dtml-with "executeQuery(REQUEST, md=_)" mapping>
+          
+  <dtml-if getRecencyPeriod>
+    <strong>
+    <dtml-if disable_recency_filter>
+      <a href="<dtml-var "container.absolute_url( action='view', params={ 'disable_recency_filter': 0, } )">"
+         class="navigate">
+         <dtml-msg "Hide records older than"> &dtml-recency_period; <dtml-msg expr="recency_period == 1 and 'day.plural' or 'days'">
+      </a>
+    <dtml-else>
+      <a href="<dtml-var "container.absolute_url( action='view', params={ 'disable_recency_filter': 1, } )">"
+         class="navigate">
+         <dtml-msg "Show all records">
+      </a>
+    </dtml-if>
+    </strong>
+    <br /><br />
+  </dtml-if>
+
+  <dtml-if total_count>
+    &dtml-results_count;&nbsp;<dtml-msg "documents of">&nbsp;&dtml-total_count;<br />
+  </dtml-if>
+
+  <dtml-in  results
+            start=qs
+            size=batch_size
+            prefix="c">
+
+    <dtml-if sequence-start>
+      <dtml-var table_pages_list>
+      <dtml-if is_manager>
+        <form name="unregister" method="POST" action="&dtml-absolute_url;">
+      </dtml-if>
+      <table border="0" cellpadding="2" cellspacing="2" class="FormLayout">
+        <tr class="row_title">
+          <dtml-if is_manager><td></td></dtml-if>
+          <td>
+            <a href="<dtml-var "container.absolute_url( action='view',
+                                params={'sort_on': 'Title',
+                                        'sort_order': sort_on == 'Title' and
+                                        not sort_order and 'reverse' or '' } )">"
+               class="navigate">
+              <dtml-msg Document>
+              <dtml-if "sort_on == 'Title'">
+                <dtml-if sort_order><dtml-var sort_down.gif>
+                <dtml-else><dtml-var sort_up.gif>
+                </dtml-if>
+              </dtml-if>
+            </a>
+          </td>
+          <dtml-unless hide_version>
+          <td>
+              <dtml-msg Version>
+          </td>
+          </dtml-unless>
+          <dtml-unless hide_registration_date>
+          <td>
+            <a href="<dtml-var "container.absolute_url( action='view',
+                                params={'sort_on': 'created',
+                                        'sort_order': sort_on == 'created' and
+                                        not sort_order and 'reverse' or '' } )">"
+               class="navigate">
+              <dtml-msg "Registration date">
+              <dtml-if "sort_on == 'created'">
+                <dtml-if sort_order><dtml-var sort_down.gif>
+                <dtml-else><dtml-var sort_up.gif>
+                </dtml-if>
+              </dtml-if>
+            </a>
+          </td>
+          </dtml-unless>
+          <dtml-unless hide_creator>
+          <td>
+            <a href="<dtml-var "container.absolute_url( action='view',
+                                params={'sort_on': 'Creator',
+                                        'sort_order': sort_on == 'Creator' and
+                                        not sort_order and 'reverse' or '' } )">"
+               class="navigate">
+              <dtml-msg User>
+              <dtml-if "sort_on == 'Creator'">
+                <dtml-if sort_order><dtml-var sort_down.gif>
+                <dtml-else><dtml-var sort_up.gif>
+                </dtml-if>
+              </dtml-if>
+            </a>
+          </td>
+          </dtml-unless>
+        <dtml-in columns>
+          <td align="center">
+            <dtml-let sparams="getSortQuery()"
+                      reverse="(sparams == sort_params) and not sort_order and 'reverse' or ''"
+                      params="sparams and portal_catalog.isValidSortQuery( **sparams ) and
+                                { 'sort_on':    sparams.get('sort_on'),
+                                  'sort_attr':  sparams.get('sort_attr'),
+                                  'sort_order':   reverse
+                                } or {}"
+                      >
+            <dtml-if params>
+            <a  href="<dtml-var "container.absolute_url( action='view', params=params )">"
+                class="navigate"
+                >
+            </dtml-if>
+            <dtml-var Title>
+            <dtml-if params>
+            <dtml-if "sparams == sort_params">
+              <dtml-if reverse><dtml-var sort_up.gif>
+              <dtml-else><dtml-var sort_down.gif>
+              </dtml-if>
+            </dtml-if>
+            </a>
+            </dtml-if>
+            </dtml-let>
+          </td>
+        </dtml-in>
+        </tr>
+    </dtml-if>
+    <dtml-let link_brains="c_item.get('link')"
+              target_brains="c_item.get('target')"
+              target="target_brains and target_brains.getObject()"
+              >
+      <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+      <dtml-if is_manager>
+        <td class="small">
+          <input type="checkbox" name="docs:list" value="<dtml-var "link_brains.target_uid">">
+        </td>
+      </dtml-if>
+      <dtml-if "target and _.SecurityCheckPermission('View', target)">
+          <td class="small">
+            <a  href="<dtml-var "target.absolute_url()" html_quote>" target="_blank">
+              <dtml-var "target.Title()" html_quote>
+            </a>
+          </td>
+          <dtml-unless hide_version>
+          <td class="small">
+            <dtml-if "target.implements(['isVersionable', 'isVersion'])">
+              <dtml-var "target.getVersion().getVersionNumber()" html_quote>
+            </dtml-if>
+          </td>
+          </dtml-unless>
+          <dtml-unless hide_registration_date>
+            <td class="small">
+              <dtml-var "link_brains.created" fmt="%d.%m.%Y %H:%M">
+            </td>
+          </dtml-unless>
+          <dtml-unless hide_creator>
+            <td class="small">
+              <dtml-var "link_brains.Creator" fmt="member">
+            </td>
+          </dtml-unless>
+          <dtml-in columns>
+          <td class="small">
+            <dtml-var "render(_, target, default='')">
+          </td>
+          </dtml-in>
+      <dtml-else>
+        <td class="small">
+          <dtml-var "link_brains.getObject().getTargetMetadata('Title')">
+        </td>
+        <td class="small">
+          <dtml-try>
+            <dtml-var "link_brains.target_uid.get('ver_id').split('_')[1]">
+          <dtml-except>
+          </dtml-try>
+        </td>
+        <dtml-unless hide_registration_date>
+          <td class="small">
+            <dtml-var "link_brains.created" fmt="%d.%m.%Y %H:%M">
+          </td>
+        </dtml-unless>
+        <dtml-unless hide_creator>
+          <td class="small">
+            <dtml-var "link_brains.Creator" fmt="member">
+          </td>
+        </dtml-unless>
+        <td colspan="<dtml-var columns fmt=collection-length>"
+            class="small" align="center">
+            <dtml-msg "Object is inaccessible.">
+        </td>
+      </dtml-if>
+      </tr>
+    </dtml-let>
+    <dtml-if sequence-end>
+      </table>
+      <dtml-if is_manager>
+        <input type="submit" name="unregister:method" value="<dtml-msg "Unregister selected documents">">
+        </form>
+      </dtml-if>
+      <dtml-var "table_pages_list(None, _, disable_controls=True)">
+        <form name="export" action="<dtml-var "absolute_url(action='registration_book_export')" html_quote>" method="POST">
+          <dtml-if "_.has_key('profile_id')">
+            <input type="hidden" name="profile_id" value="&dtml-profile_id;">
+          </dtml-if>
+          <input type="submit" name="export" value="<dtml-msg "Export to MS Excel">">
+        </form>
+    </dtml-if>
+  <dtml-else>
+    <dtml-if total_count>
+      <dtml-msg "There are no documents matching your query">
+    <dtml-else>
+      <dtml-msg "There are no documents yet">
+    </dtml-if>
+  </dtml-in>
+  <dtml-if total_count>
+    <dtml-var catalog_filter_form>
+  </dtml-if>
+
+</dtml-with>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

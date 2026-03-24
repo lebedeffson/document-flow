@@ -1,0 +1,16 @@
+<table cellspacing="1" cellpadding="0" border="0">
+ <tr>
+   <td class="smallHeader" align="right"><dtml-var "msg('Created')">:
+   <td>&nbsp;<dtml-var CreationDate>&nbsp;</td>
+ </tr>
+<dtml-if ModificationDate>
+ <tr>
+   <td class="smallHeader" align="right">
+    <dtml-var "msg('Last modified')">:
+   </td>
+   <td>
+    &nbsp;<dtml-var Date>&nbsp;
+   </td>
+ </tr>
+</dtml-if>
+</table>

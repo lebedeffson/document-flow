@@ -1,0 +1,67 @@
+<dtml-comment>
+$Id: document_comments.dtml,v 1.10 2005/07/16 14:34:59 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<dtml-comment>
+
+<table border="0">
+ <tr>
+    <td class="smallHeader"><br><dtml-msg "Changes log message"></td>
+ </tr>
+ <tr>
+    <td><textarea name="log_message:text" rows="10" cols="80"></textarea></td>
+ </tr>
+
+ <tr>
+  <td>
+
+<dtml-in changes_log mapping reverse>
+ <dtml-if sequence-start>
+  <table>
+   <tr>
+    <td class="smallHeader"><dtml-msg "Changes log"></td>
+   </tr>
+ </dtml-if>
+  <tr>
+   <td class="small">
+     <dtml-var "_.DateTime(_.int(date))" fmt="%Y-%m-%d %H:%M">
+     <dtml-var member fmt=member>
+     <dtml-var comment>
+   </td>
+ <dtml-if sequence-end>
+  </table>
+ </dtml-if>
+</dtml-in>
+  </td>
+ </tr>
+</table>
+
+</dtml-comment>
+
+<dtml-comment> Comments tree </dtml-comment>
+
+<div class="Discussion">
+  <dtml-call "REQUEST.set('show_add_reply', 1)">
+  <dtml-var viewThreadsAtBottom>
+</div>
+
+<dtml-comment> Review history </dtml-comment>
+
+<dtml-let review_history="portal_workflow.getInfoFor( this(), 'review_history', None )"
+          workflow_id="this().getCategory().getWorkflow().getId()">
+
+  <dtml-if review_history>
+    <p><strong><dtml-msg "State history"></strong><br>
+    <dtml-in review_history mapping reverse>
+      <dtml-var time fmt="%Y-%m-%d %H:%M">
+      <i><dtml-var "'%s:%s' % (workflow_id, state)" fmt=workflow_state></i>
+      <dtml-msg "By:"><dtml-var actor fmt=member>
+      </p><dtml-var comments missing fmt="structured-text"><p><br />
+    </dtml-in>
+    </p>
+  </dtml-if>
+</dtml-let>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,7 @@
+created_at=20260324-142317
+source_root=/home/lebedeffson/Code/Документооборот
+containers=rukovoditel_db_test,naudoc_bridge_test,naudoc34_legacy
+files=
+  mariadb/rukovoditel.sql
+  bridge/bridge.db
+  naudoc/Data.fs

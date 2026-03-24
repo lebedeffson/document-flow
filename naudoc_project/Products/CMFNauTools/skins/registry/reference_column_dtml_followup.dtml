@@ -1,0 +1,18 @@
+<dtml-comment>
+$Id: reference_column_dtml_followup.dtml,v 1.2 2005/10/06 11:07:47 vsafronovich Exp $
+$Editor: vsafronovich$
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+ <dtml-if "followup">
+     <dtml-in "followup.getBoundTasks()">
+       <b>&dtml-title;</b>:<br>
+       <dtml-let involved_users="listInvolvedUsers() or []">
+         <dtml-in involved_users sort="id" size="5">
+           <dtml-var sequence-item fmt=member.brief>
+           <dtml-unless sequence-end>,</dtml-unless>
+         </dtml-in>
+       </dtml-let>
+       <dtml-unless sequence-end><br></dtml-unless>
+     </dtml-in>
+  </dtml-if>

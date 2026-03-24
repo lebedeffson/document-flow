@@ -1,0 +1,10 @@
+<dtml-let months="['','January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']"
+          date="_.DateTime(_['Date'])">
+  <dtml-unless "date.isCurrentDay()">
+    <dtml-var "date.dd()"> <dtml-msg expr="months[date.month()]">
+  </dtml-unless>
+  <dtml-unless "date.isCurrentYear()">
+    <dtml-var "date.year()">
+  </dtml-unless>
+  <dtml-var date fmt="%H:%M">
+</dtml-let>

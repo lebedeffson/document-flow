@@ -1,0 +1,9 @@
+<dtml-comment>
+$Id: task_definition_clear_timer_info_emb.dtml,v 1.1 2004/04/01 09:22:14 mbernatski Exp $
+
+showing action template 'clearTimer', in info mode
+
+called from list_activated_action_templates_emb.dtml
+
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>

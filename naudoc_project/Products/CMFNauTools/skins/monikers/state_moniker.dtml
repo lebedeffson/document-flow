@@ -1,0 +1,27 @@
+<dtml-comment>
+Moniker view of the StateDefinition object.
+
+$Editor: vsafronovich $
+$Id: state_moniker.dtml,v 1.3 2006/07/07 14:28:55 ypetrov Exp $
+</dtml-comment>
+
+<dtml-if "moniker_object">
+
+<dtml-if "_.SecurityCheckPermission( 'View', this() ) and 'Manager' in AUTHENTICATED_USER.getRoles()">
+  <a href="<dtml-var "moniker_url or relative_url( action=moniker_method )" html_quote>"
+     target="&dtml.null-moniker_frame;"><dtml-msg "No title" expr=Title translate=0></a>
+
+<dtml-elif "not moniker_unauthorized">
+  <dtml-msg "No title" expr=Title translate=0>
+
+<dtml-else>
+    <dtml-raise Unauthorized></dtml-raise>
+</dtml-if>
+
+<dtml-elif moniker_id>
+
+<dtml-msg "unknown object '%(name)s'" name="moniker_id.uid">
+
+</dtml-if>
+
+

@@ -1,0 +1,30 @@
+<dtml-comment>
+Main form for actions with document versions.
+
+$Id: document_versions_form.dtml,v 1.9 2004/01/16 16:46:24 vpastukhov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-var simple_html_header>
+
+<form name="versions" method="post"
+      action="<dtml-var "relative_url( action='document_versions_handler' )" html_quote>">
+
+<h3><dtml-msg "Available versions"></h3>
+
+<dtml-var document_versions_embedded>
+<br />
+
+<dtml-if isLocked>
+  <dtml-msg "This document has been locked because it is being edited by another user.">
+  <br />
+<dtml-elif "_.SecurityCheckPermission( 'Create object versions', this() )">
+  <input type="submit" name="create_version" value="<dtml-msg "Create new version">">
+  &nbsp;
+</dtml-if>
+
+<input type="submit" name="compare_versions" value="<dtml-msg "Compare versions">">
+
+</form>
+
+<dtml-var simple_html_footer>

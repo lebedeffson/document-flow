@@ -1,0 +1,238 @@
+<dtml-comment>
+$Id: excel_form.dtml,v 1.11 2005/03/26 17:38:55 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.11 $>
+
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1251">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="NauDoc &dtml-productVersion;">
+<dtml-let table_columns="[ { 'id'     : 'Title',
+                             'title'  : 'Title',
+                             'type'   : 'string',
+                           },
+                           { 'id'     : 'Description',
+                             'title'  : 'Description',
+                             'type'   : 'text',
+                           },
+                           { 'id'     : 'Creator',
+                             'title'  : 'Assigned by',
+                             'type'   : 'userlist',
+                           },
+                           { 'id'     : 'Supervisor',
+                             'title'  : 'Supervisor',
+                             'type'   : 'userlist',
+                           },
+                           { 'id'     : 'InvolvedUsers',
+                             'title'  : 'Involved Users',
+                             'type'   : 'userlist',
+                           },
+                           { 'id'     : 'SupervisorMark',
+                             'title'  : 'Supervisor mark',
+                             'type'   : 'text',
+                           },
+                           { 'id'     : 'expires',
+                             'title'  : 'Expires',
+                             'type'   : 'date',
+                           },
+                           { 'id'     : 'ExecutionTime',
+                             'title'  : 'Execution Time',
+                             'type'   : 'date',
+                           },
+                           { 'id'     : 'Reports',
+                             'title'  : 'Reports',
+                             'type'   : 'text',
+                           },
+
+                         ]"
+          creator_info="portal_membership.getUserInfo(Creator())"
+          user_name="portal_membership.getAuthenticatedMember().getUserName()"
+          user_info="portal_membership.getUserInfo(user_name)"
+          c_name="creator_info and creator_info['lname']+' '+creator_info['fname']+' '+creator_info['mname'] or Creator()"
+          u_name="user_info and (user_info['lname']+' '+user_info['fname']+' '+user_info['mname']) or user_name"
+          selected_columns_report="REQUEST.get('selected_columns_report', REQUEST.get('cookie_selected_columns_report', '').split(','))"
+          all_tasks="portal_followup.searchTasks()"
+          our_tasks="[x.getObject() for x in all_tasks if x.getObject().getUid() in tasks]"
+          now="_.DateTime()"
+          >
+<!--[if gte mso 9]><xml>
+  <o:DocumentProperties>
+  <o:Author><dtml-var c_name></o:Author>
+  <o:LastAuthor><dtml-var u_name></o:LastAuthor>
+  <o:Created><dtml-var "_.DateTime().ISO()"></o:Created>
+  <o:LastSaved><dtml-var "_.DateTime().ISO()"></o:LastSaved>
+  </o:DocumentProperties>
+</xml><![endif]-->
+
+<!--[if gte mso 9]><xml>
+  <x:ExcelWorkbook>
+    <x:ExcelWorksheets>
+      <x:ExcelWorksheet>
+        <x:Name><dtml-msg Sheet>1</x:Name>
+        <x:WorksheetOptions>
+          <x:Selected/>
+          <x:ProtectContents>True</x:ProtectContents>
+          <x:ProtectObjects>False</x:ProtectObjects>
+          <x:ProtectScenarios>False</x:ProtectScenarios>
+        </x:WorksheetOptions>
+      </x:ExcelWorksheet>
+    </x:ExcelWorksheets>
+    <x:ProtectStructure>True</x:ProtectStructure>
+    <x:ProtectWindows>False</x:ProtectWindows>
+  </x:ExcelWorkbook>
+</xml><![endif]-->
+<style>
+.xl24
+    {mso-style-parent:style0;
+    mso-number-format:General;
+    white-space:normal;
+    }
+.xl25
+    {mso-style-parent:style0;
+    mso-number-format:"General Date";
+    white-space:normal;
+    }
+.xl26
+    {mso-style-parent:style0;
+    mso-number-format:"Yes\/No";
+    white-space:normal;
+    }
+.xl27
+    {mso-style-parent:style0;
+    mso-number-format:Standard;
+    white-space:normal;
+    }
+</style>
+</head>
+<body>
+  <dtml-in our_tasks>
+    <dtml-if sequence-start>
+      <table>
+        <tr>
+          <dtml-in table_columns mapping>
+            <dtml-if "not selected_columns_report[0] or id in selected_columns_report">
+              <td class="x124" x:str>
+                <dtml-msg expr=title>
+              </td>
+            </dtml-if>
+          </dtml-in>
+        </tr>
+    </dtml-if>
+    <dtml-let alarm_date="expires() - (expires() - effective() ) / 10"
+              task_state="isFinalized() and 'finalized' or
+                          expires().isPast() and 'expired' or
+                          alarm_date < _.DateTime() and 'beforeexpiration' or 'inprogress'"
+              icon_name="'task_%s.gif' % task_state"
+              >
+      <dtml-in table_columns mapping>
+        <dtml-if "not selected_columns_report[0] or id in selected_columns_report">
+          <dtml-if "id=='Title'">
+            <td class="x124" x:str>
+              <dtml-var Title><br>(<dtml-msg expr=task_state>)
+            </td>
+          <dtml-elif "id=='Supervisor'">
+            <td class="x124" x:str>
+              <dtml-if Supervisor>
+                <dtml-var "portal_membership.getMemberBriefName(Supervisor)">
+              <dtml-else>
+                <dtml-msg "n/a">
+              </dtml-if>
+            </td>
+          <dtml-elif "id=='Creator'">
+            <td class="x124" x:str>
+              <dtml-var "portal_membership.getMemberBriefName(Creator())">
+            </td>
+          <dtml-elif "id=='Description'">
+            <td class="x124" x:str>
+              <dtml-var Description>
+            </td>
+          <dtml-elif "id=='InvolvedUsers'">
+            <td>
+              <dtml-in InvolvedUsers>
+                <b><dtml-var "portal_membership.getMemberBriefName(_['sequence-item'])"></b>
+                <dtml-if sequence-end><dtml-else><br></dtml-if>
+              </dtml-in>
+            </td>
+          <dtml-elif "id=='created'">
+            <td class="x124" x:date>
+              <dtml-var "rDate(this(), time=created)">
+            </td>
+          <dtml-elif "id=='expires'">
+            <td>
+              <dtml-let time_remaining="_.int((expires() - now) * 86400)"
+                        perc_remaining="_.abs((expires() - effective() )) > _.abs((expires() - now)) and _.int((expires() - now) / (expires() - effective() ) * 100 )"
+                        >
+                <dtml-var "rDate(this(), time=expires() ).strip()">
+                <dtml-if "time_remaining > 0">,<br>
+                  <dtml-var "dateperiod(time_remaining, short=1)">
+                  (<dtml-var perc_remaining>%) <dtml-msg "time_left">
+                </dtml-if>
+              </dtml-let>
+            </td>
+          <dtml-elif "id=='ExecutionTime'">
+            <td>
+              <dtml-let responses="searchResponses(sort_on='date')"
+                        time_finalized="responses and responses[-1]['date'] or None"
+                        >
+                <dtml-if "isFinalized() and time_finalized">
+                  <dtml-var "dateperiod(_.int((time_finalized - effective() ) * 86400))">
+                <dtml-else>&nbsp;
+                </dtml-if>
+              </dtml-let>
+            </td>
+          <dtml-elif "id=='SupervisorMark'">
+            <td class="x124" x:str>
+              <dtml-if Supervisor>
+                <dtml-let responses="searchResponses(member=Supervisor )"
+                          supervisor_mark="_.len(responses) and responses[0]['text'] or ''"
+                          >
+                  <dtml-var supervisor_mark>
+                </dtml-let>
+              <dtml-else>
+                <dtml-msg "No supervisor">
+              </dtml-if>
+            </td>
+          <dtml-elif "id=='Reports'">
+            <td>
+              <dtml-in listResponseTypes mapping>
+                <dtml-if sequence-start>
+                  <table>
+                </dtml-if>
+                <tr>
+                  <td><dtml-msg expr=progresslist_title></td>
+                </tr>
+                <tr>
+                  <td>
+                    <dtml-in "searchResponses(status=id)" mapping>
+                      <dtml-var "portal_membership.getMemberBriefName(member)">
+                      <dtml-if isclosed>- <dtml-msg "report closed"></dtml-if>
+                      [<dtml-var "rDate(this(), time=date).strip()">]
+                      <dtml-var text newline_to_br>
+                    <dtml-else>
+                      <dtml-msg "No reports">
+                    </dtml-in>
+                  </td>
+                </tr>
+                <dtml-if sequence-end>
+                  </table>
+                </dtml-if>
+              <dtml-else>
+                <dtml-msg "No reports">
+              </dtml-in>
+            </td>
+          </dtml-if>
+        </dtml-if>
+      </dtml-in>
+    </tr>
+  </dtml-let>
+  <dtml-if sequence-end>
+    </table>
+  </dtml-if>
+</dtml-in>
+</dtml-let>
+</body>
+</html>

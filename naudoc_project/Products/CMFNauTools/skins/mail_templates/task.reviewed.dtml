@@ -1,0 +1,20 @@
+<dtml-comment>
+$Id: task.reviewed.dtml,v 1.3 2004/01/16 16:46:24 vpastukhov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+<dtml-let membername="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='en'">
+Subject: Task "<dtml-var task_title>" reviewed
+
+Task "<dtml-var task_title>" has been reviewed by supervisor <dtml-var membername>.
+URL: &dtml-task_url;
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Задание "<dtml-var task_title>" визировано
+
+Контролер <dtml-var membername> визировал задание "<dtml-var task_title>".
+URL: &dtml-task_url;
+
+</dtml-if>
+</dtml-let>

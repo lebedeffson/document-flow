@@ -1,0 +1,153 @@
+<dtml-comment>
+Main form for digital signatures.
+
+$Editor: oevsegneev $
+$Id: document_signatures_form.dtml,v 1.5 2008/10/22 09:21:34 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let signatures="getSignatures()"
+          member="portal_membership.getAuthenticatedMember()"
+          cert="member.getProperty('ds_certificate')"
+          auto_verify="portal_membership.getInterfacePreferences('ds_auto_verify')"
+          csp_name="portal_signature.getProperty('csp_name')"
+          key_length="portal_signature.getProperty('key_length')">
+
+<dtml-var signer_script>
+
+<script language="javascript">
+<!--
+
+function init() {
+  if( !IsCAPICOMInstalled() ) 
+    alert('<dtml-msg "ds.error.capicom_not_found">');
+
+  // Show current certificate
+  if( validateCert( '&dtml-cert;' )){
+    document.getElementById('bad_cert_text').style.display = 'none';
+    document.getElementById('add_text').style.display = '';
+    document.getElementById('curr_cert').style.display = '';
+    document.getElementById('add_button').style.display = '';
+    var cert_name = FindCertificateByHash('&dtml-cert;').GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME);
+    document.getElementById('certname').innerHTML = cert_name;
+    document.getElementById('certimg').innerHTML = '<img src="&dtml-portal_url;/certificate.gif" alt="<dtml-msg "ds.certificate">" title="<dtml-msg "ds.certificate">" border="0" onMouseOver="this.style.cursor = \'hand\'" onClick="displayCert(\'&dtml-cert;\',0)"/>';
+
+    <dtml-if "signatures and auto_verify">
+      verifySelected();
+    </dtml-if>
+  }
+}
+
+function verifySelected(){
+  var content = getContent( include_attachments );
+
+  for( s=0; s<sign_certs.length; s++ ){
+    var status_cont = document.getElementById('verify_status_'+sign_certs[s]);
+    if( verify( s, document.getElementById( 'sign_cont_'+sign_certs[s] ).value, content )){
+      status_cont.innerHTML = '<dtml-msg "ds.valid">';
+      status_cont.className = 'ds_valid';
+      document.getElementById('cert_link_'+sign_certs[s]).innerHTML = '<img src="&dtml-portal_url;/certificate.gif" alt="<dtml-msg "ds.certificate">" title="<dtml-msg "ds.certificate">" border="0" onMouseOver="this.style.cursor = \'hand\'" onClick="displayCert('+s+',1)"/>';
+    } else{
+      status_cont.innerHTML = '<dtml-msg "ds.not_valid">';
+      status_cont.className = 'ds_not_valid';
+    }
+  }
+}
+
+//-->
+</script>
+
+<style>
+
+.ds_not_verified{
+    color: #000000;
+}
+
+.ds_valid{
+    color: #008000;
+}
+
+.ds_not_valid{
+    color: #FF0000;
+}
+
+</style>
+
+<form name="signatures" method="post"
+      action="<dtml-var "relative_url( action='addSignature' )" html_quote>">
+
+<dtml-in signatures mapping>
+  <dtml-if sequence-start>
+    <table width="400" border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
+     <tr>
+      <td>
+        <table border="0" cellpadding="2" cellspacing="0" width="100%" class="List">
+        <tr class="row_title">
+          <td colspan="6">&nbsp;
+            <b><dtml-msg "ds.signatures"></b>
+          </td>
+        </tr>
+  </dtml-if>
+        <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+          <td><dtml-var "portal_membership.getMemberName(member_id, brief=True)"></td>
+          <td width="1%" id="cert_link_&dtml-certificate;"></td>
+          <td><dtml-var date fmt="%Y-%m-%d %H:%M"></td>
+          <td class="ds_not_verified" width="25%" id="verify_status_&dtml-certificate;"><dtml-msg "ds.not_verified"></td>
+          <td><textarea id="sign_cont_&dtml-certificate;" style="display: none;"><dtml-var signature html_quote></textarea></td>
+        </tr>
+  <dtml-if sequence-end>
+       </table>
+      </td>
+     </tr>
+    </table>
+  </dtml-if>
+</dtml-in>
+
+<dtml-if "not signatures">
+  <h1><dtml-msg "ds.not_signed"></h1>
+</dtml-if>
+
+<br /><br />
+
+<table border="0">
+  <tr id="bad_cert_text">
+    <td colspan="3"><dtml-msg "ds.error.bad_certificate"></td>
+  </tr>
+  <tr id="add_text" style="display: none;">                    
+    <td colspan="3"><h3><dtml-msg "ds.add_signature">:</h3></td>
+  </tr>
+  <tr id="curr_cert" style="display: none;">
+    <td><b><dtml-msg "ds.certificate">:</b></td>
+    <td id="certname"></td>
+    <td id="certimg"></td>
+  </tr>
+  <tr>
+    <td colspan="3">
+      <input type="button" value="<dtml-msg "ds.sign">" onClick="sign(); submit();" id="add_button" style="display: none;">
+      <dtml-if "signatures and not auto_verify">
+        <input type="button" value="<dtml-msg "ds.verify">" onClick="verifySelected();">
+      </dtml-if>
+    </td>
+  </tr>
+</table>
+
+<textarea id="sign_cont" name="sign_cont" style="display: none;"></textarea>
+<textarea id="data_cont" name="data_cont" style="display: none;"></textarea>
+
+<dtml-if isLocked>
+  <dtml-msg "This document has been locked because it is being edited by another user.">
+</dtml-if>
+
+</form>
+
+<script type="text/javascript">
+<!--
+  init();
+// -->
+</script>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

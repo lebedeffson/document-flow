@@ -1,0 +1,11 @@
+<li><strong><a href="<dtml-var "item['absolute_url']">"><dtml-var "item['title']"></strong></a>
+<ul>
+<dtml-in "publishedItems(root, 1)" prefix="f" mapping>
+  <a class="menu" href="&dtml-absolute_url;">&dtml-Title_or_id;</a><br>
+</dtml-in>
+
+<dtml-in "listSubFolders(root)" prefix="f">
+<dtml-var "site_map_item(this(), REQUEST, item=f_item, root=root+[f_item['id']])">
+</dtml-in>
+</ul>
+</li>

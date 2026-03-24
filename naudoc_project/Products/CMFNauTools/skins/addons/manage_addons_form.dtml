@@ -1,0 +1,64 @@
+<dtml-comment>
+NauDoc add-ons configuration form.
+
+$Editor: vpastukhov $
+$Id: manage_addons_form.dtml,v 1.9 2008/10/15 12:26:55 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Manage add-ons"></h2>
+
+<dtml-with portal_addons only>
+<dtml-in listAddons mapping sort="title">
+  <dtml-if sequence-start>
+    <form action="portal_addons" method="POST">
+    <table width="100%" cellpadding="2" cellspacing="2" border="0">
+      <tr class="row_title">
+        <td>&nbsp;</td>
+        <td><dtml-msg "Status"></td>
+        <td><dtml-msg "Title"></td>
+        <td><dtml-msg "Version"></td>
+      </tr>
+  </dtml-if>
+      <tr class="row_even">
+        <td width="1%">
+          <dtml-unless "status=='broken'">
+            <input type="checkbox" name="ids:list" value="&dtml-id;"
+                   <dtml-var "status=='active'" fmt=checked> />
+          </dtml-unless>
+        </td>
+        <td width="20%">
+          <dtml-if "status=='broken'">
+            <span class="error"><dtml-msg "addons.status.broken"></span>
+          <dtml-else>
+            <dtml-msg expr="'addons.status.%s' % status">
+          </dtml-if>
+        </td>
+        <td>
+          <dtml-msg expr=title>
+        </td>
+        <td>
+          &dtml.null-version;
+        </td>
+      </tr>
+  <dtml-if sequence-end>
+      <tr>
+        <td colspan="4">
+          <br />
+          <input type="submit" value="<dtml-msg "Change settings">" name="manage_changeActivatedAddons:method" />
+          &nbsp;&nbsp;&nbsp;
+          <input type="submit" value="<dtml-msg "Refresh list">"  name="manage_refreshAddons:method" />
+        </td>
+      </tr>
+    </table>
+    </form>
+  </dtml-if>
+<dtml-else>
+  <dtml-msg "No add-ons installed.">
+</dtml-in>
+</dtml-with>
+
+<dtml-var simple_html_footer>

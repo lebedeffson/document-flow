@@ -1,0 +1,41 @@
+<dtml-comment>
+<dtml-let editMode="1">
+<dtml-var document_html_header>
+</dtml-let>
+</dtml-comment>
+
+<script type="text/javascript">
+<!--
+function copyValue(f) {
+    f.elements.text.value = "" + idEdit.document.body.innerHTML + "";
+  }
+//-->
+</script>
+
+<form name="edit" action="&dtml-absolute_url;/document_edit" method="post" enctype="multipart/form-data"
+onsubmit="copyValue(this); this.submitted=true; return(true);">
+
+<table width="100%" height="100%" cellspacing="0" cellpadding="3" border="0" bgcolor="#F2F2F2">
+<tr>
+ <td align="right"><input type="submit" value="<dtml-var "msg('Save changes')">"></td>
+</tr>
+<tr>
+<td height="100%" valign="top">
+ <table cellpadding="0" cellspacing="0" width="100%" height="100%" border="1" height="100%">
+  <tr>
+   <td>
+<iframe name="idEdit" width="100%" height="100%" scrolling="auto" frameborder="0" 
+src="<dtml-var "relative_url( action='EditableBody' )">"></iframe>
+<textarea name="text" style="display:none"><dtml-var EditableBody html_quote></textarea>
+   </td>
+  </tr>
+ </table>
+</td>
+</tr>
+</table>
+
+</form>
+
+<dtml-comment>
+<dtml-var standard_html_footer>
+</dtml-comment>

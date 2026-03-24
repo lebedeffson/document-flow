@@ -1,0 +1,18 @@
+<dtml-unless do_inline_css>
+<dtml-call "RESPONSE.setHeader('Content-Type','text/css')">
+</dtml-unless>
+BODY {font: 9pt Verdana, Arial, Helvetica, sans-serif;; color: #333333}
+p {font: 9pt Verdana, Arial, Helvetica, sans-serif;; color: #333333}
+td {font: 9pt Verdana, Arial, Helvetica, sans-serif;; color: #333333}
+A:link {text-decoration: none;; color: #336666}
+A:visited {text-decoration: none;; color: #336666}
+A:active {text-decoration: none;; color: #303098}
+A:hover {color: #339999; text-decoration: none}
+h1 {  color: #333333; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt}
+h2 {  color: #333333; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt}
+h3 {  color: #333333; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt}
+.news {  font: 9pt Verdana, Arial, Helvetica, sans-serif; color: #333333}
+.zag {  font: 8pt Verdana, Arial, Helvetica, sans-serif; color: #00CC00}
+.title {  font: 11px Verdana, Arial, Helvetica, sans-serif; color: #5054A0}
+UL { margin: 0 0 0 0; padding: 0 0 0 15;}
+.label {color:red;}

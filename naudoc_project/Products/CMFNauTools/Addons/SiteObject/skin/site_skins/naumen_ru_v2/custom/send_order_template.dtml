@@ -1,0 +1,27 @@
+<dtml-if "lang=='en'">
+Content-Type: text/plain
+Subject: Questionnaire received: <dtml-var "cntx.Title()">
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Получена анкета: <dtml-var "cntx.Title()">
+</dtml-if>
+
+<dtml-in "cntx.portal_metadata.getCategoryById( cntx.category ).listAttributeDefinitions()" prefix="fld">
+<dtml-if "R.has_key(fld_item.getId())">
+  <dtml-var "fld_item.getId()">:  <dtml-var "R.get(fld_item.getId())">
+</dtml-if>
+</dtml-in>
+<dtml-in products mapping prefix="pr">
+<dtml-if sequence-start>
+<dtml-var "'-'*70">
+<dtml-var "'|%s|%s|%s|%s|'%(msg('Item').center(20),msg('Unit price').center(15),msg('Quantity').center(15),msg('Total price').center(15))">
+<dtml-var "'-'*70">
+</dtml-if>
+<dtml-var "'|%s|%s|%s|%s|'%(product_title.center(20),product_price.center(15),count.center(15), ('%.2f'%total_prices[pr_index]).center(15))">
+<dtml-if sequence-end>
+<dtml-var "'-'*70">
+<dtml-var "'|%s|%s|'%(msg('Subtotal').ljust(52),('%.2f'%total).center(15))">
+<dtml-var "'-'*70">
+</dtml-if>
+</dtml-in>

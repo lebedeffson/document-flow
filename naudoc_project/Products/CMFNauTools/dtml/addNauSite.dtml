@@ -1,0 +1,110 @@
+<dtml-comment>
+$Id: addNauSite.dtml,v 1.4 2003/10/07 09:01:05 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-let form_title="'Add NauDoc/NauSite'">
+<dtml-if manage_page_header>
+  <dtml-var manage_page_header>
+  <dtml-var manage_form_title>
+<dtml-else>
+  <html><head><title>&dtml-form_title;</title></head>
+  <body>
+  <h2>&dtml-form_title;</h2>
+</dtml-if>
+</dtml-let>
+
+<form action="manage_addNauSite" method="POST">
+<table cellspacing="0" cellpadding="2" border="0">
+  <tr>
+    <td align="left" valign="top" colspan="2">
+    <div class="form-help">
+    Please enter title and description of your intranet documentation system and click the button below to create a NauDoc/NauSite instance.
+    </div>
+    </td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Id
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="id" value="docs" size="40" />
+    </td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Title
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="title" size="40" value="NauDoc intranet" />
+    </td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Description
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <textarea name="description" cols="60" rows="7"
+     style="width: 100%"></textarea>
+    </td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Default language
+    </div>
+    </td>
+    <td>
+    <select name="language:string">
+      <dtml-in all_languages mapping sort="title">
+      <option value="&dtml-id;" <dtml-var default fmt=selected> >&dtml-title;</option>
+      </dtml-in>
+    </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Full-text search stemmer
+    </div>
+    </td>
+    <td>
+    <select name="stemmer:string:empty">
+      <option value="">None</option>
+      <dtml-in all_stemmers>
+      <option value="&dtml-sequence-item;">&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top">
+    </td>
+    <td align="left" valign="top">
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit"
+     value=" Add " />
+    </div>
+    </td>
+  </tr>
+
+</table>
+</form>
+
+
+<dtml-if manage_page_footer>
+  <dtml-var manage_page_footer>
+<dtml-else>
+  </body></html>
+</dtml-if>

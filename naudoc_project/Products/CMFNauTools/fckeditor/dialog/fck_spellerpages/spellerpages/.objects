@@ -1,0 +1,14 @@
+blank.html	: File
+blank.html.properties	: None
+controls.html	: File
+controls.html.properties	: None
+controlWindow.js	: File
+controlWindow.js.properties	: None
+spellchecker.html	: File
+spellchecker.html.properties	: None
+spellChecker.js	: File
+spellChecker.js.properties	: None
+spellerStyle.css	: File
+spellerStyle.css.properties	: None
+wordWindow.js	: File
+wordWindow.js.properties	: None

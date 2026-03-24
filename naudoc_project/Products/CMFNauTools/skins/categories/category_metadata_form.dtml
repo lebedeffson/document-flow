@@ -1,0 +1,143 @@
+<dtml-comment>
+$Id: category_metadata_form.dtml,v 1.41 2005/08/21 12:53:07 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.41 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Category attributes"></h2>
+
+<dtml-let category=this
+          show_edit_buttons="False"
+          form_name="'category_metadata_form'" >
+
+<form name="category_metadata_form" action="category_metadata" method="post"
+      onSubmit="return validateAttributesForm( this )">
+
+<script type="text/javascript">
+<!--
+
+function validateAttributesForm( form )
+{
+    if (! validateForm( form, true ))
+        return false;
+
+    disableForm(form);
+    return true;
+}
+
+//-->
+</script>
+
+<table width="100%" border="0" cellpadding="2">
+
+<dtml-in listAttributeDefinitions>
+
+  <dtml-if sequence-start>
+
+    <tr class="row_title">
+      <td width="20">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><dtml-msg "Id"></td>
+      <td><dtml-msg "Type"></td>
+      <td><dtml-msg "Title"></td>
+      <td><dtml-msg "Default value"></td>
+      <td><dtml-msg "Edit"></td>
+    </tr>
+
+  </dtml-if>
+
+  <dtml-let local_attr="isInCategory(category)">
+        <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+          <td valign="top">
+            <dtml-if local_attr>
+              <dtml-call "_.set( 'show_edit_buttons', True )">
+	      <input type="checkbox" name="ids:list" value="&dtml-getId;" />
+	    <dtml-else>
+	      &nbsp;
+	    </dtml-if>
+          </td>
+          <td>
+            <table border="0">
+             <tr>
+              <td>
+              <dtml-unless sequence-start>
+                <a href="
+                  <dtml-var "category.relative_url( action='moveAttribute',
+                                                  params={  'id':getId(),
+                                                            'direction':1})">"
+                  >
+                  <img src="&dtml-portal_url;/sort_up.gif" alt="<dtml-msg "Move up">" />
+                </a>
+              </dtml-unless>
+              </td>
+              <td>
+              <dtml-unless sequence-end>
+                <a href="
+                  <dtml-var "category.relative_url( action='moveAttribute',
+                                                  params={  'id':getId(),
+                                                            'direction':-1})">"
+                  >
+                  <img src="&dtml-portal_url;/sort_down.gif" alt="<dtml-msg "Move down">" />
+                </a>
+              </dtml-unless>
+              </td>
+             </tr>
+            </table>
+          </td>
+
+          <td valign="top">
+            &dtml-getId;
+          </td>
+
+          <td valign="top">
+	    <dtml-msg expr="'valuetype.%s' % Type()"><dtml-if isMultiple>
+              <br />(<dtml-msg "collection">)</dtml-if>
+	  </td>
+
+          <td valign="top">
+            <dtml-msg expr=Title>
+          </td>
+
+          <td>
+            <dtml-var "entry_field_edit( None, _,
+                                         descriptor=getFieldDescriptor(
+                                           name='default_%s' % getId(),
+                                           modify=False ),
+                                         value=getDefaultValue(moniker=1),
+                                       )">
+          </td>
+
+          <td valign="top">
+            <dtml-if local_attr>
+              <a href="<dtml-var "category.relative_url( action='category_attr_edit',
+                                                         params={'id':getId()} )" html_quote>">&gt;&gt;</a>
+            <dtml-else>
+              &nbsp;
+            </dtml-if>
+          </td>
+
+        </tr>
+
+  </dtml-let>
+
+</dtml-in>
+
+  <tr>
+    <td colspan="8">
+      <dtml-if show_edit_buttons>
+      <input type="submit" name="delete" value="<dtml-msg "Remove">" />
+      &nbsp;&nbsp;
+      </dtml-if>
+      <input type="submit" name="add_form" value="<dtml-msg "Add new"> &gt;&gt;" />
+    </td>
+  </tr>
+
+</table>
+
+</form>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

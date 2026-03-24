@@ -1,0 +1,117 @@
+<dtml-comment>
+$Id: version_create_form.dtml,v 1.8 2004/09/22 16:23:58 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<dtml-if message>
+ <p>&dtml-message;</p>
+ <hr>
+</dtml-if>
+
+<div class="Metadata">
+
+<dtml-let id="''"
+	  title="_.has_key('ver_id') and getVersion(ver_id).title or ''"
+	  description="_.has_key('ver_id') and getVersion(ver_id).description or ''"
+	  major="this().getMaxMajorAndMinorNumbers()[0]"
+          minor="this().getMaxMajorAndMinorNumbers()[1]">
+
+<h2><dtml-msg "Create new version on basis of the version"> '&dtml-ver_id;'</h2>
+
+<form action="<dtml-var "getVersionable().relative_url()">" method="POST" onsubmit="javascript: return Validate(this);">
+
+<input type="hidden" name="ver_id" value="<dtml-var "_.has_key('ver_id') and ver_id or ''">" >
+
+<script type="text/javascript">
+<!--
+
+function showNewVersionId( weight ){
+    if (weight==0){
+        document.all['new_id'].value = 'version_'+<dtml-var "major+1">+'.0';
+    } else {
+        document.all['new_id'].value = 'version_'+&dtml-major;+'.'+<dtml-var "minor+1">;
+    }
+}
+
+function Validate( frm )
+{
+    if ( validateIdentifier(frm.elements['new_id'], '<dtml-msg "Object id is invalid" jscript>', true) == false)
+        return false;
+
+    if ( ! frm.title.value ) {
+         alert('<dtml-msg "Specify the version title" jscript>');
+         frm.title.focus()
+         return false;
+    }
+
+    return true;
+}
+
+//-->
+</script>
+
+
+
+<table class="FormLayout">
+
+ <tr valign="top">
+  <th align="right"><dtml-msg "New version amount"></th>
+  <td colspan="3">
+    <select name="ver_weight" onChange="showNewVersionId(this.selectedIndex);">
+      <option value="major"><dtml-msg "Major version"></option>
+      <option value="minor" selected><dtml-msg "Minor version"></option>
+    </select>
+    <input type="text" id="new_id" disabled value="version_&dtml-major;.<dtml-var "minor+1">">
+
+  </td>
+
+ </tr>
+
+ <tr valign="top">
+
+  <th align="right"><dtml-msg "Title"></th>
+  <td colspan="3">
+   <input type="text"
+          name="title"
+          value="&dtml-title;"
+          size="65">
+  </td>
+
+ </tr>
+
+ <tr valign="top">
+
+  <th align="right"><dtml-msg "Description"></th>
+  <td>
+   <textarea name="description:text" rows="5"
+             cols="65">&dtml-description;</textarea>
+  </td>
+
+ </tr>
+
+
+ <tr valign="top">
+  <td><br></td>
+  <td align="left">
+    <br />
+    <input type="submit" name="createVersion:method" value=" <dtml-msg "Apply"> " />
+    <input type="submit" name="cancel" value=" <dtml-msg "Cancel"> " />
+  </td>
+
+ </tr>
+
+</table>
+
+</form>
+
+</dtml-let>
+
+</div>
+</div>
+
+<dtml-var simple_html_footer>
+
+

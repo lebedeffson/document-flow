@@ -1,0 +1,10 @@
+mx
+BTreeFolder2
+CMFCore
+CMFDefault
+CMFTopic
+DCWorkflow
+Localizer
+NauScheduler
+NuxUserGroups
+Addons.GenericTaskTypes

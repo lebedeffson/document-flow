@@ -1,0 +1,50 @@
+<dtml-comment>
+$Id: task_kick_form.dtml,v 1.5 2005/08/03 10:43:33 vsafronovich Exp $
+</dtml-comment>
+<dtml-var simple_html_header>
+
+<dtml-if selected_users>
+  
+<div class="Desktop">
+
+<h1> <dtml-var aboveInThread> </h1>
+
+<form method="post">
+ <table class="FormLayout">
+  <tr>
+   <td valign=top align=left>
+    <strong><em>  <dtml-msg "Selected users"></em></strong><br>
+<dtml-in selected_users>
+  <input type="hidden" name="selected_users:list" value="&dtml-sequence-item;">
+  <dtml-var sequence-item fmt=member><dtml-unless sequence-end>,</dtml-unless>
+</dtml-in>
+
+   </td>
+  </tr>
+  <tr>
+   <td valign=top align=left>
+    <strong><em>  <dtml-msg "Message text"></em></strong><br>
+    <textarea name="text" cols="60" rows="5" wrap="soft" style="width: 100%"></textarea>
+   </td>
+  </tr>
+  <tr>
+   <td valign=top align=left>
+      <input type="checkbox" name="open_reports" value="1"> <dtml-msg "Reopen closed reports">
+   </td>
+  </tr>
+   <tr>
+   <td>
+      <input type="submit" name="KickUsers:method" value=" <dtml-msg "Notify"> ">
+      <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;'" value=" <dtml-msg "Cancel"> ">
+   </td>
+  </tr>
+ </table>
+</form>
+
+</div>
+
+<dtml-else>
+ <dtml-var "REQUEST['RESPONSE'].redirect(absolute_url())">
+</dtml-if>
+
+<dtml-var simple_html_footer>

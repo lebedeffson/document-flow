@@ -1,0 +1,105 @@
+<dtml-comment>
+$Id: interface_preferences_form.dtml,v 1.2 2008/06/18 10:06:32 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<dtml-let member="(_.hasattr(REQUEST, 'userid') and portal_membership.getMemberById(userid)) or portal_membership.getAuthenticatedMember()">
+
+<dtml-unless "_.SecurityCheckPermission( 'Set own properties', this() )">
+   <dtml-raise Unauthorized>
+     You must be logged in to view this resource.
+   </dtml-raise>
+</dtml-unless>
+
+<div class="Desktop">
+
+<h1><dtml-var "msg('Interface preferences')"></h1>
+<dtml-var "msg('User')">: <dtml-var "member.id">
+
+<form action="interface_preferences" method="POST" target="workspace" onsubmit="top.menu.location='&dtml-portal_url;/menu';">
+
+ <dtml-if userid>
+    <h5><a href="&dtml-absolute_url;/manage_users_form"><dtml-var "msg('Portal users list')"></a></h5>
+    <input type="hidden" name='userid' value="&dtml-userid;">
+ </dtml-if>
+
+ <dtml-let prefs="portal_membership.getInterfacePreferences()">
+
+ <table class="FormLayout" border="0">
+
+  <tr>
+  <th valign="top" width="30%"><dtml-var "msg('Choice of a language')"></th>
+  <td align="left" valign="top">
+
+     <select name="lang">
+     <dtml-in "msg.get_languages_map()" mapping>
+       <option value="<dtml-var id>"<dtml-if selected> selected</dtml-if>><dtml-var title></option>
+     </dtml-in>
+     </select>
+
+  </td>
+  </tr>
+
+  <tr>
+  <th valign="top" width="30%"><dtml-var "msg('Number of viewing documents on page')"></th>
+  <td align="left" valign="top">
+
+     <select name="viewing_document_number">
+       <dtml-in "_.range(5, 51, 5)" prefix="i">
+         <option value="&dtml-i_item;" <dtml-var "_.int(prefs['viewing_document_number'])==_.int(i_item) and 'selected' or ''"> >
+           &dtml-i_item;
+         </option>
+       </dtml-in>
+     </select>
+
+  </td>
+  </tr>
+
+  <tr>
+   <th>
+    <dtml-var "msg('Cleanup HTML-code of documents')">
+   </th>
+   <td><input type="checkbox" name="cleanup" value="1"<dtml-var "prefs['cleanup']" fmt=checked>></td>
+  </tr>
+  <tr>
+   <th>
+    <dtml-var "msg('Show external editor buttons in folder view')">
+   </th>
+   <td><input type="checkbox" name="external_editor_buttons" value="1"<dtml-var "prefs['external_editor_buttons']" fmt=checked>><br>
+       <i><dtml-var "msg('Use of this option slows down folder contents displaying')"></i>
+   </td>
+  </tr>
+
+  <tr>
+   <th>
+    <dtml-var "msg('Show contents size in folder view')">
+   </th>
+   <td><input type="checkbox" name="contents_size" value="1"<dtml-var "prefs['contents_size']" fmt=checked>><br>
+       <i><dtml-var "msg('Use of this option slows down folder contents displaying')"></i>
+   </td>
+  </tr>
+
+  <tr>
+   <th>
+    <dtml-var "msg('ds.automatic_verification')">
+   </th>
+   <td><input type="checkbox" name="ds_auto_verify" value="1"<dtml-var "prefs['ds_auto_verify']" fmt=checked>>
+   </td>
+  </tr>
+
+  <tr>
+   <td></td>
+   <td><input type="submit" value=" <dtml-var "msg('Save')"> "></td>
+  </tr>
+ </table>
+
+ </dtml-let>
+
+</form>
+
+</dtml-let>
+
+</div>
+
+<dtml-var simple_html_footer>

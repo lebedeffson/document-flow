@@ -1,0 +1,197 @@
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+
+function selectType(id) {
+    document.getElementById(id).checked=true;
+}
+
+function callbackFunctionTemplate( formId, uid, title, version_id, uid_field, title_field ) {
+    document.forms[formId][uid_field].value = uid;
+    document.forms[formId][title_field].value = title;
+}
+
+//-->
+</script>
+
+<h3><dtml-msg "Script parameters"></h3>
+
+<form id="script_metadata_edit_param"
+      name="script_metadata_edit_param"
+      action="&dtml-absolute_url;/script_metadata_edit" method="POST">
+<table class="FormLayout" border="1">
+ <tr>
+ <td>
+  <dtml-in listParameters>
+  <dtml-if sequence-start>
+      <table border="0" cellpadding="2" width="100%">
+        <tr class="row_title">
+          <td width="20">&nbsp;</td>
+          <td><dtml-msg "Id"></td>
+          <td><dtml-msg "Type"></td>
+          <td><dtml-msg "Title"></td>
+          <td><dtml-msg "Default value"></td>
+        </tr>
+   </dtml-if>
+   <dtml-let param=sequence-item
+             default_value="getParameterDefaultValue( param['id'], moniker=1 )"
+             form_name="'script_metadata_edit_param'"
+   >
+          <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+          <td valign="top">
+            <input type="checkbox" name="fields:list" value="<dtml-var "param['id']">" >
+          </td>
+          <td valign="top">
+            <dtml-var "param['id']">
+          </td>
+          <td valign="top"><dtml-msg expr="param['data_type']"></td>
+          <td valign="top">
+            <input type="text" 
+                   size="15" 
+                   name="<dtml-var "'title_%s' % param['id']">" 
+                   value="<dtml-msg expr="param['title']">" />
+           </td>
+          <td>
+            <dtml-var "entry_field_edit( None, _,
+                                         name='default_%s' % param['id'],
+                                         type=param['data_type'],
+                                         value=default_value,
+                                         options=default_value,
+                                         edit_options=1,
+                                         )"
+            >
+          </td>
+        </tr>
+    </dtml-let>
+    <dtml-if sequence-end>
+       <tr>
+         <td><input type="submit" 
+                    name="deleteField"
+                    value="<dtml-msg "Remove">" /></td>
+         <td colspan="4"><input type="submit" 
+                                name="saveValues" 
+                                value="<dtml-msg "Save changes">" /></td>
+       </tr>
+      </table>
+    </td>
+  </tr>
+    </dtml-if>
+    </dtml-in>
+ </td>
+ </tr>
+ <tr>
+    <td><br><h3><dtml-msg "Add new parameter"></h3></td>
+  </tr>
+  <tr>
+     <td>
+        <table border="0" cellspacing="2" cellpadding="2">
+        <tr>
+          <td colspan="2" nowrap><dtml-msg "Parameter ID"></td>
+          <td width="100%"><input type="text" name="id" /></td>
+        </tr>
+        <tr>
+          <td colspan="2"><dtml-msg "Parameter title"></td>
+          <td><input type="text" name="title" /></td>
+        </tr>
+        <tr>
+          <td colspan="2"><b><dtml-msg "Data type"></b></td>
+          <td><b><dtml-msg "Default value"></b></td>
+        </tr>
+
+        <tr>
+          <td><input type="radio" name="fType" id="boolean" value="boolean" checked /></td>
+          <td><dtml-msg "boolean"></td>
+          <td><input type="checkbox" name="value_boolean" 
+                     onClick="selectType('boolean');"></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="date" value="date"></td>
+          <td><dtml-msg "date"></td>
+          <td><dtml-let prefix="'value'"
+                        date="_.DateTime()"
+                        date_only="1"
+              >
+               <dtml-var datetime_form>
+              </dtml-let>
+          </td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="string" value="string"></td>
+          <td><dtml-msg "string"></td>
+          <td><input type="text" name="value_string:string" 
+                     onKeyUp="selectType('string');"></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="text" value="text"></td>
+          <td><dtml-msg "text"></td>
+          <td><textarea name="value_text:text" rows="5" cols="45" 
+                        onKeyUp="selectType('text');"></textarea></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="lines" value="lines"></td>
+          <td><dtml-msg "list"></td>
+          <td><textarea name="value_lines:lines" rows="5" cols="30" 
+                        onKeyUp="selectType('lines');"></textarea></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="link" value="link"></td>
+          <td><dtml-msg "link"></td>
+          <td class="small">
+
+            <input type="hidden" name="value_link:ignore_empty">
+            <input type="text"
+                   name="value_link_title"
+                   size="20"
+                   readonly="1"
+            />
+
+            <input type="button" value="<dtml-msg "Browse...">" 
+                   onClick="selectType('link'); return OpenDocumentSelectionWnd(this.form.name, 'callbackFunctionTemplate', '', '', 'value_link:ignore_empty', 'value_link_title')">
+          </td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="int" value="int"></td>
+          <td><dtml-msg "int"></td>
+          <td><input type="text"
+                     name="value_int"
+                     onKeyUp="selectType('int');"
+                     onBlur="this.value = parseInt(this.value,10) || 0;"></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="float" value="float"></td>
+          <td><dtml-msg "float"></td>
+          <td><input type="text"
+                     name="value_float"
+                     onKeyUp="selectType('float');"
+                     onBlur="this.value = parseFloat(this.value) || '0.0';"></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="fType" id="currency" value="currency"></td>
+          <td><dtml-msg "currency"></td>
+          <td><input type="text"
+                     name="value_currency"
+                     onKeyUp="selectType('currency');"
+                     onBlur="this.value = round(parseFloat(this.value));"></td>
+          <script>
+              function round(n){
+                  if (isNaN(n)) return '0.00';
+                  n = Math.round(Math.abs(n) * 100) / 100;
+                  n = (n + 0.001) + '';
+                  return n.substring(0, n.indexOf('.') + 3);
+              }
+          </script>
+        </tr>
+        <tr>
+          <td colspan="3"><input type="submit" name="addField" 
+                                 value="<dtml-msg "Add"> "
+                                 onClick="return validateIdentifier( this.form.id, '<dtml-msg "Field is invalid">');"></td>
+        </tr>
+      </td>
+     </tr>
+  </table>
+</form>
+
+<dtml-var simple_html_footer>
+

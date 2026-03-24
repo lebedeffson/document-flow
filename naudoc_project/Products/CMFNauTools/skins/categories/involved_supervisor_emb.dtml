@@ -1,0 +1,37 @@
+<dtml-comment>
+$Id: involved_supervisor_emb.dtml,v 1.7 2005/12/13 10:46:27 ikuleshov Exp $
+$Editor: vsafronovich$
+
+called from task_definition_followup_info_emb.dtml
+</dtml-comment>
+<dtml-revision $Revision: 1.7 $>
+
+<table>
+  <tr>
+    <td class="small">
+      <dtml-msg "Supervisor">:
+      <br />
+      <select id="supervisor_user" name="&dtml-template_id;_supervisor_user" size="8">
+
+        <option value="" <dtml-var "not supervisor_user" fmt=selected> >
+          <dtml-msg None>
+        </option>
+
+      <dtml-in "['VersionOwner', 'Owner']">
+        <option value="role:&dtml-sequence-item;" 
+                <dtml-var "supervisor_user.endswith(_['sequence-item'])" fmt=selected>
+          <dtml-msg Role>: <dtml-msg expr=sequence-item>
+        </option>
+      </dtml-in>
+
+      <dtml-in "portal_membership.listMemberIds()">
+        <option value="<dtml-var sequence-item>"
+                <dtml-var "_['sequence-item']==supervisor_user" fmt=selected> >
+          <dtml-var "portal_membership.getMemberName(_['sequence-item'], positions=True)">
+        </option>
+      </dtml-in>
+
+      </select>
+    </td>
+  </tr>
+</table>

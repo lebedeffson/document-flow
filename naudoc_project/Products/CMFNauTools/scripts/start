@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# $Editor: vpastukhov $
+# $Id: start,v 1.6 2004/09/08 09:33:46 vpastukhov Exp $
+# $Revision: 1.6 $
+
+reldir=`dirname "$0"`
+reldir=`cd "$reldir" ; pwd`
+
+SOFTWARE_HOME="$reldir/lib/python"
+INSTANCE_HOME="$reldir"
+
+### begin configuration
+
+SOFTWARE_HOME="$SOFTWARE_HOME"
+INSTANCE_HOME="$INSTANCE_HOME"
+
+PYTHON="python2.1"
+PYTHON_OPTS="-O"
+
+ZOPE_SERVER="$INSTANCE_HOME/z2.py"
+ZOPE_OPTS=""
+
+USER=zope
+LOCALE=ru_RU.CP1251
+THREADS=
+
+HTTP_PORT=
+FTP_PORT=-
+WEBDAV_PORT=-
+FCGI_SOCKET=
+PCGI_CONFIG=
+
+ZODB_STORAGE=
+ZEO_SERVER=
+TMPDIR="/var/tmp"
+
+DEBUG=
+#DETAILED_LOG_FILE="$INSTANCE_HOME/var/Z2-detailed.log"
+STUPID_LOG_FILE="$INSTANCE_HOME/var/Z2-debug.log"
+STUPID_LOG_SEVERITY=-500
+PROFILE_PUBLISHER=
+
+### end configuration
+
+export INSTANCE_HOME TMPDIR
+export ZEO_SERVER ZODB_STORAGE
+export STUPID_LOG_SEVERITY STUPID_LOG_FILE
+export PROFILE_PUBLISHER
+
+while getopts ":Du:L:w:f:W:F:M:t:" OPTNAME; do
+    case $OPTNAME in
+	D) unset DEBUG ;;
+	u) unset USER ;;
+	L) unset LOCALE ;;
+	t) unset THREADS ;;
+	w) unset HTTP_PORT ;;
+	f) unset FTP_PORT ;;
+	W) unset WEBDAV_PORT ;;
+	F) unset FCGI_SOCKET ;;
+	p) unset PCGI_CONFIG ;;
+	M) unset DETAILED_LOG_FILE ;;
+    esac
+done
+
+if [ "$FCGI_SOCKET" ]; then
+    GROUP=`id -g $USER`
+    chgrp $GROUP "$FCGI_SOCKET" 2> /dev/null
+    chmod g+rw "$FCGI_SOCKET" 2> /dev/null
+fi
+
+if [ "$ZEO_SERVER" -a -x "$reldir/start_zeo" ]; then
+    ZEO_PID=`cat "$INSTANCE_HOME/var/ZEO_SERVER.pid" 2> /dev/null`
+
+    if test -z "$ZEO_PID" || ! kill -0 $ZEO_PID 2> /dev/null ; then
+	"$reldir/start_zeo"
+    fi
+fi
+
+umask 002
+trap "" HUP
+
+exec "${PYTHON}" ${PYTHON_OPTS} "${ZOPE_SERVER}" \
+	${DEBUG:+-D} \
+	${USER:+-u $USER} \
+	${LOCALE:+-L $LOCALE} \
+	${THREADS:+-t $THREADS} \
+	${HTTP_PORT:+-w $HTTP_PORT} \
+	${FTP_PORT:+-f $FTP_PORT} \
+	${WEBDAV_PORT:+-W $WEBDAV_PORT} \
+	${FCGI_SOCKET:+-F "$FCGI_SOCKET"} \
+	${PCGI_CONFIG:+-p "$PCGI_CONFIG"} \
+	${DETAILED_LOG_FILE:+-M "$DETAILED_LOG_FILE"} \
+	$ZOPE_OPTS "$@"

@@ -1,0 +1,31 @@
+<dtml-var site_html_header>
+<dtml-let container="this()">
+
+<div class="Desktop">
+
+<dtml-if "implements('isStorefront')">
+
+  <dtml-var "_[ 'storefront_step%s'% REQUEST.get('go_step','1') ]">
+
+<dtml-else>
+<ul class="txt_news">
+<dtml-in publishedItems size="15" sort="Date" reverse mapping>
+  <li>
+     [<dtml-var "date( this(), REQUEST, **_['sequence-item'] ).strip()">]
+     <br>
+     <a class="big_menu_txt" href="&dtml-absolute_url;">&dtml-Title_or_id;</a>
+     <br><br>
+  </li>
+<dtml-else>
+  <h4>
+    Публикации отсутствуют
+  </h4>
+</dtml-in>
+</ul>
+</dtml-if>
+
+</dtml-let>
+
+</div>
+
+<dtml-var site_html_footer>

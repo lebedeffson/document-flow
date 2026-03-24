@@ -1,0 +1,7 @@
+<dtml-if "lang=='en'">
+  You may cancel your subscription in these topics by visiting the following link:
+    <dtml-var unsubscription_url>
+<dtml-else>
+  ¬ы можете отказатьс€ от подписки в этих темах, открыв страницу по адресу:
+    <dtml-var unsubscription_url>
+</dtml-if>

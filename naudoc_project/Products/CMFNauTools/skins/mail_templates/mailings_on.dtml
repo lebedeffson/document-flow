@@ -1,0 +1,29 @@
+<dtml-if "lang=='en'">
+Subject: Please confirm your subscription request
+
+You need to confirm your subscription by visiting the following link:
+<dtml-var subscription_url>
+
+Simply click the link or copy/paste it into your browser.
+
+After your subscription is confirmed you will receive all updates under the topics:
+<dtml-in headings_titles prefix="loop">
+  - <dtml-var loop_key> (<dtml-var loop_item>)<dtml-var "loop_end and '.' or ';'">
+</dtml-in>
+
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Запрос на подтверждение подписки
+
+Для подтверждения Вашей подписки необходимо посетить страницу по адресу:
+<dtml-var subscription_url>
+
+Для того, чтобы открыть ссылку, достаточно щелкнуть на ней указателем мыши, либо скопировать ее текст в адресную строку Вашего браузера.
+
+После того, как Ваша подписка будет подтверждена, Вы будет получать на Ваш почтовый адрес рассылки по следующим темам:
+<dtml-in headings_titles prefix="loop">
+  - <dtml-var loop_key> <dtml-var "loop_item and '('+ loop_item + ')' or ''"><dtml-var "loop_end and '.' or ';'">
+</dtml-in>
+
+</dtml-if>

@@ -1,0 +1,39 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+# 
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+# 
+##############################################################################
+""" Caching policies tool interface.
+
+$Id: CachingPolicyManager.py,v 1.4.14.2 2004/04/23 21:11:34 sidnei Exp $
+"""
+
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
+
+
+class CachingPolicyManager(Interface):
+    """
+        Manage HTTP cache policies for skin methods.
+    """
+    id = Attribute( 'id', 'Must be set to "caching_policy_manager"' )
+
+    def getHTTPCachingHeaders( content, view_method, keywords, time=None ):
+        """
+            Update HTTP caching headers in REQUEST based on 'content',
+            'view_method', and 'keywords'.
+
+            If 'time' is supplied, use it instead of the current time
+            (for reliable testing).
+        """

@@ -1,0 +1,86 @@
+<dtml-comment>
+Form for choose version to work with.
+
+Arguments:
+
+      'selection_mode' -- optional boolean value indicating that
+      		only selection of a version should be performed
+
+      'id_prefix' -- optional prefix for 'id' attribute of version
+		selection radio buttons
+
+$Id: document_versions_embedded.dtml,v 1.9 2004/04/28 10:30:08 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-let id_prefix="_.has_key('id_prefix') and id_prefix or ''"
+          wf_id="this().getCategory().Workflow()">
+<dtml-in listVersions sort=CreationDate reverse mapping>
+
+<dtml-if sequence-start>
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+
+<tr class="row_title">
+  <td width="0">&nbsp;</td>
+  <td><dtml-msg "Version"></td>
+  <td><dtml-msg "Title"></td>
+  <td><dtml-msg "Status"></td>
+  <td><dtml-msg "Owner"></td>
+  <td><dtml-msg "Creation date"></td>
+  <td><dtml-msg "Modification date"></td>
+  <dtml-unless selection_mode>
+  <td width="0" nowrap><dtml-msg "Compare"></td>
+  </dtml-unless>
+</tr>
+
+</dtml-if>
+
+<tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+  <td>
+    <input type="radio" 
+           <dtml-if id_prefix>id="&dtml-id_prefix;_&dtml-id;"</dtml-if> 
+           name="ver_id" value="&dtml-id;"  
+           <dtml-unless selection_mode><dtml-var Current fmt=checked></dtml-unless> />
+  </td>
+  <td>
+    <a href="&dtml-URL;" target="workspace"><dtml-msg "Version">&nbsp;&dtml-Number;</a>
+    <dtml-if Principal>
+      <br /><strong class="marked"><dtml-msg "Principal"></strong>
+    </dtml-if>
+    <dtml-if Current>
+      <br /><strong><dtml-msg "Current"></strong>
+    </dtml-if>
+  </td>
+  <td>&dtml-Title;</td>
+  <td><dtml-msg expr=StateTitle></td>
+  <td><dtml-var Creator fmt=member></td>
+  <td><dtml-var "rDate(None, _, time=_.DateTime(CreationDate))"></td>
+  <td><dtml-var "rDate(None, _, time=_.DateTime(ModificationDate))"></td>
+  <dtml-unless selection_mode>
+  <td>
+    <input type="radio" name="ver_id_for_compare" value="&dtml-id;" <dtml-var Current fmt=checked> />
+  </td>
+  </dtml-unless>
+</tr>
+
+<dtml-if Description>
+<tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+  <td colspan="2">&nbsp;</td>
+  <td colspan="5" style="background-color: <dtml-if sequence-odd>#eeeeff<dtml-else>#ffffff</dtml-if>">
+    <strong><dtml-msg "Description">:</strong>
+    &dtml-Description;
+  </td>
+  <dtml-unless selection_mode>
+  <td>&nbsp;</td>
+  </dtml-unless>
+</tr>
+</dtml-if>
+
+<dtml-if sequence-end>
+</table>
+</dtml-if>
+
+<dtml-else>
+  <dtml-msg "There are no available versions.">
+</dtml-in>
+</dtml-let>

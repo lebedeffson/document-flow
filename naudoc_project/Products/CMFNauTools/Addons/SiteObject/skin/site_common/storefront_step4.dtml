@@ -1,0 +1,20 @@
+<dtml-comment>
+Step4: Thank you
+$Id: storefront_step4.dtml,v 1.1 2008/10/15 12:48:08 oevsegneev Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-var "msg('Step4: Thank you')">
+<dtml-if "canSendOrder()">
+<dtml-try>
+  <dtml-call "storefront_wizard('4')">
+  <p><dtml-var "msg('Thank you, your order was accepted')">.</p>
+  <p><dtml-var "msg('You will being contacted by our managers soon')">.</p>
+
+<dtml-except>
+
+  <h2><dtml-var "msg('Error while sending message')">.</h2>
+  <p><dtml-var "msg('Try to send again later')"></p>
+</dtml-try>
+</dtml-if>

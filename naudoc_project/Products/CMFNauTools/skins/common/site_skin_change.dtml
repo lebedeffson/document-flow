@@ -1,0 +1,98 @@
+<dtml-comment>
+External site skin selection form.
+
+$Editor: vpastukhov $
+$Id: site_skin_change.dtml,v 1.4 2004/04/22 05:54:09 spinagin Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-var simple_html_header>
+
+<dtml-if to_category>
+  <h1><dtml-msg "Choose design for site">:</h1>
+  <form name="choose_skin" action="<dtml-var "absolute_url()+'/site_constructor_form'">" method="post">
+    <input type="hidden" name="skin_id" value="">
+    <table width=100%>
+      <dtml-in "portal_site_skins.getSkinsInCategory(portal_site_skins.getCategories()[_.int(to_category)])" prefix="skin">
+      <dtml-if "(skin_number%2)==1">
+        <tr>
+      </dtml-if>
+      <td width=50% valign=top>
+        <table width=100%>
+         <tr>
+           <td colspan=2 bgcolor=#dddddd>
+             <img src="<dtml-var "skin_item.absolute_url()+'/screenshot'">">
+           </td>
+         </tr>
+         <tr>
+           <td align="right" class="smallHeader" bgcolor=#dddddd>
+             <dtml-msg "ID">:
+           </td>
+           <td bgcolor=#dddddd>
+             <dtml-var id>
+           </td>
+         </tr>
+         <tr>
+           <td align="right" class="smallHeader" bgcolor=#dddddd>
+             <dtml-msg "Title">:
+           </td>
+           <td bgcolor=#dddddd>
+             <dtml-var title_or_id>
+           </td>
+         </tr>
+         <tr>
+           <td align="right" class="smallHeader" bgcolor=#dddddd>
+             <dtml-msg "Description">:
+           </td>
+           <td bgcolor=#dddddd>
+             <dtml-var getDescription>
+           </td>
+         </tr>
+         <tr>
+           <td>
+            <a href="" onClick="choose_skin.skin_id.value='&dtml-id;'; choose_skin.submit(); return false;">
+              <dtml-msg "Choose">
+            </a>
+           </td>
+         </tr>
+        </table>
+      </td>
+      <dtml-if "(skin_number%2)==0">
+        </tr>
+      </dtml-if>
+      </dtml-in>
+      <dtml-if "_.len(portal_site_skins.getSkinsInCategory(portal_site_skins.getCategories()[_.int(to_category)]))%2==1">
+        <td>&nbsp;</td>
+        </tr>
+      </dtml-if>
+    </table>
+  </form>
+  <form action="<dtml-var "absolute_url()+'/site_skin_change'">" method="post">
+    <input type="submit" value="<dtml-msg "Back">">
+  </form>
+
+<dtml-else>
+
+  <form name="f" action="<dtml-var "absolute_url()+'/site_skin_change'">" method="post">
+    <input type="hidden" name="to_category" value="">
+    <table>
+      <tr>
+        <td align="right" class="smallHeader">
+          <dtml-msg "Choose design category">:
+        </td>
+      </tr>
+      <dtml-in "portal_site_skins.getCategories()" prefix="cat">
+        <tr>
+          <td align="left">
+            <a href="" onClick="f.to_category.value='&dtml-cat_index;'; f.submit(); return false;">
+              &dtml-cat_item;
+            </a>
+          </td>
+        </tr>
+      </dtml-in>
+    </table>
+  </form>
+</dtml-if>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,19 @@
+<dtml-comment>
+Part of file upload form.
+
+$Editor: kfirsov $
+$Id: file_upload_form.dtml,v 1.2 2004/08/18 07:57:37 kfirsov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<tr>
+  <th align="right"><dtml-msg "File">:</th>
+  <td width="100%"><input type="file" name="&dtml-upload_name;" style="width:70%"></td>
+</tr>
+<dtml-if id_>
+<tr>
+  <th align="right"><dtml-msg "Id">:</th>
+  <td width="100%"><input type="text" name="&dtml-id_;" value="" style="width:50%"> (<dtml-msg "optional">)</td>
+</tr>
+</dtml-if>

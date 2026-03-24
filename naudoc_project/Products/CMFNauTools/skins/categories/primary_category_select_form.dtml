@@ -1,0 +1,47 @@
+<dtml-comment>
+$Id: primary_category_select_form.dtml,v 1.8 2005/08/21 12:53:07 vsafronovich Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.8 $>
+
+<dtml-var simple_html_header>
+
+<h2><dtml-msg "Primary category"></h2>
+
+<dtml-msg "Documents of current category are subordinates to documents of primary category.">
+
+<form action="set_primary_category" method="POST">
+
+<table>
+  <tr class="row_title">
+    <td>
+      <dtml-msg "Categories list">
+    </td>
+ </tr>
+ <tr class="row_even" align="center">
+   <td>
+     <dtml-let primary_id=getPrimaryCategory
+               subordinate_ids="[x.getId() for x in listSubordinateCategories()] + [getId()]"
+               options="[ ( cat.getId(), cat.Title() ) for cat in listCategories()
+                         if cat.getId() not in subordinate_ids]"
+     >
+       <dtml-var "selectbox( None, _
+                           , name='primary'
+                           , options=options
+                           , value=[ primary_id ]  
+                           )">
+     </dtml-let>
+   </td>
+ </tr>
+ <tr>
+   <td>
+     <input type="submit" value="<dtml-msg Apply>">
+     <input type="submit" name="cancel" value="<dtml-msg "Cancel">">
+   </td>
+ </tr>
+</table>
+
+</form>
+
+<dtml-var simple_html_footer>

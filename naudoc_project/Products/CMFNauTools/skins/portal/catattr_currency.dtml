@@ -1,0 +1,48 @@
+<h4><dtml-msg expr="attr.Title()"><br></h4>
+
+<input type="checkbox" id="from" value="1" <dtml-var "not value or value[0]" fmt="checked">> 
+<dtml-msg "from">
+<br />
+<input type="text" 
+       id="min_currency_field"
+       name="min_currency_field:currency:ignore_empty" 
+       value="<dtml-var "value and value[0] or ''">" 
+       onBlur="this.value = (parseFloat(this.value.replace(',', '.')) || 0).toFixed(2);" 
+       size="30">
+<br />
+
+<input type="checkbox" id="to" value="1" <dtml-var "not value or value[1]" fmt="checked">> 
+<dtml-msg "to">
+<br />
+<input type="text" 
+       id="max_currency_field"
+       name="max_currency_field:currency:ignore_empty" 
+       value="<dtml-var "value and value[1] or ''">" 
+       onBlur="this.value = (parseFloat(this.value.replace(',', '.')) || 0).toFixed(2);" 
+       size="30">
+<br />
+
+<script type="text/javascript">
+<!--
+
+function Return()
+{
+    var from = document.getElementById('from').checked && document.getElementById('min_currency_field').value || '',
+        to = document.getElementById('to').checked && document.getElementById('max_currency_field').value || '';
+
+    if (from && to && !validateRange('currency', from, to)) {
+      alert('<dtml-msg "From value must be smaller than To value">');
+      return false;
+    }
+
+    opener.&dtml-callback_function;( '&dtml-callback_form;', 
+                                     '&dtml-cat_id;', 
+                                     '&dtml-attr_id;', 
+                                     '&dtml-type;', 
+                                     from+'\n'+to+'\n',
+                                     document.getElementById('child').checked
+                                   );
+}
+
+//-->
+</script>

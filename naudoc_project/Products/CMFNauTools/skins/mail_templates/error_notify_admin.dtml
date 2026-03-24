@@ -1,0 +1,62 @@
+<dtml-comment>
+Message template for error notification sent to administrator.
+
+$Editor: vpastukhov $
+$Id: error_notify_admin.dtml,v 1.4 2004/03/09 16:33:40 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-if "lang=='ru'">
+
+Content-Type: text/plain; charset=windows-1251
+Subject: Ошибка сервера NauDoc [<dtml-var id>]
+
+При обработке запроса пользователя портала NauDoc произошла
+внутренная ошибка сервера.
+
+<dtml-with entry mapping>
+Название портала: <dtml-var "portal_properties.title()">
+Адрес портала:    <dtml-var portal_url>
+Имя пользователя: <dtml-var userid> (<dtml-var username>)
+
+<dtml-if comment>
+Комментарий пользователя:
+<dtml-var comment>
+</dtml-if>
+
+Информация об ошибке:
+
+Идентификатор:    <dtml-var id>
+Время:            <dtml-var time_str>
+URL запроса:      <dtml-var url>
+Тип ошибки:       <dtml-var type>
+Значение ошибки:  <dtml-var value>
+</dtml-with>
+
+Просмотреть запись в журнале ошибок:
+<dtml-var "portal_errorlog.absolute_url( canonical=1, action='error_log_entry', params={'id':id} )">
+
+<dtml-else>
+
+Subject: NauDoc server error [<dtml-var id>]
+
+<dtml-with entry mapping>
+User name:       <dtml-var userid> (<dtml-var username>)
+
+User comment:
+<dtml-var comment>
+
+Exception information:
+
+Error ID:        <dtml-var id>
+Time:            <dtml-var time_str>
+Request URL:     <dtml-var url>
+Exception Type:  <dtml-var type>
+Exception Value: <dtml-var value>
+</dtml-with>
+
+View error log entry:
+<dtml-var "portal_errorlog.absolute_url( canonical=1, action='error_log_entry', params={'id':id} )">
+
+</dtml-if>

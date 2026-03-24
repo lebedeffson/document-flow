@@ -1,0 +1,49 @@
+<dtml-comment>
+$Editor: ypetrov $
+$Id: voting_edit_form.dtml,v 1.3 2004/03/18 07:09:32 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+<dtml-var simple_html_header>
+
+<h1><dtml-msg "Voting choices"></h1>
+
+<h2>&dtml-title_or_id;</h2>
+
+<form action="&dtml-absolute_url;/voting_edit" method="POST" enctype="multipart/form-data">
+<dtml-in listChoices mapping prefix="c">
+  <dtml-if c_start>
+  <table cellspacing="1" cellpadding="3" width="99%">
+    <tr class="row_title">
+      <td>&nbsp;</td>
+      <td width="99%"><dtml-msg "Choice"></td>
+    </tr>
+  </dtml-if>
+    <tr class="<dtml-if c_odd>row_odd<dtml-else>row_even</dtml-if>">
+      <td><input type="checkbox" name="del_choices:list:int" value="&dtml-c_index;"></td>
+      <td><input value="&dtml-title;" name="choice_titles:list" style="width:100%;"></td>
+    </tr>
+  <dtml-if c_end>
+    <tr>
+      <td align="right" colspan="2"><input type="submit" value="<dtml-msg "Delete">" name="delete_choice"></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <input type="checkbox" id="finish_voting" name="finish_voting" <dtml-var finished fmt=checked> >
+        <label for="finish_voting"><dtml-msg "Finished"></label><br>
+        <input type="checkbox" id="main_voting" name="main_voting" <dtml-var "getSite().voting==getUid()" fmt=checked> >
+        <label for="main_voting"><dtml-msg "Main voting"></label>
+      </td>
+    </tr>
+    <tr>
+      <td align="right" colspan="2"><input type="submit" value="<dtml-msg "Apply">" name="apply_changes"></td>
+    </tr>
+  </table>
+  </dtml-if>
+</dtml-in>
+
+<dtml-msg "Choice">: <input type="text" name="new_choice_title" > <input type="submit" value="<dtml-msg "Add">" name="add_choice">
+
+</form>
+
+<dtml-var simple_html_footer>

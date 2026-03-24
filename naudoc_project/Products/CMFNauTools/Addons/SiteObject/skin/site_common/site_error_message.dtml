@@ -1,0 +1,11 @@
+<dtml-var site_html_header>
+
+<div class="Desktop">
+
+<h1> Запрашиваемый файл не найден </h1>
+
+<p>Ошибка при обращении к объекту &dtml-path;</p>
+
+</div>
+
+<dtml-var site_html_footer>

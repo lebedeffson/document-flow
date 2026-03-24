@@ -1,0 +1,69 @@
+<dtml-comment> Voting box
+$Id: voting_box.dtml,v 1.1 2008/10/15 12:48:09 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-let current="_.has_key('current')"
+          voting="(current and meta_type == 'Voting' and this()) or
+                  (not current and getPublisher().getVoting())">
+
+<dtml-if "voting">
+
+  <dtml-with "voting">
+
+  <dtml-unless current>
+    <div style="background: #C8D8D0; border: 1px solid #333; font-weight: bold; padding: 2px; text-align: center">
+      Опрос
+    </div>
+    <b>&dtml-title;</b>
+  </dtml-unless>
+
+  <dtml-if "canVote(REQUEST) and not REQUEST.form.has_key('show_results') or not haveVotes()">
+  
+    <dtml-in listChoices prefix="c" mapping>
+      <dtml-if c_start>
+        <form action="&dtml-absolute_url;" method="post">
+      </dtml-if>
+      <input type="radio" id="resp&dtml-c_index;" name="responses:int" value="&dtml-c_index;" <dtml-var "c_start and 'checked' or ''">>
+      <label for="resp&dtml-c_index;">&dtml-title;</label><br>
+      <dtml-if c_end>
+        <br><input type="submit" name="processVote:method" value="<dtml-msg "Vote">">
+        </form>
+      </dtml-if>
+    </dtml-in>
+
+    <dtml-if haveVotes><a href="&dtml-absolute_url;?show_results=1"><dtml-msg "Show results"></a></dtml-if>
+
+  <dtml-else>
+  
+    <dtml-in listChoices prefix="c" mapping>
+      <dtml-let ratio="_.round(100.*count/_['total-count'], 2)">
+      <dtml-if c_start>
+        <table width="100%" cellspacing="3" cellpadding="0" border="0">
+      </dtml-if>
+      <tr>
+        <td width="20%">&dtml-title;</td>
+        <td>
+          <div class="voteBar" style="width:<dtml-var "_.int(ratio/2)">%;"></div>
+          <div>&dtml-ratio;% (&dtml-count;)</div>
+        </td>
+      </tr>
+      <dtml-if c_end>
+        <tr><td colspan="2">&nbsp;</td></tr>
+        <tr>
+          <td><dtml-msg "Total votes">:</td>
+          <td><dtml-var total-count></td>
+        </tr>
+        </table>
+      </dtml-if>
+      </dtml-let>
+    </dtml-in>
+    
+    <dtml-if "canVote(REQUEST)"><a href="&dtml-absolute_url;"><dtml-msg "Vote"></a></dtml-if>
+
+  </dtml-if>
+
+  </dtml-with>
+</dtml-if>
+
+</dtml-let>

@@ -1,0 +1,16 @@
+*shared*
+Stemmer -DDEBUG -Iq -I.\
+        src/Stemmer.c   \
+        french/frenchstem.c \
+        porter/porterstem.c \
+        german/germanstem.c \
+        dutch/dutchstem.c \
+        english/englishstem.c \
+        spanish/spanishstem.c \
+        italian/italianstem.c \
+        swedish/swedishstem.c \
+        portuguese/portuguesestem.c \
+        russian/russianstem.c \
+        danish/danishstem.c \
+        norwegian/norwegianstem.c \
+        q/api.c q/utilities.c

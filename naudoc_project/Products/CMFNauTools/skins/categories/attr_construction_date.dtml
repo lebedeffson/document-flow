@@ -1,0 +1,19 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: attr_construction_date.dtml,v 1.5 2005/11/22 18:33:31 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<tr>
+  <td><dtml-msg "Show time"></td>
+  <td nowrap="1">
+    <dtml-var "entry_field_edit( None, _,
+                                 type='boolean',
+                                 name='properties.show_time:record',
+                                 value=properties.get('show_time'),
+                                 properties={},
+                                 str_data='onClick=\'updatePropertiesForm(this)\''
+                               )">
+  </td>
+</tr>

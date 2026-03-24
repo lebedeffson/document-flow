@@ -1,0 +1,4 @@
+<dtml-comment>
+$Id: task_reportwizard_form.dtml,v 1.2 2003/04/01 11:28:28 ikuleshov Exp $
+</dtml-comment>
+<dtml-var "REQUEST['RESPONSE'].redirect(absolute_url() + '/task_reportwizard_step1')">

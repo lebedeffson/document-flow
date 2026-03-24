@@ -1,0 +1,16 @@
+
+<dtml-var comment>
+
+<dtml-if "'link_to_doc' in letter_parts">
+<dtml-msg "Link">: <dtml-var source_link>
+</dtml-if>
+
+<dtml-msg "Letter includes">:
+
+<dtml-in letter_parts prefix="parts">
+<dtml-if "parts_item=='metadata'"><dtml-msg "File card"> (metadata.html)
+<dtml-elif "parts_item=='attachment'"><dtml-msg "Document attachments"> (<dtml-var "', '.join(document_attachment_list)">)
+<dtml-elif "parts_item=='body'"><dtml-msg "Document text"> (letter.html)
+</dtml-if>
+</dtml-in>
+

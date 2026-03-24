@@ -1,0 +1,131 @@
+<dtml-comment>
+Subtemplate for displaying a single item on the folder contents page
+using default viewing format.
+
+$Editor: vpastukhov $
+$Id: folder_item_default.dtml,v 1.34 2007/01/10 13:34:41 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.34 $>
+
+<dtml-let view_url="is_directive and context.relative_url( action='view', frame='directive/'+nd_uid+'/inFrame' ) or getURL()+'/inFrame?link=view'"
+          implements="_['implements'] or []"
+>
+  <tr valign="top">
+    <td width="25">
+      <dtml-if "_.int(REQUEST.get('arch_cookie', 0))==0 or meta_type!='Heading'">
+        <dtml-unless hide_buttons>
+          <input type="checkbox" name="ids:list" value="&dtml-id;" id="cb_&dtml-id;">
+        </dtml-unless>
+      </dtml-if>
+    </td>
+    <td width="20" valign="top">
+      <dtml-var content_icon>
+    </td>
+    <td width="90%">
+      <table width="100%" cellspacing="0" cellpadding="1" border="0">
+        <tr>
+          <td class="Title" width="82%">
+            <a href="&dtml-view_url;" target="workspace">
+              <dtml-if Title>&dtml-Title;<dtml-else>&dtml-id;</dtml-if>
+            </a>
+            <dtml-if "portal_membership.getInterfacePreferences('external_editor_buttons')">
+              <dtml-with getObject><dtml-var external_edit_link></dtml-with>
+            </dtml-if>
+          </td>
+          <td colspan="3" align="right">
+            <dtml-if "'isPrintable' in implements">
+              <a target="_blank" href="<dtml-var "getURL()">/printPreview">
+                <img valign="absmiddle" name="print" src='&dtml-portal_url;/print_page.gif' alt='<dtml-msg "Print preview">' width="18" height="18">
+              </a>
+            </dtml-if>
+          </td>
+        </tr>
+        <dtml-if "portal_membership.getInterfacePreferences('contents_size')">
+          <tr>
+            <td colspan="3">
+              <dtml-try>
+               <dtml-if "'isPrincipiaFolderish' in implements">
+               <dtml-let contentssize="getObject().getContentsSize()" >
+                 <dtml-if "contentssize">
+                   <dtml-msg "Accessible documents">:&nbsp;
+                   <dtml-var "portal_catalog.searchResults( implements={'query':['isHTMLDocument', 'isPortalContent'],
+                                                                        'operator':'and'},
+                                                            parent_path = getPath())"
+                             fmt=collection-length>
+                 </dtml-if>
+                   <dtml-msg "Total objects">:&nbsp;&dtml-contentssize;
+               </dtml-let>
+               <dtml-else>
+                  <dtml-msg "Size">: <dtml-var "'%.1f' % (getObject().getContentsSize() / 1024.0)"> <dtml-msg "Kb">
+               </dtml-if>
+              <dtml-except>
+              </dtml-try>
+            </td>
+          </tr>
+        </dtml-if>
+        <dtml-let c_object="portal_metadata.getCategoryById(category)">
+        <dtml-if c_object>
+          <tr>
+            <td colspan="3"><dtml-msg "Category">:&nbsp;
+              <dtml-if "'Manager' in AUTHENTICATED_USER.getRoles()">
+                <dtml-var c_object fmt=content>
+              <dtml-else>
+                <dtml-msg expr="c_object.title">
+              </dtml-if>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3">
+              <dtml-msg "State">:&nbsp;<dtml-var "'%s:%s'%(c_object.Workflow(), state)" fmt=workflow_state>
+            </td>
+          </tr>
+        </dtml-if>
+        </dtml-let>
+
+        <dtml-if "category == 'IncomingMail'">
+          <dtml-let sender_name="getObject().getCategoryAttribute('senderName','')"
+                    sender_addr="getObject().getCategoryAttribute('senderAddress','')">
+          <dtml-if "sender_name or sender_addr">
+            <tr>
+              <td class="Properties" colspan="3">
+                <dtml-msg "Sender">:
+                <dtml-if sender_addr>
+                  <a href="mailto:&dtml-sender_addr;">
+                    &dtml-sender_name; &lt;&dtml-sender_addr;&gt;
+                  </a>
+                <dtml-else>
+                  &dtml-sender_name;
+                </dtml-if>
+               &nbsp;
+              </td>
+            </tr>
+          </dtml-if>
+          </dtml-let>
+        </dtml-if>
+        <tr>
+          <td class="small" colspan="3">
+            <a class="navigate" href="&dtml-view_url;" target="workspace">&dtml-Description;</a>
+          </td>
+        </tr>
+        <tr>
+          <td class="Properties" colspan="3">
+            [<dtml-var "rDate(this(), time=_.DateTime(_['CreationDate'])).strip()">]
+            <dtml-var Creator null fmt=member>
+          </td>
+        </tr>
+        <dtml-if registry_ids>
+          <tr>
+            <td width="95%" class="Description" colspan="3" nowrap>
+              <dtml-in registry_ids size="2" prefix="r">
+                <dtml-var r_item><dtml-var "not r_end and ';' or ''">
+                <dtml-if "r_end and r_index+1<_.len(registry_ids)">,...</dtml-if>
+              </dtml-in>
+            </td>
+          </tr>
+        </dtml-if>
+      </table>
+    </td>
+  </tr>
+
+</dtml-let>

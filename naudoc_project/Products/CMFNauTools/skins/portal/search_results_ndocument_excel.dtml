@@ -1,0 +1,128 @@
+<dtml-comment>
+$Id: search_results_ndocument_excel.dtml,v 1.3 2005/03/26 17:38:54 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+  <head>
+  <meta http-equiv=Content-Type content="text/html;<dtml-if "msg.default_language('ru')">charset=windows-1251</dtml-if>">
+  <meta name=ProgId content=Excel.Sheet>
+  <meta name=Generator content="NauDoc &dtml-productVersion;">
+  <dtml-let u_name="portal_membership.getAuthenticatedMember().getMemberBriefName()"
+            >
+  <!--[if gte mso 9]><xml>
+   <o:DocumentProperties>
+    <o:Author><dtml-var u_name html_quote></o:Author>
+    <o:LastAuthor><dtml-var u_name html_quote></o:LastAuthor>
+    <o:Created><dtml-var "_.DateTime().ISO()" html_quote></o:Created>
+    <o:LastSaved><dtml-var "_.DateTime().ISO()" html_quote></o:LastSaved>
+   </o:DocumentProperties>
+  </xml><![endif]-->
+  </dtml-let>
+  <!--[if gte mso 9]><xml>
+   <x:ExcelWorkbook>
+    <x:ExcelWorksheets>
+     <x:ExcelWorksheet>
+      <x:Name><dtml-msg Sheet>1</x:Name>
+      <x:WorksheetOptions>
+       <x:Selected/>
+       <x:ProtectContents>True</x:ProtectContents>
+       <x:ProtectObjects>False</x:ProtectObjects>
+       <x:ProtectScenarios>False</x:ProtectScenarios>
+      </x:WorksheetOptions>
+     </x:ExcelWorksheet>
+    </x:ExcelWorksheets>
+    <x:ProtectStructure>True</x:ProtectStructure>
+    <x:ProtectWindows>False</x:ProtectWindows>
+   </x:ExcelWorkbook>
+  </xml><![endif]-->
+    <style>
+    .xl24
+        {mso-style-parent:style0;
+        mso-number-format:General;
+        white-space:normal;
+        }
+    .xl25
+        {mso-style-parent:style0;
+        mso-number-format:"General Date";
+        white-space:normal;
+        }
+    .xl26
+        {mso-style-parent:style0;
+        mso-number-format:"Yes\/No";
+        white-space:normal;
+        }
+    .xl27
+        {mso-style-parent:style0;
+        mso-number-format:Standard;
+        white-space:normal;
+        }
+    </style>
+  </head>
+
+  <body>
+		<table>
+			<tr>
+				<td class="x124" x:str>
+					<strong>
+            <dtml-msg Title>
+          </strong>
+				</td>
+				<td class="x124" x:str>
+					<strong>
+            <dtml-msg Category>
+          </strong>
+				</td>
+				<td>
+					<strong>
+            <dtml-msg "category.NormativeDocument.metadata.TypeDoc">
+          </strong>
+				</td>
+				<td class="x124" x:str>
+					<strong>
+            <dtml-msg "Effective date normative">
+          </strong>
+				</td>
+				<td class="x124" x:str>
+					<strong>
+            <dtml-msg "Review reason">
+          </strong>
+				</td>
+      </tr>
+
+<dtml-let	results="portal_catalog.executeQuery(query)">
+  <dtml-in results>
+    <dtml-let object="_['sequence-item'].getObject()"
+              review_reason="_['sequence-item'].review_reason"
+              category_title="object.getCategory().Title()"
+              dv="object.getCategoryAttribute('dv') and object.getCategoryAttribute('dv').strftime('%d.%m.%Y') or ''"
+              TypeDoc="object.getCategoryAttribute('TypeDoc')"
+              >
+
+      <tr>
+        <td class="x124" x:str>
+          <dtml-var "object.Title()" html_quote>
+        </td>
+        <td class="x124" x:str>
+          <dtml-msg expr=category_title>
+        </td>
+        <td class="x124" x:str>
+          <dtml-var TypeDoc html_quote>
+        </td>
+        <td class="x125" x:date>
+          <dtml-var dv html_quote>
+        </td>
+        <td class="x124" x:str>
+          <dtml-msg expr=review_reason>
+        </td>
+      </tr>
+    </dtml-let>
+  </dtml-in>
+</dtml-let>
+
+    </table>
+	</body>
+</html>

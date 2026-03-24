@@ -1,0 +1,65 @@
+<dtml-comment>
+
+$Editor: ikuleshov$
+$Id: task_reportwizard_folders.dtml,v 1.17 2005/09/18 12:41:12 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.17 $>
+
+<dtml-if dynamic_item>
+
+  <dtml-jungle expr="portal_catalog.getObjectByUid( dynamic_item )"
+               state_id="reportwizard_folders"
+               dynamic_item
+  >
+    <dtml-let view_url="'javascript:SaveAndReturn(\'%s\', \'%s\')'%(nd_uid, Title or id)"
+              meta_info="Title or id"
+              frame="'_self'">
+      <dtml-var jungle_item>
+    </dtml-let>
+  </dtml-jungle>
+
+<dtml-else>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-var simple_html_header>
+
+<dtml-if "not REQUEST.has_key('disable_dynamic')">
+
+  <dtml-comment>
+    Detecting dynamic-compartibility of client browser
+  </dtml-comment>
+  <script language="javascript">
+    location.replace( setParam(location.href, 'disable_dynamic:int', (userAgent.hasXMLHTTP ? 0 : 1)) );
+  </script>
+
+<dtml-else>
+
+  <dtml-jungle expr="portal_url.getPortalObject().storage"
+               state_id="reportwizard_folders"
+               implements="isPrincipiaFolderish"
+               sort_order=Title,id
+               dynamic="not disable_dynamic"
+               dynamic_item_id="task_reportwizard_folders"
+  >
+    <dtml-let view_url="'javascript:SaveAndReturn(\'%s\', \'%s\');'%(nd_uid, Title or id)"
+              meta_info="Title or id"
+              frame="'_self'">
+      <dtml-var jungle_item>
+    </dtml-let>
+  </dtml-jungle>
+
+<script language="javascript">
+function SaveAndReturn( folder_uid , title)
+{
+  opener.setFolderUrl( folder_uid, title || '<dtml-msg "Object selected">' );
+  window.close();
+}
+</script>
+
+<p align="center"><a href="javascript:window.close()"><dtml-msg "Close"></a></p>
+
+</dtml-if REQUEST.has_key('disable_dynamic')>
+
+<dtml-var simple_html_footer>
+
+</dtml-if reportwizard_dynamic_item>

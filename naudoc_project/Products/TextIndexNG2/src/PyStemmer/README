@@ -1,0 +1,69 @@
+PyStemmer 
+---------
+
+What is PyStemmer ?
+
+  PyStemmer provides a unique interface to the SnowBall stemmers
+  (snowball.sourceforge.net).  A stemming algorithm (or stemmer) is a process for
+  removing the commoner morphological and inflexional endings from words in
+  English. Its main use is as part of a term normalisation process that is
+  usually done when setting up Information Retrieval systems.  A stemmer is
+  reduces a given word to its linguistic base form. Stemmesr are language
+  dependent and are often used in text indexing environments.  Stemmers can be
+  used to make searches more precise. E.g.  searching for 'cars' will also find
+  all documents that contain only 'car' because they share both the same
+  linguistic base form 'car'. 
+
+  Snowball (http://snowball.sourceforge.net) is a small string processing
+  language designed for creating stemming algorithms for use in Information
+  Retrieval.   
+ 
+
+Requirements
+
+  Python 2.1 or higher  (tested with 2.0 - 2.2)
+
+
+Installation
+
+  via Distutils:
+
+    python setup.py [build|install]
+
+
+  via Makefile.pre.in:
+
+    make -f Makefile.pre.in boot
+
+    make
+
+    make install
+
+
+API
+
+  import Stemmer
+  print Stemmer.availableStemmers()    # returns a list of all supported languages
+
+  ST = Stemmer.Stemmer('german')       # create a german Stemmer object
+  print ST.stem('blabla')              # stem one word
+
+  print ST.stem(['wort1','wort2'])     # stem a list of words
+  print ST.language()                  # returns the language of the stemmer object
+
+  ST.setCacheSize(10000)               # cache up to 10000 stemmed words
+  print ST.getCacheSize()              # return size of internal stemmer cache
+
+
+License
+
+  All this software is covered by the MIT license with 
+  (C) 2001, Andreas Jung (see LICENSE.TXT).
+
+  Snowball is published under BSD license (C) 2001, Dr. Martin Porter
+
+
+Author
+
+  Andreas Jung (andreas@andreas-jung.com)
+

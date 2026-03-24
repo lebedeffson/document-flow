@@ -1,0 +1,105 @@
+<dtml-comment>
+$Id: task_definition_script.dtml,v 1.7 2004/04/13 16:20:46 mbernatski Exp $
+$Editor: mbernatski $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.7 $>
+
+<dtml-let all_scripts="portal_catalog.searchResults(meta_type='Script')"
+          available_scripts="[s for s in all_scripts if (s.getObject().isAllowedForCategoryAndAction(this()))] "
+          script="taskDefinitionArray['script'] is not None and taskDefinitionArray['script'] or None "
+          uid="script is not None and script.nd_uid or 0"
+          parameters="taskDefinitionArray['parameters']"
+          >
+
+<tr class="row_even">
+  <td>
+    <dtml-msg "Script">:
+  </td>
+  <td>
+  <dtml-in available_scripts>
+  <dtml-if sequence-start>
+    <select name="script" size="1">
+  </dtml-if>
+      <option value="<dtml-var "_['sequence-item'].nd_uid">"
+        <dtml-var "_['sequence-item'].nd_uid==uid" fmt="selected">
+      >
+        <dtml-msg expr="_['sequence-item'].Title">
+      </option>
+   <dtml-if sequence-end>
+    </select>
+   </dtml-if>
+   <dtml-else>
+     <dtml-msg "None">
+   </dtml-in>
+  </td>
+</tr>
+<tr class="row_even">
+<dtml-if "script is not None">
+<dtml-in "script.listParameters()">
+<dtml-if sequence-start>
+  <td colspan="2" class="row_title">
+   <dtml-msg "Script parameters">:
+   <input type="hidden" name="parameters" value="">
+  </td>
+</tr>
+<tr class="row_even">
+  <td colspan="2">
+ 
+   <table border="0" cellpadding="2" width="100%">
+     <tr class="row_title">
+       <td><dtml-msg "Id"></td>
+       <td><dtml-msg "Type"></td>
+       <td><dtml-msg "Title"></td>
+       <td><dtml-msg "Value"></td>
+     </tr>
+</dtml-if>
+<dtml-let param=sequence-item
+          form_name="'taskDefinitionForm'" 
+          default_value="script.getParameterDefaultValue( param['id'], moniker=1 )"
+>
+     <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+       <td valign="top">
+           <dtml-var "param['id']">
+       </td>
+       <td valign="top">
+         <dtml-var "msg(param['data_type'], add=None)">
+       </td>
+       <td valign="top">
+         <dtml-msg expr="param['title']">
+       </td>
+       <td>
+         <dtml-if "parameters.has_key(param['id'])"> 
+           <dtml-var "entry_field_edit( None, _,
+                                        name='value_%s' % param['id'],
+                                        type=param['data_type'],
+                                        value=parameters[param['id']],
+                                        options=parameters[param['id']],
+                                        edit_options=1,
+                                       )"
+           >
+         <dtml-else>
+           <dtml-var "entry_field_edit( None, _,
+                                        name='value_%s' % param['id'],
+                                        type=param['data_type'],
+                                        value=default_value,
+                                        options=default_value,
+                                        edit_options=1,
+                                       )"
+           >
+         </dtml-if>
+        </td>
+      </tr>
+</dtml-let>
+<dtml-else>
+      <tr>
+        <td colspan="4">
+           <dtml-msg "No parameters for this script">
+        </td> 
+      </tr> 
+</dtml-in>
+   </table>
+ </td>
+</dtml-if>
+</tr>
+</dtml-let>

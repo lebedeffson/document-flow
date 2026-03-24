@@ -1,0 +1,35 @@
+<dtml-comment>
+$Id: script_edit_form.dtml,v 1.8 2005/06/27 06:24:10 vsafronovich Exp $
+$Editor: mbernatski $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<form action="&dtml-absolute_url;/script_edit" method="post" style="height: 100%">
+<table width="100%" height="100%" cellpadding="2" cellspacing="0" border="0">
+
+  <tr>
+    <td colspan="2" valign="middle" class="smallHeader">
+      <h1>&nbsp;<dtml-msg "Editing"> &dtml-title_or_id; (&dtml-getId;)</h1>
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top" colspan="2" height="99%">
+      <textarea name="data:text" wrap="off" <dtml-if "not checkScriptPerm()"> readonly="1" </dtml-if>
+                rows="20" cols="10" style="width: 100%; height: 100%; font-family: monospace; font-size: 10pt;"><dtml-var body></textarea>
+    </td>
+  </tr>
+  
+  <tr>
+    <td colspan="2">
+      <input type="submit" value=" <dtml-msg "Save"> "
+             <dtml-if "not checkScriptPerm()"> disabled </dtml-if>
+      >&nbsp;&nbsp;
+    </td>
+  </tr>
+
+</table>
+</form>
+
+<dtml-var simple_html_footer>

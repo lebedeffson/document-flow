@@ -1,0 +1,82 @@
+<dtml-comment>
+$Id: manage_categories_form.dtml,v 1.16 2005/12/01 12:53:34 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.16 $>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+
+messageCatalog.alert = "<dtml-msg "No categories selected" jscript>";
+
+-->
+</script>
+
+<h2><dtml-msg "Document categories management"></h2>
+
+<form action="manage_categories" method="POST">
+<dtml-in "portal_metadata.listCategories()">
+<dtml-if sequence-start>
+ <table width="90%" cellspacing="1">
+ <tr class="row_title">
+    <td colspan="3"><dtml-msg "Categories list"></td>
+ </tr>
+</dtml-if>
+ <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td width="1%">
+      <input type="checkbox" name="selected_categories:list" value="<dtml-var getId>" />
+    </td>
+    <td>
+      <a href="<dtml-var "relative_url(action='view', frame='inFrame')">"><dtml-var getId></a>
+    </td>
+    <td>
+      &dtml-Title;
+    </td>
+ </tr>
+<dtml-if sequence-end>
+ <tr>
+    <td colspan="3">
+       <input type="submit" name="deleteCategories"
+              value="<dtml-msg "Remove">"
+              onclick="return checkEmptiesCheckboxes( this.form, 'selected_categories', messageCatalog.alert );"
+       />
+       <input type="submit" name="exportAsXML"
+              value="<dtml-msg "Export">"
+              onclick="return checkEmptiesCheckboxes( this.form, 'selected_categories', messageCatalog.alert );"
+       />
+    </td>
+ </tr>
+ </table>
+</form>
+</dtml-if>
+</dtml-in>
+
+<br>
+
+<form action="manage_categories" method="POST" onSubmit="return validateForm(this);">
+<table>
+<tr>
+ <td colspan=2><strong><dtml-msg "New category"></strong></td>
+</tr>
+<tr>
+  <td><dtml-msg "Id">:</td>
+  <td><input type="text" size="30" 
+             name="category_id:id_"
+             validation_message="<dtml-msg "Category id is invalid">" />
+  </td>
+</tr>
+<tr>
+  <td><dtml-msg "Title">:</td>
+  <td><input type="text" size="30" 
+             name="category_title:required"
+             validation_message="<dtml-msg "specify category title">"
+             value="<dtml-var "_.get('category_title')" null html_quote>" />
+  </td>
+</tr>
+<tr>
+ <td colspan=2 align=right><input type="submit" name="addCategory" value="<dtml-msg "Add category">"></td>
+</tr>
+</table>
+</form>
+<dtml-var simple_html_footer>

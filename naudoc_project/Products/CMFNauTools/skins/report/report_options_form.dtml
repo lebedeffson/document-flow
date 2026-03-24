@@ -1,0 +1,159 @@
+<dtml-comment>
+$Editor: ikuleshov$
+$Id: report_options_form.dtml,v 1.20 2004/06/05 09:18:41 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.20 $>
+
+<dtml-var simple_html_header>
+
+<dtml-let member="portal_membership.getAuthenticatedMember()"
+          container="this()"
+>
+
+<h1> &dtml-title_or_id; </h1>
+
+<script type="text/javascript">
+
+function EnableList(elem)
+{
+    var is_lines = elem.options[elem.selectedIndex].value == 'lines';
+    document.getElementById('listrow').style.display = is_lines ? '' : 'none';
+}
+
+</script>
+<form name='manage_allowed_users_form' 
+      action="<dtml-var "relative_url( action='report_options')" html_quote>"
+      onSubmit="selectAll( this.elements['allowed_members'] ); return true;">
+  <table>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "Report options">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Responsible members">
+    </td>
+    <td>
+      <table>
+       <tr>
+         <td class="small" width="40%"><dtml-msg "All users">
+         </td>
+         <td >&nbsp;</td>
+         <td class="small" width="40%" nowrap><dtml-msg "Responsible members">
+         </td>
+       </tr>
+       <tr>
+         <td>
+         <dtml-var "user_list( None, _
+                             , name='all_users'
+                             , size=8
+                             , multiple=1
+                             , on_dbl_click='javascript:addSelectionToList(all_users, allowed_members);')">
+         </td>
+         <td><input type="button" onClick="addSelectionToList(all_users, allowed_members);" value=" &gt;&gt; "> <br><br>
+             <input type="button" onClick="deleteSelectionFromList(allowed_members);" value=" &lt;&lt; ">
+         </td>
+         <td>                       
+         <select id="allowed_members"  name="allowed_members:list" size="8" multiple onDblClick="javascript:deleteSelectionFromList(allowed_members);">
+            <dtml-in "portal_membership.listSortedUserNames(allowed_members)" mapping>
+              <option value="<dtml-var user_id>">
+                <dtml-var user_name>
+                <dtml-var "user_position and ' [%s]' % (user_position)">
+              </option>
+            </dtml-in>
+         </select>
+         </td>
+       </tr>
+      </table>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+      <dtml-msg "Responsible groups">
+    </td>
+    <td>
+      <select name="allowed_groups:list" size="8" multiple>
+      <dtml-in "portal_membership.listGroups()" sort>
+        <option value="&dtml-getId;" <dtml-var "isGroupAllowed(getId())" fmt="selected"> >
+          <dtml-msg expr=Title>
+        </option>
+      </dtml-in>
+      </select>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <input type="submit" 
+             name="apply_changes" 
+             value="<dtml-msg "Save">" />
+    </td>
+  </tr>
+</form>
+<form name="delete_columns_form"
+      action="<dtml-var "relative_url( action='report_options')" html_quote>">
+  <tr class="row_title">
+    <td colspan="2" class="smallHeader">
+        <dtml-msg "Report fields">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2" class="small">
+       <dtml-in listColumns>
+         <input type="checkbox" name="selected_fields:list" value="&dtml-getId;">
+         <dtml-msg expr=Title> (<dtml-msg expr=Type>) <br>
+
+         <dtml-if sequence-end>
+            <input type="submit" 
+                   name="del_fields" 
+                   value="<dtml-msg "Delete">" />
+         </dtml-if>
+       </dtml-in>
+    </td>
+  </tr>
+</form>
+<form name="add_column_form" 
+      action="<dtml-var "relative_url( action='report_options')" html_quote>"
+      onSubmit="return validateForm( this, true);">
+
+  <tr class="row_even">
+    <td colspan="2" class="small"> <br>
+      <dtml-msg "Id">: <input name="fname:id_" 
+                              type="text"
+                              size="10"
+                              validation_message="<dtml-msg "Column id is invalid">" />
+      <dtml-msg "Title">: <input name="ftitle:required" 
+                                 type="text" 
+                                 size="30"
+                                 validation_message="<dtml-msg "Please specify the column title">">
+      <dtml-msg "Type">:
+      <dtml-in listColumnTypes>
+        <dtml-if sequence-start>
+          <select name="ftype" onChange="EnableList(this);">
+        </dtml-if>
+          <option value="&dtml-sequence-item;" 
+                  <dtml-var "_['sequence-item']==getDefaultColumnType()" fmt=selected> >
+            <dtml-msg expr=sequence-item>
+          </option>
+        <dtml-if sequence-end></select></dtml-if>
+      </dtml-in>
+    </td>
+  </tr>
+  <tr class="row_even" id="listrow" style="display:none">
+    <td class="small">
+      <dtml-msg "Options of select">:
+    </td>
+    <td>
+      <textarea name="value_list:lines" rows="5" cols="20"></textarea>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <input type="submit" name="add_field" value="<dtml-msg "Add field">">
+    </td>
+  </tr>
+</form>
+</table>
+</dtml-let>
+
+<dtml-var simple_html_footer>

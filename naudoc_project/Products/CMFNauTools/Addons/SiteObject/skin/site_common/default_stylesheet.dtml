@@ -1,0 +1,163 @@
+<dtml-unless do_inline_css>
+<dtml-call "RESPONSE.setHeader('Content-Type','text/css')">
+</dtml-unless>
+BODY {
+	BACKGROUND: #ffffff; COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px
+}
+TH.white {
+	BACKGROUND-COLOR: #ffffff; COLOR: #494979; FONT-SIZE: 12px; FONT-WEIGHT: bold
+}
+TD {
+	COLOR: #494979; FONT-SIZE: 10px
+}
+TD.blue {
+	BACKGROUND-COLOR: #f0f0ff; FONT-SIZE: 10px
+}
+TD.dark {
+	BACKGROUND-COLOR: #8686c9; FONT-SIZE: 10px
+}
+TD.white {
+	BACKGROUND-COLOR: #ffffff
+}
+TD.whiteB {
+	BACKGROUND-COLOR: #ffffff; FONT-SIZE: 12px
+}
+I.big_menu_dark {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+FONT.h1_dark {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; FONT-WEIGHT: bold; LETTER-SPACING: 0px; MARGIN-BOTTOM: 2px; MARGIN-TOP: 2px
+}
+FONT.h3_dark {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 16px; FONT-WEIGHT: bold; MARGIN-BOTTOM: 2px; MARGIN-TOP: 2px
+}
+H3 {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 16px; FONT-WEIGHT: bold; MARGIN-BOTTOM: 20px; MARGIN-TOP: 10px
+}
+H2 {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 16px; FONT-WEIGHT: bold; MARGIN-BOTTOM: 20px; MARGIN-TOP: 10px
+}
+H1 {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 16px; FONT-WEIGHT: bold; MARGIN-BOTTOM: 20px; MARGIN-TOP: 10px
+}
+H3.it {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 16px; FONT-STYLE: italic; MARGIN-BOTTOM: 20px; MARGIN-TOP: 10px
+}
+H4 {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 14px; MARGIN-BOTTOM: 3px; MARGIN-TOP: 3px; PADDING-LEFT: 10px
+}
+P {
+	COLOR: #494979; FONT-FAMILY: Arial, Tahoma; FONT-SIZE: 12px; PADDING-LEFT: 20px
+}
+UL {
+	COLOR: #494979; FONT-FAMILY: Arial, Tahoma; FONT-SIZE: 12px; PADDING-LEFT: 0px
+}
+UL.txt_news {
+	COLOR: #494979; FONT-FAMILY: Arial, Tahoma; FONT-SIZE: 12px; LIST-STYLE: url(/external/support/img/li.gif); MARGIN-LEFT: 30px; PADDING-LEFT: 0px
+}
+OL {
+	COLOR: #494979; FONT-FAMILY: Arial, Tahoma; FONT-SIZE: 12px; PADDING-LEFT: 10px
+}
+UL.menu {
+	COLOR: #494979; FONT-FAMILY: Arial, Tahoma; FONT-SIZE: 12px; MARGIN-BOTTOM: 0px; MARGIN-LEFT: 20px; MARGIN-TOP: 0px; PADDING-LEFT: 0px
+}
+FONT.is_link {
+	COLOR: #8686c9; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; FONT-STYLE: italic; TEXT-DECORATION: none
+}
+DL {
+	COLOR: #494979; FONT-FAMILY: Arial, Tahoma; FONT-SIZE: 12px; PADDING-LEFT: 20px
+}
+A.menu {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; TEXT-DECORATION: none
+}
+A.menu:link {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; TEXT-DECORATION: none
+}
+A.menu:visited {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; TEXT-DECORATION: none
+}
+A.menu:active {
+	COLOR: #494979
+}
+A.menu:hover {
+	COLOR: #8686c9
+}
+A.enter {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 14px; FONT-WEIGHT: bold; TEXT-DECORATION: none
+}
+A.enter:link {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 14px; FONT-WEIGHT: bold; TEXT-DECORATION: none
+}
+A.enter:visited {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 14px; FONT-WEIGHT: bold; TEXT-DECORATION: none
+}
+A.enter:active {
+	COLOR: #494979
+}
+A.enter:hover {
+	COLOR: #8686c9
+}
+A.big_menu {
+	COLOR: #f0f0ff; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; FONT-WEIGHT: bold; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu:link {
+	COLOR: #f0f0ff; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; FONT-WEIGHT: bold; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu:visited {
+	COLOR: #f0f0ff; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px; FONT-WEIGHT: bold; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu:active {
+	COLOR: #f0f0ff
+}
+A.big_menu:hover {
+	COLOR: #ffffff
+}
+A.big_menu_dark {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px; FONT-WEIGHT: bold; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu_dark:link {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px; FONT-WEIGHT: bold; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu_dark:visited {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px; FONT-WEIGHT: bold; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu_dark:active {
+	COLOR: #8686c9
+}
+A.big_menu_dark:hover {
+	COLOR: #8686c9
+}
+A.big_menu_txt {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu_txt:link {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu_txt:visited {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 12px; LETTER-SPACING: 0px; TEXT-DECORATION: none
+}
+A.big_menu_txt:active {
+	COLOR: #8686c9
+}
+A.big_menu_txt:hover {
+	COLOR: #8686c9
+}
+A {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px
+}
+A:link {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px
+}
+A:visited {
+	COLOR: #494979; FONT-FAMILY: Verdana, Arial, Helvetica, Tahoma; FONT-SIZE: 10px
+}
+A:active {
+	COLOR: #494979
+}
+A:hover {
+	COLOR: #8686c9
+}
+DIV.votesBar {
+        background: darkslateblue;
+        float: left;
+}

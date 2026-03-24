@@ -1,0 +1,176 @@
+<dtml-comment>
+$Id: default_category_metadata.dtml,v 1.38 2008/05/26 15:04:06 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.38 $>
+
+<dtml-let type_name="_.get('type_name', None)"
+          category="portal_metadata.getCategoryById(category_id)"
+          attributes="category is not None and category.listAttributeDefinitions()"
+          templates="category is not None and category.listTemplates(type_name)"
+          templet_creation="category.getProperty( 'templet_creation' )"
+          bad_template="templet_creation and not category.isTempletCreation()"
+          work_template="category.getWorkTemplate()"
+          work_template_id="category.getWorkTemplateId()"
+          selected_template="REQUEST.get( 'selected_template', work_template_id )">
+
+<input type="hidden" name="display_id" value="<dtml-var "not category.getProperty('show_id') and 'none' or ''">">
+<table id="attributes_table" cellspacing="3" cellpadding="0" border="0">
+
+<dtml-if "category.getPrimaryCategory()">
+<dtml-comment> Documents of this category should have primary documents </dtml-comment>
+
+    <tr>
+        <td colspan="2">
+        <strong><dtml-var "msg('Select primary document')">:</strong>
+        </td>
+    </tr>
+    <tr>
+        <td>
+        <input type="hidden"
+               id="doc_uid"
+               name="doc_uid"
+        >
+        <input type="hidden"
+               id="doc_version"
+               name="doc_version"
+        >
+        <input type="text"
+               id="doc_title"
+               name="doc_title"
+               size="30"
+             <dtml-comment>
+               onDblClick="javascript: window.open('<dtml-var "destination.absolute_url()">')"
+             </dtml-comment>
+               value="<dtml-msg "No object selected">"
+               readonly
+        >
+        </td>
+        <td>
+        <input type="button" value="<dtml-var "msg('Browse...')">" onClick="return OpenDocumentSelectionWnd(this.form.id, 'selectDocument', '', '', '', '', '<dtml-var "category.getPrimaryCategory()">')">
+        <script>
+           function selectDocument( formId, uid, title, version_id ){
+             document.forms[formId]['doc_uid'].value = uid;
+             document.forms[formId]['doc_version'].value = version_id;
+             document.forms[formId]['doc_title'].value = title + (version_id ? ' / ' + version_id : '');
+           }
+        </script>
+        </td>
+    </tr>
+    <tr><td colspan="2">&nbsp;</td></tr>
+</dtml-if>
+
+<dtml-if "templet_creation and not bad_template">
+    <tr>
+      <td colspan="2">
+        <strong><dtml-msg "Work template">:</strong>&nbsp;<dtml-var "work_template.title_or_id()" html_quote>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <dtml-var "work_template.EditableBody(view=False)">
+      </td>
+    </tr>
+</table>
+
+<dtml-else>
+
+  <dtml-if "templet_creation and bad_template">
+    <tr>
+      <td colspan="2">
+        <div class="error"><b><dtml-msg "Sorry, you can not create the document using template"</b></div>
+      </td>
+    </tr>
+  </dtml-if>
+
+<dtml-in templates>
+<dtml-if sequence-start>
+    <tr>
+        <td colspan="2">
+        <strong><dtml-var "msg('Select template')">:</strong>
+        </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <table BORDER="0" CELLSPACING="1" CELLPADDING="1">
+          <tr>
+            <td width="1%">
+              <input type="radio"
+                     name="selected_template"
+                     value="not use"
+                     <dtml-var "not selected_template or selected_template == 'not use'" fmt=checked> 
+                     onClick="changeTemplate('default_category_metadata?category_id=&dtml.url_quote-category_id;&type_name=&dtml.url_quote-type_name;&selected_template=not%20use');"
+              >
+            </td>
+            <td>
+              <dtml-msg "None">
+            </td>
+          </tr>
+</dtml-if>
+          <tr>
+            <dtml-let obj=getTargetObject>
+            <td width="1%">
+              <input type="radio"
+                     name="selected_template"
+                     value="&dtml-getId;"
+                     <dtml-var "getId() == selected_template" fmt=checked> 
+                     onClick="changeTemplate('default_category_metadata?category_id=&dtml.url_quote-category_id;&type_name=&dtml.url_quote-type_name;&selected_template=&dtml.url_quote-getId;');"
+              >
+            </td>
+            <td>
+              <dtml-if "obj">
+                <a href="&dtml.url-obj;" target="_blank"><dtml-var "obj.title_or_id()" html_quote></a>
+              <dtml-else>
+                <dtml-var "msg('Unknown document')">
+              </dtml-if>
+            </td>
+            </dtml-let>
+          </tr>
+<dtml-if sequence-end>
+        </table>
+      </td>
+    </tr>
+    <tr><td colspan="2">&nbsp;</td></tr>
+
+</dtml-if>
+<dtml-else>
+  <input type="hidden" name="selected_template" value="not use">
+</dtml-in>
+
+<dtml-let template_id="selected_template != 'not use' and selected_template or None"
+          template_link="template_id and portal_links[template_id] or None"
+          template_obj="template_link and template_link.getTargetObject()"
+>
+
+<dtml-in attributes prefix="a">
+<dtml-unless isReadOnly>
+  <dtml-let value="template_obj and template_obj.getCategoryAttribute( getId() ) or getDefaultValue(moniker=1)">
+
+  <dtml-if "Type() == 'splitter' and not a_end">
+  <tr>
+    <td valign="top" colspan="2">
+      <h2>&dtml-Title;</h2>
+    </td>
+  </tr>
+  <dtml-elif "Type() != 'splitter'">
+  <tr>
+    <td valign="top" <dtml-var "isMandatory() and 'mandatory'" fmt=class> >
+      <dtml-var sequence-item fmt=attribute>
+    </td>
+    <td><dtml-var "entry_field_edit( None, _,
+                                     descriptor=getFieldDescriptor(
+                                       name='attr/%s'%getId() ),
+                                     value=value,
+                                 )">
+    </td>
+  </tr>
+  </dtml-if>
+
+  </dtml-let>
+</dtml-unless>
+</dtml-in>
+
+</dtml-let>
+</table>
+</dtml-if>
+</dtml-let>

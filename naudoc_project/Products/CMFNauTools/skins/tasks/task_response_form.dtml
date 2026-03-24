@@ -1,0 +1,122 @@
+<dtml-comment>
+$Id: task_response_form.dtml,v 1.24 2006/06/13 07:43:26 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.24 $>
+
+<dtml-var simple_html_header>
+
+<script language="JavaScript">
+
+function validatePlanTime(form, element_id) {
+<dtml-if "implements('isDirectiveTask') and getPlanTime() and status == 'commit'">
+    if( form[element_id + '_days'].value != '0'  ||
+        form[element_id + '_hours'].value != '0'  ||
+        form[element_id + '_minutes'].value != '0'  )
+          return true;
+    else
+          alert('<dtml-var "msg('You have to specify actual time spent to accomplish the task')">');
+          return false;
+<dtml-else>
+    return true;
+</dtml-if>
+}
+
+</script>
+
+<dtml-let rti="getResponseTypeById(status)"
+          uname="portal_membership.getAuthenticatedMember().getUserName()"
+          prev_responses="searchResponses(status=status, member=uname)"
+          recent_response="prev_responses and prev_responses[-1]"
+          recent_response_id="recent_response and recent_response['response_id']"
+          form_name="'response_form'"
+
+>
+<div class="Desktop">
+
+<h1> <dtml-var aboveInThread> </h1>
+<form id="response" name="response_form" onSubmit="return validatePlanTime(this, 'actual_time')" action="&dtml-absolute_url;" target="workfield" method="post" enctype="multipart/form-data">
+ <table class="FormLayout" width="100%">
+  <tr>
+   <td valign=top align=left>
+     <dtml-var "msg(rti['description'], add=0)">
+   </td>
+  </tr>
+  <tr>
+   <td valign=top align=left>
+    <strong><em>  <dtml-var "msg('Comment')"></em></strong><br>
+
+    <dtml-var "comment_template( this(), form='response_form', field='text', context=('task.respond.%s' % BrainsType()), value=(recent_response and recent_response['text'] or '') )">
+
+   </td>
+  </tr>
+ <dtml-if "BrainsType() == 'directive' and status == 'commit'">
+  <tr>
+   <td valign=top align=left>
+    <strong><em>  <dtml-var "msg('Actual time spent to accomplish the task')"></em></strong><br>
+            <dtml-var "dateperiod_form( this()
+                                      , prefix='actual_time'
+                                      , period=getActualTimeFor(uname) or 0
+                                      )"
+            >
+
+   </td>
+  </tr>
+  </dtml-if>
+<dtml-if "rti.get('manual_report_close', None)">
+  <tr>
+   <td>
+      <input type="checkbox" name="close_report:int" value="1"> <dtml-var "msg('Close report')">
+   </td>
+  </tr>
+</dtml-if>
+  <tr>
+   <td>
+      <input type="hidden" name="status" value="&dtml-status;">
+      <input type="submit" name="Respond:method" value=" <dtml-var "msg(rti['title'], add=0)"> ">
+      <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;'" value=" <dtml-var "msg('Cancel')"> ">
+   </td>
+  </tr>
+ </table>
+
+<script type="text/javascript">
+<!--
+registerFormCallback( 'response', disableForm );
+// -->
+</script>
+
+  <dtml-var "document_selection_box(
+                 None, _,
+                 name = 'documents',
+                 extra={'source_uname': uname, 'source_status': status, 'source_response_id': recent_response_id}
+             )">
+
+<table>
+ <dtml-var "file_upload_form(this(), upload_name='attachments')">
+
+ <dtml-in "recent_response and recent_response.get('attachments') or ()" prefix="a">
+   <tr>
+     <td colspan="2">
+       <img src="link.gif"> <dtml-var "_.getitem(a_item)" fmt=object>
+     </td>
+   </tr>
+ </dtml-in>
+</table>
+
+</form>
+
+
+<dtml-if CookedBody>
+<table width="100%">
+ <tr class="task_title">
+  <td class="smallHeader"><dtml-msg "Document text"></td>
+ </tr>
+ <tr>
+  <td><dtml-var "this().CookedBody(view=True)"></td>
+ </tr>
+</table>
+</dtml-if>
+
+</div>
+</dtml-let>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,176 @@
+<dtml-comment>
+Main form for actions with document versions.
+
+$Editor: oevsegneev $
+$Id: document_copies_holders_form.dtml,v 1.5 2004/03/29 09:40:41 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+<dtml-let perm="not _.SecurityCheckPermission('Manage properties', this())">
+
+<form name="versions" method="post"
+      action="<dtml-var "relative_url( action='document_copies_holders' )" html_quote>">
+
+<h3><dtml-msg "Copies holders"></h3>
+
+<br />
+
+<table border="0" cellpadding="2" cellspacing="1" width="85%">
+<dtml-if perm>
+<dtml-in listCopiesHolders>
+<dtml-if sequence-start>
+  <tr class="row_title" align="center">
+    <td class="small">
+      <dtml-msg "Copy number">
+    </td>
+    <td class="small">
+      <dtml-msg "Workshop">
+    </td>
+    <td class="small">
+      <dtml-msg "Department">
+    </td>
+    <td class="small">
+      <dtml-msg "Position">
+    </td>
+    <td class="small">
+      <dtml-msg "Description">
+    </td>
+  </tr>
+</dtml-if>
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>" align="center">
+    <td>
+      <dtml-var "_['sequence-item']['number']">
+    </td>
+    <td>
+      <dtml-var "_['sequence-item']['workshop']">
+    </td>
+    <td>
+      <dtml-var "_['sequence-item']['department']">
+    </td>
+    <td>
+      <dtml-var "_['sequence-item']['position']">
+    </td>
+    <td>
+      <dtml-var "_['sequence-item']['description']">
+    </td>
+  </tr>
+</dtml-in>
+<dtml-else>
+<dtml-in listCopiesHolders>
+<dtml-if sequence-start>
+  <tr class="row_title" align="center">
+    <td width="1">
+      &nbsp;
+    </td>
+    <td class="small">
+      <dtml-msg "Copy number">
+    </td>
+    <td class="small">
+      <dtml-msg "Workshop">
+    </td>
+    <td class="small">
+      <dtml-msg "Department">
+    </td>
+    <td class="small">
+      <dtml-msg "Position">
+    </td>
+    <td class="small">
+      <dtml-msg "Description">
+    </td>
+  </tr>
+</dtml-if>
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>" align="center">
+    <td width="1%"><input type="hidden" name="id:list" value="<dtml-var "_['sequence-item']['id']">"><input type="checkbox" name="ids:list" value="<dtml-var "_['sequence-item']['id']">"></td>
+    <td width="12%">
+      <input type="text" name="number:list" value="<dtml-var "_['sequence-item']['number']">" style="width: 100%">
+    </td>
+    <td width="21%">
+      <input type="text" name="workshop:list" value="<dtml-var "_['sequence-item']['workshop']">" style="width: 100%">
+    </td>
+    <td width="25%">
+      <input type="text" name="department:list" value="<dtml-var "_['sequence-item']['department']">" style="width: 100%">
+    </td>
+    <td width="21%">
+      <input type="text" name="position:list" value="<dtml-var "_['sequence-item']['position']">" style="width: 100%">
+    </td>
+    <td width="20%">
+      <textarea name="description:list" rows="3"><dtml-var "_['sequence-item']['description']"></textarea>
+    </td>
+  </tr>
+<dtml-if "_['sequence-end'] and not perm" >
+  <tr class="row_even">
+    <td colspan="6">
+      <input type="submit" name="delete_holders" value="<dtml-msg "Delete holders">">&nbsp;
+      <input type="submit" name="save_holders" value="<dtml-msg "Save changes">">
+    </td>
+  </tr>
+</dtml-if>
+</dtml-in>
+</table>
+<dtml-if "not perm">
+<br>
+<table border="0" cellpadding="5" cellspacing="1">
+  <tr class="row_even">
+    <td class="Title" colspan="2">
+      <dtml-msg "Add new holder">:
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+     <dtml-var "msg('Copy number')">
+    </td>
+    <td>
+      <input type="text" name="new_holder_number">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+     <dtml-var "msg('Workshop')">
+    </td>
+    <td>
+      <input type="text" name="new_holder_workshop">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+     <dtml-msg "Department">
+    </td>
+    <td>
+      <input type="text" name="new_holder_department">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+     <dtml-var "msg('Position')">
+    </td>
+    <td>
+      <input type="text" name="new_holder_position">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+     <dtml-var "msg('Description')">
+    </td>
+    <td>
+      <textarea name="new_holder_description" rows="5"></textarea>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="6">
+      <input type="submit" name="add_holder" value="<dtml-msg "Add">">
+    </td>
+  </tr>
+</dtml-if>
+</dtml-if>
+</table>
+
+<dtml-if isLocked>
+  <dtml-msg "This document has been locked because it is being edited by another user.">
+</dtml-if>
+
+
+</form>
+
+</dtml-let>
+<dtml-var simple_html_footer>

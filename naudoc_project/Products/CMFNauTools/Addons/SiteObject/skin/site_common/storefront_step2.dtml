@@ -1,0 +1,172 @@
+<dtml-comment>
+Step2: Shopping cart
+$Id: storefront_step2.dtml,v 1.1 2008/10/15 12:48:08 oevsegneev Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-var "msg('Step2: Shopping cart')">
+<dtml-call "storefront_wizard('2')">
+<dtml-let products=publishedItems
+          cso="canSendOrder()"
+          container_url="absolute_url()"
+          items="REQUEST['SESSION']['%s_items'%container_url]">
+
+<script language="javascript" type="text/javascript">
+<!--
+
+var form_name = 'price_form';
+<dtml-if "_.len(items)">
+var count_fields = 
+<dtml-in items mapping>
+  <dtml-if sequence-start>{</dtml-if>
+    '&dtml-id;_count' :
+    { 'price'       : &dtml-product_price;,
+      'destination' : '&dtml-id;_price' }
+  <dtml-if sequence-end>};<dtml-else>,</dtml-if>
+  
+</dtml-in>
+window.onload = recountForm;
+
+function recountForm()
+{
+    var form = document.forms[ form_name ];
+    var total_price_field = form.elements[ 'total_price' ];
+
+    var total_price = 0;
+    for (var field_id in count_fields)
+        total_price += recountPrice(form.elements[ field_id ], true);
+        
+    total_price_field.value = total_price.toFixed(2);
+}
+
+function recountPrice(field, init)
+{
+    var form = document.forms[ form_name ];
+    var total_price_field = form.elements[ 'total_price' ];
+
+    var count_data = count_fields[ field.id ];
+    var value = parseInt(field.value,10);
+       
+    if ( isNaN(value) || value < 0 )
+        value = 0;
+
+    field.value = value;
+    
+    var price = count_data['price']*value;
+    var destination_field = form.elements[ count_data['destination'] ];
+    
+    if ( !init ){
+        var total_price = parseFloat(total_price_field.value) - parseFloat(destination_field.value) + price;
+        total_price_field.value = total_price.toFixed(2)
+    }
+    destination_field.value = price.toFixed(2);
+
+    return price;
+}
+function deleteFromCart(){
+    var form = document.forms[ form_name ];
+    form.go_step.value='2';
+    return true;   
+
+}
+</dtml-if>
+function returnToShop(){
+    var form = document.forms[ form_name ];
+    form.go_step.value='1';
+    return true;   
+}
+//-->
+</script>
+
+
+<form name="price_form" action="&dtml-absolute_url;" method="POST" >
+
+<input type="hidden" name="go_step" value="3">
+
+<dtml-in items sort="Date" reverse mapping>
+<dtml-if sequence-start>
+<table width="100%" border="1" align="center" cellspacing="0" cellpadding="3">
+ <tr>
+   <th><&nbsp;</th>
+   <th><dtml-var "msg('Item')"></th>
+   <th><dtml-var "msg('Short description')"></th>
+   <th><dtml-var "msg('Unit price')"></th>
+  <dtml-if cso>
+    <th><dtml-var "msg('Quantity')"></th>
+    <th><dtml-var "msg('Total price')"></th>
+  </dtml-if>
+ </tr>
+</dtml-if>
+      <tr>
+        <td align="center">
+           <input type="checkbox" name="selected_items:list" value="&dtml-id;">
+        </td>
+        <td align="center"><dtml-if photo><img src="&dtml-absolute_url;/photo.gif" width="50" height="50"><dtml-else>
+<img src="&dtml-portal_url;/tr.gif" width="50" height="50"></dtml-if>
+          <a class="big_menu_txt" href="&dtml-absolute_url;" target="_blank">&dtml-product_title;</a>
+        </td>
+        <td><dtml-var product_description size=25 etc="...">[<a class="big_menu_txt" href="&dtml-absolute_url;" target="_blank">подробнее</a>]</td>
+        <td align="center">&dtml-product_price;</td> 
+      <dtml-if cso>
+        <td>
+          <input id="&dtml-id;_count"
+                 name="counts:list"
+                 type="text"
+                 class="text"
+                 size="3"
+                 value="&dtml-count;" 
+                 onBlur="javascript:recountPrice(this)"
+                 <dtml-var "not canSendOrder() and 'disabled' or ''">>
+
+        </td>
+        <td>
+          <input name="&dtml-id;_price"
+                 type="text"
+                 class="text" 
+                 size="7" 
+                 disabled>
+        </td>
+      </tr>
+      </dtml-if>
+<dtml-if sequence-end>
+  <dtml-if cso>
+     <tr>
+        <td colspan="5"><dtml-var "msg('Subtotal')">:</td>
+        <td>
+          <input name="total_price" 
+                 type="text" 
+                 class="text" 
+                 size="7" 
+                 onfocus="blur();">
+        </td>
+      </tr>
+  </dtml-if>
+</table>
+</dtml-if>
+<dtml-else>
+  <p><dtml-var "msg('Your shopping cart is empty')"></p>
+  <input type="submit" name="return" class="button" value="<dtml-var "msg('Continue shopping')">" onclick="javascript: return returnToShop();">   
+</dtml-in>
+
+<dtml-if "cso and _.len(items)">
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+  <tr width=1%>
+    <td>
+      <input type="submit" name="del_items" value="<dtml-var "msg('Remove from cart')">" onclick="javascript: return deleteFromCart();">
+    <td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><br><br>
+      
+      <input type="submit" name="return" class="button" style="width: 15em;" value="<dtml-var "msg('Continue shopping')">" onclick="javascript: return returnToShop();">
+    </td>
+    <td colspan="2" align="center"><br><br>   
+      <input type="submit" name="send_order" class="button" style="width: 15em;" value="<dtml-var "msg('Send order')">" >
+    </td>
+  </tr>
+</table>
+</dtml-if>
+</form>
+
+</dtml-let>

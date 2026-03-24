@@ -1,0 +1,237 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: join_form.dtml,v 1.33 2005/12/23 12:40:48 ikuleshov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.33 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h2><dtml-msg "User registration"></h2>
+
+<dtml-if "not portal_membership.checkPermission('Add portal member', this())">
+<dtml-call "RESPONSE.redirect(absolute_url())">
+</dtml-if>
+
+<dtml-if error>
+<p class="error"><dtml-msg expr=error></p>
+</dtml-if>
+
+<script type="text/javascript">
+<!--
+
+var requireEMail = <dtml-var "portal_registration.getProperty('require_email') and 'true' or 'false'">;
+
+messageCatalog.invalid_login = "<dtml-msg "Login name is invalid." jscript>";
+messageCatalog.invalid_email = "<dtml-msg "Please specify the correct e-mail address." jscript>";
+messageCatalog.empty_first_name = "<dtml-msg "Please fill in the user's first name." jscript>";
+messageCatalog.empty_last_name = "<dtml-msg "Please fill in the user's last name." jscript>";
+
+function Validate( form )
+{
+    if (! validateIdentifier( form.elements['username:string'], 'invalid_login' )) return false;
+    if (requireEMail && ! validateEmail( form.elements['email:string'], 'invalid_email' )) return false;
+    if (! validateForm(form)) return false;
+
+    // select "all_users" group
+    list = form.elements['groups:list'];
+    for (var i = 0; i < list.length; i++)
+        if (list.options[i].value == 'all_users')
+            list.options[i].selected = true;
+
+    return true;
+}
+
+// -->
+</script>
+
+<form name="add_member_form" action="register" method="POST"
+      onSubmit="javascript: return Validate(this)">
+
+<input type="hidden" name="last_visit:date" value="<dtml-var "_.DateTime()">" />
+<input type="hidden" name="prev_visit:date" value="<dtml-var "_.DateTime()">" />
+
+<table class="FormLayout" cellpadding="3" cellspacing="2" border="0">
+  <tr>
+   <td colspan=2><h1><dtml-var "msg('Mandatory data')"></h1></td>
+  </tr>
+ <tr>
+  <th><dtml-var "msg('Login Name')"></th>
+  <td>
+   <input type="text" name="username:string" size="30" value="&dtml.missing-username;" />
+   <br />
+   <dtml-var "msg('System login name')">
+  </td>
+ </tr>
+ <tr>
+  <th><dtml-var "msg('E-mail address')"></th>
+  <td align="left" valign="top">
+   <input type="text" name="email:string" size="30" value="&dtml.missing-email;" />
+   <br />
+   <dtml-var "msg('System specifies user email at the footer of all his(her) documents')">
+  </td>
+ </tr>
+
+<dtml-unless expr="portal_properties.validate_email">
+ <tr>
+  <th> <dtml-var "msg('Password')"></th>
+  <td align="left" valign="top">
+   <input type="password" name="password" size="30">
+  </td>
+ </tr>
+ <tr>
+  <th> <dtml-var "msg('Password (confirm)')"></th>
+  <td align="left" valign="top">
+   <input type="password" name="confirm" size="30" />
+   <br />
+   <dtml-var "msg('Leave blank to allow system generate the password and mail it to the user')">
+  </td>
+ </tr>
+
+ <tr>
+  <th><dtml-var "msg('Domains')">
+  </th>
+  <td>
+    <input type="text" name="domains:tokens" />
+    <br />
+    <em><dtml-var "msg('Leave this field blank if not sure')"></em>
+  </td>
+ </tr>
+
+ <tr>
+  <th class="TextField"> <dtml-var "msg('User folder name')"> </th>
+  <td align="left" valign="top">
+   <input type="text" name="home" size="30" />
+   <br />
+   <dtml-var "msg('By default user folder has the same name as the login name')">
+  </td>
+ </tr>
+</dtml-unless>
+
+ <tr>
+  <th><dtml-msg "Groups"></th>
+  <td>
+    <dtml-let all_groups="portal_membership.listGroups()"
+              storage_groups="[  g for g in all_groups if g.isUsersStorage() ]"
+              writable_groups="[ g for g in all_groups if not (g.isReadOnly() or g.isUsersStorage()) ]">
+
+    <dtml-if storage_groups>
+    <p>
+    <select name="storage:string">
+      <dtml-in storage_groups>
+      <option value="&dtml-getId;" <dtml-var useByDefault missing fmt=selected> >&dtml-Title;</option>
+      </dtml-in>
+    </select>
+    <br />
+    <dtml-msg "The user account will be placed into the selected group. This membership is permanent and cannot be changed later.">
+    </p>
+    </dtml-if>
+
+    <dtml-if writable_groups>
+    <p>
+    <select name="groups:list" size="5" multiple="1">
+      <dtml-in writable_groups>
+      <option value="&dtml-getId;" <dtml-var useByDefault missing fmt=selected> >&dtml-Title;</option>
+      </dtml-in>
+    </select>
+    <br />
+    <dtml-msg "The user will be a member of the selected groups. This list can be changed at any time.">
+    </p>
+    </dtml-if>
+
+    </dtml-let>
+  </td>
+ </tr>
+
+  <tr>
+   <td colspan=2><h1><dtml-var "msg('Optional user info')"></h1></td>
+  </tr>
+  <tr>
+   <th><dtml-var "msg('Last name')"></th>
+   <td><input type="text" name="lname:string" validation_message="empty_last_name" /></td>
+  </tr>
+  <tr>
+   <th><dtml-var "msg('First name')"></th>
+   <td><input type="text" name="fname:string" validation_message="empty_first_name" /></td>
+  </tr>
+  <tr>
+   <th><dtml-var "msg('Middle name')"></th>
+   <td><input type="text" name="mname" /></td>
+  </tr>
+  <tr>
+   <th colspan=2>&nbsp;</th>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Company')"></th>
+   <td><input type="text" name="company" /></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Phone')"></th>
+   <td><input type="text" name="phone" /></td>
+  </tr>
+
+  <tr>
+   <th><dtml-var "msg('Notes')"></th>
+   <td><textarea cols="40" rows="5" name="notes"></textarea></td>
+  </tr>
+<tr>
+ <th><dtml-msg "Grant user with the same access rights as">: </th>
+ <td>
+
+       <dtml-var "user_list(None,_, name='source_user', all=True, list_size=8, blank=1)">
+</td>
+
+</tr>
+ <tr>
+  <th> &nbsp;  </th>
+  <td>
+   <input type="checkbox" name="asManager" size="30" id="cb_asManager" />
+   <em><label for="cb_asManager"><dtml-var "msg('Portal manager')"></label></em>
+  </td>
+ </tr>
+ <tr>
+  <th> &nbsp;  </th>
+  <td>
+   <input type="checkbox" name="noHome" size="30" id="cb_noHome" />
+   <em><label for="cb_noHome"><dtml-var "msg('Don\'t create user folder')"></label></em>
+  </td>
+ </tr>
+ <tr>
+  <th> &nbsp;  </th>
+  <td>
+   <input type="checkbox" name="noDefaults" size="30" id="cb_noDefaults" />
+   <em><label for="cb_noDefaults"><dtml-var "msg('Don\'t add default content to the user folder')"></label></em>
+  </td>
+ </tr>
+ <tr>
+  <th> &nbsp;  </th>
+  <td>
+   <input type="checkbox" name="mail_me" size="30" id="cb_mailme" />
+   <em><label for="cb_mailme"><dtml-var "msg('Mail Password?')"></label></em>
+  </td>
+ </tr>
+ <tr>
+  <th> &nbsp;  </th>
+  <td>
+   <input type="checkbox" name="active" size="30" id="cb_active" 
+          <dtml-var "portal_licensing.getActiveUsersCount() < portal_licensing.getMaxActiveUsers()" fmt=checked>
+   />
+   <em><label for="cb_active"><dtml-msg join.active_user></label></em>
+  </td>
+ </tr>
+ <tr>
+  <td><br></td>
+  <td>
+   <input type="submit" name="submit" value=" <dtml-var "msg('Add user')"> ">
+  </td>
+ </tr>
+</table>
+</form>
+
+</div>
+
+<dtml-var simple_html_footer>

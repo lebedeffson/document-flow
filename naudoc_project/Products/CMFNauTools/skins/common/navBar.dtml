@@ -1,0 +1,34 @@
+<dtml-comment>
+Displays breadcrumb trail navigation bar.
+
+Parameters:
+
+    'action' -- portal action ID, 'contents' by default
+
+    'frame' -- target frame, 'workspace' by default
+
+$Id: navBar.dtml,v 1.22 2006/07/26 12:52:18 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.22 $>
+
+<dtml-let action="_.get( 'action', 'view' )"
+          frame=" _.get( 'frame',  'workspace' )"
+          method="action == 'contents' and 'folder_contents' or action">
+
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr bgcolor="#CCCCFF" height="20">
+    <td width="100%" valign="middle">
+      &nbsp;<img align="absmiddle" src="&dtml-portal_url;/gray_of.gif" width="16" height="16">&nbsp;
+      <span class="Navigation">
+        <a href="&dtml-portal_url;/storage/&dtml.url_quote-method;" target="&dtml-frame;"
+           ><dtml-msg expr="_.int(REQUEST.get('arch_cookie', 0)) and 'Archival documents' or 'Accessible documents'"></a>
+        <dtml-in "listParents( feature='isNavigable', monikers=1, exclude_root=1 )">
+           / <dtml-var "render( _, action=action, frame=frame, method=method )">
+        </dtml-in>
+      </span>
+    </td>
+  </tr>
+</table>
+
+</dtml-let>

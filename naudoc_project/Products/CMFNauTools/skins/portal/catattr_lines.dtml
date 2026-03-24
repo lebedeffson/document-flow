@@ -1,0 +1,40 @@
+<h4><dtml-msg expr="attr.Title()"></h4>
+<select name="list_field:list" id="&dtml-name;" multiple>
+  <dtml-in "attr.getProperty('options')">
+    <option name="&dtml-sequence-item;"
+            value="&dtml-sequence-item;"
+            <dtml-var "value and _['sequence-item'] in value" fmt="selected">>
+      &dtml-sequence-item;
+    </option>
+  </dtml-in>
+</select>
+<br />
+<script type="text/javascript">
+<!--
+
+function Return()
+{
+    var selections = '';
+    var k = 0;
+    var ctrl = document.getElementById('&dtml-name;');
+    for (i = 0; i < ctrl.length; i++)
+        if (ctrl.options[i].selected == true)
+        {
+            if (selections == '')
+                selections = ctrl.options[i].value;
+            else
+                selections = selections+'\n'+ctrl.options[i].value;
+            k++;
+        }
+
+    opener.&dtml-callback_function;( '&dtml-callback_form;',
+                                     '&dtml-cat_id;',
+                                     '&dtml-attr_id;',
+                                     '&dtml-type;',
+                                     selections,
+                                     document.getElementById('child').checked
+                                   );
+}
+
+//-->
+</script>

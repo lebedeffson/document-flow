@@ -1,0 +1,165 @@
+<dtml-var simple_html_header>
+<dtml-let action="_.has_key('action') and _.getitem('action') or 'edit'"
+          edit="action == 'edit'"
+          wizard_data="_.has_key('wizard_data_id') and REQUEST['SESSION'].get(wizard_data_id)"
+          default="wizard_data and wizard_data.get('task_form')
+                   or edit and { 'title': Title()
+                               , 'description': Description()
+                               , 'effective_date': effective()
+                               , 'involved_users': listInvolvedUsers()
+                               , 'supervisor': Supervisor()
+                               }
+                   or { 'title': not implements('isPortalRoot') and Title() or ''
+                      , 'description': ''
+                      , 'involved_users': getCategoryAttribute('ResponsAuthor')
+                      , 'supervisor': getCategoryAttribute('OriginalHolder')
+                      }
+                  "
+>
+<script type="text/javascript"><!--
+
+  window.onload =
+    function () {
+      var form = document.forms['followup'];
+    };
+
+  function Validate(frm, save_template)
+  {
+    if (!frm.title.value) {
+       alert('<dtml-var "msg('Please specify task title')">');
+       return false;
+    }
+
+//    selectAll(frm.involved_users);
+
+    return validateForm(frm);
+  }
+
+  function sendForm(action)
+  {
+    var form = document.forms['followup']
+    form.action='portal_membership/processTemplateActions';
+    form.template_action.value = action
+  }
+
+//--></script>
+
+
+
+<dtml-if expr="not _.hasattr(this(), 'followup') and not this().implements( 'isTaskItem' )">
+  <dtml-call expr="portal_followup.getTasksFor(this())">
+</dtml-if>
+
+
+<dtml-if "implements( 'isTaskItem' )">
+<h1> <dtml-var aboveInThread> </h1>
+</dtml-if>
+
+<form name='followup' method="POST" action="&dtml-absolute_url;/followup" onSubmit="return Validate(this);" enctype="multipart/form-data">
+
+  <input type="hidden" name="template_action" value="">
+
+<dtml-if edit>
+  <input type="hidden" name="task_id" value="&dtml-getId;">
+</dtml-if>
+
+<dtml-if brains_type>
+  <input type="hidden" name="brains_type" value="&dtml-brains_type;">
+</dtml-if>
+
+  <table>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-var "msg('New task details')">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-var "msg('Task title')">
+    </td>
+    <td>
+       <input name="title" size="50"
+        value="<dtml-var "default.get('title')" html_quote>"
+       />
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-var "msg('Task description')">
+    </td>
+    <td>
+       <textarea name="description"
+                 rows="10"
+                 cols="50"
+       ><dtml-var "default.get('description')"></textarea>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-var "msg('Consideration time')">
+    </td>
+    <td class="small">
+	<select name="consideration_time">
+		<dtml-in "_.range(1,500)">
+		<option <dtml-var sequence-index>>
+			<dtml-var sequence-item>
+		</option>
+		</dtml-in>
+	</select>
+	&nbsp;
+	<dtml-var "msg('days')">
+    </td>
+  </tr>
+  <tr class="row_even">
+	<td class="small">
+		<dtml-var "msg('Responsible authors')">
+	</td>
+	<td class="small">
+    <dtml-in "getCategoryAttribute('ResponsAuthor')">
+      <dtml-var sequence-item fmt=member><br>
+    </dtml-in>
+	</td>
+  </tr>
+
+  <tr class="row_even">
+	<td class="small">
+		<dtml-var "msg('Original holder')">
+	</td>
+	<td class="small">
+    <dtml-in "getCategoryAttribute('OriginalHolder')">
+      <dtml-var sequence-item fmt=member>
+    </dtml-in>
+	</td>
+  </tr>
+
+<tr>
+  <td colspan="2">
+    <table>
+      <dtml-var "file_upload_form(this(), upload_name='attachment')">
+    </table>
+  </td>
+</tr>
+
+  <tr>
+    <td colspan="2">
+	<input type=submit name="modification_edit:method" value="<dtml-var "edit and msg('Edit task') or msg('Add task')">">
+    <input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;'" value=" <dtml-var "msg('Cancel')"> ">
+    </td>
+  </tr>
+  </table>
+</form>
+
+<dtml-if CookedBody>
+<table width="100%">
+ <tr class="task_title">
+  <td class="smallHeader"><dtml-var "msg('Document text')"></td>
+ </tr>
+ <tr>
+  <td><dtml-var CookedBody></td>
+ </tr>
+</table>
+</dtml-if>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

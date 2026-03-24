@@ -1,0 +1,65 @@
+<dtml-comment>
+$Id: workflow_graph.dtml,v 1.1.1.1 2005/10/20 07:39:16 ikuleshov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1.1.1 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-call "REQUEST.set('PageTitle', msg('Workflow map'))">
+<dtml-var simple_html_header>
+
+<dtml-let state="REQUEST.get('state')"
+          transition="REQUEST.get('transition')"
+>
+
+<map name="graph_map">
+  <dtml-var "getGraph( fmt='cmap',
+                       state=state,
+                       transition=transition 
+                     )"
+  >
+</map>
+
+<img id="graph"
+     src="<dtml-var "absolute_url( action='getGraph',
+                                   params={ 'fmt': 'png',
+                                            'state': state,
+                                            'transition': transition, 
+                                          }
+                                 )">"
+     usemap="#graph_map"
+/>
+
+</dtml-let>
+
+<script type="text/javascript">
+function resizeWindow( element )
+{
+    if(element.readyState != "complete"){
+       window.setTimeout("resizeWindow(element)", 100);
+       return;
+    }
+    ew = element.offsetWidth + 50;
+    eh = element.offsetHeight + 50;
+    sw = screen.availWidth;
+    sh = screen.availHeight;
+    width = (sw > ew)?ew:sw;
+    height = (sh > eh)?eh:sh;
+    window.resizeTo( width, height );
+}
+
+window.focus();
+var element = window.document.getElementById( 'graph' );
+resizeWindow( element );
+
+map = window.document.getElementById( 'graph_map' );
+for( i=0; i < map.areas.length; i++ )
+{
+    registerCallback(
+          map.areas[ i ], 'onClick',
+          function (ev) { window.close() }
+      );
+
+}
+</script>
+
+<dtml-var simple_html_footer>

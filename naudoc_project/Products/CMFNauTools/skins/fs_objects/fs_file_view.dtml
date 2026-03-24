@@ -1,0 +1,51 @@
+<dtml-comment>
+FileSystem File view form.
+
+$Id: fs_file_view.dtml,v 1.5 2004/04/30 07:14:19 ypetrov Exp $
+$Editor: kfirsov $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-var simple_html_header>
+
+<dtml-call "checkUpdate()">
+
+<dtml-if checkExists>
+  <dtml-var "this()">
+</dtml-if>
+
+<h1>&dtml-title_or_id; (&dtml-getId;)</h1>
+
+<table class="ContentsList" cellspacing="2" cellpadding="2" width="100%" border="0">
+<tr>
+  <td class="cell_title" align=center ><dtml-msg "Name"></td>
+  <td class="cell_title" align=center><dtml-msg "Path"></td>
+  <td class="cell_title" align=center><dtml-msg "Modification date"></td>
+  <td class="cell_title" align=center><dtml-msg "Size"></td>
+</tr>
+<tr>
+  <td colspan="8" align="center"><img src="spacer.gif" height="5" alt=""></td>
+</tr>
+<tr>
+  <td class="Description" align=center>
+    <dtml-if isViewable>
+      <a href="&dtml-absolute_url;">&dtml-getFullName;</a>
+    <dtml-else>
+      &dtml-getFullName;
+    </dtml-if>
+  </td>
+  <td class="Description" align=center>&dtml-getFilePath;</td>
+  <td class="Description" align=center><dtml-if checkExists><dtml-var "rDate(this(), time=modified()).strip()"><dtml-else>N/A</dtml-if></td>
+  <td class="Description" align=center><dtml-if checkExists>&dtml-getSize;&nbsp;B<dtml-else>N/A</dtml-if></td>
+</tr>
+</table>
+
+<p><dtml-if checkExists>
+     <a href="&dtml-absolute_url;" target="_blank"><dtml-msg "Download"></a>
+   <dtml-else>
+     <b><dtml-msg "File not found"></b>
+   </dtml-if>
+</p>
+ 
+<dtml-var simple_html_footer>

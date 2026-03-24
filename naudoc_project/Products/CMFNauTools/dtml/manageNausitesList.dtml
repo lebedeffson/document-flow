@@ -1,0 +1,38 @@
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<table cellspacing=2 width=100%>
+
+<dtml-let packOpts="getPackDBoptions()" backupOpts="getBackupDBoptions()">
+  <tr>
+   <th valign="top" align="left"> Pack Zope database
+   </th>
+   <td>
+     Pack each <dtml-var "packOpts.get('pack_days', 0)"> days at 
+     <dtml-var "packOpts.get('pack_hours', 0)">:<dtml-var "packOpts.get('pack_minutes',0)">. <br>
+     Removing revisions of objects that are older than <dtml-var "packOpts.get('pack_older',0)"> days.
+   </td>
+  </tr>
+
+  <tr>
+   <th valign="top" align="left"> Backup Zope database
+   </th>
+   <td>
+     Backup each 
+     <dtml-var "backupOpts.get('backup_days', 0)"> days at 
+     <dtml-var "backupOpts.get('backup_hours', 0)">:
+     <dtml-var "backupOpts.get('backup_minutes', 0)"> and store no more than
+     <dtml-var "backupOpts.get('backup_copies', 1)"> copies. <br>
+     Path to store backups: '<dtml-var "backupOpts.get('backup_path', '')">'
+   </td>
+  </tr>
+
+  <tr>
+   <th valign="top" align="left" colspan=2> These properties may be changed from Nausite.
+   </th>
+  </tr>
+
+</dtml-let>
+
+</table>
+<dtml-var manage_page_footer>

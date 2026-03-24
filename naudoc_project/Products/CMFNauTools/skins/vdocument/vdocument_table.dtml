@@ -1,0 +1,165 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_table.dtml,v 1.34 2004/07/23 07:23:30 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.34 $>
+
+<dtml-let container=this
+          uname="portal_membership.getAuthenticatedMember().getMemberName()"
+          table_columns=listColumnsMetadata
+          results="executeQuery(REQUEST)"
+>
+  <dtml-if total_count>
+    &dtml-results_count;&nbsp;<dtml-msg "entries of">&nbsp;&dtml-total_count;
+  </dtml-if>
+
+  <dtml-if "results_count > batch_size">
+    <dtml-var table_pages_list>
+  </dtml-if>
+
+  <dtml-in results size=batch_size start=qs>
+    <dtml-if sequence-start>
+      <form method="POST" action="&dtml-absolute_url;"  class="inline">
+        <table cellspacing="1" cellpadding="3" width="100%">
+        <tr class="row_title">
+          <td width="1%"></td>
+          <td width="1%"><dtml-msg "Chief user"></td>
+          <dtml-in table_columns mapping>
+          <td class="small" valign="middle" align="center">
+            <dtml-if "sort_on==id">
+              <dtml-if "sort_order == 'desc'">
+                <dtml-var sort_up.gif>
+              <dtml-elif "sort_order == 'asc'">
+                <dtml-var sort_down.gif>
+              </dtml-if>
+            </dtml-if>
+            <em>
+              <a class="navigate"
+                 href="<dtml-var "container.absolute_url(params={ 'sort_on': id
+                                                                , 'sort_order': sort_on==id and ('asc','desc')[sort_order=='asc'] or None
+                                                                })" html_quote>"
+              >
+                <dtml-msg expr=title>
+              </a>
+            </em>
+          </td>
+          </dtml-in>
+          <dtml-in listStepValues>
+            <td class="navigate" valign="middle" align="center">
+              &dtml-Title;
+            </td>
+          </dtml-in>
+        </tr>
+    </dtml-if>
+
+    <dtml-let entry=this
+              passed_steps=PassedSteps
+    >
+
+     <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+       <td class="small" nowrap>
+         <dtml-if "entry.allowed()">
+           <input type="checkbox" name="selected_entries:list" value="&dtml-getId;"/>
+         </dtml-if>
+
+         <a class="<dtml-var "entry.allowed() and 'nav' or 'navigate'">"
+            href="&dtml-absolute_url;"
+         >&gt;&gt;&gt;</a>
+         <dtml-if "uname == entry.getChiefUser()"><b>!</b></dtml-if>
+       </td>
+       <td nowrap>
+         <dtml-var getChiefUser fmt=member.brief>
+       </td>
+     <dtml-in table_columns mapping>
+       <td>
+         <dtml-var "entry_field_view( None, _
+                                    , name=name
+                                    , type=type
+                                    , value=entry.get(id, moniker=1)
+                                    )">
+       </td>
+     </dtml-in>
+
+     <dtml-let entry_step_id="entry.getStepId()"
+               enabled="entry.isEnabled()"
+               entry_state="enabled and 'enabled' or 'disabled'">
+       <dtml-in listStepValues>
+         <dtml-let step_id=sequence-number>
+           <td align="center" <dtml-if "not enabled">class="col_even"</dtml-if> />
+             <dtml-if "step_id in passed_steps">
+               <dtml-if "step_id <= entry_step_id">
+                 <img src='vdocument_step_passed_&dtml-entry_state;.gif'
+                      alt="<dtml-msg "step_passed"> (<dtml-msg expr="'vdocument_entry_%s' %entry_state">)"
+                 >
+               <dtml-else>
+                 <img src='vdocument_step_cancelled_&dtml-entry_state;.gif'
+                      alt="<dtml-msg "step_cancelled"> (<dtml-msg expr="'vdocument_entry_%s' %entry_state">)"
+                 >
+               </dtml-if>
+             <dtml-elif "step_id == entry_step_id">
+
+               <img src='vdocument_step_query_&dtml-entry_state;.gif' 
+                    alt="<dtml-msg "step_query"> (<dtml-msg expr="'vdocument_entry_%s' %entry_state">)"
+               >
+             </dtml-if>
+           </td>
+         </dtml-let>
+       </dtml-in>
+     </dtml-let>
+     </tr>
+    </dtml-let>
+
+    <dtml-if sequence-end>
+      </table>
+
+      <dtml-if "portal_membership.checkPermission('Modify portal content', this())">
+        <input type="submit" name="delEntries:method" value="<dtml-msg "Delete entry">">
+        <input type="button" 
+               name="selectAll" 
+               value="<dtml-msg "Select All">" 
+               onClick="toggleSelect(this.form['selected_entries:list'], this)">
+
+      </dtml-if>
+      </form>
+    </dtml-if>
+  <dtml-else>
+    <p>
+      <dtml-if total_count>
+        <dtml-msg "There are no entries matching your query">
+      <dtml-else>
+        <dtml-msg "There are no entries yet">
+      </dtml-if>
+    </p>
+  </dtml-in>
+
+  <dtml-if total_count>
+    <br/><br/>
+    <dtml-var "catalog_filter_form(None, _, filter_id=getUid(), filter=getFilter(REQUEST))">
+
+    <form method="GET" action="&dtml-absolute_url;" class="inline">
+      <input type="hidden"
+             name="apply_filter:boolean"
+             value="1"
+      />
+
+      <dtml-if "listAllowedStepKeys()">
+      <input type="checkbox"
+             name="filter_editable:boolean"
+             onClick="this.form.submit()"
+             <dtml-var "filter_editable" fmt=checked>
+      />
+      <label for="filter_editable:boolean"><dtml-msg "Show only editable entries"></label>
+      <br>
+      </dtml-if>
+
+      <input type="checkbox"
+             name="show_finalized:boolean"
+             onClick="this.form.submit()"
+             <dtml-var "show_finalized" fmt=checked>
+      />
+      <label for="show_finalized:boolean"><dtml-msg "Show finalized entries"></label>
+    </form>
+
+  </dtml-if>
+</dtml-let>

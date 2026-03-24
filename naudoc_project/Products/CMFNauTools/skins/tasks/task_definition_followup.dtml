@@ -1,0 +1,278 @@
+<dtml-let var_postfix="'var'"
+          vars="taskDefinitionArray['vars']"
+>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg "Task info">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-msg "Task title">
+    </td>
+    <td>
+       <input name="title" size="50"
+              value="<dtml-var "taskDefinitionArray['title']" html_quote>"
+       />
+       <br />
+       <input type="checkbox"
+              name="_allow_edit:list"
+              value="title"
+              <dtml-var "'title' in taskDefinitionArray['_allow_edit']" fmt=checked>
+       />
+       <dtml-msg "editable during state change">
+    </td>
+  </tr>
+  <tr class="row_even"> 
+    <td colspan="2"> 
+      <dtml-msg "Context variable's name">:
+      <input name="title_&dtml-var_postfix;" size="20"
+             value="<dtml-var "vars.get('title')" null>"
+      />
+    </td> 
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <dtml-var "involved_users_emb( this(),
+                                     task_definition_type=taskDefinitionArray['type'],
+                                     involved_users=taskDefinitionArray['involved_users'],
+                                     name='involved_users'
+                                   )"> 
+   
+
+      <table border="0">
+      <tr> 
+        <td> 
+          <input type="checkbox" 
+                 name="_allow_edit:list" 
+                 value="involved_users" 
+                 <dtml-var "'involved_users' in taskDefinitionArray['_allow_edit']" fmt=checked>
+          /> 
+          <dtml-msg "editable during state change"> 
+        </td> 
+      </tr>
+      <tr> 
+        <td> 
+          <input type="checkbox" 
+                 name="_full_userlist"
+                 value="1"
+                 <dtml-var "taskDefinitionArray['_full_userlist']" fmt=checked>
+          />
+          <dtml-msg "Display full user list during state change"> 
+        </td> 
+      </tr>
+      <tr class="row_even"> 
+        <td> 
+          <dtml-msg "Context variable's name">:
+          <input name="involved_users_&dtml-var_postfix;" size="20"
+                 value="<dtml-var "vars.get('involved_users')" null>"
+          />
+        </td> 
+      </tr>
+      </table>
+
+
+<dtml-if "taskDefinitionArray['type'] == 'followup_request' or
+          taskDefinitionArray['type'] == 'followup_signature_request'"
+>
+   </td>
+</tr>
+<tr class="row_title">
+  <td class="smallHeader" colspan="2">
+    <dtml-msg "Use confirmation queue">
+  </td>
+</tr> 
+<tr class="row_even">
+  <td colspan="2"> 
+    <input type="checkbox" name="confirm_by_turn" value="1" 
+           <dtml-var "taskDefinitionArray['confirm_by_turn']" fmt=checked>
+    > <dtml-msg "use confirmation queue">
+  </td>
+</tr>  
+<tr class="row_even"> 
+  <td colspan="2"> 
+    <input type="checkbox" 
+           name="_allow_edit:list" 
+           value="confirm_by_turn" 
+           <dtml-var "'confirm_by_turn' in taskDefinitionArray['_allow_edit']" fmt=checked> > 
+    <dtml-msg "editable during state change"> 
+  </td> 
+</tr> 
+<tr class="row_even">
+  <td colspan="2">
+    <dtml-msg "Context variable's name">:
+    <input name="confirm_by_turn_&dtml-var_postfix;" size="20"
+           value="<dtml-var "vars.get('confirm_by_turn')" null>"
+    />
+  </td>
+</tr> 
+<tr class="row_title">
+  <td class="smallHeader" colspan="2">
+    <dtml-msg "Notify every">
+  </td>
+</tr> 
+<tr class="row_even">
+  <td colspan="2">
+    <input type="checkbox" name="notification_level" id="notification_level" value="1"
+           <dtml-var "taskDefinitionArray['notification_level']" fmt=checked>
+    > <dtml-msg "notify every">
+  </td>
+</tr>
+<tr class="row_even"> 
+  <td colspan="2"> 
+    <input type="checkbox" 
+           name="_allow_edit:list" 
+           value="notification_level" 
+           <dtml-var "'notification_level' in taskDefinitionArray['_allow_edit']" fmt=checked> > 
+    <dtml-msg "editable during state change"> 
+  </td> 
+</tr> 
+
+</dtml-if>
+
+<dtml-if "taskDefinitionArray['type']=='followup_directive' or taskDefinitionArray['type'] == 'followup_information'" >
+  </td> 
+</tr> 
+<tr class="row_title"> 
+  <td class="smallHeader" colspan="2">
+    <dtml-msg "Alarm settings">
+  </td> 
+</tr> 
+
+<dtml-let default_alarm_settings="{'type': 'percents', 'value': 10,
+                                   'include_descr': False,
+                                   'note': msg('Task revision is needed')}"
+          add_mode="taskDefinitionArray['_mode'] == 'add'"
+          default="{'alarm_settings':add_mode and default_alarm_settings or taskDefinitionArray['alarm_settings']}">
+<dtml-var task_alarm_form>
+<tr class="row_even">
+  <td colspan="2">
+  <dtml-let checked="'alarm_settings' in taskDefinitionArray['_allow_edit'] and 'checked' or ''"> 
+    <input type="checkbox" name="_allow_edit:list" value="alarm_settings" &dtml-checked; /> <dtml-var "msg('editable during state change')"> 
+  </dtml-let>
+  </td>
+</tr>
+</dtml-let>
+
+<tr class="row_title"> 
+  <td class="smallHeader" colspan="2">
+    <dtml-msg "Supervisor">
+  </td> 
+</tr> 
+<tr class="row_even"> 
+  <td colspan="2"> 
+  <select id="supervisor_user" name="supervisor_user" size="8"> 
+    <option value="" <dtml-var "not taskDefinitionArray['supervisor_user']" fmt=selected>><dtml-var "msg('None')"> 
+  <dtml-comment>----------[ roles for docflow ]----------</dtml-comment>
+    <dtml-let roles="['VersionOwner', 'Owner']">
+      <dtml-in roles>
+        <dtml-let selected="_['sequence-item']==taskDefinitionArray['supervisor_user'][_.len('role:'):] and 'selected' or ''">
+        <option &dtml-selected; value="role:&dtml-sequence-item;"><dtml-var "msg('Role')">: <dtml-var "msg(_['sequence-item'])"></option>
+        </dtml-let>
+      </dtml-in>
+    </dtml-let>
+  <dtml-comment>----------[ /roles for docflow ]----------</dtml-comment>
+  <dtml-in "portal_membership.listSortedUserNames(portal_membership.listMemberIds())" mapping>
+    <dtml-let selected="_['sequence-item']['user_id']==taskDefinitionArray['supervisor_user'] and 'selected' or ''">
+      <option &dtml-selected; value="<dtml-var user_id>">
+        <dtml-var user_name>
+      </option>
+    </dtml-let>
+  </dtml-in>
+  </select>
+  <br />
+  <dtml-let checked="'supervisor_user' in taskDefinitionArray['_allow_edit'] and 'checked' or ''"> 
+    <input type="checkbox" name="_allow_edit:list" value="supervisor_user" &dtml-checked; /> <dtml-var "msg('editable during state change')"> 
+  </dtml-let>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <dtml-msg "Context variable's name">:
+      <input name="supervisor_user_&dtml-var_postfix;" size="20"
+             value="<dtml-var "vars.get('supervisor_user')" null>"
+      />
+      
+</dtml-if>
+    </td>
+  </tr>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+      <dtml-msg "Relative expiration date">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <dtml-var "entry_field_edit( None, _
+               , type='time_period'
+               , name='duration_time'
+               , value=taskDefinitionArray['duration_time']
+               )"
+      >
+    <br />
+    <dtml-let checked="'duration_time' in taskDefinitionArray['_allow_edit'] and 'checked' or ''">
+      <input type="checkbox" name="_allow_edit:list" value="duration_time" &dtml-checked;> <dtml-var "msg('editable during state change')">
+    </dtml-let>    
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <dtml-msg "Context variable's name">:
+      <input name="duration_time_&dtml-var_postfix;" size="20"
+             value="<dtml-var "vars.get('duration_time')" null>"
+      />
+    </td>
+  </tr>  
+
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+      <dtml-msg "Task description">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+       <textarea name="description" 
+                 rows="10" 
+                 cols="50"
+       ><dtml-var "taskDefinitionArray['description']"></textarea>
+       <br />
+        <dtml-let checked="'description' in taskDefinitionArray['_allow_edit'] and 'checked' or ''">
+         <input type="checkbox" name="_allow_edit:list" value="description" &dtml-checked; /> <dtml-var "msg('editable during state change')">
+        </dtml-let>
+
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2">
+      <dtml-msg "Context variable's name">:
+      <input name="description_&dtml-var_postfix;" size="20"
+             value="<dtml-var "vars.get('description')" null>"
+      />
+    </td>
+  </tr>
+  <tr class="row_title">
+    <td class="smallHeader" colspan="2">
+      <dtml-msg "Finalization condition">
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td colspan="2" class="small">
+      <dtml-let modes="portal_followup.listFinalizationModes()"
+                selected_mode="taskDefinitionArray['finalization_mode'] or modes and modes[0]"
+      >
+      <dtml-in modes>
+
+      <input id="finalization_mode_&dtml-sequence-item;"
+             type="radio"
+             name="finalization_mode" 
+             value="&dtml-sequence-item;"
+             <dtml-var "selected_mode==_['sequence-item']" fmt=checked>
+      />
+      <label for="finalization_mode_&dtml-sequence-item;"><dtml-msg expr=sequence-item></label>
+
+      <br>
+      </dtml-in>
+      </dtml-let>
+    </td>
+  </tr>
+</dtml-let>  

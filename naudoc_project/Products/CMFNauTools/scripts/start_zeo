@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# $Editor: vpastukhov $
+# $Id: start_zeo,v 1.2 2004/02/08 14:01:37 vpastukhov Exp $
+# $Revision: 1.2 $
+
+reldir=`dirname "$0"`
+reldir=`cd "$reldir" ; pwd`
+
+SOFTWARE_HOME="$reldir/lib/python"
+INSTANCE_HOME="$reldir"
+
+### begin configuration
+
+SOFTWARE_HOME="$SOFTWARE_HOME"
+INSTANCE_HOME="$INSTANCE_HOME"
+
+PYTHON="python2.2"
+PYTHON_OPTS="-O"
+
+ZEO_SERVER="$SOFTWARE_HOME/ZEO/start.py"
+ZEO_OPTS=""
+
+USER=zope
+ZEO_PORT=9100
+
+DATABASE="$INSTANCE_HOME/var/Data.fs"
+TMPDIR="/var/tmp"
+
+DEBUG=
+STUPID_LOG_FILE="$INSTANCE_HOME/var/Z2-zeo.log"
+STUPID_LOG_SEVERITY=0
+
+### end configuration
+
+export INSTANCE_HOME TMPDIR
+export STUPID_LOG_SEVERITY STUPID_LOG_FILE
+
+while getopts ":Du:p:" OPTNAME; do
+    case $OPTNAME in
+	D) unset DEBUG ;;
+	u) unset USER ;;
+	p) unset ZEO_PORT ;;
+    esac
+done
+
+umask 002
+trap "" HUP
+
+"${PYTHON}" ${PYTHON_OPTS} "${ZEO_SERVER}" \
+	${DEBUG:+-D} \
+	${USER:+-u $USER} \
+	${ZEO_PORT:+-p $ZEO_PORT} \
+	${DATABASE:+"$DATABASE"} \
+	$ZEO_OPTS "$@" &
+
+sleep 1

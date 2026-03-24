@@ -1,0 +1,61 @@
+<dtml-comment>
+$Id: datetime_form.dtml,v 1.17 2005/03/26 17:38:54 vsafronovich Exp $
+
+'date' - default date
+'date_only' - flag that prevents the time elements to be displayed in a form
+'prefix' - prefix that used in ids and names of form elements
+</dtml-comment>
+
+<dtml-revision $Revision: 1.17 $>
+
+<dtml-unless "REQUEST.get( '_datetime_form' )">
+<dtml-call "REQUEST.set( '_datetime_form', True )">
+
+<link id="calendar_css" rel="stylesheet" type="text/css" href="&dtml-portal_url;/calendar-win2k-cold-1.css" />
+
+<script type="text/javascript" src="&dtml-portal_url;/calendar.js"></script>
+<script type="text/javascript" src="&dtml-portal_url;/calendar-<dtml-var "msg.get_selected_language()">.js"></script>
+<script type="text/javascript" src="&dtml-portal_url;/calendar-setup.js"></script>
+
+<script type="text/javascript">
+<!--
+
+fieldEditHandler.calendar_params = new Array();
+
+// -->
+</script>
+
+</dtml-unless>
+
+<dtml-let
+    date="date and (_.same_type(date, '') and _.DateTime(date) or date) or ''"
+    date_only="_.has_key('date_only') and date_only or None"
+    format="date_only and '%d.%m.%Y' or '%d.%m.%Y %H:%M'"
+    date2="date and _.DateTime(_.str(date)).strftime(format)"
+    input_size="date_only and 12 or 20"
+    storeTime="date_only and 'false' or 'true'"
+    postfix="date_only and 'date_' or 'datetime_'"
+    >
+
+<input type="text" name="&dtml-prefix;:&dtml-postfix;" id="&dtml-prefix;_field" value="&dtml-date2;"
+       size="&dtml-input_size;" <dtml-var str_data missing>
+/>&nbsp;<input type="button" id="&dtml-prefix;_button" value="..." />
+
+<script type="text/javascript">
+<!--
+
+var params = {
+    'inputField' : '&dtml-prefix;_field',      // id of the input field
+    'button'     : '&dtml-prefix;_button',   // trigger for the calendar (button ID)
+    'ifFormat'   : 'dd.mm.y',   // date format that will be stored in the input field
+    'daFormat'   : 'dd.mm.y',   // the date format that will be used to display the date in displayArea
+    'storeTime'  : &dtml-storeTime;        // parse from input field time, and store it back (space delimiter)
+};
+
+fieldEditHandler.calendar_params.push( params );
+Calendar.setup( cloneObject(params) );
+
+// -->
+</script>
+
+</dtml-let>

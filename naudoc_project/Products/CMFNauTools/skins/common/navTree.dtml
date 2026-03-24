@@ -1,0 +1,55 @@
+<dtml-comment>
+$Editor: ypetrov $
+$Id: navTree.dtml,v 1.62 2006/05/16 10:04:58 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-let isArchive="_.get('arch') or 0">
+
+<dtml-if dynamic_item>
+  <dtml-jungle expr="portal_catalog.getObjectByUid(dynamic_item)"
+               urlparams="{'arch:int':isArchive}"
+               dynamic_item>
+    <dtml-let view_url="getURL(1)+'/inFrame?link=view&arch=%s' % isArchive"
+              meta_info="Title or id">
+      <dtml-var jungle_item>
+    </dtml-let>
+  </dtml-jungle>
+
+<dtml-else>
+
+<dtml-var simple_html_header>
+
+<dtml-if "not REQUEST.has_key('disable_dynamic')">
+
+  <dtml-comment>
+  Detecting dynamic-compartibility of client browser
+  </dtml-comment>
+  <script language="javascript">
+  location.replace( setParam( location.href
+                            , 'disable_dynamic:int'
+                            , (userAgent.hasXMLHTTP ? 0 : 1) ) );
+  </script>
+
+<dtml-else>
+
+  <dtml-jungle expr="portal_url.getPortalObject().getNavRoot(arch=isArchive)"
+               urlparams="{'arch:int':isArchive}"
+               implements="isPrincipiaFolderish"
+               sort_order=Title,id
+               dynamic="not disable_dynamic"
+               dynamic_item_id="navTree">
+    <dtml-let view_url="getURL(1)+'/inFrame?link=view&arch=%s' % isArchive"
+              meta_info="_.get('tree-level') and (Title or id) or
+                        msg(isArchive and 'Archival documents' or 'Accessible documents')">
+      <dtml-var jungle_item>
+    </dtml-let>
+
+  </dtml-jungle>
+
+</dtml-if>
+
+<dtml-var simple_html_footer>
+
+</dtml-if>
+
+</dtml-let>

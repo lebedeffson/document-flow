@@ -1,0 +1,154 @@
+
+<dtml-if "REQUEST.has_key('traverse_subpath') and traverse_subpath and meta_type == 'Subscription Root'">
+ <table>
+  <tr>
+   <td valign="top">
+
+
+<dtml-let user="getSubscribedUserInfo(REQUEST.get('subscribed_email', None))">
+
+  <table>
+    <tr>
+      <th colspan="2"><dtml-if user>Ваши данные
+        <dtml-else>Форма регистрации нового пользователя</dtml-if>
+
+      <br><br></th>
+    </tr>
+<form action="&dtml-absolute_url;" method="POST">
+   <dtml-in "	('Email*', 'email'),
+   		('Last name', 'lname'),
+   		('First name', 'fname'),
+   		('Middle name', 'mname'),
+   		('Company', 'company_name')
+   	    " prefix="words">
+    <tr>
+      <td><dtml-var "msg(words_key)"></td>
+      <td><input name="<dtml-var "words_item">"
+      type="<dtml-var "words_item in ['email_password', 'confirm'] and 'password' or 'text'">"
+      value="<dtml-var "user.get(words_item, '')">" /></td>
+    </tr>
+   </dtml-in>
+
+<dtml-comment>
+  <tr>
+    <td><dtml-var "msg('Delivery interval')">: </td>
+    <td>
+      <select name="periodicity:int">
+        <option value="1"><dtml-var "msg('By fact')"></option>
+        <option value="2"><dtml-var "msg('Once a week')"></option>
+        <option value="3"><dtml-var "msg('Once a month')"></option>
+      </select>
+    </td>
+  </tr>
+</dtml-comment>
+
+  <tr>
+    <td colspan="2">
+      <dtml-var "msg('Topics to subscribe')">*:
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <dtml-var "site_subscription_hierarchy(this(), parent_path=None, user=user)">
+    </td>
+  </tr>
+    <tr>
+      <td colspan="2">Примечание: поля, помеченные *, обязательны для заполнения.</td>
+    </tr>
+<dtml-if "user.get('aborted')">
+  <tr>
+    <td colspan="2">
+     <br><br>
+     <font color="red">В данный момент Ваша подписка прекращена.</font><br>
+     <input type="checkbox" name="renewSubscription" value="1" checked> Возобновить подписку
+    </td>
+  </tr>
+</dtml-if>
+    <tr>
+     <td colspan="2" align="right">
+      <dtml-if user>
+       <input name="subscription:method" type="submit" value="Изменить"/>
+       <input name="action" type="hidden" value="change" />
+       <input name="subpath" type="hidden" value="<dtml-var "_.string.join(traverse_subpath[:], '/')">"/>
+      <dtml-else>
+       <input name="subscription:method" type="submit" value="Подписаться"/>
+       <input name="action" type="hidden" value="subscribe" />
+       <input name="subpath" type="hidden" value="<dtml-var "_.string.join(traverse_subpath[:], '/')">"/>
+      </dtml-if>
+
+     </td>
+    </tr>
+
+
+</form>
+  </table>
+
+</dtml-let>
+
+
+
+   </td>
+
+<dtml-unless "REQUEST.get('subscribed_email', None)">
+
+   <td valign="top">
+  <table>
+    <tr>
+      <th colspan="2">Для зарегистрированных пользователей</th>
+    </tr>
+<form action="&dtml-absolute_url;" method="POST">
+    <tr>
+      <td>Email</td>
+      <td><input name="email" type="text"/></td>
+    </tr>
+    <tr>
+     <td colspan="2" align="right">
+       <input name="subscription:method" type="submit" value="Продолжить"/>
+       <input name="subpath" type="hidden" value="<dtml-var "_.string.join(traverse_subpath[:], '/')">"/>
+       <input name="action" type="hidden" value="loginSubscribed" />
+     </td>
+    </tr>
+</form>
+  </table>
+</dtml-unless>
+
+</dtml-if>
+
+
+<dtml-comment>
+  <br>
+  <table width="200">
+    <tr>
+      <th colspan="2">Забыли пароль?</th>
+    </tr>
+<form action="&dtml-absolute_url;" method="POST">
+    <tr>
+      <td>Email</td>
+      <td><input name="email" type="text" /></td>
+    </tr>
+
+    <tr>
+     <td colspan="2" align="right">
+       <input name="subscription:method" type="submit" value="Продолжить"/>
+       <input name="subpath" type="hidden" value="<dtml-var "_.string.join(traverse_subpath[:-1], '/')">"/>
+       <input name="action" type="hidden" value="lostPassword" />
+     </td>
+    </tr>
+</form>
+  </table>
+
+
+
+</dtml-comment>
+     </td>
+  </tr>
+ </table>
+
+
+
+
+<dtml-comment>
+<dtml-var site_html_header>
+
+<dtml-var site_html_footer>
+</dtml-comment>

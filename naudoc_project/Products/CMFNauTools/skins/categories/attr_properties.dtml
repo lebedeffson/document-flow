@@ -1,0 +1,141 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: attr_properties.dtml,v 1.12 2007/07/12 12:23:53 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.12 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-var simple_html_header>
+
+<dtml-if "not _.get('properties',0) and not _.get( 'construction', False )">
+<dtml-let id="REQUEST.get('id',None)"
+          category=this
+          attribute="id and category.getAttributeDefinition( id ) or None"
+          type="attribute and attribute.getHandlerId()"
+          multiple="attribute and attribute.isMultiple()"
+          properties="attribute and attribute.getProperties( default=None, uids=1 )"
+          default_value="attribute and attribute.getDefaultValue( moniker=True )"
+
+>
+  <dtml-if "id is not None">
+  <dtml-call "REQUEST.set('type', type),
+              REQUEST.set('properties', properties),
+              REQUEST.set('default', default_value),
+              REQUEST.set('multiple', multiple)
+  ">
+  </dtml-if>
+</dtml-let>
+</dtml-if>
+
+<dtml-with REQUEST>
+<dtml-let type="_.get('type')"
+          multiple="_.get( 'multiple', False )"
+          with_default="_.get( 'with_default', True )"
+          info="type and portal_metadata.getAttributeType( type )"
+          template_name="info and info.getTemplate('construction')"
+          properties="_.get( 'properties', {} )"
+          form_name="'properties_form'" 
+          construction="_.get( 'construction', False )">
+
+<form name="properties_form" action="&dtml-URL;" method="POST">
+
+<input type="hidden" name="construction:boolean" value="&dtml.null-construction;" />
+<input type="hidden" name="type:string" value="&dtml.null-type;" />
+<input type="hidden" name="multiple:boolean" value="<dtml-var "multiple and 'on' or ''">" />
+<input type="hidden" name="with_default:boolean" value="<dtml-var "with_default and 'on' or ''">" />
+
+<script type="text/javascript">
+<!--
+
+var parentFrame = getParentFrame( window );
+var targetID    = parentFrame.getAttribute('properties_table_id');
+var targetIndex = parseInt( parentFrame.getAttribute('properties_table_row') );
+var targetTable = getDocument( parentFrame ).getElementById( targetID );
+var formIndex   = null;
+var copiedCount = null;
+var formSubmit  = false;
+
+function changeValueType( type, multiple, with_default )
+{
+    var form = this.document.forms['properties_form'];
+
+    form.elements['type:string'].value = type;
+    form.elements['multiple:boolean'].value = multiple ? 'on' : '';
+    form.elements['with_default:boolean'].value = with_default ? 'on' : '';
+
+    runCallbacks( 'onSubmit', form );
+    form.submit();
+
+    return true;
+}
+
+function updateValueProperties( source )
+{
+    var form = this.document.forms['properties_form'];
+    copyFormItems( source, form, formIndex, 4 );
+    runCallbacks( 'onSubmit', form );
+    form.submit();
+    return true;
+}
+
+
+registerCallback(
+        window, 'onLoad',
+        function (ev) {
+            var source = this.document.getElementsByTagName('table')[0];
+            formIndex = this.parent.document.forms[0].elements.length - 2; // XXX
+            copiedCount = appendTableRows( source, targetTable, null, targetIndex );
+            this.parent.fieldEditHandler.update( this.fieldEditHandler );
+            // XXX not cool
+            this.parent.link_callback = this.link_callback;
+            if (this.Calendar) {
+                this.parent.Calendar = this.Calendar;
+                copyStyleSheet( this.document.getElementById('calendar_css'), this.parent.document );
+                var params_array = fieldEditHandler.calendar_params;
+                for (var i = 0; i < params_array.length; i++)
+                    this.parent.Calendar.setup( cloneObject(params_array[i]), this.parent.document );
+            }
+        }
+    );
+  
+registerCallback(
+        window, 'onUnload',
+        function (ev) {
+            if (! formSubmit)
+                deleteTableRows( targetTable, targetIndex, copiedCount );
+            copiedCount = null;
+        }
+    );
+
+// -->
+</script>
+
+<table>
+
+<dtml-if template_name>
+<dtml-var "_.getitem( template_name, 0 )( None, _ )">
+</dtml-if>
+
+<dtml-if "with_default and type and not (info.isDerived() and info.isReadOnly())">
+  <tr valign="top">
+    <td><dtml-msg "Default value"></td>
+    <td><dtml-var "entry_field_edit( None, _,
+                                     type=type,
+                                     multiple=multiple,
+                                     name='default',
+                                     value=not _.get( 'construction', False ) and  _.get('default')
+                                           or None,
+                                     properties=properties,
+                                   )">
+    </td>
+  </tr>
+</dtml-if>
+
+</table>
+
+</form>
+
+</dtml-let>
+</dtml-with>
+<dtml-var simple_html_footer>

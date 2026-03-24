@@ -1,0 +1,51 @@
+<dtml-comment>
+
+'left_name' - selectbox left id
+'right_name' -selectbox right id
+'size' - selectboxs size
+'multiple' - multiple param, half implemented yet
+'left_options' - available list of the left options ( id, title )
+'right_options' - available list of the right options ( id, title )
+'left_value' - preselected left options
+'right_value' - preselected right options
+
+$Editor: vsafronovich $
+$Id: dual_selectbox_template.dtml,v 1.1 2005/04/30 13:39:24 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.1 $>
+
+<td style="width:45%; height:100%;" valign="top">
+  <dtml-var "selectbox( None, _
+                      , name=left_name
+                      , options=left_options
+                      , value=_.get('left_value', None)
+                      , on_dbl_click='addSelectionToList( %s, %s );'%(left_name, right_name)
+                      )">
+</td>
+<td style="width:10%;">
+  <input type="button"
+         value=" &gt;&gt; " 
+         onClick="addSelectionToList( &dtml-left_name;, &dtml-right_name; );" />
+  <br />
+  <input type="button"
+         value=" &lt;&lt; "
+         onClick="deleteSelectionFromList( &dtml-right_name; );" />
+  <br /><br />
+  <input type="button"
+         value="<dtml-msg "Move up">"
+         onClick="upSelectionInList( &dtml-right_name; );" />
+  <br />
+  <input type="button"
+         value="<dtml-msg "Move down">"
+         onClick="downSelectionInList( &dtml-right_name; );" />
+</td>
+<td style="width:45%; height:100%;" valign="top">
+  <dtml-var "selectbox( None, _
+                      , name=right_name
+                      , options=right_options
+                      , value=_.get('right_value', None)
+                      , on_dbl_click='deleteSelectionFromList( %s );' % right_name
+                      )">
+</td>
+

@@ -1,0 +1,12 @@
+<dtml-let container="implements('isHTMLDocument') and this() or getBase()">
+<dtml-var "container.CookedBody()">
+<dtml-in "container.listCategoryAttributes( monikers=True )" prefix="a">
+  <dtml-var "a_key.getId()"><dtml-var a_item>
+</dtml-in>
+
+<dtml-if "REQUEST.has_key('include_attachments')">
+  <dtml-in "container.listAttachments()" prefix="s">
+    <dtml-var "s_item.RawBody()">
+  </dtml-in>
+</dtml-if>
+</dtml-let>

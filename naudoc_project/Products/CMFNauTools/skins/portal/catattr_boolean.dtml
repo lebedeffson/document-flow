@@ -1,0 +1,20 @@
+<h4><dtml-msg expr="attr.Title()"></h4>
+<input type="checkbox" id="&dtml-name;" value="1" <dtml-var "value and value[0]=='true'" fmt="checked">>
+<dtml-msg "Yes/No">
+<br />
+<script type="text/javascript">
+<!--
+
+function Return()
+{
+    opener.&dtml-callback_function;( '&dtml-callback_form;',
+                                     '&dtml-cat_id;',
+                                     '&dtml-attr_id;',
+                                     '&dtml-type;',
+                                     document.getElementById('&dtml-name;').checked,
+                                     document.getElementById('child').checked
+                                   );
+}
+
+//-->
+</script>

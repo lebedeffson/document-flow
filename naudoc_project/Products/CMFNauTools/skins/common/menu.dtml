@@ -1,0 +1,173 @@
+<dtml-comment>
+$Id: menu.dtml,v 1.68 2007/10/01 08:46:12 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.68 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', 'menu')">
+<dtml-var simple_html_header>
+
+<dtml-let rel_portal_url="getPortalObject().relative_url">
+<script type="text/javascript">
+<!--
+
+var currentSection = '<dtml-var "REQUEST.get( 'where', 'navTree' )">',
+  navTree_url = setParam( '<dtml-var "rel_portal_url( action='navTree' )"
+                                     fmt=jscript>'
+                        , 'disable_dynamic:int'
+                        , (userAgent.hasXMLHTTP ? 0 : 1)
+                        ),
+  archTree_url = setParam( navTree_url, 'arch:int', 1 ),
+  followup_url = setParam( '<dtml-var "rel_portal_url( action='followup_menu' )"
+                                     fmt=jscript>'
+                        , 'disable_dynamic:int'
+                        , (userAgent.hasXMLHTTP ? 0 : 1)
+                        );
+
+//TODO: move this to action information
+var menuSections = 
+{
+  'navTree' : navTree_url,
+  'followup_menu' : followup_url,
+  'user' : '<dtml-var "rel_portal_url( action='listGroupActions', params={'type':'user'} )"
+                      fmt=jscript>',
+  'global' : '<dtml-var "rel_portal_url( action='listGroupActions', params={'type':'global'} )"
+                        fmt=jscript>',
+  'search' : '<dtml-var "rel_portal_url( action='search_form' )" fmt=jscript>',
+  'ArchTree' : archTree_url,
+  'help' : '<dtml-var "rel_portal_url( action='listGroupActions', params={'type':'help'} )"
+                       fmt=jscript>',
+  'favorites' : '<dtml-var "rel_portal_url( action='member_favorites' )" fmt=jscript>'
+};
+
+var buttonImages = [
+	'search_over.gif', 'search.gif'
+    ];
+
+preloadImages( buttonImages );
+
+function changeImage( section, prefix )
+{
+    // to id added _ to avoid conflict with search_form.search input    
+    var img = document.getElementById( section + '_' );
+    if (img)
+        img.src = portalImagesURL + '/' + img.name + '_' + prefix + '.gif';
+}
+
+function reload( section, update )
+{
+    if ( update && section != currentSection )
+        return false;
+
+    changeImage( currentSection, 'off' );
+    changeImage( section, 'on' );
+   
+    link = menuSections[ section ];
+
+    if ( !link ) 
+        window.frames.menuTree.location.reload( 1 );
+    else
+        window.frames.menuTree.location.replace( link );
+    
+    currentSection = section;
+    return false;
+}
+
+function loadMenuItem( menuframe )
+{
+    if ( menuframe.menuItemLoaded )
+       return;
+
+    var link = '<dtml-var link fmt=jscript missing>';
+    menuframe.src = link || menuSections[ currentSection ];
+
+    menuframe.menuItemLoaded = true;
+}
+
+//-->
+</script>
+
+<table style="border: 1px solid #FFFFFF;
+       border-right-color: #999999;
+       border-bottom-color: #999999; 
+       width: 100%; height: 100%;"
+       cellspacing="0" cellpadding="0"> 
+  <tr>
+    <td style="padding: 0 5px 0 5px;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <form name="search_form" 
+                action="<dtml-var "relative_url( action='search_query' )">"
+                method="POST"
+                target="workspace"
+                onSubmit="return validateForm( this, 1 );">
+
+          <input type="hidden" name="mode" value="simple" />
+          <td>
+            <img src="&dtml-rel_portal_url;/naudoclogo.gif" alt="Logo" />
+          </td>
+          <td width="100%" nowrap>
+            <input type="text"
+                   name="text:search" 
+                   class="search" 
+                   value="&dtml.missing.html_quote-text;"
+                   title="<dtml-msg search.syntax_tip newlines=0>"
+                   size="10" />
+          </td>
+          <td>
+            <input type="image"
+                   name="search"
+                   src="&dtml-rel_portal_url;/search.gif" 
+                   onMouseOver='change(this,1);'
+                   onMouseOut='change(this,2);' />
+          </td>
+          </form>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 0 5px 0 5px;" width="100%">
+     <table cellspacing="0" cellpadding="0" border="0">
+      <tr>
+       <dtml-let curr_section="REQUEST.get('where','navTree')"
+       >
+       <dtml-in "portal_actions.listFilteredActionsFor(this())['menu']" mapping>
+         <td>
+           <a href="about:blank" target="menuTree"
+              onClick="return reload( '&dtml-id;' );"
+              onMouseOver="this.style.backgroundColor = '#f2f2f2';
+                           return setStatus('<dtml-msg expr=name>');"
+              onMouseOut="this.style.backgroundColor = 'transparent'; resetStatus();">
+             <img id="&dtml-id;_"
+                  name="&dtml-icon;" 
+                  src="&dtml-rel_portal_url;/&dtml-icon;_<dtml-var "curr_section==id and 'on' or 'off'">.gif"
+                  width="34" height="32" alt="<dtml-msg expr=name>"
+                  style="display: block;" />
+           </a>
+         </td>
+       </dtml-in>
+       </dtml-let>
+      </tr>
+     </table>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top" width="100%" height="100%" 
+        style="background-color: white; padding:0 5px 5px 5px;">
+      <iframe name="menuTree" 
+              src="about:blank"
+              width="100%" height="100%" 
+              scrolling="auto" frameborder="0"
+              onLoad="loadMenuItem( this );"
+              style="border: 1px solid #CCCCCC;
+                     border-left-color: #999999;
+                     border-top: none;">
+        <dtml-msg "Sorry, your browser does not support frames">
+      </iframe>
+    </td>
+  </tr>
+</table>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

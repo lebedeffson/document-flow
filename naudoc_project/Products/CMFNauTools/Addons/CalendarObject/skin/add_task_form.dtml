@@ -1,0 +1,154 @@
+<dtml-comment>
+Form for add task
+$Editor: spinagin $
+$Id: add_task_form.dtml,v 1.3 2007/07/03 12:18:52 adolgushin Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.3 $>
+
+<script type="text/javascript" src="&dtml-portal_url;/entry_field_scripts.js"></script>
+<script type="text/javascript">
+<!--
+function procChanged(proc_field){
+    var  state_box=document.getElementById('state');
+
+    if (proc_field.value<0) proc_field.value=0;
+    if (proc_field.value>100) proc_field.value=100;
+
+    if (proc_field.value==100) state_box.value='Finished';
+
+    if ((proc_field.value<100)&&(state_box.value=='Finished')) state_box.value='Start';
+    if ((proc_field.value>0)&&(state_box.value=='Not start')) state_box.value='Start';
+
+}
+
+function stateChanged(state_field){
+    var  proc_field=document.getElementById('ready_proc');
+    if (state_field.value=='Finished') proc_field.value=100;
+    if (state_field.value=='Not start') proc_field.value=0;
+}
+
+function incProc(){
+    var proc_field=document.getElementById('ready_proc');
+    var new_val=0;
+    if (proc_field.value<100) new_val=100
+    if (proc_field.value<75) new_val=75
+    if (proc_field.value<50) new_val=50
+    if (proc_field.value<25) new_val=25
+
+    if (new_val!=0) proc_field.value=new_val;
+    procChanged(proc_field)
+}
+
+function decProc(){
+    var proc_field=document.getElementById('ready_proc');
+    var new_val=100;
+    if (proc_field.value>0) new_val=0
+    if (proc_field.value>25) new_val=25
+    if (proc_field.value>50) new_val=50
+    if (proc_field.value>75) new_val=75
+
+    if (new_val!=100) proc_field.value=new_val;
+    procChanged(proc_field)
+}
+
+function validateForm( form ){
+title_field=form.title.value;
+text_field=form.text.value;
+
+if (!title_field && !text_field) {
+    alert('<dtml-msg "Specify title or text">');
+    return false;}
+
+return true;
+}
+
+//-->
+</SCRIPT>
+
+<dtml-let ch_task="REQUEST.has_key('changed_task_id') and getTask(REQUEST['changed_task_id']) or None"
+>
+<form action="add_task" method="POST" name="add_task_form" onSubmit="return validateForm(this);">  
+
+  <dtml-if "skin_version=='1.0'">
+  <table width="100%" border="0" cellpadding="2" cellspacing="1">
+    <tr class="row_odd">
+      <td><b><dtml-msg "Add task"></b></td>
+    </tr>
+  </table>
+  <dtml-var ramka_header>
+  </dtml-if>
+
+  <table cellpadding="2" cellspacing="0" border="0">
+
+    <dtml-if "skin_version=='0.1'">
+    <tr>  
+      <td align="center"  colspan="2">
+          <font color="#6F91D8"><b>
+            <dtml-if ch_task>
+              <dtml-msg "Change task">
+            <dtml-else>
+              <dtml-msg "Add task">
+            </dtml-if>
+            </b></font>
+      <td align="right"> <dtml-if "not show_tasks"><a href="javasript:changeAddForm()" onClick="eval(href); return false"> <img src="&dtml-portal_url;/external_editor.gif" ></a></dtml-if>
+    </dtml-if>
+    <tr>
+      <td align="left" width="100%"><b><dtml-msg "Task title"></b>
+      <td align="left" colspan="2"><input type="text" name="title" size="58" value="<dtml-var "ch_task and ch_task.title() or ''">">
+    <tr>
+      <td align="left"><b><dtml-msg "Task description"></b>
+      <td align="left" colspan="2"><textarea name="text" rows="5" cols="57"><dtml-var "ch_task and ch_task.getTaskText() or ''"></textarea>
+    <tr>
+      <td align="left"><b><dtml-msg "Plan date"></b>
+      <td align="left" valign="middle">
+         <dtml-var "datetime_form( this()
+                    , prefix='plan_date'
+                    , date_only = True
+                    , date=ch_task and ch_task.getTaskPlanDate() or _.DateTime()
+                             )"
+         >
+           
+    <tr>
+      <td align="left"><b><dtml-msg "Priority">:</b>
+      <td align="left" colspan="2">
+        <select name="priority">
+          <option value="1" <dtml-var "ch_task and ch_task.priority()=='1'" fmt="selected">><dtml-msg "Small" ></option>
+          <option value="2" <dtml-var "ch_task and ch_task.priority()=='2'" fmt="selected">><dtml-msg "Normal"></option>
+          <option value="3" <dtml-var "ch_task and ch_task.priority()=='3'" fmt="selected">><dtml-msg "High"></option>
+        </select>
+    <tr>
+      <td align="left"><b><dtml-msg "State">:</b>
+      <td align="left">
+        <select name="state" onChange="stateChanged(this)">
+          <dtml-in "listCalendarTaskStates()">
+          <option value="&dtml-sequence-item;"
+                  <dtml-var "ch_task and ch_task.state()==_['sequence-item']" fmt="selected">
+          ><dtml-msg expr="_['sequence-item']"></option>
+          </dtml-in>
+        </select>
+      <td>
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr><td rowspan="2"><b><dtml-msg "Ready">:</b>&nbsp;
+              <td rowspan="2">
+                <input type="text" name="ready_proc:int" id="ready_proc" value="<dtml-var "ch_task and ch_task.ready_proc()or 0">" size="3" onKeyUp="procChanged(this)" onBlur="return fieldEditHandler.int_check(this)">%
+              <td align="center"><a href="javascript:incProc();" onClick="eval(href); return false" class="navigate">  + </a>
+          <tr><td align="center"><a href="javascript:decProc();" onClick="eval(href); return false" class="navigate">  - </a>
+        </table>
+    <tr>
+      <td align="left"><b><dtml-msg "Public"></b>
+      <td align="left" valign="middle" colspan=2>
+        <dtml-let checked="(ch_task and ch_task.isPublic()) or (not ch_task and public_default_check)"
+        >
+        <input type="checkbox" name="is_public" value="1"  <dtml-var "checked" fmt="checked"> />
+        </dtml-let>
+        &nbsp;&nbsp;&nbsp;&nbsp;<input name="save_button" type="submit" value="<dtml-msg "Change">" style="display:<dtml-var "ch_task">;"> <input name="add_button" type="submit" value="<dtml-msg "Add">">
+  </table>
+  <dtml-if "skin_version=='1.0'">
+    <dtml-var ramka_footer>
+  </dtml-if>
+  <input type="hidden" value="<dtml-var "ch_task and ch_task.getId() or ''">" name="id">
+
+</form>
+
+</dtml-let>

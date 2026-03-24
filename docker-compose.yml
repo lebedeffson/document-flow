@@ -1,0 +1,14 @@
+services:
+  naudoc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: naudoc34
+    ports:
+      - "8080:8080"
+    user: "1000:1000"
+    volumes:
+      - ./naudoc_project/Products:/opt/naudoc/Products
+      - ./naudoc_project/zopeedit:/opt/naudoc/lib/python/zopeedit
+      - ./naudoc_project/var/Data.fs:/opt/naudoc/var/Data.fs
+    restart: unless-stopped

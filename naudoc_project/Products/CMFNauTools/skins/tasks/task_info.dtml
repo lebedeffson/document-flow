@@ -1,0 +1,221 @@
+<dtml-comment>
+$Id: task_info.dtml,v 1.38 2008/04/08 10:51:34 oevsegneev Exp $
+$Editor: ikuleshov $
+</dtml-comment>
+
+<dtml-let schedule="implements('isRecurrentTask') and getSchedule()"
+          editable="not _.has_key('editable') and isCreator() and not isFinalized() or _.has_key('editable') and _.getitem('editable')"
+          periodical="not not schedule"
+          brains_type=BrainsType
+          brains_tti="portal_followup.getTaskType(brains_type)"
+          uname="portal_membership.getAuthenticatedMember().getUserName()"
+          task_uid="getUid()">
+
+<dtml-if editable>
+<form method="post" action="&dtml-absolute_url;"
+      style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;">
+  <input type="hidden" name="periodical:boolean" value="&dtml-periodical;">
+</dtml-if>
+  <table cellpadding=2>
+  <tr class="task_title">
+    <td class="smallHeader" colspan="2">
+       <dtml-msg expr="brains_tti.getProperty('title')"> 
+       <dtml-if schedule><img src='timer.gif' alt="<dtml-msg "Scheduled task">"/></dtml-if>
+       <dtml-if "implements('isRequestTask') and isOrdered()">(<dtml-msg task.request_ordered>)</dtml-if>
+    </td>
+  </tr>
+
+  <tr class="row_even">
+    <td class="smallHeader">
+       <dtml-msg "Description">:
+    </td>
+    <td class="small">
+       <dtml-var Description newline_to_br>
+    </td>
+  </tr>
+
+<dtml-in listAttachedFiles>
+ <dtml-if sequence-start>
+  <tr class="row_even">
+    <td class="smallHeader">
+       <dtml-msg "Suggested file">:
+    </td>
+	<td class="smallHeader">
+		<table border="0" cellpadding="2" cellspacing="0" width="100%" class="List">
+  </dtml-if>
+        <tr>
+         <td>
+           <a href="&dtml-relative_url;" target="_blank">
+             <dtml-if icon>
+              <img src="&dtml-portal_url;/&dtml-icon;" alt="&dtml-meta_type;"
+                     title="&dtml-meta_type;" border="0"/>
+             <dtml-else>&nbsp;</dtml-if>
+             &dtml-title_or_id;</a> (<dtml-var "'%.1f' % (get_size() / 1024.0)"> Kb)
+         </td>
+         <td align=right valign=middle nowrap>
+          <dtml-if isLocked>
+            <span class="resolution"><dtml-msg "Editing by">&nbsp;<dtml-var getLockCreator fmt=member></span>
+          <dtml-else>
+            <dtml-var external_edit_link>
+          </dtml-if>
+         </td>
+        </tr>
+ <dtml-if sequence-end>
+ 		</table>
+     </td>
+  </tr>
+ </dtml-if>
+</dtml-in>
+
+  <tr class="row_even">
+    <td class="smallHeader">
+       <dtml-msg "Assigned by">:
+    </td>
+    <td class="small">
+       <dtml-var Creator fmt=member>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="smallHeader">
+       <dtml-msg "Effective date">:
+    </td>
+    <td class="small" nowrap>
+           <dtml-var "effective_date" fmt="%Y-%m-%d %H:%M">
+    </td>
+  </tr>
+     <tr class="row_even">
+       <td class="smallHeader">
+          <dtml-msg "Expiration date">:
+       </td>
+       <td class="small" nowrap>
+          <dtml-var "expiration_date" fmt="%Y-%m-%d %H:%M">
+
+          <dtml-if "_.DateTime() > expiration_date and not isFinalized()">
+            <b><dtml-msg "expired"></b>
+          </dtml-if>
+       </td>
+     </tr>
+<dtml-if "implements('isDirectiveTask')">
+<dtml-let plan_time="getPlanTime()"
+          actual_time="getActualTimeFor(uname)">
+<dtml-if plan_time>
+     <tr class="row_even">
+      <td class="smallHeader">
+         <dtml-msg "Plan time">:
+      </td>
+      <td class="small" nowrap>
+           <dtml-var "dateperiod(getPlanTime())">
+       </td>
+     </tr>
+</dtml-if>
+
+ <dtml-if actual_time>
+     <tr class="row_even">
+      <td class="smallHeader">
+         <dtml-msg "Actual time">:
+      </td>
+      <td class="small" nowrap>
+           <dtml-var "dateperiod(actual_time)">
+       </td>
+     </tr>
+ </dtml-if>
+</dtml-let>
+</dtml-if>
+
+<dtml-if periodical>
+     <tr class="row_even">
+      <td class="smallHeader">
+         <dtml-msg "Schedule">:
+      </td>
+      <td class="small">
+           <dtml-var temporal_expr newline_to_br>
+       </td>
+     </tr>
+     <tr class="row_even">
+      <td class="smallHeader">
+         <dtml-msg "Duration">:
+      </td>
+      <td class="small" nowrap>
+         <dtml-var "dateperiod(duration)">
+      </td>
+     </tr>
+     <dtml-if schedule>
+     <dtml-let next="schedule.getNextOccurenceDate()">
+     <tr class="row_even">
+       <td class="smallHeader">
+          <dtml-msg "Next time">:
+       </td>
+       <td class="small" nowrap>
+         <dtml-if next><dtml-var "next.strftime('%x %X')">
+         <dtml-else><dtml-msg never></dtml-if>
+       </td>
+     </tr>
+     </dtml-let>
+     </dtml-if>
+</dtml-if>
+     <dtml-if "Supervisor()">
+     <tr class="row_even">
+       <td class="smallHeader">
+          <dtml-msg "Supervisor">:
+       </td>
+       <td class="small">
+         <dtml-var Supervisor fmt=member>
+       </td>
+     </tr>
+     </dtml-if>
+
+     <dtml-let do_sort="not (implements('isRequestTask') and isOrdered())"
+               involved_users="portal_membership.listSortedUserNames( listInvolvedUsers(), do_sort=do_sort )"     
+     >
+     <dtml-if involved_users>
+     <tr class="row_even">
+       <td class="smallHeader">
+          <dtml-msg "Involved members">:
+       </td>
+       <td>
+        <table width="100%" cellpadding="0" cellspacing="0">
+         <tr>
+          <td class="small">
+            <dtml-in involved_users mapping>
+                 <dtml-var user_id fmt=member>
+   	    <br>
+            <dtml-if "(_['sequence-length'] > 10) and _['sequence-index'] == _['sequence-length'] / 2">
+             <dtml-comment> End of first column </dtml-comment>
+             </td>
+   	  <td width="1"><dtml-var spacer.gif></td>
+             <td class="small">
+            </dtml-if>
+           <dtml-else>
+                -
+           </dtml-in>
+         </td>
+        </tr>
+       </table>
+       </td>
+     </tr>
+     </dtml-if>
+     </dtml-let>
+
+     <tr class="row_even">
+       <td class="smallHeader">
+          <dtml-msg "Finalization condition">:
+       </td>
+       <td class="small">
+         <dtml-msg expr=getFinalizationMode>
+       </td>
+     </tr>
+
+     <tr class="row_even">
+       <td class="smallHeader" colspan="2" align="right">
+         <dtml-if editable>
+           <input type="submit" name="<dtml-var "getTypeInfo().getActionById( 'edit' )">:method" value="<dtml-msg Change>">
+         </dtml-if>
+      </td>
+     </tr>
+  </table>
+
+<dtml-if editable>
+</form>
+</dtml-if>
+
+</dtml-let>

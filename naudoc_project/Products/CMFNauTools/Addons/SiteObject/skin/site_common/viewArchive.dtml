@@ -1,0 +1,141 @@
+<dtml-var site_html_header>
+
+<dtml-let archive="listArchive(REQUEST)">
+
+
+<dtml-if "archiveProperty()=='None'">
+ <dtml-in archive prefix="doc" reverse>
+    <a class="menu" href="&dtml-heading_external_url;/<dtml-var "doc_item['id']">?archive=1"><dtml-var "doc_item['title']"></a><br>
+ </dtml-in>
+
+<dtml-elif "archiveProperty()=='byYear'">
+<ul>
+ <dtml-in archive prefix="doc">
+    <dtml-if "doc_item.has_key('id')">
+       &nbsp;&nbsp;<a class="menu" href="&dtml-heading_external_url;/<dtml-var "doc_item['id']">?archive=1&year=<dtml-var "doc_item['year']">"><dtml-var "doc_item['title']"></a><br>
+    <dtml-elif "doc_item.has_key('opened')">
+       <li>
+       <i class="menu"><dtml-var "msg(doc_item['year'])"></i> (<dtml-var "msg('Documents')">: <dtml-var "doc_item['number_of_document']">)<br>
+    <dtml-else>
+        <li>
+        <a class="menu" href="&dtml-heading_external_url;/viewArchive?year=<dtml-var "doc_item['year']">"><dtml-var "doc_item['year']"></a>  (<dtml-var "doc_item['number_of_document']">)<br>
+    </dtml-if>
+ </dtml-in>
+</ul>
+
+<dtml-elif "archiveProperty()=='byMonth'">
+<ul>
+<ul>
+ <dtml-in archive prefix="doc">
+    <dtml-if "doc_item.has_key('id')">
+       &nbsp;&nbsp;<a class="menu" href="&dtml-heading_external_url;/<dtml-var "doc_item['id']">?archive=1&year=<dtml-var "doc_item['year']">&month=<dtml-var "doc_item['month']">"><dtml-var "doc_item['title']"></a><br>
+    <dtml-elif "doc_item.has_key('opened') and doc_item.has_key('month')">
+<dtml-let mo="['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']">
+       <li>
+        <i class="menu"><dtml-var "msg(mo[ _.int(doc_item['month'])-1 ])"></i> (<dtml-var "msg('Documents')">: <dtml-var "doc_item['number_of_document']">)<br>
+</dtml-let>
+    <dtml-elif "doc_item.has_key('month')">
+<dtml-let mo="['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']">
+        <li>
+          <a class="menu" href="&dtml-heading_external_url;/viewArchive?year=<dtml-var "doc_item['year']">&month=<dtml-var "doc_item['month']">"><dtml-var "msg(mo[ _.int(doc_item['month'])-1 ])"></a> (<dtml-var "msg('Documents')">: <dtml-var "doc_item['number_of_document']">)<br>
+</dtml-let>
+    <dtml-elif "doc_item.has_key('year') and doc_item.has_key('opened')">
+        </ul>
+        <li>
+        <i class="menu"><dtml-var "doc_item['year']"></i> (<dtml-var "msg('Documents')">: <dtml-var "doc_item['number_of_document']">)<br>
+        <ul>
+    <dtml-elif "doc_item.has_key('year')">
+        </ul>
+        <li>
+        <a class="menu" href="&dtml-heading_external_url;/viewArchive?year=<dtml-var "doc_item['year']">"><dtml-var "doc_item['year']"></a> (<dtml-var "msg('Documents')">: <dtml-var "doc_item['number_of_document']">)<br>
+        <ul>
+    </dtml-if>
+ </dtml-in>
+</ul>
+</ul>
+
+<dtml-elif "archiveProperty()=='byDay'">
+
+<dtml-if "REQUEST.has_key('day')">
+<dtml-in archive prefix="doc">
+&nbsp;&nbsp;<a class="menu" href="&dtml-heading_external_url;/<dtml-var "doc_item['id']">?archive=1&year=<dtml-var "doc_item['year']">&month=<dtml-var "doc_item['month']">&day=<dtml-var "doc_item['day']">"><dtml-var "doc_item['title']"></a><br>  
+<dtml-else>
+no publication
+</dtml-in>
+<dtml-else>
+
+<dtml-if "not REQUEST.has_key('year')">
+   <dtml-call "REQUEST.set('year', _.str(_.DateTime().year()))">
+</dtml-if>
+<dtml-if "not REQUEST.has_key('month')">
+   <dtml-call "REQUEST.set('month', _.str(_.DateTime().month()))">
+</dtml-if>
+
+<dtml-if "_.DateTime(_.int(year), _.int(month), 1).dow_1()==1">
+  <dtml-call "REQUEST.set('day_of_week', 6)">
+<dtml-else>
+  <dtml-call "REQUEST.set('day_of_week', _.DateTime(_.int(year), _.int(month), 1).dow_1()-2)">
+</dtml-if>
+<dtml-call "REQUEST.set('days_in_month', ((_.int(month) < 12 and _.DateTime(_.int(year) + (_.int(month)==12), (_.int(month))%12+1, 1).dayOfYear())
+                or (_.int(month)==12 and _.DateTime(_.int(year), _.int(month), 31).dayOfYear()+1) )
+                - _.DateTime(_.int(year), _.int(month), 1).dayOfYear())">
+
+<dtml-let mo="['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']">
+   <dtml-var "msg(mo[_.int(month)-1])"> (<dtml-var "msg('Documents')">: <dtml-var "archive['number_of_documents_by_month']">)<br>
+</dtml-let>
+
+<table>
+<tr>
+<dtml-in "['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']" prefix="d">
+<td><dtml-var "msg(d_item)"></td>
+</dtml-in>
+</tr>
+<tr><td colspan=7><hr size=1></td></tr>
+
+<dtml-in "_.range(0, 6)" prefix="row">
+<tr>
+  <dtml-in "_.range(0, 7)" prefix="col">
+    <td>
+       <dtml-if "(row_item*7+col_item) >= day_of_week and ((row_item*7+col_item)-day_of_week < days_in_month)">
+         <dtml-if "col_item==6"><font color="red"></dtml-if>
+         <dtml-if "archive['days'].has_key(_.str(row_item*7+col_item - day_of_week+1))">
+            <a class="menu" href="&dtml-heading_external_url;/viewArchive?year=&dtml-year;&month=&dtml-month;&day=<dtml-var "row_item*7+col_item - day_of_week+1">"><b><dtml-var "row_item*7+col_item - day_of_week+1"></b></a>
+         <dtml-else>
+            <i class="menu"><dtml-var "row_item*7+col_item - day_of_week+1"></i>
+         </dtml-if>
+         <dtml-if "col_item==6"></font></dtml-if>
+       </dtml-if>
+    </td>    
+  </dtml-in>
+</tr>
+</dtml-in>
+</table>
+
+<form action="viewArchive" method="get">
+<select name="year">
+  <dtml-in "archive['years'].keys()" sort prefix="years">
+    <option value="&dtml-years_item;" <dtml-var "year==years_item and 'selected'">>
+        &dtml-years_item;
+    </option>
+  </dtml-in>
+</select>
+
+<select name="month">
+  <dtml-in "['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']" prefix="months">
+    <option value="&dtml-months_number;" <dtml-var "_.int(month)==months_number and 'selected'">>
+        <dtml-var "msg(months_item)">
+    </option>
+  </dtml-in>
+</select>
+
+<input type="submit" value="OK">
+
+</form>
+
+</dtml-if>
+
+</dtml-if>
+
+</dtml-let>
+<dtml-var site_html_footer>
+

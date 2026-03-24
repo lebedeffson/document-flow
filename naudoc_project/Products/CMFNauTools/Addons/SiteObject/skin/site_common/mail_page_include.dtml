@@ -1,0 +1,3 @@
+<dtml-let cur_obj="_.hasattr(this(), 'getCurrentObject') and getCurrentObject() or this()">
+<a href="mailto:?subject=ссылка на страницу '<dtml-var "cur_obj.title_or_id()">'&body=<dtml-var "URL + '/' + (_.string.join(_.getattr(REQUEST, 'traverse_subpath', ''), '/'))">">ѕослать ссылку другу</a>
+</dtml-let>

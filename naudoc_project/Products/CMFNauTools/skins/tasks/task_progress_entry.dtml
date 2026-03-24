@@ -1,0 +1,53 @@
+<dtml-comment>
+$Id: task_progress_entry.dtml,v 1.16 2005/04/08 14:50:22 ikuleshov Exp $
+</dtml-comment>
+   <table cellspacing="0" cellpadding="1" bgcolor="#0000AA" width="100%">
+    <tr>
+    <td>
+     <table cellspacing="5" cellpadding="0" bgcolor="#FFFFFF" width="100%">
+      <tr>
+       <td class="small">
+
+          <dtml-if canSendNotifications>
+             <input type="checkbox" name="selected_users:list" value="&dtml-member;">
+          </dtml-if>
+          <dtml-var member fmt=member>
+
+          <dtml-if isclosed>
+                - <dtml-msg "report closed">
+          </dtml-if>
+
+          [<dtml-var "rDate(None, _, time=date)" fmt=strip>]
+        </td>
+      </tr>
+      <tr>
+        <td class="resolution"><dtml-var text newline_to_br html_quote></td>
+      </tr>
+     <dtml-in "portal_links.searchLinks( source=this(),
+                                         source_uname=member,
+                                         source_status=status,
+                                         source_response_id=response_id )" 
+     >
+       <tr>
+         <td>
+           <img src='&dtml-portal_url;/link.gif'>
+           <dtml-var getObject fmt=link.target>
+         </td>
+       </tr>
+     </dtml-in>
+
+      <dtml-if attachment>
+      <dtml-let file="_.getitem(attachment)">
+      <tr>
+        <td><img src='&dtml-portal_url;/link.gif'>
+            <a href="<dtml-var "relative_url(action=attachment)" html_quote>"><dtml-var "file.title_or_id()" html_quote></a>
+        </td>
+      </tr>
+      </dtml-let>
+      </dtml-if>
+
+     </table>
+    </td>
+    </tr>
+   </table>
+<br>

@@ -1,0 +1,23 @@
+<dtml-comment>
+$Id: task_definition_another_doc_transition_info_emb.dtml,v 1.3 2004/02/10 11:32:28 kfirsov Exp $
+$Editor: kfirsov $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+<dtml-msgtext>
+  For all documents having category %(categories)s%(inherited)s being in state '%(state)s', to which from current document there are links with type '%(link)s', perform transition: '%(transition)s'.
+<dtml-msgparam categories>
+  <dtml-msg expr="task_definition['document_category']">
+<dtml-msgparam inherited>
+  <dtml-if "task_definition['use_inheritance']">&nbsp;(<dtml-msg "or inherited from it">)</dtml-if>
+<dtml-msgparam state>
+  <dtml-msg expr="task_definition['state_id']"> (<dtml-var "task_definition['state_id']">)
+<dtml-msgparam link>
+  <dtml-msg expr="portal_links.getRelationInfo(task_definition['link_type'])['title']">
+<dtml-msgparam transition>
+  <dtml-let category="portal_metadata.getCategoryById( task_definition['document_category'] )"
+            wf="category.Workflow()"
+            ti="portal_workflow.getTransitionInfo(wf, task_definition['transition_id'])">
+   <dtml-msg expr="(ti['actbox_name'] or ti['title'])"> (<dtml-var "task_definition['transition_id']">)
+</dtml-let>
+</dtml-msgtext>

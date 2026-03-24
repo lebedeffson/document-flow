@@ -1,0 +1,101 @@
+<dtml-comment>
+Pop-up page showing user information with send message capability.
+
+$Editor: vpastukhov $
+$Id: user_info_form.dtml,v 1.12 2005/12/13 10:46:30 ikuleshov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.12 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-call "REQUEST.set('PageTitle', 'User Information')">
+
+<dtml-var simple_html_header>
+
+<dtml-let info="portal_membership.getUserInfo(_['userid'])"
+          isAnon="portal_membership.isAnonymousUser()"
+          uname="isAnon and 'Guest'
+                 or portal_membership.getAuthenticatedMember().getUserName()"
+>
+<dtml-if info>
+  <dtml-with info mapping>
+    <table class="FormLayout">
+      <tr>
+        <th><dtml-msg "User"> </th>
+        <td><dtml-var userid> </td>
+      </tr>
+      <dtml-if is_orphaned>
+      <tr>
+        <th><dtml-msg "State"></th>
+        <td><dtml-msg "Dismissed"></td>
+      </tr>
+      <dtml-elif is_locked>
+      <tr>
+        <th><dtml-msg "State"></th>
+        <td><dtml-msg "Locked"></td>
+      </tr>
+      </dtml-if>
+      <tr>
+        <th><dtml-msg "E-mail address"></th>
+        <td><a href="mailto:&dtml-email;">&dtml-email;</a></td>
+      </tr>
+      <tr>
+        <th><dtml-msg "First name"></th>
+        <td>&dtml-fname;</td>
+      </tr>
+      <tr>
+        <th><dtml-msg "Middle name"></th>
+        <td>&dtml-mname;</td>
+      </tr>
+      <tr>
+        <th><dtml-msg "Last name"></th>
+        <td>&dtml-lname;</td>
+      </tr>
+      <tr>
+        <th><dtml-msg "Company"></th>
+        <td>&dtml-company;</td>
+      </tr>
+      <tr>
+        <th><dtml-msg "Positions"></th>
+        <td><dtml-in positions><dtml-var sequence-item><dtml-unless sequence-end>, </dtml-unless></dtml-in></td>
+      </tr>
+      <tr>
+        <th><dtml-msg "Phone"></th>
+        <td>&dtml-phone;</td>
+      </tr>
+      <tr>
+        <th><dtml-msg "Notes"></th>
+        <td>&dtml-notes;</td>
+      </tr>
+    </table>
+    <form action="&dtml-portal_url;/send_mail" method="POST">
+      <table class="FormLayout">
+        <tr>
+          <td colspan="2"><dtml-msg "Send mail"></td>
+        </tr>
+        <tr>
+          <td><dtml-msg "Subject">:</td>
+          <td width="100%"> <input type="text" name="subj" size="70"> </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input type="hidden" name="from" value="<dtml-var "portal_membership.getMemberEmail(_['uname'])">" size="40">
+            <input type="hidden" name="to" value="&dtml-email;">
+            <textarea name="mail_text" cols="80" rows="20"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input type="submit" value="<dtml-msg "Send">">
+          </td>
+        </tr>
+      </table>
+    </form>
+  </dtml-with>
+<dtml-else>
+  <p><dtml-var userid>: <dtml-msg "User info is empty"></p>
+</dtml-if>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

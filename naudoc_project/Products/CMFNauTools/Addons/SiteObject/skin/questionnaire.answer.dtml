@@ -1,0 +1,44 @@
+<dtml-comment>
+
+$Editor: oevsegneev $
+$Id: questionnaire.answer.dtml,v 1.2 2008/06/09 12:35:44 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-if "lang=='en'">
+Content-Type: text/html
+Subject: Questionnaire received: &dtml-Title;
+
+<dtml-else>
+Content-Type: text/html; charset=windows-1251
+Subject: Получена анкета: &dtml-Title;
+
+</dtml-if>
+
+<table border="0">
+
+<dtml-in attrs mapping>
+  <dtml-if "type == 'date'">
+    <dtml-let day="REQUEST.get('%s_day' % id, '')"
+              month="REQUEST.get('%s_month' % id, '')"
+              year="REQUEST.get('%s_year' % id, '')"
+              hours="REQUEST.get('%s_hour' % id, '')"
+              minutes="REQUEST.get('%s_minute' % id, '')"
+    >
+      <tr>
+        <td>&dtml-title;:</td>
+        <td>&dtml-day;.&dtml-month;.&dtml-year;<dtml-if "hours and minutes">&nbsp;&dtml-hour;:&dtml-minute;</dtml-if></td>
+      </tr>
+    </dtml-let>
+
+  <dtml-else>
+    <dtml-if "REQUEST.has_key(id)">
+      <tr>
+        <td>&dtml-title;:</td><td><dtml-var "REQUEST.get(id, '')"></td>
+      </tr>
+    </dtml-if>
+  </dtml-if>
+</dtml-in>
+
+</table>

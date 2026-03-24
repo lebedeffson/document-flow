@@ -1,0 +1,66 @@
+<dtml-var migration_html_header>
+
+<h2>Portal skins setup</h2>
+
+<dtml-with getMigrationContext>
+
+<form method="POST" onsubmit="disableForm(this);">
+
+<p>Next skins will be <b>added</b>:</p>
+
+<dtml-let script_init="script_init[now_configuring]"
+          skins_to_remove="script_init.get('skins_to_remove')"
+          skins_to_add="script_init.get('skins_to_add')"
+>
+
+<UL>
+<dtml-in skins_to_add>
+  <LI>&dtml-sequence-item;
+  </LI>
+</dtml-in>
+</UL>
+
+<dtml-in skins_to_remove>
+<dtml-if sequence-start>
+<p>Next skins will be <b>removed</b>:</p>
+<table class="thin" cellspacing="0" cellpadding="3" width="50%">
+<tr>
+  <th width="50%">
+    Skin id
+  </th>
+  <th width="25%">
+    Remove skin
+  </th>
+  <th width="25%">
+    Keep skin
+  </th>
+</tr>
+</dtml-if>
+  <tr>
+    <td class="thin">
+      &dtml-sequence-item;
+    </td>
+    <td class="thin">
+      <input type="radio" name="&dtml-sequence-item;" value="remove" checked>
+    </td>
+    <td class="thin">
+      <input type="radio" name="&dtml-sequence-item;" value="leave">
+    </td>
+  </tr>
+<dtml-if sequence-end>
+</table>
+</dtml-if>
+</dtml-in>
+
+<p>Other skins will be <b>updated</b>.</p>
+
+</dtml-let>
+
+<br /><br />
+<input type="submit" name="configure_next" value=" Ok ">
+
+</form>
+
+</dtml-with>
+
+<dtml-var migration_html_footer>

@@ -1,0 +1,30 @@
+<dtml-comment>
+$Id: followup_member_in.dtml,v 1.9 2007/09/28 13:48:52 oevsegneev Exp $
+</dtml-comment>
+<dtml-var simple_html_header>
+
+<p>
+<strong><a href="&dtml-portal_url;/followup_stat">&lt;&lt; <dtml-var "msg('Back to the summary tasks statistics page')"></a></strong>
+</p>
+
+<table width="100%">
+<tr>
+  <td>
+     <h1><dtml-var "msg('Incoming tasks of the user')"> <dtml-var member_id fmt=member></h1>
+  </td>
+</tr>
+<tr>
+  <td>
+
+<dtml-var "task_list_embedded( this()
+                             , mode_name='incoming_member_tasks'
+                             , show_filter=1
+                             , REQUEST=REQUEST
+                             , showTabs='none'
+                             )"
+>
+  </td>
+</tr>
+</table>
+
+<dtml-var simple_html_footer>

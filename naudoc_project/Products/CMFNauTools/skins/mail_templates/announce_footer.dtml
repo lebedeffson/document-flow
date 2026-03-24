@@ -1,0 +1,9 @@
+
+===
+<dtml-if "lang=='en'">
+Best regards,
+Administration of the www.naumen.ru site
+<dtml-else>
+С уважением, 
+Администрация сайта www.naumen.ru
+</dtml-if>

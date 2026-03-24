@@ -1,0 +1,89 @@
+<dtml-comment>
+$Id: registry_columns_form.dtml,v 1.11 2004/03/18 13:36:06 vsafronovich Exp $
+$Editor: kfirsov$
+</dtml-comment>
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-var simple_html_header>
+
+<form method="post" name="edit_column" action="&dtml-absolute_url;/editColumn">
+
+<dtml-with "getColumnById(column_id)">
+<h1> <dtml-msg "Editing"> </h1>
+
+<table>
+  <tr>
+    <td><dtml-msg "id">:</td>
+    <td><dtml-var getId></td>
+  </tr>
+  <tr>
+    <td><dtml-msg "Title">:</td>
+    <td><input size=50 name="title" value="<dtml-msg expr=Title>"</td>
+  </tr>
+  <tr>
+    <td><dtml-msg "Type">:</td>
+    <td><dtml-msg expr=Type></td>
+  </tr>
+  <dtml-if "Type() == 'lines'">
+  <dtml-let text="'\r\n'.join(getListById(getId()))">
+  <tr>
+    <td><dtml-msg "List">:</td>
+    <td>
+      <textarea name="value_list:lines" rows="5" cols="20">&dtml-text;</textarea>
+    </td>
+  </tr>
+  </dtml-let>
+  </dtml-if>
+  <tr>
+    <td colspan="2">
+      <input type="checkbox" name="editable_after_reg" <dtml-var isEditableAfterReg fmt=checked> >
+      <dtml-msg "Allows modification">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <input type="checkbox" name="allows_input" <dtml-var allowsInput fmt=checked> >
+      <dtml-msg "Allows input">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <input type="checkbox" name="visible" <dtml-var isVisible fmt=checked> >
+      <dtml-msg "Visible">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <select name="width">
+        <dtml-in "_.range(10, 201, 10)">
+        <option value="<dtml-var sequence-item>" <dtml-var "_['sequence-item']==getWidth()" fmt=selected> >
+           <dtml-var sequence-item>
+        </dtml-in>
+      </select> <dtml-msg "Width">
+    </td>
+  <tr>
+  <tr>
+    <td colspan="2"><input type="checkbox" name="exportable:boolean" <dtml-var "isExportable()" fmt=checked>>
+      <dtml-msg "Exportable">
+    </td>
+  </tr>
+  <dtml-if "isComputed()">
+    <script type="text/javascript">
+      document.forms['edit_column'].editable_after_reg.disabled=true;
+      document.forms['edit_column'].allows_input.disabled=true;
+    </script>
+  </dtml-if>
+
+</table>
+
+<input type="hidden" name="id" value="<dtml-var column_id>">
+<input type="submit" value="<dtml-msg "Change">">
+<input type="button" 
+       onClick="JavaScript:location.href='<dtml-var "absolute_url(action='registry_options_form')" html_quote fmt=jscript>';"
+       value="<dtml-msg "Cancel">"/>
+
+</form>
+
+</dtml-with>
+
+<dtml-var simple_html_footer>

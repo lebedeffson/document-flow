@@ -1,0 +1,52 @@
+<dtml-comment>
+$Id: search_attrs.dtml,v 1.3 2004/07/06 11:48:19 oevsegneev Exp $
+
+'ctrl_value'   -  
+'profile_id'   - 
+'query_id'     - 
+
+</dtml-comment>
+<dtml-let cat_id="ctrl_value"
+          query="portal_catalog.getQuery( query_id, REQUEST=REQUEST )"
+          category="portal_metadata.getCategoryById(cat_id)"
+          attrs="category.listAttributeDefinitions()"
+>
+  <dtml-msg "Category attributes"><br />
+  <select name="conditions_&dtml-cat_id;:list" size="5" style="width: 90%;" ondblclick="openPopUp(this.form, '&dtml-cat_id;', 1)" multiple>   
+  </select><br />
+
+  <select name="attrs_&dtml-cat_id;" id="attrs_&dtml-cat_id;" style="width: 90%;">
+    <dtml-in attrs>
+      <dtml-if "Type() not in ('link',)">
+        <option value="&dtml-getId;"><dtml-msg expr="Title()"></option>
+      </dtml-if>
+    </dtml-in>
+  </select><br />
+
+  <dtml-in attrs prefix="attr">
+
+    <input type="hidden" 
+           id="&dtml-cat_id;_<dtml-var "attr_item.getId()">"
+           name="&dtml-cat_id;_<dtml-var "attr_item.getId()">:lines"
+           value="<dtml-var "search_form_func( REQUEST, 
+                                               query = query, 
+                                               cat_id = cat_id, 
+                                               attr_id = attr_item.getId(),
+                                               attr_type = attr_item.Type(),
+                                               mode = 1 )">">
+
+    <input type="hidden" 
+           name="&dtml-cat_id;_<dtml-var "attr_item.getId()">_inchild" 
+           value="<dtml-var "search_form_func( REQUEST,
+                                               query = query, 
+                                               cat_id = cat_id, 
+                                               attr_id = attr_item.getId(),
+                                               attr_type = attr_item.Type(),
+                                               mode = 2 )">">
+
+  </dtml-in>
+
+  <input type="button" name="add_attribute" value="<dtml-msg "Add">" onClick="openPopUp(this.form, '&dtml-cat_id;', 0)"/>
+  <input type="button" name="delete_attribute" value="<dtml-msg "Delete">" onClick="deleteSelection( this.form, 'conditions_&dtml-cat_id;:list' )"/>
+  <br />
+</dtml-let>

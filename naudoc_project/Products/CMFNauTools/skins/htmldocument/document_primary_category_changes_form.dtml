@@ -1,0 +1,72 @@
+<dtml-comment>
+
+Showing subordinary document of this primary category document.
+'changes'
+
+TODO:
+$Id: document_primary_category_changes_form.dtml,v 1.6 2004/02/26 16:16:56 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+
+<dtml-var simple_html_header>
+
+<br>
+<b><dtml-msg "Subordinate documents"></b>
+<br>
+<br>
+<dtml-let
+  filter_category="REQUEST.get('view_category', 'NormativeDocumentEdit')"
+  filter_state="REQUEST.get('view_state', 'effective')"
+  filter_category="filter_category!='_all' and filter_category or None"
+  filter_state="filter_state!='_all' and filter_state or None">
+
+<form action="" method="get" name="form_view_filter">
+<b><dtml-msg "Filter">:</b>
+<dtml-msg "Category">:
+<select name="view_category" onchange="location.href='?view_category='+this[this.selectedIndex].value+'&view_state=_all'">
+  <option value="_all">--<dtml-msg "any category">--
+<dtml-in "this().getCategory().listSubordinateCategories()">
+  <dtml-let selected="_['sequence-item'].getId()==filter_category">
+  <option <dtml-var selected fmt=selected> value="<dtml-var "_['sequence-item'].getId()">">
+    <dtml-msg expr="_['sequence-item'].Title()">
+  </dtml-let>
+</dtml-in>
+</select>
+
+<dtml-msg "State">:
+<dtml-var "selectstate( this(),
+                        name='view_state',
+                        category_id=filter_category,
+                        state_id=filter_state,
+                        use_any_state=1,
+                        onchange='location.href=\'?view_category=\'+document.form_view_filter.view_category.value+\'&view_state=\'+this[this.selectedIndex].value'
+                      )">
+</form>
+
+<dtml-let sub_docs="listSubordinateDocuments(version_dependent=1, category_id=filter_category, state_id=filter_state)">
+<dtml-in "sub_docs and portal_catalog.searchResults(nd_uid=sub_docs)">
+  <dtml-if sequence-start>
+    <table>
+      <tr class="row_odd">
+        <td><b><dtml-msg "Title"></b></td>
+        <td><b><dtml-msg "Category"></b></td>
+        <td><b><dtml-msg "State"></b></td>
+      </tr>
+  </dtml-if>
+      <tr class="row_even">
+        <td><a href="&dtml-getPath;">&dtml-Title;</a></td>
+      <dtml-let category="portal_metadata.getCategoryById( category )">
+        <td><dtml-msg expr="category.Title()"></td>
+        <td><dtml-msg expr="portal_workflow.getStateTitle( category.Workflow(), state)"></td>
+      </dtml-let>
+      </tr>
+  <dtml-if sequence-end>
+    </table>
+  </dtml-if>
+<dtml-else>
+  <p><dtml-msg "n/a"></p>
+</dtml-in>
+</dtml-let>
+
+</dtml-let>
+<dtml-var simple_html_footer>

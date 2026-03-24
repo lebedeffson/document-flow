@@ -1,0 +1,46 @@
+<dtml-var site_html_header>
+
+<dtml-if "meta_type == 'Subscription Root'">
+  <dtml-var site_subscription_form>
+<dtml-else>
+
+<dtml-let container="this()">
+
+<div class="Desktop">
+
+
+<dtml-if "implements('isStorefront')">
+  <dtml-let go_step="REQUEST.get('go_step','1')">
+  <dtml-if "go_step=='4'">
+    <dtml-var storefront_step4>
+  <dtml-elif "go_step=='3'">  
+    <dtml-var storefront_step3>
+  <dtml-elif "go_step=='2'">
+    <dtml-var storefront_step2>
+  <dtml-elif "go_step=='1'">
+    <dtml-var storefront_step1>
+  </dtml-if>
+  </dtml-let>
+<dtml-else>
+<ul class="txt_news">
+<dtml-in publishedItems size="15" sort="Date" reverse mapping>
+  <li>
+     [<dtml-var "date( this(), REQUEST, **_['sequence-item'] ).strip()">]
+     <br>
+     <a class="big_menu_txt" href="&dtml-absolute_url;">&dtml-Title_or_id;</a>
+     <br><br>
+  </li>
+<dtml-else>
+  <h4>
+    Публикации отсутствуют
+  </h4>
+</dtml-in>
+</ul>
+</dtml-if>
+
+</dtml-let>
+
+</div>
+</dtml-if>
+
+<dtml-var site_html_footer>

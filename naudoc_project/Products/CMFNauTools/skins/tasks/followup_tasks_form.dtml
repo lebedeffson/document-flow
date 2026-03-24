@@ -1,0 +1,39 @@
+<dtml-comment>
+$Id: followup_tasks_form.dtml,v 1.9 2006/04/18 16:08:12 ikuleshov Exp $
+</dtml-comment>
+
+<dtml-call "REQUEST.set('editMode',1)">
+
+<dtml-if expr="not _.hasattr(this(), 'followup') and not this().implements( 'isTaskItem' )">
+  <dtml-call expr="portal_followup.getTasksFor(this())">
+</dtml-if>
+
+<dtml-var simple_html_header>
+  
+<div class="Desktop">
+
+<h1>
+   <img src="&dtml-portal_url;/task_icon.gif" alt="" />
+   <a href="&dtml-absolute_url;/view" target="workspace">&dtml-title_or_id;</a>
+</h1>
+
+<dtml-var task_factory_form>
+                             
+<h5><dtml-var "msg('Follow-up tasks')">:</h5>
+
+<dtml-var viewTasksTree>
+
+          <table cellspacing="3" cellpadding="0" bgcolor="#E5E5E5">
+          <tr>
+             <td>
+             <input type="image" src="&dtml-portal_url;/task_report.gif"
+                    name="task_reportwizard_form:method"
+                    alt="<dtml-var "msg('Report wizard')">"
+             /></td>
+             <td><a class="tabs" href="&dtml-relative_url;/task_reportwizard_form"><dtml-var "msg('Report wizard')"></a></td>
+          </tr>
+          </table>
+
+</div>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,154 @@
+<dtml-comment>
+$Id: task_reportwizard_step3.dtml,v 1.6 2004/05/06 10:16:06 vsafronovich Exp $
+$Editor: ikuleshov $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1> <dtml-var aboveInThread> </h1>
+<h1> <dtml-msg "Report wizard">, <dtml-msg "step"> 3</h1>
+
+<p><dtml-msg "Check the report and change it if necessary"></p>
+<form name="report" 
+      method="POST" 
+      action="&dtml-absolute_url;" 
+      onSubmit="return validateForm(this);">
+
+<dtml-comment>
+  Store report options
+</dtml-comment>
+
+<dtml-if selected_tasks>
+
+<dtml-in selected_tasks>
+  <dtml-let task_id=sequence-item
+            response_request_code="'%s_responses' % task_id"
+            selected_responses="REQUEST.has_key(response_request_code) and _[response_request_code] or []"
+  >
+     <input type="hidden" 
+            name="selected_tasks:list" 
+            value="&dtml-task_id;"
+     />
+
+     <dtml-in selected_responses>
+          <input type="hidden"
+                 name="&dtml-task_id;_responses:list" 
+                 value="&dtml-sequence-item;"
+          />
+     </dtml-in>
+  </dtml-let>
+</dtml-in>
+
+<dtml-comment>
+  Create preview
+</dtml-comment>
+
+<dtml-var "_.apply(_.getitem(REQUEST.get('template', '')), (this(), REQUEST))">
+
+<table>
+<tr>
+  <td class="small" colspan="2">
+   <p><dtml-msg "Report wizard will now create an ordinary HTML document based on your report. Please specify the document's title and description."></p>
+  </td>
+</tr>
+<tr>
+  <td class="smallHeader" align="right">
+    <dtml-msg "Title">:
+  </td>
+  <td>
+    <input type="text" 
+           name="task_title:required" 
+           value="<dtml-msg "Report">: &dtml-Title;" 
+           size="50"
+    />
+  </td>
+</tr>
+<tr>
+  <td class="smallHeader" align="right">
+    <dtml-msg "Description">:
+  </td>
+  <td>
+    <textarea name="task_description" rows="10" cols="70"><dtml-msg "General report"></textarea>
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td class="small">
+      <input type="checkbox" name="no_css" value="1"> <dtml-msg "Disable stylesheets">
+  </td>
+</tr>
+<tr>
+  <td class="smallHeader" align="right">
+    <dtml-msg "Save report to folder">:
+    
+  </td>
+  <td>
+    <input type="text" disabled size=50 value="" id="folder"> 
+    <input type="button" value="<dtml-msg "Browse...">" onClick="return open_folders_wnd();">
+  </td>
+</tr>
+
+</table>
+
+<script>
+function open_folders_wnd()
+{
+    registerWindow( 'Task_Report_Wizard'
+                  , '&dtml-absolute_url;/task_reportwizard_folders'
+                  , 'toolbar=no,scrollbars=yes,width=300,height=400,resizable=yes'
+                  );
+}
+
+function setFolderUrl( folder_uid, title )
+{
+    document.forms[0].folder.value = title;
+    document.forms[0].folder_uid.value = folder_uid;
+}
+</script>
+
+<dtml-else>
+  <p><i><dtml-msg "You have to specify at least one report"></i></p>
+</dtml-if>
+
+      <input type="hidden" value="" name="folder_uid">
+      
+      <input type="hidden" 
+             name="inc_inf" 
+             value="&dtml-inc_inf;"
+      />
+
+      <input type="hidden" 
+             name="template" 
+             value="<dtml-var "REQUEST.get('template', '')">"
+      />
+
+      <input type="hidden" 
+             name="doc_view" 
+             value="1"
+      />
+
+      <input type="button" 
+             onClick="JavaScript:location.href='&dtml-absolute_url;/document_follow_up_form'" 
+             value=" <dtml-msg "Cancel"> "
+      />
+
+<dtml-if selected_tasks>
+      <input type="submit" 
+             name="task_reportwizard_step2:method" 
+             value=" &lt;&lt; <dtml-msg "Back"> "
+      />
+
+      <input type="submit" 
+             name="task_reportwizard_step4:method" 
+             value=" <dtml-msg "Save report"> "
+      />
+</dtml-if>
+</form>
+
+
+</div>
+
+<dtml-var simple_html_footer>

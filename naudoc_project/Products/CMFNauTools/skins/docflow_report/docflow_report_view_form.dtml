@@ -1,0 +1,160 @@
+<dtml-comment>
+$Id: docflow_report_view_form.dtml,v 1.25 2006/05/05 10:39:56 ishabalin Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.25 $>
+
+<dtml-var simple_html_header>
+<h3> &dtml-title_or_id; </h3>
+
+<dtml-if "getSearchableCategory() and listColumns()">
+  <dtml-let container=this
+            columns_=listColumns>
+
+  <dtml-with "executeQuery(REQUEST)" mapping>
+
+  <dtml-if total_count>
+    &dtml-results_count;&nbsp;<dtml-msg "documents of">&nbsp;&dtml-total_count;
+  </dtml-if>
+
+  <table>
+  <tr><td>
+  <dtml-in  results
+            start=qs
+            size=batch_size
+            >
+
+    <dtml-if sequence-start>
+      <dtml-var table_pages_list>
+      <table border="0" cellpadding="2" cellspacing="2" class="FormLayout">
+        <tr class="row_title">
+          <td></td>
+          <dtml-in columns_>
+          <td align="center">
+            <dtml-let sparams="getSortQuery()"
+                      reverse="(sparams == sort_params) and not sort_order and 'reverse' or ''"
+                      params="sparams and portal_catalog.isValidSortQuery( **sparams ) and
+                                { 'sort_on':    sparams.get('sort_on'),
+                                  'sort_attr':  sparams.get('sort_attr'),
+                                  'sort_order':   reverse
+                                } or {}"
+                      >
+            <dtml-if params>
+            <a  href="<dtml-var "container.absolute_url( action='view', params=params )">"
+                class="navigate"
+                >
+            </dtml-if>
+            <dtml-var Title>
+            <dtml-if params>
+            <dtml-if "sparams == sort_params">
+              <dtml-if reverse><dtml-var sort_up.gif>
+              <dtml-else><dtml-var sort_down.gif>
+              </dtml-if>
+            </dtml-if>
+            </a>
+            </dtml-if>
+            </dtml-let>
+          </td>
+          </dtml-in>
+        </tr>
+    </dtml-if>
+    <dtml-let object=getObject>
+    <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td>
+      <a class="toolbar-button" onClick="eval(href); return false"
+         href="javascript:window.open('<dtml-var "object.absolute_url(action='document_workflow_history', params={'noframe': 1})" fmt="jscript">',
+                                      'wnd_popup_menu', 'toolbar=no,scrollbars=yes,width=300,height=400,resizable=yes')">
+        <img src="virt_doc_icon.gif" width="16" height="16" alt="<dtml-msg "Workflow history chart">"></a>
+    </td>
+    <dtml-in columns_>
+      <td align="center">
+        <dtml-var "render(_, object, default='')">
+      </td>
+    </dtml-in>
+    </tr>
+    </dtml-let>
+    <dtml-if sequence-end>
+    <dtml-comment> Show minimun, maximum, average for attributes </dtml-comment>
+
+   <dtml-let aggregates="getAggregates(results)">
+    <dtml-in "('Minimum', 'Average', 'Maximum')" prefix="aggr" reverse>
+    <tr class='<dtml-var "(_.len(results)+ aggr_index) % 2  and 'row_odd' or 'row_even'">'>
+     <dtml-in columns_ prefix="clmn">
+       <dtml-if sequence-start>
+       <td>
+         <span class="mandatory"><dtml-msg expr="aggr_item"></span>
+       </td>
+       </dtml-if>
+       <td align="center">
+       <dtml-if "clmn_item.column_type == 'attribute' and aggregates.has_key(clmn_item.attribute)">
+           <dtml-comment>
+           ...te][2 - aggr_index] - kinda ugly way to reverse the order,
+                                    didn't want to touch 'getAggregates' method
+           </dtml-comment>
+           <dtml-let aggr_value="aggregates[clmn_item.attribute][2 - aggr_index]"
+                     aggr_value_str="aggr_value is not None and ('%5.5f' % aggr_value) or ''">
+                <dtml-var aggr_value_str>
+           </dtml-let>
+       </dtml-if>
+       </td>
+     </dtml-in>
+    </tr>
+    </dtml-in>
+
+   </dtml-let>
+
+    <dtml-comment> show number of documents in each state </dtml-comment>
+    <tr class='<dtml-var "_.len(results) % 2  and 'row_even' or 'row_odd'">'>
+     <dtml-in columns_>
+       <dtml-if sequence-start>
+       <td>
+         <span class="mandatory"><dtml-msg Total></span>
+       </td>
+       </dtml-if>
+       <td align="center">
+       <dtml-if "_['sequence-item'].column_type == 'stateflag'">
+         <dtml-let filtered_by_state="[r for r in results if r.state==_['sequence-item'].state]">
+           <dtml-var "_.len(filtered_by_state)">
+         </dtml-let>
+       </dtml-if>
+       </td>
+     </dtml-in>
+    </tr>
+      </table>
+      <dtml-var "table_pages_list(None, _, disable_controls=True)">
+    </dtml-if>
+  <dtml-else>
+    <dtml-if total_count>
+      <dtml-msg "There are no documents matching your query">
+    <dtml-else>
+      <dtml-msg "There are no documents yet">
+    </dtml-if>
+  </dtml-in>
+  </td></tr>
+  <dtml-if total_count>
+    <tr><td>
+    <form name="control">
+      <input type="checkbox"
+             <dtml-var show_all_versions fmt=checked>
+             onClick="this.form.submit();"
+             >
+      <input type="hidden" 
+             name="show_all:boolean"
+             value="<dtml-var "not show_all_versions">"
+             >
+      &nbsp;<dtml-msg "Show all versions of documents">
+    </form>
+    </td></tr>
+    <tr><td>
+    <dtml-var catalog_filter_form>
+    </td></tr>
+  </dtml-if total_count>
+  </table>
+  </dtml-with executeQuery>
+  </dtml-let>
+<dtml-else>
+  <dtml-msg "Object is not configured correctly">
+</dtml-if>
+
+<dtml-var simple_html_footer>

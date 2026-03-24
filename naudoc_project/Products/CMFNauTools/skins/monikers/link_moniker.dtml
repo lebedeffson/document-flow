@@ -1,0 +1,68 @@
+<dtml-comment>
+Moniker view of the Link object.
+
+TODO: add support for document version title display
+
+$Editor: vpastukhov $
+$Id: link_moniker.dtml,v 1.9 2004/11/23 17:54:12 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-if "moniker_object">
+
+<dtml-if moniker_source>
+
+  <dtml-if isSourceAllowed>
+    <dtml-try>
+      <dtml-let source_data=getSourceMetadata>
+      <a href="<dtml-var "source_data.getURL()" html_quote>" target="&dtml-moniker_frame;"><dtml-msg "No title" expr="source_data['Title']" translate=0></a>
+      </dtml-let>
+    <dtml-except>
+      <dtml-let source_object=getSourceObject>
+      <a href="<dtml-var "source_object.relative_url()" html_quote>" target="&dtml-moniker_frame;"><dtml-msg "No title" expr="source_object.Title()" translate=0></a>
+      </dtml-let>
+    </dtml-try>
+
+  <dtml-elif "not moniker_unauthorized">
+    <dtml-msg "No title" expr="getSourceMetadata('Title')" translate=0>
+    <span class="error">(<dtml-msg "inaccessible">)</span>
+
+  <dtml-else>
+    <dtml-raise Unauthorized></dtml-raise>
+  </dtml-if>
+
+</dtml-if>
+
+<dtml-if moniker_both>
+<dtml-msg expr="getRelationInfo('verb')">
+</dtml-if>
+
+<dtml-if moniker_target>
+
+  <dtml-if isTargetAllowed>
+    <dtml-try>
+      <dtml-let target_data=getTargetMetadata>
+      <a href="<dtml-var "target_data.getURL()" html_quote>" target="&dtml-moniker_frame;"><dtml-msg "No title" expr="target_data['Title']" translate=0></a>
+      </dtml-let>
+    <dtml-except>
+      <dtml-let target_object=getTargetObject>
+      <a href="<dtml-var "target_object.relative_url()" html_quote>" target="&dtml-moniker_frame;"><dtml-msg "No title" expr="target_object.Title()" translate=0></a>
+      </dtml-let>
+    </dtml-try>
+
+  <dtml-elif "not moniker_unauthorized">
+    <dtml-msg "No title" expr="getTargetMetadata('Title')" translate=0>
+    <span class="error">(<dtml-msg expr="isTargetRemoved() and 'removed' or 'inaccessible'">)</span>
+
+  <dtml-else>
+    <dtml-raise Unauthorized></dtml-raise>
+  </dtml-if>
+
+</dtml-if>
+
+<dtml-elif moniker_id>
+
+<dtml-msg "unknown link '%(id)s'" id="moniker_id.uid">
+
+</dtml-if>

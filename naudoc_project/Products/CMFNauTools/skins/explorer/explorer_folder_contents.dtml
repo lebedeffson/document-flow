@@ -1,0 +1,118 @@
+<dtml-comment>
+
+$Id: explorer_folder_contents.dtml,v 1.10 2006/04/19 12:49:03 oevsegneev Exp $
+$Editor: vsafronovich $
+</dtml-comment>
+<dtml-revision $Revision: 1.10 $>
+
+<dtml-let Explorer=explorer_init
+          item="_.has_key('item') and item">
+<dtml-with "Explorer.content_index(item)" mapping>
+
+<dtml-if results>
+  <script language="javascript" 
+          src="<dtml-var "portal_url( action='explorer_folder_item_js', 
+                                      params={'explorer_id':explorer_id})">"
+  ></script>
+</dtml-if>
+<table height="100%" width="100%" cellspacing="0" cellpadding="0">
+  <tr valign="top">
+    <td style="border-right:1px solid;" width="33%"> <dtml-var explorer_tree> </td>
+    <td width="100%">
+<form>
+<table width="100%" border="0">
+
+<dtml-comment>
+<tr>
+  <td>
+    <dtml-var "navBar(object, REQUEST, action='explorer_index?item=?????', frame='contents' )">
+                   need new navBar because item do not pass to moniker now
+  </td>
+</tr>
+</dtml-comment>
+<tr>
+  <td valign="top">
+    <h1><img align="absmiddle" src="<dtml-var "portal_url(action='gray_of.gif')">" width="16" height="16">
+      <dtml-if "object.parent().implements('isPortalRoot')">
+        <dtml-msg "Accessible documents">
+      <dtml-else>
+        <dtml-var "object" fmt=content>
+      </dtml-if>
+    </h1>
+  </td>
+</tr>
+
+<tr>
+  <td colspan="2">
+    <dtml-let pages_list_params="'&item=%s&explorer_id=%s'%(item,explorer_id)"
+    >
+    <table cellspacing="1" cellpadding="0" width="100%" border="0">
+    <dtml-if "results_count > batch_size">
+      <tr>
+        <td>
+          <dtml-var "table_pages_list( None, _, disable_controls=1, params=pages_list_params )">
+        </td>
+      </tr>
+    </dtml-if>
+      <tr>
+        <td>
+          <dtml-in results size=batch_size start=qs>
+          <dtml-if sequence-start>
+            <table class="SearchFormLayout" border="0" cellspacing="5" cellpadding="0" width="100%">
+              <tr>
+                <th>&nbsp;</th>
+                <th colspan="2"> <dtml-msg "Title"> </th>
+                <th> <dtml-msg "Type"> </th>
+                <th> <dtml-msg "Date"> </th>
+              </tr>
+          </dtml-if>
+            <dtml-let item="_['sequence-key'][0]"
+                      result="_['sequence-key'][1]">
+
+              <dtml-var explorer_folder_item_view>
+
+              <dtml-if "'isVersionable' in implements">
+                <dtml-var explorer_folder_subitems_view>
+              </dtml-if>
+
+            </dtml-let>
+          <dtml-if sequence-end>
+            </table>
+          </dtml-if>
+          <dtml-else>
+            <h4><dtml-msg "Folder is empty"></h4>
+          </dtml-in>
+        </td>
+      </tr>
+    <dtml-if "results_count > batch_size">
+    <tr>
+      <td>
+        <dtml-var "table_pages_list( None, _, disable_controls=1, params=pages_list_params )">
+      </td>
+    </tr>
+    </dtml-if>
+    </table>
+    </dtml-let>
+  </td>
+</tr>
+</table>
+
+<p align="left">
+<dtml-if results>
+  <input type="button"
+         name="select"
+         value="<dtml-msg "Select document">"
+         onClick="return SaveAndReturn( this.form.target_item, this.form.target_subitem );">
+</dtml-if>
+  <input type="button"
+         name="close"
+         value="<dtml-msg "Close">"
+         onClick="return top.close();">
+</p>
+</form>
+</td>
+</tr>
+<table>
+
+</dtml-with>
+</dtml-let>

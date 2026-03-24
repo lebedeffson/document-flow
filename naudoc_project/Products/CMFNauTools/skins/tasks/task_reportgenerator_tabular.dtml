@@ -1,0 +1,70 @@
+<dtml-comment>
+$Id: task_reportgenerator_tabular.dtml,v 1.11 2004/09/03 13:25:40 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.11 $>
+
+<table cellspacing="0" cellpadding="3" width="100%" class="report">
+<tr>
+  <td class="report" align="center" bgcolor="#FFFFFF"> <b><dtml-var "msg('Number')"></b> </td>
+  <td class="report" bgcolor="#FFFFFF" align="center"> <b><dtml-var "msg('User')"></b> </td>
+  <td class="report" bgcolor="#FFFFFF" align="center"> <b><dtml-var "msg('Report')"></b> </td>
+  <td class="report" bgcolor="#FFFFFF" align="center"> <b><dtml-var "msg('Date')"></b> </td>
+</tr>
+<dtml-in selected_tasks>
+  <dtml-let task_id=sequence-item
+            task="followup.getTask(task_id)"
+            task_index="_['sequence-index'] + 1"
+            task_title="task.Title()"
+            task_creator="portal_membership.getMemberBriefName(task.Creator())"
+            task_date="task.effective_date"
+            response_request_code="'%s_responses' % task_id"
+            selected_responses="REQUEST.has_key(response_request_code) and _[response_request_code] or []"
+            sorted_responses="[]"
+  >
+
+     <dtml-in selected_responses>
+        <dtml-if sequence-start>
+          <tr>
+            <td class="report" align="center" bgcolor="#FFFFFF"> <b>&dtml-task_index;.</b> </td>
+            <td class="report" bgcolor="#FFFFFF"> <b>&dtml-task_creator;</b> </td>
+            <td class="report" bgcolor="#FFFFFF"> <b>&dtml-task_title;</b> </td>
+            <td class="report" bgcolor="#FFFFFF"> <b><dtml-var "task_date" fmt="%d.%m.%Y %H:%M"></b> </td>
+          </tr>
+        </dtml-if>
+     <dtml-let code=sequence-item
+               member="code.split(':')[0]"
+               date_str="code.split(':')[1]"
+               date="_.DateTime(_.float(date_str))"
+               user="portal_membership.getMemberBriefName(member)"
+               response="task.searchResponses(member=member, date=date)[0]"
+               implicit_id="'%s_%s' %( task_id, date_str )"
+               resp="{ 'user':user
+                     , 'text':_.has_key( 'r_%s' % implicit_id ) 
+                              and _.getitem('r_%s' % implicit_id,0) 
+                              or response['text']
+                     , 'date':date }"  >
+        <input type="hidden" value="<dtml-var "resp['text']">" name="<dtml-var "'r_%s' % implicit_id">">
+        <dtml-call expr="resp not in sorted_responses and sorted_responses.append(resp)">
+     </dtml-let>
+     </dtml-in>
+
+     <dtml-in sorted_responses mapping sort="date">
+          <tr>
+            <td align="center"  bgcolor="#FFFFFF" class="report"> &dtml-task_index;.&dtml-sequence-number;
+            </td>
+            <td bgcolor="#FFFFFF" class="report">
+                   <dtml-var "user">
+            </td>
+            <td bgcolor="#FFFFFF" class="report">
+                   <dtml-var "text or '&nbsp;'" newline_to_br>
+            </td>
+            <td bgcolor="#FFFFFF" class="report">
+                   <dtml-var "date" fmt="%d.%m.%Y %H:%M">
+            </td>
+          </tr>
+
+     </dtml-in>
+
+  </dtml-let>
+</dtml-in>
+</table>

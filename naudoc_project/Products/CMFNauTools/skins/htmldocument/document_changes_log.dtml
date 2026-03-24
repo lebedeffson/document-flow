@@ -1,0 +1,17 @@
+<dtml-in changes_log mapping reverse>
+ <dtml-if sequence-start>
+  <table>
+   <tr>
+    <td class="smallHeader"><dtml-var "msg('Changes log')"></td>
+   </tr>
+ </dtml-if>
+  <tr>
+   <td class="small">
+     <dtml-var "_.DateTime(_.int(date))" fmt="%Y-%m-%d %H:%M">
+     <dtml-var member fmt=member>
+     <dtml-var comment>
+   </td>
+ <dtml-if sequence-end>
+  </table>
+ </dtml-if>
+</dtml-in>

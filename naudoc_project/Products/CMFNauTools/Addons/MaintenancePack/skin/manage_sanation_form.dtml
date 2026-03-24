@@ -1,0 +1,96 @@
+<dtml-comment>
+$Id: manage_sanation_form.dtml,v 1.1 2009/02/17 15:04:22 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+<script type="text/javascript" src="&dtml-portal_url;/entry_field_scripts.js"></script>
+
+<div class="Desktop">
+
+<h1><dtml-var "msg('Manage Sanation')"></h1>
+
+<div id="cfg_body">
+
+<form name="portal_sanation" action="&dtml.url-manage_sanation;" method="POST">
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2" width="100%">
+  <tr class="row_title">
+    <td align="left"><dtml-msg "maintenance_pack.refresh_catalogs"></td>
+  </tr>
+  <tr class="row_even">
+    <td><dtml-msg "maintenance_pack.refresh_catalogs_text"></td>
+  </tr>
+  <tr class="row_even">
+    <td>
+      <input type="checkbox" name="refresh_ids:list" value="portal_catalog" checked><dtml-msg "maintenance_pack.main_catalog"><br/>
+      <input type="checkbox" name="refresh_ids:list" value="portal_followup"><dtml-msg "maintenance_pack.task_catalog"><br/>
+      <input type="checkbox" name="refresh_ids:list" value="portal_links"><dtml-msg "maintenance_pack.link_catalog"><br/>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td><input type="Submit" name="refresh" value="<dtml-msg "Refresh">"></td>
+  </tr>
+</table>
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2" width="100%">
+  <tr class="row_title">
+    <td align="left"><dtml-msg "maintenance_pack.rebuild_catalogs"></td>
+  </tr>
+  <tr class="row_even">
+    <td><dtml-msg "maintenance_pack.rebuild_catalogs_text"></td>
+  </tr>
+  <tr class="row_even">
+    <td>
+      <input type="checkbox" name="rebuild_ids:list" value="portal_catalog" checked><dtml-msg "maintenance_pack.main_catalog"><br/>
+      <input type="checkbox" name="rebuild_ids:list" value="portal_followup"><dtml-msg "maintenance_pack.task_catalog"><br/>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td><input type="Submit" name="rebuild" value="<dtml-msg "maintenance_pack.rebuild">"></td>
+  </tr>
+</table>
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2" width="100%">
+  <tr class="row_title">
+    <td align="left"><dtml-msg "maintenance_pack.clean_tree"></td>
+  </tr>
+  <tr class="row_even">
+    <td><dtml-msg "maintenance_pack.clean_tree_text"></td>
+  </tr>
+  <tr class="row_even">
+    <td>
+      <dtml-let field_id="'target_folder'">
+      <input type="hidden" id="&dtml-field_id;_uid" name="target_folder:uid" value="" />
+      <input type="text" id="&dtml-field_id;_title" size="30" value="" readonly="1" />
+      <input type="button" value="<dtml-msg "Browse...">" onClick="javascript: fieldEditHandler.folder_select('&dtml-field_id;'); return false" />
+      </dtml-let>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td>
+      <dtml-msg "maintenance_pack.clean_tree_before">&nbsp;
+      <dtml-var "datetime_form( None, _
+                              , prefix='before_date'
+                              , date=None
+                              , date_only=True )">
+      
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td><input type="Submit" name="clean_tree" value="<dtml-msg "maintenance_pack.clean">"></td>
+  </tr>
+</table>
+
+<dtml-msg "maintenance_pack.clean_warning">
+
+</form>
+
+</div>
+</div>
+
+<script language="javascript">
+var field_id = '';
+window['target_folder_link'] = '<dtml-var "relative_url(action = 'task_reportwizard_folders')">';
+</script>
+
+<dtml-var simple_html_footer>

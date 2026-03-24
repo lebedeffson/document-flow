@@ -1,0 +1,76 @@
+<dtml-comment>
+$Id$
+
+</dtml-comment>
+
+<dtml-let cat_id="_.has_key('category_id') and _['category_id'] or Category()"
+          category="portal_metadata.getCategoryById(cat_id)"
+          attr_name="task_definition['attribute_name']"
+          attribute="category.getAttributeDefinition(attr_name)"
+          attr_value="attribute.Type()=='date' and not task_definition['attribute_value'] and _.DateTime() or task_definition['attribute_value']"
+          allow_edit="task_definition['_allow_edit']"
+          var_postfix="'var'"
+          vars="task_definition['vars']"
+>
+<dtml-with attribute>
+<table cellspacing="2" cellpadding="3">
+  <tr>
+     <td>
+       <h3>
+         <dtml-msg "Category attribute">
+       </h3>
+     </td>
+  </tr>
+  <tr>
+   <td>
+      <table border="0" cellpadding="2" width="100%" >
+        <tr class="row_title">
+          <td>
+            <dtml-msg "Id">
+          </td>
+          <td>
+            <dtml-msg "Title">
+          </td>
+          <td>
+            <dtml-msg "Type">
+          </td>
+          <td>
+            <dtml-msg "Attribute value">
+          </td>
+        </tr>
+
+        <tr class="row_even">
+          <td valign="top">&dtml-getId;</td>
+          <td valign="top">
+            <dtml-msg expr=Title>
+          </td>
+          <td valign="top">
+            <dtml-msg expr=Type><dtml-if isMultiple>,
+            <br /><dtml-msg "multivalued"></dtml-if>
+          </td>
+          <td>
+            <dtml-if "'attribute_value' in allow_edit">
+              <dtml-var "entry_field_edit( None, _,
+                                           descriptor=getFieldDescriptor(
+                                           name=template_id+'_attribute_value',
+                                           type=Type(),
+                                           edit=1 ),
+                                           value=attr_value,
+                                          )">
+            <dtml-else>
+              <dtml-var "entry_field_view( None, _,
+                                           type=Type(),
+                                           multiple=1,
+                                           value=attr_value,
+                                          )">
+
+            </dtml-if>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</dtml-with>
+
+</dtml-let>

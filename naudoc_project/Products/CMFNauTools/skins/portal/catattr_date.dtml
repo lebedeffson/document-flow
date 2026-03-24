@@ -1,0 +1,47 @@
+<h4><dtml-msg expr="attr.Title()"></h4>
+<input type="checkbox" id="from" value="1" <dtml-var "not value or value[0]" fmt="checked">>
+<dtml-msg "from">
+<br />
+<dtml-var "datetime_form( this()
+                        , prefix='min_date'
+                        , date=value and value[0] and _.DateTime(value[0]).strftime('%d.%m.%Y %H:%M') or (_.DateTime() - 1.0)
+  		        , fast_input=1
+                        )"
+>
+<br />
+
+<input type="checkbox" id="to" value="1" <dtml-var "not value or value[1]" fmt="checked">>
+<dtml-msg "to">
+<br />
+<dtml-var "datetime_form( this()
+                        , prefix='max_date'
+                        , date=value and value[1] and _.DateTime(value[1]).strftime('%d.%m.%Y %H:%M') or (_.DateTime() + 1.0)
+			, fast_input=1
+                        )"
+>
+<br />
+
+<script type="text/javascript">
+<!--
+
+function Return()
+{
+    var from = document.getElementById('from').checked && document.getElementById('min_date_field').value || '',
+        to = document.getElementById('to').checked && document.getElementById('max_date_field').value || '';
+
+    if (from && to && !validateRange('datetime', from, to)) {
+        alert('<dtml-msg "From value must be smaller than To value">');
+        return false;
+    }
+
+    opener.&dtml-callback_function;( '&dtml-callback_form;',
+                                     '&dtml-cat_id;',
+                                     '&dtml-attr_id;',
+                                     '&dtml-type;',
+                                     from+'\n'+to+'\n',
+                                     document.getElementById('child').checked
+                                   );
+}
+
+//-->
+</script>

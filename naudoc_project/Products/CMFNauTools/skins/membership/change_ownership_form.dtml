@@ -1,0 +1,48 @@
+<dtml-comment>
+<dtml-let helpId="'Object-Ownership.html'">
+<dtml-var standard_html_header>
+</dtml-let>
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<div class="Metadata">
+
+<h2><dtml-var "msg('Document ownership')"></h2>
+<form action="change_ownership" method="post" target="workspace" onSubmit="return validateUserForm(this);">
+
+<table class="FormLayout">
+
+ <tr valign="top">
+
+  <th align="right"> <dtml-var "msg('URL')"> </th>
+  <td colspan=2> <dtml-var Identifier> </td>
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> <dtml-var "msg('Owner')"> </th>
+  <td>
+  <dtml-var "user_list(this(), name='userid', list_size=15)">
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <td><br>
+  </td>
+  <td align=left>
+  <br> <input type="submit" name="change_and_edit" value=" <dtml-var "msg('Apply')"> ">
+  </td>
+
+ </tr>
+
+</table>
+
+</form>
+
+</div>
+
+</div>
+
+<dtml-var simple_html_footer>

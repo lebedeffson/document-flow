@@ -1,0 +1,55 @@
+<dtml-comment>
+$Id: task_definition_register_version.dtml,v 1.2 2007/05/24 12:46:25 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-let registry_uid="taskDefinitionArray.get('registry_uid', '')"
+          res="portal_catalog.searchResults(  meta_type='RegistrationBook',
+                                              sort_on='Title')"
+          all_reg_books="[x.getObject() for x in res]"
+          reg_books="[  x for x in all_reg_books if x and x.getRegisteredCategory() in listBaseIds()]"
+          >
+
+<dtml-in reg_books>
+  <dtml-if sequence-start>
+    <p><dtml-msg "Available registries">:</p>
+    <table border="0" cellpadding="2" cellspacing="2" class="FormLayout">
+      <tr class="row_title">
+        <td></td>
+        <td>
+          <dtml-msg Title>
+        </td>
+        <td>
+          <dtml-msg Description>
+        </td>
+        <td>
+          <dtml-msg Department>
+        </td>
+      </tr>
+  </dtml-if>
+      <tr class="row_even">
+        <td>
+          <input  type="radio" name="registry_uid" value="<dtml-var "getUid()">"
+                  <dtml-var "(registry_uid == getUid()) and 'checked' or ''">
+                  >
+        </td>
+        <td class="small">
+          <a href="&dtml-absolute_url;" target="_blank"><dtml-var Title></a>
+        </td>
+        <td>
+          <dtml-var Description newline_to_br>
+        </td>
+        <td class="small">
+          <dtml-var getDepartment>
+        </td>
+      </tr>
+  <dtml-if sequence-end>
+    </table>
+  </dtml-if>
+<dtml-else>
+  <p>
+  <dtml-msg "There are no registries available for you">
+  </p>
+</dtml-in>
+</dtml-let>

@@ -1,0 +1,29 @@
+
+The Localizer has been developed by J. David Ibáñez, Andres
+Marzal contributed the original zgettext.py script.
+
+The experience I got developing the Translator product with
+Federico Di Gregorio helped me to develop the Localizer. The
+LocalContent icon was made by him for the Translator product.
+Thanks Federico.
+
+The Localizer born with the exploration of several ideas of
+Bjorn Stabell, thanks Bjorn.
+
+The GNU gettext utilities and the python module gettext provide
+essential functionality to the Localizer. Many thanks to all
+its developers, the Free Software Foundation and the Pythonlabs
+team.
+
+The LocalPropertyManager and LocalContent classes have been
+inspired by the work and the ideas of Lalo Martins and "smt".
+The Zope patch by Tim McLaughlin that provides REQUEST in the
+Globals module made them possible. Thank you!
+
+Other people has helped reporting and fixing bugs, providing
+translations and feedback. They're Arnaud Lefèvre, Danny William
+Adair, Gabor Suveg, Garikoitz Araolaza, Francois Meehan, Luistxo
+Fernandez, Magnus Heino and Serge Stinckwich. Thanks!
+
+
+Hope don't forget anybody :)

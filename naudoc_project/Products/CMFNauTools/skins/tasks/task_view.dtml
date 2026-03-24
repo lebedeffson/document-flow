@@ -1,0 +1,156 @@
+<dtml-comment>
+$Id: task_view.dtml,v 1.32 2006/04/27 12:56:24 ikuleshov Exp $
+</dtml-comment>
+
+<dtml-if "portal_membership.checkPermission('View', this().getBase())">
+<dtml-let
+  versionable_base="this().getBase().implements('isVersionable')"
+  document_version="versionable_base and this().getBase().getVersion().getId() or None"
+  task_version="this().version_id">
+  <dtml-if "task_version and document_version!=task_version">
+    <dtml-let url_to_doc="versionable_base and this().getBase().absolute_url()+'/version/'+task_version+'/followup/'+getId() or ''">
+    <dtml-comment>redirect to task's version of document context</dtml-comment>
+    <dtml-call "REQUEST['RESPONSE'].redirect( url_to_doc )">
+    </dtml-let>
+  </dtml-if>
+</dtml-let>
+</dtml-if>
+
+<dtml-var simple_html_header>
+
+<dtml-let
+  container="portal_membership.checkPermission('View', this().getBase()) and this().getBase() or None">
+
+<div class="Desktop">
+
+<h1>
+  <img src="&dtml-portal_url;/task_icon.gif" alt="" />
+  &nbsp;<dtml-var "aboveInThread(top_action='document_follow_up_form')">
+</h1>
+
+<dtml-if isInvolved>
+  <dtml-msg "You are assigned to participate in this task.">
+</dtml-if> 
+<dtml-var task_info>
+
+<dtml-var task_controls>
+
+<dtml-if isFinalized>
+  <dtml-let result="getResultById(ResultCode())"
+            result_title="result and result.get('title') or ''"
+  >
+      <p>
+        <b><dtml-msg "Finalized task"></b>
+        <dtml-if result><br><dtml-msg "Task result">: <dtml-msg expr=result_title></dtml-if>
+      </p>
+  </dtml-let>
+</dtml-if>
+
+<dtml-if isEnabled>
+  <h3><dtml-msg "Progress report"></h3>
+<dtml-else>
+  <dtml-comment>
+    <p><b><dtml-msg "Not effective"></b></p>
+  </dtml-comment>
+</dtml-if>
+
+<dtml-var task_progress>
+
+<dtml-var viewTasksTree>
+
+<dtml-in getHistory mapping reverse>
+ <dtml-if sequence-start>
+  <table cellspacing="3">
+   <tr>
+    <td class="smallHeader"><dtml-msg "Notifications log"></td>
+   </tr>
+ </dtml-if>
+  <tr>
+   <td class="small">
+     <dtml-var date fmt="%Y-%m-%d %H:%M">
+      <b><dtml-var actor fmt=member.brief></b>
+      <br>
+      <dtml-msg "Sent to users">:
+      <b><dtml-in rcpt><dtml-var sequence-item fmt=member.brief><dtml-unless sequence-end>, </dtml-unless></dtml-in></b>
+      <br>
+      <em><dtml-var text></em>
+   </td>
+ <dtml-if sequence-end>
+  </table>
+ </dtml-if>
+</dtml-in>
+
+<dtml-if "container and container.implements('isDocument')">
+<form name="metadata_edit_form" action="&dtml-absolute_url;/metadata_edit" method="POST" onsubmit="return validateForm(this, 1, 1);">
+<table width="100%">
+<tr class="task_title">
+  <td class="smallHeader"><dtml-msg "Document text"></td>
+</tr>
+<tr>
+  <td style="padding: 10px"><dtml-var "container.CookedBody(view=1)"></td>
+</tr>
+<dtml-let attributes="container.listCategoryAttributes( monikers=True )"
+          category_object="container.getCategory()"
+          attr_perm="container.implements('isCategorial') and category_object and [not not container.checkAttributePermissionModify(x) for x in category_object.listAttributeDefinitions()] or []"
+          amodify="attr_perm.sort() or (attr_perm and attr_perm[-1] or 0)"
+>
+<dtml-if attributes>
+  <tr class="task_title">
+    <td class="smallHeader"><dtml-msg "Document attributes"></td>
+  </tr>
+  <tr><td><dtml-var "attribute_fields_embedded(None, _, document = container)"></td></tr>
+<dtml-if "amodify">
+  <tr><td><input type="submit" name="metadata" value=" <dtml-msg "Apply"> "></td></tr>
+</dtml-if>  
+</dtml-if>
+</dtml-let>
+  <tr>
+    <td>
+      <dtml-var "document_links_embedded(container, _)">
+    </td>
+  </tr>
+</table>
+</form>
+
+<dtml-in "container.listAttachments()">
+ <dtml-if sequence-start>
+    <table width="400" border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
+     <tr>
+      <td>
+        <table border="0" cellpadding="2" cellspacing="0" width="100%" class="List">
+        <tr class="row_title">
+          <td colspan="4">&nbsp;
+            <b><dtml-msg "Attached files"></b>
+         </td>
+        </tr>
+  </dtml-if>
+        <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+         <td>        
+           <a href="&dtml-relative_url;" target="_blank">
+             <dtml-if icon>
+              <img src="&dtml-portal_url;/&dtml-icon;" alt="&dtml-meta_type;"
+                     title="&dtml-meta_type;" border="0"/>
+             <dtml-else>&nbsp;</dtml-if>
+             &dtml-title_or_id;</a> (<dtml-var "'%.1f' % (get_size() / 1024.0)"> Kb)
+         </td>
+         <td align=right valign=middle nowrap>
+          <dtml-if isLocked>
+            <span class="resolution"><dtml-msg "Editing by">&nbsp;<dtml-var getLockCreator fmt=member></span>
+          <dtml-else>
+            <dtml-var external_edit_link>
+          </dtml-if>
+         </td>
+        </tr>
+ <dtml-if sequence-end>
+        </table>
+      </td></tr>
+      </table>
+ </dtml-if>
+</dtml-in>
+</dtml-if>
+
+</div>
+
+</dtml-let>
+
+<dtml-var simple_html_footer>

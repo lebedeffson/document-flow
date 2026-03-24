@@ -1,0 +1,263 @@
+<dtml-comment>
+$Id: registration_book_edit_form.dtml,v 1.27 2006/06/28 14:03:35 ypetrov Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.27 $>
+
+<dtml-var simple_html_header>
+
+<form name="settings" action="registration_book_edit" method="POST">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>
+      <table  border="0" cellpadding="2" cellspacing="2"
+              width="100%" class="FormLayout">
+        <tr class="row_title">
+          <td colspan="2" class="smallHeader">
+            <dtml-msg Metadata>
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td align="right" class="small">
+            <dtml-msg Title>
+          </td>
+          <td>
+            <input type="text" name="title" value="&dtml-Title;" size="60">
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td align="right" class="small"> <dtml-msg Description> </td>
+          <td>
+            <textarea name="description"
+                      cols=60 rows=5>&dtml-Description;</textarea>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr><td>&nbsp;</td></tr>
+  <dtml-let object=this
+            cat_id="REQUEST.get('cat', None) or object.getRegisteredCategory()"
+            category="portal_metadata.getCategoryById(cat_id)"
+            cat_attrs="[x for x in category.listAttributeDefinitions()]"
+            string_attrs="[x for x in cat_attrs if x.Type() == 'string']"
+            reg_attr="object.getRegistrationNumberAttributeId()"
+            dest_folder="object.getPapersFolder()"
+            dest_folder_uid="dest_folder and dest_folder[0] or ''"
+            dest_folder_title="dest_folder and dest_folder[1] or ''"
+            >
+  <tr>
+    <td>
+      <table  border="0" cellpadding="2" cellspacing="2"
+              width="100%" class="FormLayout">
+        <tr class="row_title">
+          <td colspan="2" class="smallHeader"><dtml-msg Settings></td>
+        </tr>
+        <tr class="row_even">
+          <td class="small">
+            <dtml-msg "Category of registered documents">
+          </td>
+          <td>
+            <select name="category"
+                    onChange="document.location.replace(
+                              'registration_book_edit_form?cat='
+                              +this.options[this.selectedIndex].value);">
+            <dtml-in "portal_metadata.listCategories()">
+              <option value="<dtml-var getId>"
+                      <dtml-var "getId() == cat_id" fmt=selected>
+                      >
+              <dtml-msg expr="Title">
+              </option>
+            </dtml-in>
+            </select>
+            <br>
+            <font color="red">
+            <dtml-msg "Attention! Changing this value will cause documents that
+                      doesn't match selected category to be unregistered!">
+
+            </font>
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td class="small">
+            <dtml-msg "Document attribute to store registration number">
+          </td>
+          <td>
+            <select name="reg_no_attr">
+              <option value="" <dtml-var "reg_attr and ' ' or 'selected'"> >
+                -&nbsp;<dtml-msg "n/a">&nbsp;-
+              </option>
+            <dtml-in string_attrs>
+              <option value="<dtml-var getId>"
+                      <dtml-var "getId() == reg_attr and 'selected' or ' '">
+                      >
+              <dtml-msg expr="Title">
+              </option>
+            </dtml-in>
+            </select>
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td class="small">
+            <dtml-msg "Registration number forming rule">
+          </td>
+          <td>
+            <input  type="text" name="reg_no_rule" size="50"
+                    value="<dtml-var "object.getRegistrationNumberTemplate()" html_quote>"
+                    />
+            <br/>
+            <a href="javascript:showHint('reg_book_date')"><dtml-msg "Help"></a>
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td class="small">
+            <dtml-msg Department>
+          </td>
+          <td>
+            <input  type="text" name="department" size="50"
+                    value="<dtml-var "object.getDepartment()" html_quote>"
+                    />
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td class="small">
+            <dtml-msg "Folder to place paper documents">
+          </td>
+          <td class="small">
+            <input type="text" disabled size=50 id="dest_folder_title"
+                   value="&dtml-dest_folder_title;">
+            <input type="hidden" name="dest_folder_uid"
+                   value="&dtml-dest_folder_uid;">
+            <input type="button" value="<dtml-msg "Browse...">"
+                   onClick="fieldEditHandler.folder_select('dest_folder')">
+
+<dtml-unless "REQUEST.get( '_entry_field_edit.common' )">
+<dtml-call "REQUEST.set( '_entry_field_edit.common', True )">
+<script type="text/javascript" src="&dtml-portal_url;/entry_field_scripts.js"></script>
+</dtml-unless>
+
+<script language="javascript">
+var field_id = '';
+window['dest_folder_link'] = '<dtml-var "relative_url(action = 'task_reportwizard_folders')">';
+</script>
+
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td class="small">
+            <dtml-msg "Internal counter">
+          </td>
+          <td>
+            <input  type="radio" name="change_counter" checked="1"
+                    value="leave"
+                    onClick="javascript: this.form.last_id.disabled = true;" />
+             &nbsp;
+            <dtml-msg "The current value of counter - %(value)s (leave without modification)" value=getLastSequenceNumber>
+            <br>
+            <input  type="radio" name="change_counter"
+                    value="change"
+                    onClick="javascript: this.form.last_id.disabled = false;" />
+             &nbsp;
+            <dtml-msg "Set the following value:">&nbsp;
+            <input type="text" size="10" id="last_id" name="last_id:int" value="&dtml-getLastSequenceNumber;" disabled="1" />
+          </td>
+        </tr>
+        <tr class="row_even">
+          <td class="small">
+            <dtml-msg "Hide records older than">
+          </td>
+          <td>
+            <select name="recency_period">
+              <option value="0" <dtml-var "not getRecencyPeriod()" fmt=selected> >
+                <dtml-msg "registration_book.recency_disabled">
+              </option>
+              <option value="1" <dtml-var "getRecencyPeriod() == 1" fmt=selected> >
+                1 <dtml-msg day.plural>
+              </option>
+              <dtml-in "_.range(2, 15)">
+                <option value="&dtml-sequence-item;"
+                  <dtml-var "getRecencyPeriod() == _['sequence-item']" fmt=selected>
+                  >
+                  &dtml-sequence-item; <dtml-msg days>
+                </option>
+              </dtml-in>
+            </select>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr><td>&nbsp;</td></tr>
+  <tr>
+    <td>
+      <dtml-var "reference_column_edit_form( None, _
+                                           , columns_title='Registration book columns'
+                                           , modify_title=True)">
+    </td>
+  </tr>
+  <tr class="row_even"><td>&nbsp;</td></tr>
+    <tr>
+      <td>
+        <dtml-msg "Hide columns">:
+        <br><input type="checkbox" value="1" name="hide_registration_date" <dtml-var "hide_registration_date" fmt=checked> > <dtml-msg "Registration date">
+        <br><input type="checkbox" value="1" name="hide_creator" <dtml-var "hide_creator" fmt=checked> > <dtml-msg User>
+        <br><input type="checkbox" value="1" name="hide_version" <dtml-var "hide_version" fmt=checked> > <dtml-msg Version>
+        <table  border="0" cellpadding="2" cellspacing="0"
+                width="100%" class="FormLayout">
+        <dtml-in cat_attrs>
+          <dtml-if sequence-start>
+            <tr class="row_even">
+              <td colspan="2">
+                <dtml-msg "Category attributes">
+              </td>
+            </tr>
+            <tr class="row_even">
+              <td>
+                <select name="attribute">
+          </dtml-if>
+          <option value="<dtml-var getId>"><dtml-msg expr="Title"></option>
+          <dtml-if sequence-end>
+                </select>
+              </td>
+              <td>
+                <input type="submit" name="add_attribute_column" value="<dtml-msg Add>">
+              </td>
+            </tr>
+          </dtml-if>
+        </dtml-in>
+        <dtml-in listMetaColumns>
+          <dtml-if sequence-start>
+            <tr class="row_even">
+              <td colspan="2">
+                <dtml-msg "Additional metadata">
+              </td>
+            </tr>
+            <tr class="row_even">
+              <td>
+                <select name="meta">
+          </dtml-if>
+          <option value="<dtml-var sequence-item>"><dtml-msg expr=sequence-item></option>
+          <dtml-if sequence-end>
+                </select>
+              </td>
+              <td>
+                <input type="submit" name="add_meta_column" value="<dtml-msg Add>">
+              </td>
+           </tr>
+          </dtml-if>
+        </dtml-in>
+      </table>
+    </td>
+  </tr>
+  </dtml-let>
+  <tr class="row_even"><td><hr></td></tr>
+  <tr class="row_even" align="right">
+    <td>
+      <input type="submit" name="save" value="<dtml-msg Save>">
+    </td>
+  </tr>
+</table>
+</form>
+
+<dtml-var simple_html_footer>

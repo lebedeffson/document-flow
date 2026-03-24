@@ -1,0 +1,17 @@
+<dtml-comment>
+$Id: viewTasksTree.dtml,v 1.15 2005/10/31 09:47:42 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.15 $>
+
+<dtml-if followup>
+
+<dtml-if "followup.getBoundTasks()">
+
+<br>
+<dtml-forest branches_expr="followup.getBoundTasks()" sort="expires">
+  <dtml-var "this()" fmt=task.simple>
+</dtml-forest>
+
+</dtml-if>
+
+</dtml-if>

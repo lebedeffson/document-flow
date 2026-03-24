@@ -1,0 +1,299 @@
+
+msgid ""
+msgstr "Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2002-02-23 14:02+CET\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+
+msgid "A Local Content object provides an storage for multilingual (and non multilingual) properties. It also helps to keep your content separated from the logic and the presentation."
+msgstr ""
+
+
+msgid "A Localizer object provides <em>locale folders</em>, each one associated with a language. It transparently adds a locale folder to the path so objects for that language will be used. It's useful to localize special objects like images, or specific logic (to format dates for example)."
+msgstr ""
+
+
+msgid "A locale folder is just a normal folder with a <tt>SiteRoot</tt>. Its id must be a language code, the title is optional. Locale folders are used to store special objects like images and logic that needs to be localized."
+msgstr ""
+
+
+msgid "A message catalog stores messages and its translations to different languages. It provides the <tt>gettext</tt> method to get the right translation for a given message. Message catalogs are useful to translate the application interfaces (labels, buttons, etc..)."
+msgstr ""
+
+
+msgid "Add"
+msgstr ""
+
+
+msgid "Add Local Content"
+msgstr ""
+
+
+msgid "Add Locale Folder"
+msgstr ""
+
+
+msgid "Add Localizer"
+msgstr ""
+
+
+msgid "Add Message Catalog"
+msgstr ""
+
+
+msgid "Attributes"
+msgstr ""
+
+
+msgid "Back to manage messages."
+msgstr ""
+
+
+msgid "Besides the title the header of a PO file stores more information, the name and the email address of the last translator, the email adress of the translation team and the charset. The forms below let to modify this information for each language."
+msgstr ""
+
+
+msgid "Change"
+msgstr ""
+
+
+msgid "Charset"
+msgstr ""
+
+
+msgid "Contents"
+msgstr ""
+
+
+msgid "Default"
+msgstr ""
+
+
+msgid "Delete"
+msgstr ""
+
+
+msgid "Export"
+msgstr ""
+
+
+msgid "File"
+msgstr ""
+
+
+msgid "File / Language"
+msgstr ""
+
+
+msgid "Filter"
+msgstr ""
+
+
+msgid "Find"
+msgstr ""
+
+
+msgid "Header"
+msgstr ""
+
+
+msgid "Hide this language"
+msgstr ""
+
+
+msgid "Id"
+msgstr ""
+
+
+msgid "Import"
+msgstr ""
+
+
+msgid "Import/Export"
+msgstr ""
+
+
+msgid "Language"
+msgstr ""
+
+
+msgid "Languages"
+msgstr ""
+
+
+msgid "Local properties"
+msgstr ""
+
+
+msgid "Locale folders"
+msgstr ""
+
+
+msgid "Locale folders are useful to store special multilingual objects like images and specific logic. If used the <tt>Localizer</tt> object will transparently add the right locale folder to the url. If you want to use locale folders check the checkbox, otherwise uncheck it, then click the <tt>Change</tt> button."
+msgstr ""
+
+
+msgid "Message"
+msgstr ""
+
+
+msgid "Message catalog"
+msgstr ""
+
+
+msgid "Messages"
+msgstr ""
+
+
+msgid "Name"
+msgstr ""
+
+
+msgid "Next"
+msgstr ""
+
+
+msgid "No languages available."
+msgstr ""
+
+
+msgid "Ownership"
+msgstr ""
+
+
+msgid "Previous"
+msgstr ""
+
+
+msgid "Properties"
+msgstr ""
+
+
+msgid "Results %d-%d of %d"
+msgstr ""
+
+
+msgid "Save changes"
+msgstr ""
+
+
+msgid "Security"
+msgstr ""
+
+
+msgid "Show this language"
+msgstr ""
+
+
+msgid "Team e-mail address"
+msgstr ""
+
+
+msgid "Text to translate:"
+msgstr ""
+
+
+msgid "There aren't languages"
+msgstr ""
+
+
+msgid "There aren't messages."
+msgstr ""
+
+
+msgid "There aren't properties."
+msgstr ""
+
+
+msgid "This <tt>%s</tt> object needs to be upgraded"
+msgstr ""
+
+
+msgid "This <tt>Localizer</tt> object don't needs to be upgraded."
+msgstr ""
+
+
+msgid "This <tt>Localizer</tt> object needs to be upgraded."
+msgstr ""
+
+
+msgid "This object don't needs to be upgraded."
+msgstr ""
+
+
+msgid "Title"
+msgstr ""
+
+
+msgid "To add a language select it and click the <tt>Add</tt> button."
+msgstr ""
+
+
+msgid "To add a new message enter it and click the <tt>Add</tt> button."
+msgstr ""
+
+
+msgid "To add a new property enter its name and type and click the <tt>Add</tt> button."
+msgstr ""
+
+
+msgid "To add a new property enter its name, select its type and click the <tt>Add</tt> button."
+msgstr ""
+
+
+msgid "To delete a language check it and click the <tt>Delete</tt> button. To change the default language select it and click the <tt>Change</tt> button."
+msgstr ""
+
+
+msgid "To show only few messages enter a regular expression and click the <tt>Filter</tt> button."
+msgstr ""
+
+
+msgid "Type"
+msgstr ""
+
+
+msgid "Undo"
+msgstr ""
+
+
+msgid "Upgrade"
+msgstr ""
+
+
+msgid "Use locale folders"
+msgstr ""
+
+
+msgid "View"
+msgstr ""
+
+
+msgid "With this form you can change the title of the message catalog. The title also is used as the value of the <tt>Project-Id-Version</tt> field in the header of the PO files, which are generated when the message catalog is exported."
+msgstr ""
+
+
+msgid "You can add new messages and translations importing a PO file. Enter the filename, select the language of the translations and click the <tt>Import</tt> button."
+msgstr ""
+
+
+msgid "You can export the messages and their translations to PO files. Check <tt>locale.pot</tt> to get only the messages, without their translations. Check any other option to get a PO file with the messages and their translations to the selected language. Then click the <tt>Export</tt> button."
+msgstr ""
+
+
+msgid "Your e-mail address"
+msgstr ""
+
+
+msgid "Your name"
+msgstr ""
+
+
+msgid "default"
+msgstr ""
+

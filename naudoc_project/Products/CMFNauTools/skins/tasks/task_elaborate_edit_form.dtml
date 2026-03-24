@@ -1,0 +1,150 @@
+<dtml-comment>
+$Id: task_elaborate_edit_form.dtml,v 1.9 2005/10/12 11:32:46 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.9 $>
+
+<dtml-unless inline>
+    <dtml-call "REQUEST.set('OpenInFrame', '')">
+    <dtml-var simple_html_header>
+<form name="task_edit_form">
+</dtml-unless>
+
+<dtml-let available_members="not _.has_key('key') and _.has_key('available_members') and available_members or []"
+          expiration_date="not _.has_key('key') and _.has_key('expiration_date') and expiration_date or _.DateTime()"
+          description="not _.has_key('key') and _.has_key('description') and description or ''"
+>
+  <table>
+   <tr class="row_title">
+      <td colspan="2">
+          <dtml-var "msg('Task elaboration form')">
+      </td>
+   </tr>
+   <tr class="row_even">
+     <td class="small">
+        <dtml-var "msg('Description')">
+     </td>
+     <td>
+        <textarea name="description" rows="6" cols="50"><dtml-var description></textarea>
+     </td>
+   </tr>
+  <tr class="row_even">
+    <td class="small">
+       <dtml-var "msg('Expiration date')">
+    </td>
+    <td>
+            <dtml-var "datetime_form( this()
+                                    , prefix='expiration_date'
+                                    , date=expiration_date
+                                    )"
+            >
+    </td>
+  </tr>
+   <tr class="row_even">
+     <td colspan="2">
+        <table>
+        <tr class="row_even">
+          <td class="small" width="40%"><dtml-var "msg('Available users')">
+          </td>
+          <td>&nbsp;</td>
+          <td class="small" width="40%" nowrap><dtml-var "msg('Responsible members')">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <dtml-var "user_list(this(), name='available_members', list_size=8, multiple=1, user_ids=available_members, on_dbl_click='javascript:addSelectionToList(available_members, selected_members);')">
+          </td>
+          <td>
+            <input type=button
+                   onClick="javascript:addSelectionToList(available_members, selected_members);"
+                   value=" >> "
+            > <br><br>
+            <input type=button
+                   onClick="javascript:addSelectionToList(selected_members, available_members);deleteSelectionFromList(selected_members);"
+                   value=" << "
+            >
+          </td>
+          <td>
+            <select id="selected_members"
+                    name="selected_members:list"
+                    size="8"
+                    onDblClick="javascript:deleteSelectionFromList(selected_members);"
+                    multiple
+            ></select>
+          </td>
+        </tr>
+        </table>
+     </td>
+   </tr>
+   <tr>
+     <td>
+        <dtml-if key>
+           <input type=button
+                  name="save"
+                  value="<dtml-var "msg('Save changes')">"
+                  onClick="javascript: save_task();"
+           >
+        <dtml-else>
+           <input type=submit name="add" value="<dtml-var "msg('Define a subtask')">">
+        </dtml-if>
+     </td>
+   </tr>
+  </table>
+
+</dtml-let>
+
+<dtml-unless inline>
+</form>
+</dtml-unless>
+
+<dtml-if key>
+
+  <script type="text/javascript"><!--
+     key = <dtml-var key>;
+     remote_form = opener.document.elaboration_form;
+     local_form = document.task_edit_form
+
+     function initialize()
+     {
+        local_form.description.value = remote_form['description_' + key].value;
+
+        r_available_members = remote_form['available_members'];
+        for(var i = 0; i < r_available_members.length; i++) {
+             addOptionTo( local_form.available_members
+                        , r_available_members.options[i].text
+                        , r_available_members.options[i].value
+                        );
+        }
+
+        r_involved_users = remote_form['involved_users_' + key];
+        for(var i = 0; i < r_involved_users.length; i++) {
+             addOptionTo( local_form.selected_members
+                        , r_involved_users.options[i].text
+                        , r_involved_users.options[i].value
+                        );
+        }
+
+        local_form.expiration_date_field.value = remote_form['expiration_date_' + key].value;
+     }
+
+     function save_task()
+     {
+        remote_form['description_' + key].value = local_form.description.value;
+        remote_form['expiration_date_' + key].value = local_form.expiration_date_field.value;
+
+        clearList(r_involved_users);
+        selectAll(local_form.selected_members);
+
+        addSelectionToList(local_form.selected_members, r_involved_users);
+
+        window.close();
+     }
+
+     initialize();
+
+  //--></script>
+
+</dtml-if>
+
+<dtml-unless inline>
+<dtml-var simple_html_footer>
+</dtml-unless>

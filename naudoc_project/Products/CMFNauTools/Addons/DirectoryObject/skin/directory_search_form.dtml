@@ -1,0 +1,43 @@
+<dtml-comment>
+$Id: directory_search_form.dtml,v 1.5 2006/05/18 08:41:51 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-if "_.has_key('explorer_id')">
+<form name="search_form" 
+      action="<dtml-var "relative_url( action='explorer_frame' )">"
+      method="POST" >
+
+  <input type="hidden" name="explorer_id" value="&dtml-explorer_id;">
+<dtml-else>
+<form name="search_form" 
+      action="&dtml-absolute_url;"
+      method="POST" >
+</dtml-if>
+<input type="hidden" name="search_enable:boolean" value="on">
+<input type="hidden" name="disable_dynamic" value="&dtml.missing-disable_dynamic;">
+
+<table width="200" border="0" cellspacing="0" cellpadding="0" >
+  <tr> 
+    <td colspan=2>
+      <dtml-msg "Search">
+    </td>
+  </tr>
+  <tr>
+    <td width="100%"> 
+      <input type="text"
+             name="text:search" 
+             class="search" 
+             value="&dtml.html_quote.missing-text;"
+             title="<dtml-msg search.syntax_tip newlines=0>"
+             size="10" />
+    </td>
+    <td>
+      <input type="image"
+             name="search"
+             src="&dtml-portal_url;/search.gif" 
+             onMouseOver='change(this,1);'
+             onMouseOut='change(this,2);' />
+    </td>
+  </tr>
+</table>
+</form>

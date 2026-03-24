@@ -1,0 +1,52 @@
+<dtml-comment>
+'name' - selectbox id
+'size' - selectbox size
+'options' - available list options
+'value' - preselected options
+
+$Editor: ikuleshov $
+$Id: selectbox.dtml,v 1.5 2005/07/03 10:26:05 vsafronovich Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.5 $>
+
+<dtml-let value="_.has_key('value') and value or []"
+	  rows="_.has_key('size') and size or 6"
+          on_dbl_click="_.has_key('on_dbl_click') and 'onDblClick=\'%s\'' % (on_dbl_click) or ''"
+	  flags="{}" >
+
+<dtml-if "_.has_key('multiple') and multiple">
+
+  <select id="&dtml-name;" 
+          name="&dtml-name;:list" 
+          size="&dtml-rows;"
+          multiple="1"
+          <dtml-var on_dbl_click>
+  >
+    <dtml-in options>
+      <option value="&dtml-sequence-key;" <dtml-var "_['sequence-key'] in value" fmt=selected> >
+              <dtml-msg expr=sequence-item></option>
+    </dtml-in>
+  </select>
+  <input type="hidden" name="&dtml-name;:tokens:default" value="" />
+
+  <dtml-if "_.len(options) > rows">
+  <br />
+  <dtml-msg "Fast search">: <input type="text" value=""
+            onKeyUp="SearchStrInSelect( this.value, this.form.elements['<dtml-var name fmt=jscript>:list'] )" />
+  </dtml-if>
+
+<dtml-else>
+
+  <select name="&dtml-name;:string">
+    <dtml-in options>
+      <option value="&dtml-sequence-key;" <dtml-var "_['sequence-key'] == value and flags.setdefault('found',1)" fmt=selected> >
+              <dtml-msg expr=sequence-item></option>
+    </dtml-in>
+    <dtml-unless "flags.get('found')">
+      <option value="" selected="1">(<dtml-msg "not selected">)</option>
+    </dtml-unless>
+  </select>
+
+</dtml-if>
+</dtml-let>

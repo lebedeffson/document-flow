@@ -1,0 +1,129 @@
+<dtml-comment>
+$Id: task_definition_distribute_document_info_emb.dtml,v 1.3 2008/12/03 13:05:41 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+
+ <table class="FormLayout" border="0">
+  <tr class="row_odd">
+    <td class="smallHeader">
+      <dtml-var "msg('Distribute the document to the following users')">
+    </td>
+  </tr>
+  <tr class="row_even">
+   <td align=left>
+     <dtml-if "'users' in task_definition['_allow_edit']">
+
+<script type="text/javascript">
+<!--
+
+  function validateConfirm( ev ){
+    frm = ev.srcElement;
+    if ( !validSelectionRequestedUsers( frm ) ){
+      alert('<dtml-var "msg('You have not selected user(s)')">');
+      return false;
+    }
+      
+/*    if ( !validSelectionLetterContent( frm ) ){
+      alert("<dtml-var "msg('You didn\'t specify what to include in the letter.')">");
+      return false;
+    }
+      
+    if ( selectedTransportableContent( frm ) && !userAgreeWithSendOverNonSecureConnection() ){
+      return false;
+    }
+*/    
+    requested_users = frm['&dtml-template_id;_requested_users:list'];
+    selectAll(requested_users);
+    return true;
+  }
+
+  registerCallback(
+        this.confirm_form, 'onSubmit', validateConfirm
+    );
+    
+  function validSelectionRequestedUsers( frm ){
+    requested_users = frm['&dtml-template_id;_requested_users:list'];
+    return ( requested_users.length > 0 || frm['other_user_emails'].value );
+  }
+    
+  function validSelectionLetterContent( frm ){
+    list = frm['letter_parts:list'];
+    return ( list[0].checked || list[1].checked || list[2].checked || list[3].checked);
+  }
+
+  function selectedTransportableContent( frm ){
+    list = frm['letter_parts:list'];
+    return ( list[0].checked || list[1].checked || list[2].checked);
+  }
+
+  function userAgreeWithSendOverNonSecureConnection(){
+    return confirm('<dtml-var "msg('Attention! The information will be sent over non-secure connection, continue?')">');
+  }
+
+//-->
+</script>
+
+
+        <dtml-let preselected_users="task_definition['requested_users']"
+                  name="'%s_requested_users' % template_id"
+        >
+          <dtml-var users_selection>
+        </dtml-let>
+
+       <dtml-var "msg('Other addresses (use semicolon as separator)')">
+       <br><textarea name="other_user_emails" cols="40" rows="3"><dtml-var "task_definition['other_user_emails']"></textarea>
+     <dtml-else>
+        <dtml-in "task_definition['requested_users']">
+            <dtml-var sequence-item fmt=member>
+          <dtml-unless sequence-end><br/></dtml-unless>
+        </dtml-in>
+        <br>
+        <dtml-var "task_definition['other_user_emails']">       
+     </dtml-if>
+   </td>
+  </tr>
+
+  <tr class="row_odd">
+    <td class="smallHeader">
+       <dtml-var "msg('Content of the letter')"><br>
+    </td>
+  </tr>
+  <tr class="row_even">
+    <td class="small">
+      <dtml-if "'content' in task_definition['_allow_edit']">
+       <dtml-var "msg('Subject')">: <input type="text" name="&dtml-template_id;_subject" size="50" value="<dtml-var "task_definition['subject']">">
+       <br>
+       <br><input type="checkbox" name="&dtml-template_id;_letter_parts:list" value="body" <dtml-if "'body' in task_definition['letter_parts']">checked</dtml-if>> <dtml-var "msg('include document body')">
+       <br><input type="checkbox" name="&dtml-template_id;_letter_parts:list" value="attachment" <dtml-if "'attachment' in task_definition['letter_parts']">checked</dtml-if>> <dtml-var "msg('include attachments')">
+       <br><input type="checkbox" name="&dtml-template_id;_letter_parts:list" value="metadata" <dtml-if "'metadata' in task_definition['letter_parts']">checked</dtml-if>> <dtml-var "msg('include registration card')">
+       <br><input type="checkbox" name="&dtml-template_id;_letter_parts:list" value="link_to_doc" <dtml-if "'link_to_doc' in task_definition['letter_parts']">checked</dtml-if>> <dtml-var "msg('include link to the document')">
+       <br>
+       <br><dtml-var "msg('Message text')">
+       <br><textarea name="&dtml-template_id;_comment" rows="5" cols="80"><dtml-var "task_definition['comment']"></textarea>
+      <dtml-else>
+       <dtml-var "msg('Subject')">: <dtml-var "task_definition['subject']">
+       <dtml-if "'body' in task_definition['letter_parts']">
+         <br><dtml-var "msg('include document body')">
+       </dtml-if>
+       <dtml-if "'attachment' in task_definition['letter_parts']">
+         <br><dtml-var "msg('include attachments')">
+       </dtml-if>
+       <dtml-if "'metadata' in task_definition['letter_parts']">
+         <br><dtml-var "msg('include registration card')">
+       </dtml-if>
+       <dtml-if "'link_to_doc' in task_definition['letter_parts']">
+         <br><dtml-var "msg('include link to the document')">
+       </dtml-if>
+         <br><dtml-var "msg('Message text')">: <dtml-var "task_definition['comment']">
+      </dtml-if>
+    </td>
+  </tr>
+  <dtml-comment>
+  <tr>
+   <td><br><h1>&dtml-title_or_id;</h1></td>
+  </tr>
+  <tr>
+   <td><dtml-var CookedBody></td>
+  </tr>
+  </dtml-comment>
+ </table>

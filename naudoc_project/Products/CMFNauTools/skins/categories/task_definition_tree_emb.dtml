@@ -1,0 +1,11 @@
+<b><dtml-var text_message>:</b><br />
+<dtml-in "taskTemplateContainerAdapter.getTaskDefinitionTreeItems( getId(), template_id, id_parent )" mapping>
+  <nobr><dtml-var "'&nbsp;' * level">
+    <a href="task_template_task_definition_info?parent_id=&dtml-id_parent;&template_id=&dtml-template_id;&id_task_definition=<dtml-var id_task_definition>">
+      &dtml-name; (<dtml-msg expr=task_definition_type_title>)
+    </a>
+  </nobr>
+  <br />
+<dtml-else>
+  <dtml-msg "None">
+</dtml-in>

@@ -1,0 +1,55 @@
+<dtml-var migration_html_header>
+
+<h2>Portal categories setup</h2>
+
+<dtml-with getMigrationContext>
+
+<form method="POST" onsubmit="disableForm(this);">
+
+<p>Current portal version already has the following categories. You can either 
+replace the particular categories with their factory settings or make a backup 
+copy of selected categories. Backup objects will have an 'old_' prefix in 
+their id.
+</p>
+
+<dtml-let script_init="script_init[now_configuring]"
+          categories_to_update="script_init.get('categories_to_update')"
+>
+
+<table class="thin" cellspacing="0" cellpadding="3" width="50%">
+<tr>
+  <td class="thin" width="25%">
+    Replace
+  </td>
+  <td class="thin" width="25%">
+    Backup
+  </td>
+  <td class="thin" width="50%">
+    Category id
+  </td>
+</tr>
+<dtml-in categories_to_update>
+  <tr>
+    <td class="thin">
+      <input type="radio" name="&dtml-sequence-item;" value="replace" checked>
+    </td>
+    <td class="thin">
+      <input type="radio" name="&dtml-sequence-item;" value="old">
+    </td>
+    <td class="thin">
+      &dtml-sequence-item;
+    </td>
+  </tr>
+</dtml-in>
+</table>
+
+</dtml-let>
+
+<br /><br />
+<input type="submit" name="configure_next" value=" Ok ">
+
+</form>
+
+</dtml-with>
+
+<dtml-var migration_html_footer>

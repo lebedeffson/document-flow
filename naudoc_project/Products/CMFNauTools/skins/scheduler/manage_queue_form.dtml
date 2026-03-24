@@ -1,0 +1,74 @@
+<dtml-comment>
+$Id: manage_queue_form.dtml,v 1.8 2004/09/08 09:40:16 vpastukhov Exp $
+</dtml-comment>
+<dtml-var scheduler_html_header>
+<dtml-with portal_scheduler>
+
+<span class="form-help"><dtml-msg scheduler.queue.explain></span>
+
+<br><br>
+
+<dtml-let schedule=getSchedule
+          queue="schedule.getEventQueue()"
+          expiration_interval="queue.getExpirationInterval()"
+          expires="queue.expires"
+>
+<form action="manage_queue" method="post">
+<span class="form-text">
+<dtml-msg scheduler.queue.items count="_.len(queue)">
+</span>
+
+<br>
+
+<span class="form-label"><dtml-msg scheduler.queue.refresh_interval>:</span>
+<span class="form-text">
+  <dtml-var "expiration_interval.minutes"> <dtml-msg "minute(s)">
+  <dtml-var "expiration_interval.seconds"> <dtml-msg "second(s)">
+</span>
+
+<br>
+
+<span class="form-label"><dtml-msg scheduler.queue.expiration_time>:</span>
+<span class="form-text">
+  <dtml-var "expires and expires.strftime('%x %X') or '?'">
+</span>
+
+<br>
+
+<span class="form-label"><dtml-msg scheduler.queue.system_time>:</span>
+<span class="form-text">
+  <dtml-var "_.DateTime().strftime('%x %X')">
+</span>
+
+<br><br>
+
+<input type="submit" name="refresh" value=" <dtml-msg scheduler.queue.refresh> ">
+<input type="submit" value=" <dtml-msg "Update this page"> ">
+<dtml-in "queue.queue">
+<dtml-if sequence-start>
+  <br><hr>
+  <table cellspacing="2" cellpadding="2" border="0">
+  <tr>
+    <td class="form-label"><dtml-msg scheduler.queue.start_time></td>
+    <td class="form-label"><dtml-msg Id></td>
+    <td class="form-label"><dtml-msg Title></td>
+  </tr>
+</dtml-if>
+  <dtml-let element="schedule[ _['sequence-item'] ]">
+  <tr>
+    <td class="form-element"><dtml-var "_['sequence-key'].strftime('%x %X')"></td>
+    <td class="form-element"><dtml-var sequence-item></td>
+    <td class="form-element"><dtml-var "element.title"></td>
+  </tr>
+  </dtml-let>
+<dtml-if sequence-end>
+  </tr>
+  </table>
+</dtml-if>
+</dtml-in>
+
+</form>
+</dtml-let>
+
+</dtml-with>
+<dtml-var simple_html_footer>

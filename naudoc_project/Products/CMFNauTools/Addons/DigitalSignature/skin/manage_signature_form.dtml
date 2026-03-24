@@ -1,0 +1,237 @@
+<dtml-comment>
+$Id: manage_signature_form.dtml,v 1.5 2008/06/18 13:04:59 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-var simple_html_header>
+
+<dtml-with portal_signature only>
+
+<object
+  style="display:none;"
+  id="oXEnroll"
+  classid="clsid:127698e4-e730-4e5c-a2b1-21490a70c8a1"
+  codebase="&dtml-portal_url;/xenrlinf.cab#version=5,131,3686,0">
+</object>
+
+<script type="text/javascript">
+<!--
+    var AT_SIGNATURE=2;
+    var ALG_CLASS_HASH=4<<13;
+    var ALG_CLASS_SIGNATURE=1<<13;
+    var KEY_LEN_MIN=true;
+    var KEY_LEN_MAX=false;
+    var KEY_LEN_MIN_DEFAULT=384;
+    var KEY_LEN_MAX_DEFAULT=16384;
+
+function IsXEnrollInstalled() {
+    if (typeof(oXEnroll) == "object")
+      if (oXEnroll.object != null)
+        return true;
+}
+
+function init() {
+    if (IsXEnrollInstalled()) {
+      listProviders();
+      <dtml-if "portal_signature.getProperty('csp_name')">
+        updateControls( document.getElementById('csp_type') );
+      </dtml-if>
+    } else
+      document.getElementById('cfg_body').innerHTML = '<p class="DocumentStatusBar"><dtml-msg "ds.error.xenroll_not_found"></p>';
+}
+
+function listProviders() {
+    var max_ptq = 76;
+    var XEnroll = new ActiveXObject("CEnroll.CEnroll.1");
+    var csp_cont = document.getElementById('csp_type');
+
+    var csp_name = '';
+    var csp_num = 1;
+
+    for (t=0; t<max_ptq; t++) {
+      XEnroll.ProviderType = t;
+      for (p=0; p<max_ptq; p++) {
+        try {
+          csp_name = XEnroll.enumProviders(p, 0);
+        } catch (e) {
+          break;
+        }
+        if (XEnroll.GetSupportedKeySpec() && AT_SIGNATURE) {
+          csp_cont.options[csp_num] = new Option(csp_name, t);
+          if ( csp_name == '<dtml-var "portal_signature.getProperty('csp_name')" html_quote>' )
+            csp_cont.options[csp_num].selected = true;
+          csp_num++;
+        }
+      }
+    }
+}
+
+function updateControls( select ) {
+    var idx = select.selectedIndex;
+    var csp_name = select.options[idx].text;
+    var csp_type = select.options[idx].value;
+
+    document.getElementById('csp_name').value = csp_name;
+
+    listHashAlgs( csp_type, csp_name );
+    listKeyLength( csp_type, csp_name );
+    fillSignAlg( csp_type, csp_name )
+}
+
+function listHashAlgs( csp_type, csp_name ) {
+    var hash_alg_cont = document.getElementById('hash_alg_id');
+    // clear options (except first) 
+    hash_alg_cont.options.length = 1;
+
+    if (!csp_type)
+      return false;
+
+    var max_aq = 15;
+    var XEnroll = new ActiveXObject("CEnroll.CEnroll.1");
+
+    var alg_id = 0;
+    var alg_name = '';
+
+    XEnroll.ProviderType = csp_type;
+    XEnroll.ProviderName = csp_name;
+
+    for (a=0; a<max_aq; a++) {
+      try {
+        alg_id = XEnroll.EnumAlgs(a, ALG_CLASS_HASH);
+      } catch (e) {
+        break;
+      }
+      alg_name = XEnroll.GetAlgName(alg_id);
+      hash_alg_cont.options[a+1] = new Option(alg_name, alg_id);
+      if ( alg_id == '<dtml-var "portal_signature.getProperty('hash_alg_id')" html_quote>' )
+        hash_alg_cont.options[a+1].selected = true;
+
+    }
+}
+
+function fillSignAlg( csp_type, csp_name ) {
+    var sign_alg_id_cont = document.getElementById('sign_alg_id_cont');
+    var sign_alg_id = document.getElementById('sign_alg_id');
+    // clear text container 
+    sign_alg_id_cont.innerHTML = '<dtml-msg "not selected">';
+    sign_alg_id.value = '';
+
+    if (!csp_type)
+      return false;
+
+    var XEnroll = new ActiveXObject("CEnroll.CEnroll.1");
+
+    XEnroll.ProviderType = csp_type;
+    XEnroll.ProviderName = csp_name;
+
+    var alg_id = XEnroll.EnumAlgs(0, ALG_CLASS_SIGNATURE);
+    var alg_name = XEnroll.GetAlgName(alg_id);
+    sign_alg_id_cont.innerHTML = alg_name;
+    sign_alg_id.value = alg_id;
+}
+
+function listKeyLength( csp_type, csp_name ) {
+    var keylen_cont = document.getElementById('key_length');
+    // clear options (except first) 
+    keylen_cont.options.length = 1;
+
+    if (!csp_type)
+      return false;
+
+    var XEnroll = new ActiveXObject("CEnroll.CEnroll.1");
+    var min,max = 0;
+    var num = 1;
+
+    XEnroll.ProviderType = csp_type;
+    XEnroll.ProviderName = csp_name;
+
+    try { 
+      var min = XEnroll.GetKeyLen(KEY_LEN_MIN, false);
+    } catch (e) {
+      min = KEY_LEN_MIN_DEFAULT;
+    }
+
+    try { 
+      var max = XEnroll.GetKeyLen(KEY_LEN_MAX, false);
+    } catch (e) {
+      max = KEY_LEN_MAX_DEFAULT;
+    }
+
+    for (len=128; len<min; len*=2);
+    min = len;
+      for (len=min; len<=max; len*=2) {
+        keylen_cont.options[num] = new Option(len, len);
+        if ( len == '<dtml-var "portal_signature.getProperty('key_length')" html_quote>' )
+          keylen_cont.options[num].selected = true;
+      num++;
+    }
+}
+
+//-->
+</script>
+
+<div class="Desktop">
+
+<h1><dtml-var "msg('ds.configuration')"></h1>
+
+<div id="cfg_body">
+
+<form name="portal_signature" action="&dtml.url-reconfig_signature;" method="POST">
+
+<table class="FormLayout" border="0" cellspacing="2" cellpadding="2">
+  <tr>
+    <th><dtml-msg "ds.csp"></th>
+    <td>
+      <select id="csp_type" name="csp_type" onChange="updateControls(this);">
+        <option><dtml-msg "not selected"></option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "ds.sign_algorithm"></th>
+    <td id="sign_alg_id_cont"><dtml-msg "not selected"></td>
+  </tr>
+  <tr style="display:none;">
+    <th><dtml-msg "ds.hash_algorithm"></th>
+    <td>
+      <select id="hash_alg_id" name="hash_alg_id">
+        <option><dtml-msg "not selected"></option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "ds.key_length"></th>
+    <td>
+      <select id="key_length" name="key_length">
+        <option><dtml-msg "not selected"></option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <th><dtml-msg "ds.sign_attachments"></th>
+    <td>
+      <input type="checkbox" name="include_attachments:int" value="1" <dtml-var "portal_signature.getProperty('include_attachments')" fmt=checked>><dtml-msg "Yes/No">
+    </td>
+  </tr>
+  <tr>
+   <td>&nbsp;</td>
+   <td colspan="2"><input type="Submit" name="submit" value="<dtml-var "msg('Apply')">"></td>
+  </tr>
+</table>
+
+<input type="hidden" id="sign_alg_id" name="sign_alg_id" value="">
+<input type="hidden" id="csp_name" name="csp_name" value="">
+
+</form>
+
+</div>
+</div>
+
+<script type="text/javascript">
+<!--
+init();
+// -->
+</script>
+
+</dtml-with>
+
+<dtml-var simple_html_footer>

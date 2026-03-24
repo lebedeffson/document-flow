@@ -1,0 +1,177 @@
+<dtml-comment>
+$Id: registration_book_migration_form.dtml,v 1.4 2004/04/30 07:01:52 ishabalin Exp $
+$Editor: ishabalin $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-var simple_html_header>
+<dtml-let res="portal_catalog.searchResults(  meta_type='Registry',
+                                              sort_on='Title')"
+          regs="[x.getObject() for x in res]"
+          reg_uid="REQUEST.get('uid', '')"
+          cat_id="getRegisteredCategory()"
+          cat_def="portal_metadata.getCategoryById(cat_id)"
+          attrs="cat_def.listAttributeDefinitions()"
+          >
+<form name="migration" action="registration_book_migration">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>
+      <h3><dtml-msg "Migration from old version registry"></h3>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <dtml-msg "Migration">
+      <dtml-msg "allows to import data from old version registry and
+                re-register documents at this registry">.
+    </td>
+  </tr>
+  <tr><td>&nbsp;</td></tr>
+<dtml-in regs>
+  <dtml-if sequence-start>
+    <tr>
+      <td>
+        <h3><dtml-msg "Available old version registries">:</h3>
+      </td>
+    </tr>
+    <tr><td>
+    <table border="0" cellpadding="2" cellspacing="2" width="100%">
+      <tr class="row_title">
+        <td></td>
+        <td class="small">
+          <dtml-msg Title>
+        </td>
+        <td class="small">
+          <dtml-msg Department>
+        </td>
+        <td class="small">
+          <dtml-msg Description>
+        </td>
+      </tr>
+  </dtml-if>
+      <tr class="row_even">
+        <td>
+          <input  type="radio" name="registry_uid" value="<dtml-var getUid>"
+                  onClick="document.location.replace(
+                          'registration_book_migration_form?uid='
+                          +'<dtml-var getUid>');"
+                  <dtml-var "(getUid() == reg_uid) and 'checked' or ' '">
+                  >
+        </td>
+        <td class="small">
+          <dtml-var Title>
+        </td>
+        <td class="small">
+          <dtml-var getDepartment>
+        </td>
+        <td>
+          <dtml-var Description newline_to_br>
+        </td>
+      </tr>
+  <dtml-if sequence-end>
+    </table>
+    </td></tr>
+  </dtml-if>
+<dtml-else>
+  <tr>
+    <td>
+      <h3><dtml-msg "There are no old version registries available"></h3>
+    </td>
+  </tr>
+</dtml-in>
+<dtml-in regs>
+  <dtml-if "getUid() == reg_uid">
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td>
+        <h3><dtml-msg "Migration scheme">:</h3>
+      </td>
+    <tr>
+      <td>
+        <dtml-msg   "Select category attributes (in the list boxes below) to
+                    which corresponding registry fields should be copied">.
+        <dtml-msg   "If you are not sure to select attribute or do not want the
+                    field to be copied just leave the blank value">.
+      </td>
+    </tr>
+    </tr>
+    <tr><td>
+    <table border="0" cellpadding="2" cellspacing="2" width="100%">
+      <tr class="row_title">
+        <td class="small">
+          <dtml-msg "Registry columns">
+        </td>
+        <td class="small">
+          <dtml-msg Type>
+        </td>
+        <td class="small">
+          <dtml-msg "Category attributes">
+        </td>
+      </tr>
+    <dtml-in listColumns>
+      <tr class="row_even">
+        <td class="small">
+          <dtml-msg expr=Title>
+        </td>
+        <td>
+          <dtml-msg expr=Type>
+        </td>
+        <td>
+            <dtml-comment>
+            Registry columns types:   'string', 'text', 'boolean', 'date', 'lines', 'float', 'int'
+            Category attribute types: 'string', 'text', 'boolean', 'date', 'lines'
+            </dtml-comment>
+            <dtml-let ftype="Type()"
+                      fid="getId()">
+              <dtml-in "[x for x in attrs if x.Type() == ftype]">
+                <dtml-if sequence-start>
+                  <select name="<dtml-var "'col_%s' % (fid)">">
+                  <option value="">
+                </dtml-if>
+                <option value="<dtml-var getId>"><dtml-var Title>
+              <dtml-else>
+                <dtml-msg "n/a">
+              </dtml-in>
+            </dtml-let>
+          </select>
+        </td>
+      </tr>
+    </dtml-in>
+    </table>
+    </td></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td>
+        <dtml-msg "Category of registered documents">
+        (<dtml-msg "according to registration book settings">):
+        <b><dtml-msg expr="cat_def.Title()"></b>
+      </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td>
+        <input type="radio" name="skip_mismatches" value="1" checked>
+        <dtml-msg "Skip documents whose category does not match">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="radio" name="skip_mismatches" value="">
+        <dtml-msg "Change category of documents">
+      </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td class="small">
+        <input type="submit" name="migrate" value="<dtml-msg Migration> >>">
+      </td>
+    </tr>
+  </dtml-if>
+</dtml-in>
+</table>
+</form>
+</dtml-let>
+
+<dtml-var simple_html_footer>

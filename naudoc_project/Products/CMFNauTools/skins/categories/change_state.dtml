@@ -1,0 +1,100 @@
+<dtml-comment>
+$Id: change_state.dtml,v 1.15 2006/03/01 15:33:38 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.15 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<dtml-let member="portal_membership.getAuthenticatedMember()"
+          review_history="portal_workflow.getInfoFor(this(), 'review_history')"
+          state="portal_workflow.getInfoFor(this(), 'state', '')"
+          wf_id="portal_metadata.getCategoryById(Category()).Workflow()"
+          form_name="'confirm_form'"
+>
+
+<dtml-with "portal_workflow.getTransitionInfo(wf_id, transition)" mapping>
+
+<h1><dtml-msg expr=title></h1>
+
+<form name="confirm_form" method="post" action="content_status_modify">
+
+ <table class="FormLayout">
+  <tr>
+   <td colspan="2" valign="top" align="left">
+     <strong><dtml-msg "Current state">:</strong>
+     <dtml-var this fmt=workflow_state>
+     <input type="hidden" name="transition" value="&dtml-transition;">
+   </td>
+  </tr>
+  <tr>
+   <td colspan="2" valign="top" align="left">
+    <strong>  <dtml-msg "Destination state">:</strong>
+    <dtml-if new_state_id>
+      <dtml-var "'%s:%s' % (wf_id, new_state_id)" fmt=workflow_state>
+    <dtml-else>
+      <dtml-msg "Remain in state">
+    </dtml-if>
+   </td>
+  </tr>
+
+  <tr>
+   <td colspan="2" valign="top" align="left">
+    <strong><dtml-msg "Comment"></strong><br />
+
+<dtml-var "comment_template( None, _,
+                             form=form_name, field='comment', context='state',
+                             value=(_.has_key('comment') and comment or '') )">
+
+   </td>
+  </tr>
+ </table>
+
+ <dtml-var "list_activated_action_templates_emb( None, _, transition=transition, form_name='confirm_form' )">
+
+<input type="submit" value=" <dtml-msg "Change state"> ">
+
+<script type="text/javascript">
+<!--
+registerFormCallback( 'confirm_form', disableForm );
+// -->
+</script>
+
+</form>
+
+<p>
+ <dtml-in review_history mapping reverse>
+  <dtml-if sequence-start>
+   <table>
+   <tr>
+      <td>
+         <strong><dtml-msg "State history"></strong>
+      </td>
+   </tr>
+  </dtml-if>
+  <tr>
+    <td>
+       <dtml-var time fmt="%Y-%m-%d %H:%M">
+       <i><dtml-var "portal_workflow.getTransitionTitle( wf_id, action)" html_quote></i>
+       <dtml-msg "By:"> <dtml-var actor fmt=member>
+    </td>
+  </tr>
+  <dtml-if comments>
+  <tr>
+    <td>
+      &nbsp;<dtml-var comments html_quote>
+    </td>
+  </tr>
+  </dtml-if>
+  <dtml-if sequence-end>
+  </table>
+  </dtml-if>
+ </dtml-in>
+
+</dtml-with>
+</dtml-let>
+
+</div>
+
+<dtml-var simple_html_footer>

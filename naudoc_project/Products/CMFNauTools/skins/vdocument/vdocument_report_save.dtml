@@ -1,0 +1,28 @@
+<dtml-comment>
+
+$Editor: ikuleshov $
+$Id: vdocument_report_save.dtml,v 1.6 2004/04/28 06:53:59 ypetrov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.6 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1> <dtml-msg "Report created"> </h1>
+
+<form name="save_report">
+<p>
+  <dtml-msg "Your report has been saved with name">
+  <a href="<dtml-var "parent().saveAs( report_title
+                                     , report_description
+                                     , _.getitem(template)
+                                     , getId()
+                                     , REQUEST)" html_quote>">&dtml-report_title;</a>
+</p>
+<input type="button" onClick="JavaScript:location.href='&dtml-absolute_url;'" value=" <dtml-msg "OK"> ">
+</form>
+
+</div>
+
+<dtml-var simple_html_footer>

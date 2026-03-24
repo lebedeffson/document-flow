@@ -1,0 +1,14 @@
+<dtml-if "lang=='ru'">
+Content-Type: text/plain; charset=windows-1251
+Subject: Обновления на www.naumen.ru
+
+Здравствуйте.
+
+На сайте компании "Наумен" (www.naumen.ru) были опубликованы новые документы.
+<dtml-else>
+Subject: Renovations on www.naumen.ru
+
+Hello.
+
+On the site of company "Naumen" (www.naumen.ru) new documents has been published .
+</dtml-if>

@@ -1,0 +1,65 @@
+<dtml-comment>
+$Id: task_progress_entry.dtml,v 1.2 2008/06/18 10:06:32 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-let signature="is_signable and container.getSignature(task_id=task_id, response_id=response_id)"
+          is_signable="is_signable and signature">
+<dtml-if is_signable>
+<textarea id="sign_cont_<dtml-var "signature['certificate']">" style="display: none;"><dtml-var "signature['signature']" html_quote></textarea>
+</dtml-if>
+
+<table cellspacing="0" cellpadding="1" bgcolor="#0000AA" width="100%">
+  <tr>
+    <td>
+    <table cellspacing="5" cellpadding="0" bgcolor="#FFFFFF" width="100%">
+      <tr>
+        <td class="small">
+
+          <dtml-if "canSendNotifications() or is_signable">
+             <input type="checkbox" name="selected_users:list" value="&dtml-member;">
+          </dtml-if>
+          <dtml-var member fmt=member>
+
+          <dtml-if isclosed>
+                - <dtml-msg "report closed">
+          </dtml-if>
+
+          [<dtml-var "rDate(None, _, time=date)" fmt=strip>]
+          <dtml-if is_signable>
+            (<dtml-msg "ds.ds">: <span class="ds_not_verified" id="verify_status_<dtml-var "signature['certificate']">"><dtml-msg "ds.not_verified"></span>)
+          </dtml-if>
+        </td>
+      </tr>
+      <tr>
+        <td class="resolution"><dtml-var text newline_to_br html_quote></td>
+      </tr>
+
+      <dtml-in "portal_links.searchLinks( source=this(),
+                                          source_uname=member,
+                                          source_status=status,
+                                          source_response_id=response_id )" 
+      >
+      <tr>
+        <td>
+          <img src='&dtml-portal_url;/link.gif'>
+          <dtml-var getObject fmt=link.target>
+        </td>
+      </tr>
+      </dtml-in>
+
+      <dtml-if attachment>
+      <dtml-let file="_.getitem(attachment)">
+      <tr>
+        <td><img src='&dtml-portal_url;/link.gif'>
+            <a href="<dtml-var "relative_url(action=attachment)" html_quote>"><dtml-var "file.title_or_id()" html_quote></a>
+        </td>
+      </tr>
+      </dtml-let>
+      </dtml-if>
+
+    </table>
+    </td>
+  </tr>
+</table>
+<br>
+</dtml-let>

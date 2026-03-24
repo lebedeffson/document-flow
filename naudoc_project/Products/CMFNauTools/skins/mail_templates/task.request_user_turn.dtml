@@ -1,0 +1,29 @@
+<dtml-comment>
+$Id: task.request_user_turn.dtml,v 1.3 2007/05/11 11:34:54 ynovokreschenov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+<dtml-if "_.has_key('msg_format') and msg_format=='sms'">
+<dtml-if "lang=='en'">
+Content-Type: text/plain;
+
+It's your turn to examine request "<dtml-var task_title>". Creator: <dtml-var creator>
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+
+Ваша очередь рассмотреть запрос "<dtml-var task_title>". Автор задания: <dtml-var creator>
+</dtml-if>
+<dtml-else>
+<dtml-if "lang=='en'">
+Subject: Please examine request "<dtml-var task_title>"
+
+It's your turn to examine request "<dtml-var task_title>". 
+Creator: <dtml-var creator>
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Рассмотрите запрос "<dtml-var task_title>"
+
+Ваша очередь рассмотреть запрос "<dtml-var task_title>".
+Автор задания: <dtml-var creator>
+</dtml-if>
+URL: &dtml-task_url;
+</dtml-if>

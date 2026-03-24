@@ -1,0 +1,68 @@
+<dtml-comment>
+$Id: reference_column_edit_form.dtml,v 1.1 2005/11/27 17:06:12 vsafronovich Exp $
+$Editor: vsafronovich$
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-let columns_title="_.get('columns_title') or 'None'"
+          modify_title="_.get('modify_title') or False">
+          
+<dtml-in listColumns>
+  <dtml-if sequence-start>
+
+  <tr>
+    <td>
+      <table border="0" cellpadding="2" 
+             cellspacing="0" width="100%" class="FormLayout">
+        <tr class="row_title">
+          <td colspan="4" class="smallHeader"><dtml-msg expr=columns_title></td>
+        </tr>
+
+      </dtml-if>
+
+        <tr class="row_even">
+          <td width="1%">
+            <input type="checkbox" name="<dtml-var "'del_' + getId()">" />
+          </td>
+          <td width="1%">
+      <dtml-unless sequence-start>
+            <a href="<dtml-var "object.relative_url(action='moveColumn'
+                                                   , params={'id':getId(), 'direction':1})">">
+              <img src="&dtml-portal_url;/sort_up.gif">
+            </a>
+      </dtml-unless>
+          </td>
+          <td width="1%">
+      <dtml-unless sequence-end>
+            <a href="<dtml-var "object.relative_url(action='moveColumn'
+                                                   , params={'id':getId(), 'direction':-1})">">
+              <img src="&dtml-portal_url;/sort_down.gif">
+            </a>
+      </dtml-unless>
+          </td>
+          <td>
+            <dtml-var "entry_field_edit( None, _
+                                       , name='title_' + getId()
+                                       , type='string'
+                                       , value=Title()
+                                       , descriptor={ 'modify':modify_title
+                                                    , 'view':True}
+                                       )">
+          </td>
+        </tr>
+      <dtml-if sequence-end>
+        <tr class="row_even">
+          <td colspan="4">
+            <input type="submit" 
+                   name="delete_columns"
+                   value="<dtml-msg Delete>" />
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  </dtml-if>
+</dtml-in>
+
+</dtml-let>

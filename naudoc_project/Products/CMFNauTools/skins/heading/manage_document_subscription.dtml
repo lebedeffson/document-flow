@@ -1,0 +1,103 @@
+
+<dtml-call "REQUEST.set( 'noCache', 1 )">
+
+<dtml-var simple_html_header>
+<div class="Desktop">
+
+<form method="POST" action="&dtml-absolute_url;" target="workfield">
+
+<h3><dtml-var "msg('Subscription to %s updates' % (this().implements('isHTMLDocument') and 'document' or 'folder',))"></h3>
+
+
+<script type="text/javascript">
+
+function selectAllTransitions( checked ){
+  var form = document.forms[0];
+  checkBoxes = form['transitions:list']
+  len = checkBoxes.length;
+  if (len) {
+    for ( i = 0; i < len; i++ ){
+      checkBoxes[i].checked = checked;
+    }
+  }
+}
+
+function deselectAllButton(){
+  var button = document.getElementById('all_button');
+  button.checked = false;
+}
+
+</script>
+
+
+<dtml-let transitions="portal_metadata.listTransitionsIdsWithNotification( Category() )">
+  <dtml-in transitions prefix="tr">
+    <dtml-let ti="portal_workflow.getTransitionInfo( getCategory().Workflow(), tr_item )">
+      <dtml-if tr_start>
+        <table border=0 width="100%">
+          <tr class="row_title">
+            
+            <td colspan="2">
+              <dtml-var "msg('Please choose transitions you want to subscribe')">
+            </dt>
+          </tr>
+      </dtml-if>
+          <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+            <td>
+              <input type="checkbox" name="transitions:list" value="<dtml-var tr_item>"
+                <dtml-var "isSubscribed(tr_item) and 'checked' or ''"> 
+                onClick="deselectAllButton();"
+              >
+            </dt>
+            <td width="100%">
+              <dtml-var "msg(ti['actbox_name'] or ti['id'])">
+            </dt>
+          </tr>
+        
+      <dtml-if tr_end>
+          <tr class="<dtml-if sequence-odd>row_even<dtml-else>row_odd</dtml-if>">
+            <td>
+              <input type="checkbox" id="all_button" onClick="selectAllTransitions(this.checked);">
+            </dt>
+            <td width="100%">
+              <dtml-var "msg('All')">
+            </dt>
+          </tr>
+        </table>
+      </dtml-if>
+     
+    </dtml-let>
+  
+  <dtml-else>
+    <dtml-var "msg('There are no transitions you may subscribe')">
+  </dtml-in>
+
+
+</dtml-let>
+
+<hr>
+<table border=0 width="100%">
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td>
+      <input type="checkbox" name="changes" value="1"
+        <dtml-var "isSubscribed() and 'checked' or ''"> 
+              >
+    </dt>
+    <td width="100%">
+      <dtml-var "msg('Receive notifications about document changes')">
+    </dt>
+  </tr>
+</table>
+
+
+<input type="submit" name="subscribe:method" value="<dtml-var "msg('Subscribe')">">
+
+
+&nbsp;&nbsp;
+<input type="submit" value="<dtml-var "msg('Cancel')">">
+</p>
+
+</form>
+
+</div>
+<dtml-var simple_html_footer>

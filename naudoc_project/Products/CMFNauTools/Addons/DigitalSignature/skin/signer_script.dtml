@@ -1,0 +1,153 @@
+<dtml-comment>
+Document signer javascript
+
+$Editor: oevsegneev $
+$Id: signer_script.dtml,v 1.2 2008/06/18 10:06:32 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<object
+  style="display:none;"
+  id="oCAPICOM"
+  classid="clsid:A996E48C-D3DC-4244-89F7-AFA33EC60679"
+  codebase="&dtml-portal_url;/capicom.cab#version=2,0,0,0"></object>
+
+<script type="text/javascript">
+<!--
+  var CAPICOM_INFO_SUBJECT_SIMPLE_NAME = 0;
+  var CAPICOM_STORE_OPEN_READ_ONLY = 0;
+  var CAPICOM_CURRENT_USER_STORE = 2;
+  var CAPICOM_CERTIFICATE_FIND_SHA1_HASH = 0;
+  var CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME = 0;
+  var CAPICOM_ENCODE_BASE64 = 0;
+  var CAPICOM_E_CANCELLED = -2138568446;
+  var AT_EXCHANGE = 1;
+  var AT_SIGNATURE = 2;
+
+  var CAPICOM_VERIFY_SIGNATURE_ONLY = 0;
+  var CAPICOM_VERIFY_SIGNATURE_AND_CERTIFICATE = 1;
+
+  var signer_certs = new Array();
+  var is_broken = 0;
+  var include_attachments = <dtml-var "portal_signature.getProperty('include_attachments') and 'true' or 'false'">;
+
+  var sign_certs = new Array(
+    <dtml-in "_.has_key('signatures') and signatures or not _.has_key('signatures') and container.getSignatures() or []" mapping>
+    '&dtml-certificate;'<dtml-unless sequence-end>,</dtml-unless>
+    </dtml-in>
+    );
+
+function IsCAPICOMInstalled() {
+  if (typeof(oCAPICOM) == "object")
+    if (oCAPICOM.object != null)
+      return true;
+}
+
+function displayCert(id, signer_cert) {
+  if (signer_cert)
+    var cert = signer_certs[id];
+  else
+    var cert = FindCertificateByHash(id);
+  cert.Display();
+}
+
+function FindCertificateByHash(hash) {
+  // instantiate the CAPICOM objects
+  var MyStore = new ActiveXObject("CAPICOM.Store");
+
+  // open the current users personal certificate store
+  try {
+    MyStore.Open(CAPICOM_CURRENT_USER_STORE, "My", CAPICOM_STORE_OPEN_READ_ONLY);
+  } catch (e) {
+    if (e.number != CAPICOM_E_CANCELLED) {
+      alert('<dtml-msg "An error occurred while opening your certificate stores">');
+      return false;
+    }
+  }
+
+  // find all of the certificates that have the specified hash
+  var FilteredCertificates = MyStore.Certificates.Find(CAPICOM_CERTIFICATE_FIND_SHA1_HASH, hash);
+  return FilteredCertificates.Item(1);
+
+  // Clean Up
+  MyStore = null;
+  FilteredCertificates = null;
+}
+
+function sign() {
+  // instantiate the CAPICOM objects
+  var SignedData = new ActiveXObject("CAPICOM.SignedData");
+  var Signer = new ActiveXObject("CAPICOM.Signer");
+  var TimeAttribute = new ActiveXObject("CAPICOM.Attribute");
+  var cert_hash = '&dtml-cert;';
+  var sign_cont = document.getElementById('sign_cont'); 
+
+  // Sign if only any cert is selected
+  if (cert_hash) {
+    
+    // Set content for sign
+    SignedData.Content = getContent( include_attachments );
+    try {
+      // Set the Certificate we would like to sign with
+      Signer.Certificate = FindCertificateByHash(cert_hash);
+		   	
+      // Set time
+      var Today = new Date();
+      TimeAttribute.Name = CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME;
+      TimeAttribute.Value = Today.getVarDate();
+      Today = null;
+      Signer.AuthenticatedAttributes.Add(TimeAttribute);
+			
+      // Sign
+      var Signature = SignedData.Sign(Signer, true, CAPICOM_ENCODE_BASE64);
+      } catch (e) {
+        if (e.number != CAPICOM_E_CANCELLED) {
+          alert('<dtml-msg "An error occurred while signing">: ' + e.description);
+          return false;
+      }
+    }
+  sign_cont.value = Signature;
+
+ } else
+   alert('<dtml-msg "ds.error.bad_certificate">');
+}
+
+function verify( cert_index, signature, content ) {
+  var SignedData = new ActiveXObject('CAPICOM.SignedData');
+  try {
+    SignedData.Content = content;
+    SignedData.Verify( signature, true, CAPICOM_VERIFY_SIGNATURE_AND_CERTIFICATE );
+    signer_certs[cert_index] = SignedData.Certificates.Item(1);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function validateCert( hash ) {
+  if (!hash) return 0;
+  var cert = FindCertificateByHash(hash);
+  var result = 0;
+  if (cert) {
+    var cert_rk = cert.PrivateKey;
+    var cert_uk = cert.PublicKey();
+    var key_length = cert_uk.Length;
+    var csp_name = cert_rk.ProviderName;
+    var key_spec = cert_rk.KeySpec;
+    var equil_csp = csp_name=='&dtml-csp_name;';
+    var equil_key_length = key_length=='&dtml-key_length;';
+    var equil_key_spec = key_spec==(AT_SIGNATURE | AT_EXCHANGE) || key_spec==AT_SIGNATURE;
+    result = equil_csp && equil_key_length && equil_key_spec;
+  }
+  return result
+}
+
+function getContent( include_attachments ) {
+  if( include_attachments )
+    return userAgent.downloadURL('&dtml-absolute_url;/document_forsign_content?include_attachments=1');
+  else
+    return userAgent.downloadURL('&dtml-absolute_url;/document_forsign_content');
+}
+
+//-->
+</script>

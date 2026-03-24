@@ -1,0 +1,13 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: task_definition_external_message_info_emb.dtml,v 1.1 2004/09/15 13:39:53 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.1 $>
+
+<table cellspacing="2" cellpadding="2">
+  <tr>
+    <td class="smallHeader"><dtml-msg "Messaging service">:</td>
+    <td><dtml-var "task_definition['message_service']" fmt=object></td>
+  </tr>
+</table>

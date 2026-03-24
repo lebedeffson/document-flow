@@ -1,0 +1,64 @@
+<dtml-comment>
+$Id: subscr_import_form.dtml,v 1.1 2004/04/22 05:25:02 kfirsov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h2><dtml-var registry_icon.gif>&nbsp;&dtml-title_or_id;</h2>
+
+<p>&dtml-description;</p>
+
+<p><h1><dtml-var "msg('Import entries from CSV file')">:</h1>
+
+<form name="csv" method="post" action="&dtml-absolute_url;" enctype="multipart/form-data" >
+<table>
+  <tr>
+    <td>
+      <dtml-var "msg('Please explain columns order starting with 1')">. (<dtml-var "msg('Leave empty value if there is no such column in the file')">.)
+    </td>
+  </tr>
+  <dtml-in "('Email', 'email',),
+    ('Last name', 'lname',),
+    ('First name', 'fname',),
+    ('Middle name', 'mname',),
+    ('FIO', 'fio',),
+    ('Company', 'company_name',),
+    ('Position', 'position',),
+    ('Company business activity', 'company_business_activity',),
+    ('Contact', 'contact',),
+    ('Phones', 'phones',),
+    ('Post address', 'post_address',)" prefix="fld">
+    <tr>
+      <td>
+        <input type="text" maxlength="2" size="2" name="order_<dtml-var fld_item>" > <dtml-var "msg(fld_key)"><br>
+      </td>
+    </tr>
+  </dtml-in>
+  <tr>
+    <td>
+      <input type="checkbox" name="ignore_titles" value="1"><dtml-var "msg('First row contains titles.')">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <dtml-var "msg('File')">&nbsp;<input type="file" name="csv_file" size="35">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <dtml-var "msg('Topics to subscribe')">:
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <dtml-var "subscriptions_hierarchy(this(), parent_path=absolute_url(1), user=getSubscribedUser(''))">
+    </td>
+  </tr>
+</table>
+
+<p><input type="submit" name="importFromCSV:method" value="<dtml-var "msg('Import data')">">
+</form>
+<dtml-var simple_html_footer>

@@ -1,0 +1,87 @@
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+
+<h1> <dtml-msg "Undo Transactions"> </h1>
+
+<dtml-let transactions="portal_undo.listUndoableTransactionsFor(this())">
+
+<dtml-if transactions>
+<FORM ACTION="undo_handler" METHOD="POST">
+  <p><dtml-var "msg('This application\'s transactional feature allows you to easily undo changes made to the application\'s settings or data. You can revert the application to a \'snapshot\' of it\'s state at a previous point in time.')" html_quote></p>
+
+  <table class="FormLayout" width="100%">
+    <tr>
+      <td colspan=4 align=center>
+        <INPUT TYPE="SUBMIT" VALUE=" <dtml-msg "Undo"> ">
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+    </tr>
+    <dtml-if first_transaction>
+       <tr><td colspan=4 align=center>
+       <a href="undo_form?first_transaction:int=<dtml-var
+	 expr="first_transaction*2-last_transaction"
+	 >&last_transaction:int=<dtml-var first_transaction
+         >&PrincipiaUndoBatchSize:int=<dtml-var PrincipiaUndoBatchSize
+         >">
+       <dtml-msg "Later Transactions"></h>
+       </td></tr>
+    </dtml-if>
+    <dtml-in transactions mapping>
+  
+      <tr class="<dtml-if sequence-odd>row_even<dtml-else>row_odd</dtml-if>">
+        <td>
+          <table border=0 cellpadding="0" cellspacing="0">
+           <tr>
+             <td valign=middle rowspan=2>
+               <input type=checkbox name="transaction_info:list" value="<dtml-var id html_quote>">
+             </td>
+             <td colspan=1 >
+	     <strong><dtml-var description html_quote></strong>
+             </td>
+           <tr>
+             <td valign="top">
+              <dtml-msg "by:"> <strong>
+              <dtml-if user_name>
+	     <dtml-var user_name html_quote>
+             <dtml-else>
+              <em>Zope</em>
+             </dtml-if>
+	     </strong>
+             &nbsp;&nbsp;&nbsp; <dtml-var rDate>
+             </td>
+           </tr>
+          </table>
+        </td>
+      </tr>
+
+    </dtml-in>
+    <tr><td colspan=4 align=center>
+    <dtml-if expr="_.len(transactions) == PrincipiaUndoBatchSize">
+       <a href="undo_form?first_transaction:int=<dtml-var
+	 last_transaction>&last_transaction:int=<dtml-var
+	 expr="last_transaction+PrincipiaUndoBatchSize"
+         >&PrincipiaUndoBatchSize:int=<dtml-var PrincipiaUndoBatchSize
+         >">
+       <dtml-msg "Earlier Transactions"></a>
+    </dtml-if>
+    </td></tr>
+    <tr><td></td></tr>
+    <tr><td colspan=4 align=center><INPUT TYPE="SUBMIT" VALUE=" <dtml-msg "Undo"> ">
+    </td></tr>
+  </table>
+  </FORM>
+
+<dtml-else>
+
+  <dtml-msg "There are no transactions that can be undone.">
+
+</dtml-if>
+
+</dtml-let>
+
+</div>
+
+<dtml-var simple_html_footer>

@@ -1,0 +1,68 @@
+<dtml-comment>
+html head section.
+
+$Editor: vsafronovich $
+$Id: dynamic_html_head.dtml,v 1.6 2008/12/19 10:46:48 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.6 $>
+
+<head>
+
+<meta http-equiv="content-type" content="<dtml-var "_.has_key('RESPONSE') and RESPONSE.headers.get('content-type') or 'text/html'">">
+
+<title>
+<dtml-if "REQUEST.has_key('PageTitle')">
+  <dtml-msg expr="REQUEST['PageTitle']">,&nbsp;
+<dtml-elif "not implements('isPortalRoot')">
+  <dtml-if "_.has_key('Title')">
+    &dtml-Title;,&nbsp;
+  <dtml-elif "title_or_id()">
+    &dtml-title_or_id;,&nbsp;
+  </dtml-if>
+</dtml-if>
+<dtml-var "portal_properties.title()" html_quote>&nbsp;:&nbsp;
+[<dtml-var "portal_membership.getAuthenticatedMember().getMemberName()" html_quote>]
+</title>
+
+<script type="text/javascript">
+<!--
+    var portalRootURL  = '<dtml-var portal_url>';
+    var objectBaseURL  = '<dtml-var absolute_url>';
+    var objectRelativeURL  = '<dtml-var relative_url>';
+    var objectPath     = '<dtml-var physical_path>';
+    var openInFrame    = '<dtml-var "REQUEST.get('OpenInFrame')" null="">';
+    var updateSections = '<dtml-var "' '.join( REQUEST.get('_UpdateSections',[]) )">';
+    var commonImages   = [];
+//-->
+</script>
+
+<dtml-comment>
+<script type="text/javascript" src="&dtml-portal_url;/dumper.js"></script>
+</dtml-comment>
+<script type="text/javascript" src="&dtml-portal_url;/scripts.js"></script>
+
+<script type="text/javascript">
+<!--
+    messageCatalog.select_user = "<dtml-msg "Select user" jscript>";
+    messageCatalog.select_role = "<dtml-msg "Select role" jscript>";
+    messageCatalog.enter_integer = "<dtml-msg "Enter integer number" jscript>";
+    messageCatalog.enter_long = "<dtml-msg "Enter long integer number" jscript>";
+    messageCatalog.enter_float = "<dtml-msg "Enter floating point number" jscript>";
+    messageCatalog.enter_currency = "<dtml-msg "Enter currency number" jscript>";
+    messageCatalog.required_input = "<dtml-msg "No input for required field. Please, fill field value" jscript>";
+    messageCatalog.invalid_date = "<dtml-msg "Invalid date" jscript>";
+    messageCatalog.invalid_id = "<dtml-msg "Object id is invalid" jscript>";
+    messageCatalog.invalid_pattern ="<dtml-msg "Incorrect search pattern" jscript>";
+    messageCatalog.select_all = "<dtml-msg "Select All" jscript>";
+    messageCatalog.deselect_all = "<dtml-msg "Deselect All" jscript>";
+    messageCatalog.mandatory_attribute = "<dtml-msg "Please specify mandatory attribute" jscript>";
+    messageCatalog.not_found = "<dtml-msg "Searched word was not found on this page" jscript>";
+//-->
+</script>
+
+<link rel="stylesheet" type="text/css" href="&dtml-portal_url;/styles.css">
+
+<dtml-var dynamic_stylesheet>
+
+</head>

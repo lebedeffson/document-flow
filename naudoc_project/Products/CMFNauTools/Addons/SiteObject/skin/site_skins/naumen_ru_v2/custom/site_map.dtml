@@ -1,0 +1,3 @@
+<dtml-var site_html_header>
+<dtml-var "site_map_item(this(), REQUEST, item={'absolute_url': getPublisher().absolute_url(), 'title': 'главная страница'}, root=[])">
+<dtml-var site_html_footer>

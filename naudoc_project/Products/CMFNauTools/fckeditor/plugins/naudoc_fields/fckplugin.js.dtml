@@ -1,0 +1,228 @@
+<dtml-call "RESPONSE.setHeader('Content-Type', 'text/javascript')">
+
+function objectIsEmpty(object)
+{
+    for (var key in object)
+        return false
+    return true
+}
+
+var root_window = FCK.EditorWindow.parent.parent
+
+// Register the "EditField" command.
+var EditFieldCommand = function() {}
+EditFieldCommand.prototype = new FCKDialogCommand(
+                                     'EditField', 
+                                     root_window.messageCatalog.edit_field,
+                                     root_window.objectBaseURL + '/attribute_dialog',
+                                     450, 400,
+                                     function ()
+                                     {
+                                        if (_getField())
+                                            return FCK_TRISTATE_OFF
+
+                                        return FCK_TRISTATE_DISABLED
+                                     })
+
+EditFieldCommand.prototype.Execute = function()
+{
+    var field = _getField(),
+        name = _getFieldName(field),
+        info = root_window._fields[name]
+
+    if (! info[1]) {
+        // field is not viewable
+        alert(root_window.messageCatalog.not_allowed_to_read_field)
+        return
+    } else if (! info[2]) {
+        // field is not editable
+        alert(root_window.messageCatalog.not_allowed_to_edit_field)
+        return
+    }
+
+    FCKDialog.OpenDialog('FCKDialog_' + this.Name,
+                         this.Title, 
+                         root_window.setParam(this.Url, 'field_name', _getFieldName(field)), 
+                         this.Width,
+                         this.Height)
+}
+
+FCKCommands.RegisterCommand('EditField', new EditFieldCommand)
+
+// Create the "EditField" toolbar button.
+var button = new FCKToolbarButton('EditField', root_window.messageCatalog.edit_field, null, null, false, true)
+button.IconPath = FCKConfig.SkinPath + 'toolbar/hiddenfield.gif'
+FCKToolbarItems.RegisterItem('EditField', button)
+
+// Register doubleclick handler.
+FCK.RegisterDoubleClickHandler(
+    function (element)
+    { 
+        if (! _isField(element)) return
+        FCKCommands.GetCommand('EditField').Execute()
+    },
+    'SPAN'
+    )
+
+// Create the "InsertField" command.
+function InsertFieldCommand()
+{
+    this.Name = 'InsertField'
+}
+InsertFieldCommand.prototype.Execute = function(field_name, option)
+{
+    var base_url = root_window.objectBaseURL,
+        url = root_window.setParam(base_url + '/getField', 'name', field_name),
+        field_source = root_window.userAgent.downloadURL(url)
+
+    FCK.InsertHtml(field_source)
+    Redraw(true)
+
+    InsertFieldCombo.prototype.RefreshActiveItems(option.FCKSpecialCombo)
+}
+InsertFieldCommand.prototype.GetState = function()
+{
+    return FCK_TRISTATE_OFF
+}
+
+// Create the "InsertField" toolbar combo.
+function InsertFieldCombo()
+{
+    this.Command = new InsertFieldCommand()
+}
+InsertFieldCombo.prototype = new FCKToolbarSpecialCombo
+InsertFieldCombo.prototype.GetLabel = function()
+{
+    return "" // caption is empty
+}
+InsertFieldCombo.prototype.CreateItems = function(combo)
+{
+    var fields = root_window._fields
+    for (var id in fields)
+        combo.AddItem(id, fields[id][0], fields[id][0])
+
+    this.RefreshActiveItems(combo)
+}
+InsertFieldCombo.prototype.RefreshActiveItems = function(combo, value)
+{
+    combo.DeselectAll()
+    combo.SetLabel(root_window.messageCatalog.insert_field)
+}
+FCKToolbarItems.RegisterItem('InsertField', new InsertFieldCombo())
+
+// Add buttons to toolbar
+if (! objectIsEmpty(root_window._fields))
+    FCKConfig.ToolbarSets["Default"] = FCKConfig.ToolbarSets["Default"].concat([['EditField', 'InsertField']])
+
+// xxx
+function _isField(element)
+{
+    return (element.className == 'category-attribute')
+}
+
+function _getField(element)
+{
+    element = element || FCK.Selection.GetSelectedElement() || FCK.Selection.GetParentElement()
+
+    while (element && !(element.tagName == 'SPAN' && _isField(element)))
+        element = element.parentNode
+
+    return element
+}
+
+function _getFieldName(element)
+{
+    return element.id.substr(6)
+}
+
+function Redraw(only_fields)
+{
+    var spans = FCK.EditorDocument.body.getElementsByTagName('SPAN')
+    for (var i = 0; i < spans.length; i++) {
+        var span = spans[i]
+
+        if (! _isField(span)) continue
+
+        span.contentEditable = false
+        span.onresizestart = function()
+        {
+            FCK.EditorWindow.event.returnValue = false
+            return false
+        }
+    
+        // XXX empty fields are too small in IE
+        if (! span.innerText)
+            span.innerHTML += '&nbsp;'
+    }
+
+    if (! only_fields) {
+        if (FCKBrowserInfo.IsIE)
+            FCK.EditorDocument.onclick = function()
+            {
+                var element = FCK.EditorWindow.event.srcElement
+                if (element.tagName == 'A') {
+                    var field = _getField(element)
+
+                    if (! field) return true
+
+                    var range = FCK.EditorDocument.body.createControlRange()
+                    range.add(field)
+                    range.select()
+
+                    //element.onclick = function() { return false }
+                    //FCKSelection.MoveToNode(element.parentNode)
+
+                    return false
+                }
+            }
+        else {
+            FCK.EditorDocument.addEventListener(
+                'click', 
+                function (event)
+                {
+                    var field = _getField(event.target)
+
+                    if (field)
+                        FCKSelection.SelectElement(event.target)
+                },
+                true
+            )
+
+            // Here we have to emulate contentEditable = false in Mozilla
+            
+            FCK.EditorDocument.addEventListener(
+                'keypress',
+                function (event)
+                {
+                    var field = _getField() // event.target is always HTML
+
+                    if (! field) return
+
+                    // ignore alphanumeric keypresses, Backspace, Del and Shift-Insert
+                    if (event.charCode != 0 || // alphanumeric
+                        event.keyCode == 8  || // Backspace
+                        event.keyCode == 46 || // Del
+                        (event.shiftKey 
+                         && event.keyCode == 45) || // Shift-Insert
+                        event.keyCode == 13    // Enter
+                       )
+                        event.preventDefault()
+
+                    // create linebreak and move to next line on Enter
+                    if (event.keyCode == 13) {
+                        var br = FCK.EditorDocument.createElement('BR')
+                        field.parentNode.insertBefore(br, field.nextSibling)
+
+                        FCKSelection.SelectElement(br)
+                        FCK.EditorWindow.getSelection().collapseToEnd()
+                        //range.moveToEnd(field) // ???
+                    }
+                },
+                true
+            )
+        }
+    }
+}
+Redraw()
+
+FCK.Events.AttachEvent('OnAfterSetHTML', Redraw)

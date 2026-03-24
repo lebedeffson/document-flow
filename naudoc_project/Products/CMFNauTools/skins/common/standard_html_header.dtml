@@ -1,0 +1,64 @@
+<dtml-comment>
+HTML header section for workspace pages.
+
+$Editor: vpastukhov $
+$Id: standard_html_header.dtml,v 1.76 2006/05/16 11:12:46 oevsegneev Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.76 $>
+
+<html>
+
+<dtml-call "REQUEST.set( 'OpenInFrame', 'workspace' )">
+<dtml-var dynamic_html_head>
+
+<body class="Standard">
+
+<dtml-if "REQUEST.has_key('arch') and _.int(arch)==1">
+<dtml-call "RESPONSE.setCookie('arch_cookie', '1', path = REQUEST['BASEPATH1'])">
+<dtml-call "REQUEST.set('arch_cookie', 1)">
+</dtml-if>
+
+<dtml-if "REQUEST.has_key('arch') and _.int(arch)==0">
+<dtml-call "RESPONSE.setCookie('arch_cookie', '0', path = REQUEST['BASEPATH1'])">
+<dtml-call "REQUEST.set('arch_cookie', 0)">
+</dtml-if>
+
+
+<table width="100%" height="100%" 
+       border="0" cellspacing="0" cellpadding="0" 
+       align="left" valign="top">
+  <tr>
+    <td style="<dtml-unless "implements('hasTabs')">border-bottom: 1px solid #999999;</dtml-unless>
+               height: 47px;">
+      <dtml-var standard_top_bar>
+    </td>
+  </tr>
+  <dtml-if portal_status_message>
+    <tr>
+      <td>
+        <p class="DocumentStatusBar">
+          <dtml-msg expr=portal_status_message
+                    msgparams=REQUEST moniker_target="'_blank'">
+        </p>
+      </td>
+    </tr>
+  </dtml-if>
+  <dtml-if "implements('hasHeadingInfo')">
+    <tr>
+      <td><h1><dtml-var getHeadingInfo html_quote></h1></td>
+    </tr>
+  </dtml-if hasHeadingInfo>
+  <dtml-if "implements('hasTabs')">
+    <dtml-if listTabs>
+    <tr>
+      <td>
+        <dtml-var "tabs_head(listTabs)">
+      </td>
+    </tr>
+    </dtml-if listTabs>
+  </dtml-if hasTabs>
+    <tr>
+      <td style="border-left: 1px solid #999999;
+                 border-right: 1px solid #CCCCCC; 
+                 border-bottom: 1px solid #CCCCCC;" height="100%">

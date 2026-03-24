@@ -1,0 +1,29 @@
+<dtml-let traverse_len="_.len(traverse_subpath)"
+          current_len="_.len(subpath)"
+          currentId="(traverse_len == current_len + 1) and traverse_subpath[-1] or None"
+>
+
+<dtml-in "go.publishedItems(subpath, exact=1)" mapping>
+  <dtml-if sequence-start>
+    <table border=0 cellpacing=0 cellpadding=0>
+  </dtml-if>
+
+  <dtml-unless isIndexDocument>
+    <tr>
+      <td align=left valign=top><img src="&dtml-portal_url;/mdoc.gif"></td>
+      <td>
+        <dtml-if "id == currentId">
+          <b>&dtml-Title_or_id;</b>
+        <dtml-else>
+          <a href="&dtml-absolute_url;">&dtml-Title_or_id;</a>
+        </dtml-if>
+      </td>
+    </tr>
+  </dtml-unless>
+
+  <dtml-if sequence-end>
+    </table>
+  </dtml-if>
+</dtml-in>
+
+</dtml-let>

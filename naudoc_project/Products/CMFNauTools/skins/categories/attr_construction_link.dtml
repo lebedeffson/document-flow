@@ -1,0 +1,160 @@
+<dtml-comment>
+$Editor: vpastukhov $
+$Id: attr_construction_link.dtml,v 1.11 2004/09/08 09:40:15 vpastukhov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.11 $>
+
+<dtml-let items_realm="properties.get( 'scope' )"
+          items_realm="items_realm and items_realm.moniker()"
+          allowed_types="properties.get( 'allowed_types', [] )"
+          allowed_categories="properties.get( 'allowed_categories', [] )"
+          available_types="(items_realm and items_realm(_) or storage).allowedContentTypes()"
+          type_info="available_types and allowed_types and portal_types.getTypeInfo( allowed_types[0] ) or None"
+          use_categories="type_info and type_info.typeImplements('isCategorial')"
+          available_categories="use_categories and portal_metadata.listCategories( type_info.getId() )"
+>
+
+<script type="text/javascript">
+<!--
+
+registerCallback(
+        document.forms['properties_form'], 'onSubmit',
+        function (ev) {
+<dtml-if available_categories>
+            selectAll( this.allowed_categories );
+</dtml-if>
+        }
+    );
+
+function validateProperties( form )
+{
+<dtml-if available_categories>
+    selectAll( form.allowed_categories );
+</dtml-if>
+    return true;
+}
+
+fieldEditHandler.link_update_categories =
+function ( field )
+{
+    var form = field.form;
+    var allowed = form.elements['properties.allowed_categories:record:list'];
+
+    var value = '';
+    for (var i = 0; i < allowed.options.length; i++)
+        value += (value && ',') + allowed.options[i].value;
+
+    this.link_properties( form, 'default', null, null, null, value );
+}
+
+//-->
+</script>
+
+<tr>
+  <td><dtml-msg "Objects selection realm"></td>
+  <td nowrap="1">
+    <dtml-var "entry_field_edit( None, _,
+                                 type='link',
+                                 name='properties.scope:record',
+                                 value=items_realm,
+                                 properties={'allowed_features':['isItemsRealm']},
+                                 str_data='onChange=\'updatePropertiesForm(this)\'',
+                               )">
+    <i><dtml-msg "The attribute values in all existing objects will be reset whenever the realm is changed."></i>
+    <input type="hidden" name="properties.allowed_types:record:tokens:default" value="" />
+    <input type="hidden" name="properties.allowed_categories:record:tokens:default" value="" />
+  </td>
+</tr>
+
+<dtml-if available_types>
+
+<tr>
+  <td><dtml-msg "Allowed content type"></td>
+  <td>
+  <dtml-in available_types>
+    <dtml-if sequence-start>
+      <select name="properties.allowed_types:record:list" onChange="updatePropertiesForm(this)">
+        <option value=""><dtml-msg "Any"></option>
+    </dtml-if>
+        <option value="&dtml-getId;" <dtml-var "getId() in allowed_types" fmt=selected> >
+                <dtml-msg expr=Title></option>
+    <dtml-if sequence-end>
+      </select>
+    </dtml-if>
+  </dtml-in>
+  </td>
+</tr>
+
+</dtml-if>
+
+<dtml-if available_categories>
+
+<tr>
+  <td><dtml-msg "Allowed categories"></td>
+  <td>
+     <table cellspacing="0">
+     <tr class="row_title">
+       <td class="small" width="40%"><dtml-msg "All categories"></td>
+       <td>&nbsp;</td>
+       <td class="small" width="40%" nowrap><dtml-msg "Allowed categories"></td>
+     </tr>
+     <tr class="row_even">
+       <td>
+        <select id="available_categories" multiple="1" size="10"
+                onDblClick="javascript: addSelectionToList( available_categories, allowed_categories ); fieldEditHandler.link_update_categories(this)">
+          <dtml-in available_categories>
+          <option value="&dtml-getId;"><dtml-msg expr=Title></option>
+          </dtml-in>
+        </select>
+      </td>
+      <td align="center">
+        <input type=button
+               onClick="javascript: addSelectionToList( available_categories, allowed_categories ); fieldEditHandler.link_update_categories(this)"
+               value=" &gt;&gt; ">
+        <br><br>
+        <input type=button
+               onClick="javascript: deleteSelectionFromList( allowed_categories ); fieldEditHandler.link_update_categories(this)"
+               value=" &lt;&lt; "
+        >
+        <br><br>
+        <input type=button
+               onClick="javascript: upSelectionInList( allowed_categories );"
+               value="<dtml-msg "Move up">"
+        >
+        <br><br>
+        <input type=button
+               onClick="javascript: downSelectionInList( allowed_categories );"
+               value="<dtml-msg "Move down">"
+        >
+      </td>
+      <td>
+        <select name="properties.allowed_categories:record:list"
+                id="allowed_categories" size="10" multiple="1"
+                onDblClick="javascript: deleteSelectionFromList( allowed_categories ); fieldEditHandler.link_update_categories(this)">
+          <dtml-in available_categories>
+          <dtml-if "getId() in allowed_categories">
+          <option value="&dtml-getId;"><dtml-msg expr=Title></option>
+          </dtml-if>
+          </dtml-in>
+        </select>
+      </td>
+    </tr>
+    <tr class="row_even">
+      <td nowrap>
+        <dtml-msg "Fast search">:
+        <input type="text" value="" onKeyUp="SearchStrInSelect( value, available_categories );">
+      </td>
+      <td>&nbsp;</td>
+      <td nowrap>
+        <dtml-msg "Fast search">:
+        <input type="text" value="" onKeyUp="SearchStrInSelect( value, allowed_categories );">
+      </td>
+    </tr>
+    </table>
+  </td>
+</tr>
+
+</dtml-if>
+
+</dtml-let>

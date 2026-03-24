@@ -1,0 +1,132 @@
+<dtml-comment>
+Viewer for one month
+$Editor: spinagin $
+$Id: calendar_month_view.dtml,v 1.2 2007/07/03 12:18:53 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-let len_of_text="getSettingById('len_of_text')"
+          week_table_mode_only_title="getSettingById('week_table_mode_only_title')"
+          show_tasks_month_view="getSettingById('show_tasks_month_view')"
+          popup_full_text="getSettingById('popup_full_text')"
+
+          month_info="getMonthInfo(selected_year, selected_month)"
+          begin_date="month_info[0]"
+          max_notes="show_tasks_month_view and 3 or 6"
+>
+
+<dtml-if "skin_version=='1.0'">
+
+<table width="100%" cellpadding="2" cellspacing="2" border="0">
+  <tr>
+    <td colspan="3" align="left">
+      <font size="2">
+        <b style="color: #3366CC"><dtml-msg "Notes">:</b> <b><dtml-msg expr="months_map[selected_month].capitalize()"> &dtml-selected_year;</b>
+      </font>
+    </td>
+    <td colspan="3" align="right">
+      <dtml-msg "Filter">:
+      <select name="filter_topic" onChange="document.location.replace('calendar_view?month='+&dtml-selected_month;+'&year='+&dtml-selected_year;+'&filter_topic='+this.value)">
+        <option value=""></option>
+        <dtml-in "listTopics()">
+          <option value="&dtml-sequence-item;" <dtml-var "filter_topic==_['sequence-item']" fmt=selected>>&dtml-sequence-item;</option>
+        </dtml-in>
+      </select>
+    </td>
+  </tr>
+  <tr class="row_title">
+    <td><dtml-msg "Monday"></td>
+    <td><dtml-msg "Tuesday"></td>
+    <td><dtml-msg "Wednesday"></td>
+    <td><dtml-msg "Thursday"></td>
+    <td><dtml-msg "Friday"></td>
+    <td><dtml-msg "holidays.short"></td>
+  </tr>
+  <tr class="row_even">
+  <dtml-in "_.range(_.round(month_info[-1]-month_info[0])+1)">
+  <dtml-let date="begin_date+_['sequence-item']">
+    <dtml-if "date.dow()<>6 and date.dow()<>0">
+      <td width="17%" rowspan="2"  height="100"
+    <dtml-elif "date.dow()==6">
+      <td  height="50"
+    <dtml-elif "date.dow()==0">
+    <tr class="row_even">
+      <td  height="50"
+    </dtml-if>
+        <dtml-if "date.month()<>selected_month"> bgcolor="#FFFFFF" class="roundborder"</dtml-if> 
+        valign="top"
+      >
+       <dtml-var calendar_month_day_view>
+    <dtml-if "date.dow()==0">
+      </td>
+    <tr class="row_even">
+    </dtml-if>
+  </dtml-let>
+  </dtml-in>
+</table>
+
+<dtml-else>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+  <td><h3 align="center"><dtml-msg expr="months_map[selected_month].capitalize()"> &dtml-selected_year;</h3>
+  <td align="right" width="5%" nowrap="1">
+    <dtml-msg "Filter">:
+    <select name="filter_topic" onChange="document.location.replace('calendar_view?month='+&dtml-selected_month;+'&year='+&dtml-selected_year;+'&filter_topic='+this.value)">
+      <option value=""></option>
+      <dtml-in "listTopics()">
+        <option value="&dtml-sequence-item;" <dtml-var "filter_topic==_['sequence-item']" fmt=selected>>&dtml-sequence-item;</option>
+      </dtml-in>
+    </select>
+</table>
+
+<dtml-comment>
+<dtml-var ramka_header>
+</dtml-comment>
+<table width="100%" cellpadding="0" cellspacing="0" border="1" class="CalendarTaskList">
+   <tr align="center" height="10" class="Title">
+    <td><dtml-msg "Monday"></td>
+    <td><dtml-msg "Tuesday"></td>
+    <td><dtml-msg "Wednesday"></td>
+    <td><dtml-msg "Thursday"></td>
+    <td><dtml-msg "Friday"></td>
+    <td><dtml-msg "holidays.short"></td>
+   </tr>
+
+<tr>
+<dtml-in "_.range(_.round(month_info[-1]-month_info[0])+1)">
+<dtml-let date="begin_date+_['sequence-item']">
+
+   <dtml-comment> =================== Monday - Friday   ===============</dtml-comment>
+   <dtml-if "date.dow()<>6 and date.dow()<>0">
+    <td width="17%" rowspan="2"  height="100"
+
+   <dtml-comment> =================== Saturday   ===============</dtml-comment>
+   <dtml-elif "date.dow()==6">
+    <td  height="50"
+
+   <dtml-comment> =================== Sunday   ===============</dtml-comment>
+   <dtml-elif "date.dow()==0">
+    <tr>
+    <td  height="50"
+    </dtml-if>
+
+        <dtml-if "date.month()<>selected_month"> bgcolor="#FFFFFF"</dtml-if> 
+        valign="top"
+    >
+        <dtml-comment>--------   view one day -----------------</dtml-comment>
+        <dtml-var calendar_month_day_view>
+
+   <dtml-if "date.dow()==0">
+    </td>
+    <tr>
+   </dtml-if>
+
+</dtml-let>
+</dtml-in>
+</table>
+</dtml-if>
+
+<dtml-comment>
+<dtml-var ramka_footer>
+</dtml-comment>
+</dtml-let>

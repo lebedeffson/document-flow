@@ -1,0 +1,4 @@
+title = 'Naumen.ru v2.0 skin'
+category = 'defaults'
+description
+This is second version of Naumen.ru site skin (September 2002 - February 2003)

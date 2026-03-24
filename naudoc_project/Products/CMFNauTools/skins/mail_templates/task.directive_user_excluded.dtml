@@ -1,0 +1,21 @@
+<dtml-comment>
+$Id: task.directive_user_excluded.dtml,v 1.5 2004/01/16 16:46:24 vpastukhov Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.5 $>
+<dtml-let actor="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='en'">
+Subject: You are drop-out from task "<dtml-var task_title>"
+
+You are no longer involved into the task "<dtml-var task_title>"
+Creator: <dtml-var actor>
+URL: &dtml-task_url;
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: Задание "<dtml-var task_title>" отменено
+
+Вы исключены из задания "<dtml-var task_title>"
+Автор задания: <dtml-var actor>
+URL: &dtml-task_url;
+</dtml-if>
+</dtml-let>

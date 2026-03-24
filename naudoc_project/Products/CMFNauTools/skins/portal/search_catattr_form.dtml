@@ -1,0 +1,46 @@
+<dtml-comment>
+$Id: search_catattr_form.dtml,v 1.7 2007/06/04 13:14:42 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.7 $>
+
+<dtml-call "REQUEST.set('OpenInFrame', '')">
+<dtml-call "REQUEST.set('PageTitle', 'User Information')">
+
+<dtml-var simple_html_header>
+
+<dtml-let cat_id="REQUEST.get('cat_id', '')"
+          attr_id="REQUEST.get('attr_id', '')"
+          in_child="REQUEST.get('in_child', 0)"
+          attr="portal_metadata.getCategoryById(cat_id).getAttributeDefinition(attr_id)"
+          value="REQUEST.get('attr_value', None)"
+          type="attr.Type()"
+          name="attr_id"
+          catattr_method="_.getitem('catattr_'+(type=='text' and 'string' or type), 0)"
+>
+
+<script type="text/javascript">
+<!--
+function setAttr(form) {
+  if (validateForm( form )) {
+    Return();
+    window.close();
+  }
+  return false;
+}
+//-->
+</script>
+
+<form id="attr_form">
+
+  <dtml-var catattr_method>
+
+<input type="checkbox" name="child" id="child" value="1" <dtml-var in_child fmt=checked>>
+
+<dtml-var "msg('Search in child categories')">
+<br />
+<input type="button" value="&nbsp;&nbsp;<dtml-msg "Ok">&nbsp;&nbsp;" onClick="setAttr(this.form);">
+<input type="button" value="<dtml-msg "Cancel">" onClick="window.close();">
+</form>
+</dtml-let>
+
+<dtml-var simple_html_footer>

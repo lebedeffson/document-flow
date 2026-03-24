@@ -1,0 +1,21 @@
+<dtml-comment>
+$Id: task.directive_user_included.dtml,v 1.1 2009/02/17 15:04:22 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.1 $>
+<dtml-let actor="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='en'">
+Subject: You are a member of task "<dtml-var task_title>"
+
+You are a member of task "<dtml-var task_title>"
+Creator: <dtml-var actor>
+URL: (dtml-var task_url>
+
+<dtml-else>
+Content-Type: text/plain; charset=windows-1251
+Subject: <dtml-var over_subject fmt=untaint>
+
+Вы включены в задание "<dtml-var task_title>"
+Автор задания: <dtml-var actor>
+URL: &dtml-task_url;
+</dtml-if>
+</dtml-let>

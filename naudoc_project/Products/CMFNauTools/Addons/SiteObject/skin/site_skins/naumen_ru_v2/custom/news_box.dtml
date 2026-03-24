@@ -1,0 +1,19 @@
+<ul>
+
+<dtml-let primary_document="go.getLastPresentedDocument(1)">
+<dtml-if "primary_document">
+ <li>[<dtml-var "date(primary_document, REQUEST).strip()">]<br>
+ <b><a href="<dtml-var "primary_document.absolute_url()">"><dtml-var "primary_document.title"></a></b><br><br></li>
+</dtml-if>
+</dtml-let>
+
+<dtml-in "go.listPresentedDocuments(2)" sort="Date" reverse>
+  <li>
+     [<dtml-var "date(this(), REQUEST).strip()">]
+     <br>
+     <a class="big_menu_txt" href="&dtml-absolute_url;">&dtml-title;</a>
+     <br><br>
+  </li>
+</dtml-in>
+
+</ul>

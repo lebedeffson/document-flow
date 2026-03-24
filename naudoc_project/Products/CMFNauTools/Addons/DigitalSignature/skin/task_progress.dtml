@@ -1,0 +1,75 @@
+<dtml-comment>
+$Id: task_progress.dtml,v 1.2 2008/06/18 10:06:32 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-if canSendNotifications>
+  <form method="POST" action="&dtml-absolute_url;">
+</dtml-if>
+
+<dtml-in listResponseTypes mapping>
+<dtml-if sequence-start>
+ <table cellpadding=2 width="100%">
+</dtml-if>
+ <tr class="task_title">
+   <td class="smallHeader"><dtml-msg expr=progresslist_title></td>
+ </tr>
+ <tr><td>
+  <dtml-in "searchResponses(status=id)" sort=member,date mapping>
+    <dtml-var task_progress_entry fmt=strip>
+  <dtml-else>
+    <dtml-msg "No reports">
+  </dtml-in>
+ </td></tr>
+<dtml-if sequence-end>
+ </table>
+</dtml-if>
+</dtml-in>
+
+<dtml-if isEnabled>
+<dtml-in "listPendingUsers()">
+<dtml-if sequence-start>
+ <table cellpadding=2 width="100%">
+ <tr class="task_title">
+   <td class="smallHeader"><dtml-msg "Pending reply from">:</td>
+ </tr>
+ <tr>
+   <td>
+     <table  cellpadding="2" cellspacing="0">
+     <tr>
+       <td class="small">
+</dtml-if>
+          <dtml-if canSendNotifications>
+             <input type="checkbox" name="selected_users:list" value="&dtml-sequence-item;">
+          </dtml-if>
+           <dtml-var sequence-item fmt=member>
+           <br>
+        <dtml-if "(_['sequence-length'] > 10) and _['sequence-index'] == _['sequence-length'] / 2">
+          <dtml-comment> End of first column </dtml-comment>
+          </td>
+          <td width="1"><img src="&dtml-portal_url;/spacer.gif"></td>
+          <td class="small">
+        </dtml-if>
+<dtml-if sequence-end>
+       </td>
+     </tr>
+     </table>
+   </td>
+ </tr>
+ </table>
+</dtml-if>
+</dtml-in>
+
+<dtml-if canSendNotifications>
+ <input type="submit" value="<dtml-msg Notify> &gt;&gt;" name="task_kick_form:method">
+</dtml-if>
+<dtml-if "is_signable and signatures and not auto_verify">
+ <input type="button" value="<dtml-msg "ds.verify">" onClick="verifySelected();">
+</dtml-if>
+
+</dtml-if>
+
+<dtml-if canSendNotifications>
+  </form>
+</dtml-if>
+

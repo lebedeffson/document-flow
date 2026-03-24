@@ -1,0 +1,85 @@
+<dtml-comment>
+$Id: workflow_states.dtml,v 1.16 2006/02/22 10:31:39 oevsegneev Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.16 $>
+
+<dtml-var simple_html_header>
+
+<script type="text/javascript">
+<!--
+
+messageCatalog.alert = "<dtml-msg "No states selected" jscript>";
+
+-->
+</script>
+
+<h2><dtml-msg "Document category states"></h2>
+
+<dtml-let wf=Workflow>
+
+<dtml-with "portal_workflow[wf].states">
+<dtml-in values sort=title_or_id>
+
+<dtml-if sequence-start>
+<form action="workflows" method="POST" onsubmit="return checkEmptiesCheckboxes( this, 'ids', messageCatalog.alert );">
+  <table border="0" cellspacing="0" cellpadding="2" width="100%">
+</dtml-if>
+
+ <tr class="row_title">
+   <td align="left" colspan="2">
+    <input type="checkbox" name="ids:list" value="&dtml-id;" 
+           <dtml-var "not isPrivateItem(_['sequence-item'])" fmt=disabled>
+    />
+    <dtml-if expr="id == initial_state">*</dtml-if>
+    <dtml-var sequence-item fmt=workflow_state>
+    <dtml-unless "isPrivateItem(_['sequence-item'])">(<dtml-msg acquired>)</dtml-unless>
+   </td>
+ </tr>
+ <dtml-in getTransitions>
+  <tr>
+    <td width="10%"></td>
+    <td>
+     <dtml-let ti="portal_workflow.getTransitionInfo(wf, _['sequence-item'])">
+     <a href="transition_properties?transition=&dtml-sequence-item;"><dtml-var "ti['title']" html_quote></a>
+     </dtml-let>
+    </td>
+  </tr>
+ <dtml-else>
+  <tr>
+    <td></td>
+    <td><em><dtml-msg "No transitions">.</em></td>
+  </tr>
+ </dtml-in>
+
+<dtml-if sequence-end>
+</table>
+<input type="submit" name="deleteStates" value="<dtml-var "msg('Delete')">"
+       onclick="return checkEmptiesCheckboxes( this.form, 'ids', messageCatalog.alert );" />
+<input type="submit" name="setInitialState" value="<dtml-var "msg('Set Initial State')">"
+       onclick="return checkEmptiesCheckboxes( this.form, 'ids', messageCatalog.alert );" />
+<input type="submit" name="unsetInitialState" value="<dtml-var "msg('Unset Initial State')">"
+       <dtml-var "not initial_state" fmt=disabled> />
+</form>
+</dtml-if>
+
+<dtml-else>
+ <em><dtml-msg "No states defined">.</em>
+</dtml-in>
+
+<br />
+
+<h3><dtml-msg "Add a state"></h3>
+
+<form action="workflows" method="POST" onsubmit="return validateForm(this);">
+  <p><dtml-msg "Id"> <input type="text" name="state_id:id_" value="" />
+    <input type="submit" 
+         name="addState" 
+         value="<dtml-msg "Add">" 
+    />
+  </p>
+</form>
+
+</dtml-with>
+</dtml-let>
+
+<dtml-var simple_html_footer>

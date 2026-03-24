@@ -1,0 +1,191 @@
+var menus = new Array(), subMenus = new Array();
+
+function OpenMenuWnd( key )
+{
+	wnd_popup = window.open("", "wnd_popup_menu", "toolbar=no,scrollbars=no,width=200,height=210,resizable=no");
+	wnd_popup.close();
+	wnd_popup = window.open("", "wnd_popup_menu", "toolbar=no,scrollbars=no,width=200,height=210,resizable=no");
+
+	wnd_popup.document.write('\
+		<html>\n \
+			<title> ' + menus[key].name + ' </title>\n \
+			<head>\n \
+				<link rel="stylesheet" href="default_stylesheet">\n \
+				<script language="JavaScript">\n \
+					function Go(url)\n \
+					{\n \
+						window.opener.focus();\n \
+						window.opener.location.href = url;\n \
+						window.close();\n \
+						return false;\n \
+					}\n \
+				</script>\n \
+			</head>\n \
+			<body>\n \
+	\n');
+
+	wnd_popup.document.write('<table border="0" cellspacing="0" cellpadding="0" class="NavBar">\n<tr><td valign=top>\n');
+	wnd_popup.document.write('<table align=left border="0" cellspacing="0" cellpadding="0" class="NavBarItem">\
+	                <tr bgcolor="#FFFFFF">\
+	                  <td background="menu_left_tcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+                          <td background="menu_top_border.gif"><img src="spacer.gif" width=2 height=2></td>\
+                          <td background="menu_right_tcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+	                </tr>\
+         \n');
+
+	for (entry in subMenus[key]) {
+		var addOn;
+		if(subMenus[key][entry].description)
+		      wnd_popup.document.write('<tr class="Popup">\
+                                                    <td background="menu_left_border.gif"><img src="spacer.gif" width=2 height=1>\
+                                                    <td style="cursor:hand;padding: 3px;" onClick="return Go(\'' + subMenus[key][entry].url + '\');" onMouseOver="this.style.backgroundColor=\'#0A246A\';this.style.color=\'#FFFFFF\';" onMouseOut="this.style.backgroundColor=\'#D4D0C8\';this.style.color=\'#000000\';" class="NavBarItem"> ' + entry  + '</td>\
+                                                    <td background="menu_right_border.gif"><img src="spacer.gif" width=2 height=1></td>\
+                                      </tr>\n');
+
+	}
+	      wnd_popup.document.write('<tr>\
+                                <td background="menu_left_bcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+                                <td background="menu_bottom_border.gif"><img src="spacer.gif" width=2 height=2></td>\
+                                <td background="menu_right_bcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+                              </tr>\
+                          \n');
+
+	wnd_popup.document.write('</table>\n');
+
+	wnd_popup.document.write('</td></tr>\n<tr><td align=center valign=bottom>\n<a class="navigate" OnClick="return Go(\'/\');" href="/"></a>\n');
+	wnd_popup.document.write('</td></tr></table>\n');
+
+	wnd_popup.document.write('</body></html>\n');
+	return false;
+}
+
+function ShowHidePopup(layer, visStr) {
+    var theObj;
+
+    if (navigator.appName == "Netscape" && document.layers != null) {
+      theObj = eval("document.layers[\'"+layer+"\']");
+      if (theObj) theObj.visibility = visStr;
+    } else if (document.all != null) { //IE
+      if (visStr == "show") visStr = "visible";
+      if (visStr == "hide") visStr = "hidden";
+      theObj = eval("document.all[\'"+layer+"\']");
+      if (theObj) theObj.style.visibility = visStr;
+  }
+}
+
+function HideAll() {
+    for (key in menus) {
+	ShowHidePopup(eval('\"'+key+'\"'),'hide');
+    }
+}
+
+function AddMenu(id, name, url) {
+   menus[ id ] = new Array();
+   menus[ id ].name = name;
+   menus[ id ].url = url;
+   subMenus[ id ] = new Array();
+}
+
+function AddSubMenu(id, name, url, description, target) {
+   subMenus[ id ][name] = new Array();
+   subMenus[ id ][name].url = url;
+
+   if(description)
+	subMenus[ id ][name].description = description;
+   else
+	subMenus[ id ][name].description = name;
+
+   subMenus[ id ][name].target = target;
+}
+
+function DrawToolBar() {
+    var key, i=0;
+
+    document.write('\
+	<table class="NavBar" border="0" cellspacing="0" cellpadding="0">\
+        <tr>\
+          <td align=right valign="bottom" width=6><img width="5" src="path.gif"></td>\
+    \n');
+
+    for (key in menus) {
+	if(menus[ key ].url)
+		action = ' href="' + menus[ key ].url + '" ';
+	else
+		action = ' href="#" OnClick="return OpenMenuWnd(\'' + key + '\');" ';
+
+	document.write('<td style="padding-left: 5px;padding-right: 0px;" class="NavBar">' + (i ? ' &nbsp; ' : '') + '<a class="navigate" ' + action + '  onMouseOver="HideAll(); ShowHidePopup(\'' + key + '\',\'show\');">' + menus[ key ].name + '</a></td>\n');
+	i++;
+    }
+
+    var userAgent = navigator.userAgent;
+    var MSIEIndex = userAgent.indexOf("MSIE");
+    if (userAgent.indexOf("MSIE") != -1 &&
+	userAgent.substring((MSIEIndex + 5),(MSIEIndex + 6)) > 4) {
+    
+	document.write('\
+	     </tr>\
+	     <tr>\
+	       <td align=right width=5><img src="spacer.gif" height=1></td>\
+	\n');
+    
+        for (key in menus) {
+  	  var notEmpty = 0;
+
+	  for (s in subMenus[key]) {
+		notEmpty = 1;
+	   }
+
+ 	  if(notEmpty)
+          {
+	      document.write('\
+	          <td>\
+	            <div id="' + key +'" style="position:absolute; width:240px; height:115px; z-index:2; visibility: hidden">\
+	              <table align=left border="0" cellspacing="0" cellpadding="0" class="NavBarItem">\
+	                <tr bgcolor="#FFFFFF">\
+	                  <td background="menu_left_tcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+                          <td background="menu_top_border.gif"><img src="spacer.gif" width=2 height=2></td>\
+                          <td background="menu_right_tcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+	                </tr>\
+              \n');
+	      
+	      for (entry in subMenus[key]) {
+		      var addOn;
+
+		      if(subMenus[key][entry].description)
+				addOn += ' title="' + subMenus[key][entry].description + '" ';
+		      if(subMenus[key][entry].target)
+				addOn += ' target="' + subMenus[key][entry].target + '" ';
+
+		      var A;
+		      if(subMenus[key][entry].description != -1)
+			A = '<a class="navigate" class=menuPopup href="' + subMenus[key][entry].url + '" ' + addOn + '>' + entry + '</a>';
+		      else
+			A = '<a class="navigate" class=disabledPopup>'+ entry + '</a>';
+
+		      document.write('<tr class="Popup" onMouseOut="ShowHidePopup(\'' + key + '\', \'hide\');" onMouseOver="ShowHidePopup(\'' + key + '\', \'show\');">\
+                                                    <td background="menu_left_border.gif"><img src="spacer.gif" width=2 height=1>\
+                                                    <td onClick="location.href=\''+ subMenus[key][entry].url + '\'" onMouseOver="this.style.backgroundColor=\'#0A246A\';this.style.color=\'#FFFFFF\';" onMouseOut="this.style.backgroundColor=\'#D4D0C8\';this.style.color=\'#000000\';" class="NavBar"> &nbsp; ' + entry  + ' &nbsp; </td>\
+                                                    <td background="menu_right_border.gif"><img src="spacer.gif" width=2 height=1></td>\
+                                      </tr>\n');
+		      addOn='';
+	      }
+	      document.write('<tr>\
+                                <td background="menu_left_bcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+                                <td background="menu_bottom_border.gif"><img src="spacer.gif" width=2 height=2></td>\
+                                <td background="menu_right_bcorner.gif"><img src="spacer.gif" width=2 height=2></td>\
+                              </tr>\
+                          \n');
+
+	      document.write('\
+	              </table>\
+	            </div>\
+	          </td>\
+	      \n');
+	  }
+	  else document.write('<td></td>');
+       }
+    }
+
+    document.write('        </tr>\n</table>\n');
+}
+

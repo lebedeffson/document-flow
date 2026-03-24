@@ -1,0 +1,112 @@
+<dtml-comment>
+Main view template
+$Editor: spinagin $
+$Id: calendar_view.dtml,v 1.2 2007/07/03 12:18:55 adolgushin Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.2 $>
+
+<dtml-var simple_html_header>
+<dtml-var calendar_styles>
+
+<dtml-let months_map="{1:'january',2:'february',3:'march',4:'april',5:'may',6:'june',7:'july',8:'august',9: 'september', 10:'october', 11:'november',12: 'december'}"
+          now="_.DateTime()"
+          now_month="now.month()"
+          selected_month="_.int(REQUEST.get('month',now_month))"
+          selected_day="_.int(REQUEST.has_key('week') and '0' or REQUEST.get('day',now.day()))"
+          selected_year="_.int(REQUEST.get('year',now.year()))"
+          selected_week="REQUEST.has_key('week') and _.int(REQUEST['week']) or None"
+          click_month="not REQUEST.has_key('week') and not REQUEST.has_key('day') and REQUEST.has_key('month')"
+          years="_.range(now.year()-2,now.year()+3)"
+          day_with_notes="listDayWithNotes(selected_year, selected_month)"
+          filter_topic="REQUEST.get('filter_topic', '')"
+          allow_edit="_.SecurityCheckPermission( 'Create object versions', this() )"
+          show_tasks="REQUEST.get('show_tasks', None)"
+          skin_version="getSettingById('calendar_skin_version')"
+>
+<dtml-if "skin_version=='0.1'">
+  <dtml-msg "Calendar"> &dtml-Title;
+</dtml-if>
+<table width="100%" border="0">
+<tr>
+  <td>
+
+    <dtml-if "skin_version=='1.0'">
+    <table width="100%" border="0" cellpadding="2" cellspacing="0">
+      <tr class="row_odd">
+        <td><b><dtml-msg "Calendar"> &dtml-Title;</b></td>
+      </tr>
+    </table>
+    </dtml-if>
+
+    <dtml-var ramka_header>
+      <dtml-var calendar_table>
+    <dtml-var ramka_footer>
+  </td>
+  <td valign="top" align="left" height="100%" width="100%">
+    <dtml-if "selected_day!=0 and allow_edit"> 
+      <dtml-comment>=====   DAY or MONTH view mode ====================</dtml-comment>
+        <dtml-var "add_form(None, _)">
+    
+    <dtml-elif selected_week>
+
+      <dtml-comment>=====   WEEK view mode ====================</dtml-comment>
+      <dtml-let default_mode="getSettingById('week_mode')"
+                cur_mode="REQUEST.has_key('week_mode') and REQUEST['week_mode'] or default_mode"
+      >
+        <dtml-if "skin_version=='1.0'">
+        <b><dtml-msg "View mode"></b><br><br>
+        <select onChange="javascript:location.href='&dtml-absolute_url;/calendar_view?week_mode='+this.value+'&week=<dtml-var selected_week>&month=<dtml-var selected_month>&year=<dtml-var selected_year>'">
+          <option value="short"
+            <dtml-var "cur_mode=='short'" fmt=selected>
+          >
+            <dtml-msg "simple view mode">
+          <option value="table"
+            <dtml-var "cur_mode=='table'" fmt=selected>
+          >
+            <dtml-msg "table view mode">
+        </select>
+
+        <dtml-else>
+        <a href="&dtml-absolute_url;/calendar_view?week_mode=short&week=<dtml-var selected_week>&month=<dtml-var selected_month>&year=<dtml-var selected_year>" class="navigate">
+            <dtml-msg "simple view mode">
+        </a> 
+        <dtml-if "cur_mode=='short'"> ( <dtml-msg "Current view"> )</dtml-if><br>
+        <a href="&dtml-absolute_url;/calendar_view?week_mode=table&week=<dtml-var selected_week>&month=<dtml-var selected_month>&year=<dtml-var selected_year>" class="navigate">
+            <dtml-msg "table view mode">
+        </a><dtml-if "cur_mode=='table'"> ( <dtml-msg "Current view"> )</dtml-if> <br>
+        </dtml-if>
+        
+      </dtml-let>
+    </dtml-if>
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+  <dtml-if show_tasks>
+    <p><a href="&dtml-absolute_url;/calendar_view" class="Navigate">&nbsp;<font size="2"><u><b><dtml-msg expr="skin_version=='1.0' and 'Show notes list' or 'Notes list'"></b></u></font></a></p>
+  <dtml-else>
+    <p><a href="&dtml-absolute_url;/calendar_view?show_tasks=1" class="Navigate">&nbsp;<font size="2"><u><b><dtml-msg expr="skin_version=='1.0' and 'Show tasks list' or 'Tasks list'"></b></u></font></a></p>    
+  </dtml-if>
+  </td>
+</tr>
+
+</table>
+<p>
+    <dtml-if "show_tasks">
+        <dtml-var calendar_tasks_list>
+    <dtml-else>
+        <dtml-if "click_month">
+            <dtml-var calendar_month_view>
+        </dtml-if>
+
+        <dtml-if "selected_week">
+            <dtml-var calendar_week_view>
+        </dtml-if>
+        <dtml-if "selected_day!=0 and not click_month">
+            <dtml-var calendar_day_view>
+        </dtml-if>
+    </dtml-if>
+</p>
+</dtml-let>
+
+<dtml-var simple_html_footer>

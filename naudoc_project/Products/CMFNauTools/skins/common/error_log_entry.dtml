@@ -1,0 +1,145 @@
+<dtml-comment>
+View logged server error information.
+
+$Editor: vpastukhov $
+$Id: error_log_entry.dtml,v 1.10 2005/12/23 12:40:48 ikuleshov Exp $
+</dtml-comment>
+
+<dtml-revision $Revision: 1.10 $>
+
+<dtml-call "REQUEST.set( 'OpenInFrame', '' )">
+<dtml-var simple_html_header>
+
+<dtml-let  entry="portal_errorlog.getLogEntryById( REQUEST['id'] )">
+<dtml-if   entry>
+<dtml-with entry mapping>
+
+<dtml-if "_.SecurityCheckPermission( 'Log Site Errors', this() )">
+
+<h2><dtml-msg "Report error to the NauDoc support service"></h2>
+
+<form name="error_report_form" method="post"
+      action="<dtml-var "portal_errorlog.relative_url( action='sendErrorReport' )" html_quote>">
+
+<input type="hidden" name="id" value="&dtml-id;" />
+
+<p>
+<strong><dtml-msg "Comment">:</strong><br />
+<textarea name="comment:text" tabindex="1" wrap="soft" rows="8" style="width: 100%"
+          ><dtml-var comment_adm html_quote>
+</textarea>
+<br />
+<input type="radio" name="support:boolean" id="support_box_on" tabindex="2" value="1" checked="1"
+       /><label for="support_box_on"><dtml-msg "Notify NauDoc support service"></label>
+<br />
+<input type="radio" name="support:boolean" id="support_box_off" tabindex="3" value=""
+       /><label for="support_box_off"><dtml-msg "Send report to e-mail address">:</label>
+<input type="text" name="email:string:ignore_empty" value="" tabindex="4" size="50"
+       onChange="javascript: this.form['support:boolean'][1].checked = true" />
+</p>
+
+<p><input type="submit" name="report" value=" <dtml-msg "Send"> " tabindex="5" /></p>
+
+</form>
+
+<hr size="1">
+
+</dtml-if>
+
+<h2>System information</h2>
+
+<table class="error">
+  <tr>
+    <th align="left">NauDoc Version</th>
+    <td>&dtml-version;</td>
+  </tr>
+  <tr>
+    <th align="left">Active Addons</th>
+    <td>&dtml-active_addons;</td>
+  </tr>
+  <tr>
+    <th align="left">Zope Version</th>
+    <td>&dtml-zope_info;</td>
+  </tr>
+  <tr>
+    <th align="left">ZODB Version</th>
+    <td>&dtml-zodb_info;</td>
+  </tr>
+  <tr>
+    <th align="left">Python Version</th>
+    <td>&dtml-python_info;</td>
+  </tr>
+  <tr>
+    <th align="left">System Platform</th>
+    <td>&dtml-system_info;</td>
+  </tr>
+  <tr>
+    <th align="left">License Usage</th>
+    <td>&dtml-license_info;</td>
+  </tr>
+</table>
+
+<h2>Exception information</h2>
+
+<table class="error">
+  <tr>
+    <th align="left">Error ID</th>
+    <td><a href="<dtml-var "portal_errorlog.absolute_url(
+                                action='error_log_entry',
+                                params={'id':id},
+                            )" html_quote>">&dtml-id;</a></td>
+  </tr>
+  <tr>
+    <th align="left">Time</th>
+    <td><dtml-var "_.DateTime(time)"></td>
+  </tr>
+  <tr>
+    <th align="left">User Name</th>
+    <td>&dtml-userid; (&dtml-username;)</td>
+  </tr>
+  <tr>
+    <th align="left">Request URL</th>
+    <td><a href="&dtml-url;">&dtml-url;</a></td>
+  </tr>
+  <tr>
+    <th align="left">Exception Type</th>
+    <td>&dtml-type;</td>
+  </tr>
+  <tr>
+    <th align="left">Exception Value</th>
+    <td>&dtml-value;</td>
+  </tr>
+</table>
+
+<h2>Exception traceback</h2>
+
+<dtml-if tb_html>
+<dtml-var tb_html>
+<dtml-else>
+<pre><dtml-var tb_text html_quote></pre>
+</dtml-if>
+
+<dtml-if req_html>
+<h2>REQUEST</h2>
+
+<div class="error">
+<dtml-var req_html>
+</div>
+</dtml-if>
+
+<hr size="1">
+
+<h2><a href="<dtml-var "portal_errorlog.relative_url(
+                            action='getLogEntryAsText',
+                            params={'id':id},
+                        )" html_quote>"><dtml-msg "View this entry as text"></a></h2>
+
+</dtml-with>
+<dtml-else>
+
+<p><dtml-msg "Log entry [%(id)s] not found or expired." msgparams=REQUEST></p>
+
+</dtml-if>
+</dtml-let>
+
+<dtml-var simple_html_footer>

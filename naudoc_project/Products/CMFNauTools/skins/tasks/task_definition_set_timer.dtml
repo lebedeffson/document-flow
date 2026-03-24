@@ -1,0 +1,47 @@
+<dtml-comment>
+$Editor: mbernatski $
+$Id: task_definition_set_timer.dtml,v 1.3 2004/04/05 11:22:04 mbernatski Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.3 $>
+<dtml-let wf=Workflow
+          available_attributes=listAttributeDefinitions
+          date_attributes="[a for a in available_attributes if a.Type() == 'date']"
+          >
+<tr class="row_even">
+  <td>
+    <dtml-msg "Transitions">:
+  </td>
+  <td>
+    <dtml-with "portal_workflow[wf].transitions">
+     <dtml-in values sort=id>
+      <dtml-if sequence-start>
+        <select name="transition">
+      </dtml-if>
+         <option value="&dtml-id;" <dtml-var "getId()==taskDefinitionArray['transition']" fmt=selected> >
+           <dtml-var "msg(actbox_name or id)">
+         </option>
+      <dtml-if sequence-end>
+        </select>
+      </dtml-if>
+     <dtml-else>
+       <dtml-msg "None">
+     </dtml-in>
+    </dtml-with>
+  </td>
+</tr>
+<tr class="row_even">
+  <td>
+    <dtml-msg "Document category attributes">:
+  </td>
+  <td>
+    <select name="attribute_name">
+     <option value="">---</option>
+     <dtml-in date_attributes sort=id>
+       <option value="<dtml-var getId>" <dtml-var "getId()==taskDefinitionArray['attribute_name']" fmt=selected>>
+         <dtml-var "Title() and Title() or getId()">
+       </option>
+     </dtml-in>
+     </select>
+  </td>
+</tr>
+</dtml-let>

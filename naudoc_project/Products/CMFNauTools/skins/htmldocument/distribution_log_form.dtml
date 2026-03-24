@@ -1,0 +1,64 @@
+<dtml-comment>
+$Id: distribution_log_form.dtml,v 1.4 2005/07/29 04:15:54 vsafronovich Exp $
+</dtml-comment>
+<dtml-revision $Revision: 1.4 $>
+
+<dtml-var simple_html_header>
+
+<div class="Desktop">
+<h2><dtml-var "msg('Distribution log')"></h2>
+
+<form method="POST" action="&dtml-absolute_url;" target="workfield">
+  <table cellspacing="3" cellpadding="3" border="0">
+    <dtml-in distribution_log mapping reverse>
+      <dtml-if sequence-start> 
+        <tr class="row_title">
+          <td>&nbsp;</td>
+          <td><dtml-var "msg('Send date')"></td>
+          <td><dtml-var "msg('Sender')"></td>
+          <td><dtml-var "msg('Recipients')"></td>
+        </tr>
+      </dtml-if>
+      <dtml-if sequence-even>
+        <tr class="row_even">
+      <dtml-else>
+        <tr class="row_odd">
+      </dtml-if>
+      <td>
+        <dtml-let checked="_['sequence-start'] and 'checked' or ''">
+          <input type="radio" name="mail_to_receive" value="&dtml-log_id;" &dtml-checked;>
+        </dtml-let>
+      </td>
+      <td class="small">
+        <dtml-var "_.DateTime(_.int(date))" fmt="%Y-%m-%d %H:%M">
+      </td>
+      <td class="small">
+        <dtml-var who_id fmt=member>
+      </td>
+      <td class="small">
+        <dtml-in recipients>
+          <dtml-if "_['sequence-item'].find('@')>-1">
+            <dtml-var sequence-item>
+          <dtml-else>
+            <dtml-var sequence-item fmt=member>
+          </dtml-if>
+          <dtml-unless sequence-end>; </dtml-unless>
+        </dtml-in>
+      </td>
+    </tr> 
+  <dtml-else>
+    <tr>
+      <td><dtml-var "msg('Distribution log empty')"></td>
+    </tr>
+  </dtml-in>
+</table>
+
+<dtml-if distribution_log>
+  <input type="submit" name="receiveMailCopyFromDistributionLog:method" value="<dtml-var "msg('Get copy of letter')">">
+</dtml-if>
+
+</form>
+
+</div>
+
+<dtml-var simple_html_footer>

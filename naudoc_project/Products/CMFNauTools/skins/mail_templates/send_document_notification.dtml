@@ -1,0 +1,21 @@
+<dtml-let membername="portal_membership.getAuthenticatedMember().getMemberName()">
+<dtml-if "lang=='ru'">
+Content-Type: text/plain; charset=windows-1251
+Subject: [Уведомление] "<dtml-var source_title>"
+
+<dtml-var membername> уведомляет вас о документе "<dtml-var source_title>".
+URL: <dtml-var source_link>
+
+<dtml-if comment>Комментарии: <dtml-var comment></dtml-if>
+
+<dtml-elif "lang=='en'">
+Subject: [Notification] "<dtml-var source_title>"
+
+<dtml-var membername> notifies you about the document "<dtml-var source_title>".
+URL: <dtml-var source_link>
+
+<dtml-if comment>Comment: <dtml-var comment></dtml-if>
+
+</dtml-if>
+</dtml-let>
+

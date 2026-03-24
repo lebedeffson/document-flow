@@ -1,0 +1,292 @@
+<dtml-comment>
+$Id: task_list_embedded.dtml,v 1.74 2007/10/02 08:21:33 oevsegneev Exp $
+$Editor: ikuleshov $
+
+'hide_empty' - do not show informational messages if no matching tasks were found
+'show_filter' - enables the filtering settings box
+'header' - description message
+'mode_name' - pass to executeQuery.
+
+</dtml-comment>
+<dtml-revision $Revision: 1.74 $>
+
+<dtml-let container=this
+          uname="portal_membership.getAuthenticatedMember().getUserName()"
+          url="REQUEST['URL']"
+          showTaskMode="REQUEST.get('showTaskMode')"
+          urlPostfix="['showTaskMode=%s&' % showTaskMode, ''][showTaskMode is None]"
+          hide_empty="_.has_key('hide_empty')"
+          member_id="REQUEST.get('member_id', '')"
+          member_param="member_id and '&member_id=%s' % member_id or ''"
+          show_checkboxes="portal_membership.checkPermission('Manage portal', this())"
+          target="_.get('target', '')"
+>
+
+<dtml-with "portal_followup.executeQuery2(mode_name, REQUEST, md=_)" mapping>
+
+<dtml-if "results or not hide_empty">
+
+<dtml-if "_.get('header') and results_count">
+  <p><dtml-msg expr=header></p>
+</dtml-if>
+
+  <dtml-if total_count>
+    &dtml-results_count;&nbsp;<dtml-msg "tasks of">&nbsp;&dtml-total_count;<br />
+  </dtml-if>
+
+<dtml-var "table_pages_list( None, _
+                           , params='&showTaskMode=%s%s' % ( mode_name, member_param )
+                           , disable_controls=True
+                           )"
+>
+
+<form name="task_list_embedded_form" method="POST">
+<dtml-in results start=qs size=batch_size>
+
+<dtml-if sequence-start>
+ <table cellspacing="1" cellpadding="3" width="100%">
+   <tr class="row_title">
+     <dtml-if "show_checkboxes"><td width="8">&nbsp;</td></dtml-if>
+     <td width="16">&nbsp;</td>
+     <dtml-in table_columns mapping>
+       <dtml-if "not selected_columns[0] or id in selected_columns">
+         <td class="col_odd" valign="middle" align="left">
+           <dtml-if "sort_on==id">
+             <dtml-if "sort_order == 'reverse'">
+               <img src="&dtml-portal_url;/sort_up.gif" alt="<dtml-msg Up>" />
+             <dtml-else>
+               <img src="&dtml-portal_url;/sort_down.gif" alt="<dtml-msg Down>" />
+             </dtml-if>
+           </dtml-if>
+           <dtml-if "id not in ['InvolvedUsers', 'DocumentTitle']">
+             <a class="navigate"
+                href="&dtml-url;?&dtml-urlPostfix;sort_on=<dtml-var id><dtml-if "sort_on==id">&sort_order=<dtml-var "_.string.strip(sort_order and ' ' or 'reverse')"></dtml-if><dtml-if member_id>&member_id=&dtml-member_id;</dtml-if>">
+               <dtml-msg expr=title>
+             </a>
+           <dtml-else>
+             <dtml-msg expr=title>
+           </dtml-if>
+         </td>
+       </dtml-if>
+     </dtml-in>
+   </tr>
+</dtml-if>
+
+<dtml-with getObject>
+  <dtml-let expires=expires
+            effective=effective
+            alarm_date="expires - (expires - effective) / 10"
+            task_state="_['isFinalized'] and 'finalized' or
+                        expires.isPast() and 'expired' or
+                        alarm_date < _.DateTime() and 'beforeexpiration' or 'inprogress'"
+            icon_name="'task_%s.gif' % task_state"
+            unread="not _['SeenBy'] or uname not in _['SeenBy']"
+            cell_style="(unread and 'font-weight: bold;'  or '')"
+  >
+  <tr class="<dtml-if sequence-odd>row_odd<dtml-else>row_even</dtml-if>">
+    <td><a target="&dtml-target;"
+           href="<dtml-var "absolute_url(action='view')">"
+        ><img width="16"
+              height="16"
+              src="&dtml-icon_name;"
+              alt="<dtml-msg expr=task_state>"
+         /></a>
+    </td>
+  <dtml-if "show_checkboxes">
+    <td width="8">
+      <input type="checkbox"
+             name="ids:list"
+             value="&dtml-getUid;" />
+    </td>
+  </dtml-if>   
+<dtml-in table_columns mapping>
+      <dtml-if "not selected_columns[0] or id in selected_columns">
+           <dtml-if "id=='Supervisor'">
+               <td style="&dtml-cell_style;" nowrap>
+                  <dtml-if Supervisor>
+                     <dtml-var Supervisor fmt=member.brief>
+                  <dtml-else>
+                     <dtml-msg "n/a">
+                  </dtml-if>
+               </td>
+            <dtml-elif "id=='BrainsType'">
+               <td style="&dtml-cell_style;">
+                    <dtml-msg expr=BrainsType>
+               </td>
+            <dtml-elif "id=='Title'">
+               <td style="&dtml-cell_style;">
+                    <a target="&dtml-target;"
+                       href="<dtml-var "absolute_url(action='view')">">&dtml-Title;</a>
+               </td>
+            <dtml-elif "id=='DocumentTitle'">
+               <td style="&dtml-cell_style;" nowrap>
+                 <dtml-let moniker_frame="'workspace'"
+                           moniker_method="'document_follow_up_form'">
+                   <dtml-var getBase fmt=content>
+                 </dtml-let>
+              </td>
+            <dtml-elif "id=='Creator'">
+               <td style="&dtml-cell_style;">
+                 <dtml-var Creator fmt=member.brief>
+               </td>
+            <dtml-elif "id=='DocumentCategory'">
+               <td style="&dtml-cell_style;">
+                 <dtml-let category=DocumentCategory
+                           c_obj="category and portal_metadata.getCategoryById(category)">
+                     <dtml-if c_obj>
+                        <dtml-msg expr="c_obj.Title()">
+                     <dtml-else>
+                        <dtml-msg "n/a">
+                     </dtml-if>
+                 </dtml-let>
+               </td>
+            <dtml-elif "id=='DocumentFolder'">
+               <td style="&dtml-cell_style;">
+                 <dtml-let parent=getBase
+                           folder="parent.implements('isBusinessProcedure') and parent.Title() or DocumentFolder()">
+                     <dtml-if folder>
+                        <dtml-msg expr=folder>
+                     <dtml-else>
+                        <dtml-msg "Portal root">
+                     </dtml-if>
+                 </dtml-let>
+               </td>
+            <dtml-elif "id=='InvolvedUsers'">
+               <td style="&dtml-cell_style;" nowrap>
+
+                  <dtml-in listInvolvedUsers sort="id" size="5">
+                    <dtml-var sequence-item fmt=member>
+
+                    <dtml-in "searchResponses(member=_['sequence-item'])" sort="date" mapping>
+                      <dtml-let rti="getResponseTypeById(status)"
+                                icon="rti is not None and rti.get('icon')"
+                      >
+                         <dtml-if "icon and _[icon]">
+                            <img src="&dtml-icon;" alt="<dtml-msg "Got response">: <dtml-msg expr="rti.get('title')">"/>
+                         </dtml-if>
+                      </dtml-let>
+                    </dtml-in>
+
+                    <dtml-if "implements('isDirectiveTask')">
+                    <dtml-let actual_time="getActualTimeFor(_['sequence-item']) or 0"
+                              plan_time="getPlanTime()"
+                    >
+
+                      <dtml-if "plan_time and actual_time">
+                           <dtml-let disparity="plan_time - actual_time"
+                                     tip="'Actual task perfomance time %s planned on' % (disparity > 0 and 'outstrips' or 'exceeds')"
+                                     style="disparity > 0 and 'color: green' or 'color: red;'"
+                           >
+
+                            <a target="&dtml-target;"
+                               style="&dtml-style;" title="<dtml-msg expr=tip> <dtml-var "dateperiod(_.abs(disparity))">"/>
+                              <dtml-var "disparity > 0 and '+' or '-'"><dtml-var "dateperiod(_.abs(disparity), short=1)">
+                            </a>
+                          </dtml-let>
+                      </dtml-if>
+                    </dtml-let>
+                    </dtml-if>
+
+                    <br />
+                  </dtml-in>
+               </td>
+            <dtml-elif "id=='created'">
+               <td style="&dtml-cell_style;" nowrap>
+                 <dtml-var "rDate( None, _, time=created() )">
+               </td>
+            <dtml-elif "id=='effective'">
+               <td style="&dtml-cell_style;" nowrap>
+                 <dtml-var "rDate( None, _, time=_['effective'] )">
+               </td>
+            <dtml-elif "id=='expires'">
+              <td style="&dtml-cell_style;" nowrap>
+                <dtml-let now=ZopeTime
+                          time_remaining="expires - now"
+                          perc_remaining="effective < now < expires and (expires - now) / (expires - effective)"
+                >
+                  <dtml-var "rDate( None, _, time=expires )">
+                  <dtml-if "time_remaining > 0">,<br>
+                    <dtml-var "dateperiod(time_remaining * 86400, short=1)">
+                    (<dtml-var perc_remaining fmt=percent>) <dtml-msg "time_left">
+                  </dtml-if>
+                </dtml-let>
+              </td>
+            </dtml-if>
+      </dtml-if>
+   </dtml-in>
+  </tr>
+  </dtml-let>
+</dtml-with>
+
+<dtml-if sequence-end>
+  </table>
+
+  <dtml-if "portal_membership.checkPermission('Manage portal', this())">
+   <br /> 
+   <input type="hidden" name="from_task_list_embedded" value="from_task_list_embedded" />
+   <input type="submit" name="task_delete_confirmation:method" value="<dtml-msg "Delete tasks">" />
+   <input type="button"
+          value="<dtml-msg "Select All">"
+          onClick="toggleSelect( this.form['ids:list'], this )"
+   />
+
+   <input type="hidden" name="showTaskMode" value="<dtml-var mode_name>" />
+  </dtml-if>
+
+</dtml-if>
+
+<dtml-else>
+  <br />
+  <p align="center"><i><dtml-msg "No matching tasks found"></i></p>
+  <br />
+</dtml-in>
+
+</form>
+
+<dtml-var "table_pages_list( None, _
+                           , params='&showTaskMode=%s%s' % ( mode_name, member_param )
+                           , disable_controls=True
+                           )">
+
+</dtml-if>
+
+<dtml-if show_filter>
+<dtml-if total_count>
+
+  <dtml-var catalog_filter_form>
+
+  <form method="POST">
+  <table width="100%">
+     <tr>
+        <td>
+              <dtml-msg "Task properties to display">:
+        </td>
+     </tr>
+     <tr>
+        <td>
+              <select name="selected_columns:list" size="6" multiple>
+                 <dtml-in table_columns mapping>
+                       <option value="&dtml-id;"
+                            <dtml-var "(not selected_columns[0] or id in selected_columns)" fmt=selected>
+                       /><dtml-msg expr=title></option>
+                 </dtml-in>
+              </select>
+        </td>
+      </tr>
+      <tr>
+         <td>
+              <input type="submit" name="update_filter" value="<dtml-msg "Apply">" />
+        </td>
+     </tr>
+   </table>
+     <input type="hidden" name="showTaskMode" value="<dtml-var mode_name>" />
+
+   <dtml-if member_id>
+   <input type="hidden" name="member_id" value="&dtml-member_id;" />
+   </dtml-if>
+   </form>
+</dtml-if total_count>
+</dtml-if>
+
+</dtml-with executeQuery2>
+</dtml-let>
