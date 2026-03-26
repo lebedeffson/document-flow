@@ -4,3 +4,4 @@ __pycache__/
 *.py[cod]
 
 rukovoditel-test/dist/cache/
+rukovoditel-test/dist/log/*.log
