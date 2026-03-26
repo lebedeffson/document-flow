@@ -110,46 +110,53 @@ switch ($app_module_action)
                 <title>' . $file['filename'] . '</title>
 
                 <style>
-                    html {
+                    html,
+                    body,
+                    form,
+                    #iframeEditor {
                         height: 100%;
                         width: 100%;
                     }
 
                     body {
-                        background: #333;
+                        background: #1f2933;
                         color: #333;
                         font-family: Arial, Tahoma,sans-serif;
                         font-size: 12px;
                         font-weight: normal;
-                        height: 100%;
                         margin: 0;
-                        overflow-y: hidden;
+                        overflow: hidden;
                         padding: 0;
                         text-decoration: none;
                     }
 
                     form {
-                        height: 100%;
+                        min-height: 100%;
                     }
 
                     div {
                         margin: 0;
                         padding: 0;
                     }
+
+                    #iframeEditor {
+                        min-height: 100vh;
+                        background: #fff;
+                    }
                 </style>
 
                 <script type="text/javascript" src="' . $cfg->get('url_to_js_api') . '"></script> 
                 
                 <script>
-                var сonnectEditor = function () {
-                    config = ' . json_encode($config) . '
-                    docEditor = new DocsAPI.DocEditor("iframeEditor", config);
+                var connectEditor = function () {
+                    var config = ' . json_encode($config) . ';
+                    window.docEditor = new DocsAPI.DocEditor("iframeEditor", config);
                 }
                 
                 if (window.addEventListener) {
-                    window.addEventListener("load", сonnectEditor);
+                    window.addEventListener("load", connectEditor);
                 } else if (window.attachEvent) {
-                    window.attachEvent("load", сonnectEditor);
+                    window.attachEvent("load", connectEditor);
                 }
                 </script>
                 

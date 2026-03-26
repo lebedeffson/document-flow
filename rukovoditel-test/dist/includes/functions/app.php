@@ -1679,20 +1679,12 @@ function app_copyright_text()
 
 function app_powered_by_text()
 {
-    if (CFG_HIDE_POWERED_BY_TEXT == 1)
-        return '';
-
-    $text = '<small>' . TEXT_POWERED_BY . '&nbsp;<a rel="nofollow" target="_blank" href="https://www.rukovoditel.net' . (APP_LANGUAGE_SHORT_CODE == 'ru' ? '.ru' : '') . '" title="' . TEXT_POWERED_BY_TITLE . '">www.rukovoditel.net' . (APP_LANGUAGE_SHORT_CODE == 'ru' ? '.ru' : '') . '</a></small>';
-
-    return $text;
+    return '';
 }
 
 function app_author_text()
 {
-    if (CFG_HIDE_POWERED_BY_TEXT == 1)
-        return '';
-
-    return '<meta content="www.rukovoditel.net' . (APP_LANGUAGE_SHORT_CODE == 'ru' ? '.ru' : '') . '" name="author"/>' . "\n";
+    return '';
 }
 
 function app_crop_str($str)

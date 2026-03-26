@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+RUKOVODITEL_URL="https://localhost:18443/index.php?module=dashboard/"
+
 echo "[smoke] stack health"
 bash ops/check_stack.sh >/tmp/dms_check_stack.log
 tail -n +1 /tmp/dms_check_stack.log
@@ -25,7 +27,7 @@ opener = urllib.request.build_opener(
     urllib.request.HTTPCookieProcessor(cj),
 )
 
-html = opener.open("https://localhost:18443/").read().decode("utf-8", "ignore")
+html = opener.open("https://localhost:18443/index.php?module=dashboard/").read().decode("utf-8", "ignore")
 match = re.search(r'name="form_session_token" id="form_session_token" value="([^"]+)"', html)
 if not match:
     print("Rukovoditel login token not found", file=sys.stderr)
@@ -42,10 +44,10 @@ resp = opener.open("https://localhost:18443/index.php?module=users/login&action=
 body = resp.read().decode("utf-8", "ignore")
 
 required = [
-    "Мое рабочее место",
-    "Операционная работа",
+    "Главная",
+    "Работа",
     "Документы",
-    "Контроль руководителя",
+    "Контроль",
 ]
 missing = [item for item in required if item not in body]
 print("final_url:", resp.geturl())

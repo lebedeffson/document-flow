@@ -382,6 +382,7 @@ define('TEXT_RESET_SEARCH','Reset Search');
 define('TEXT_HEADING_DB_BACKUP','Database Backup');
 define('TEXT_BACKUP_CREATED','Backup Created');
 define('TEXT_DOWNLOAD','Download');
+define('TEXT_OPEN_IN_EDITOR','Open in editor');
 define('TEXT_RESTORE','Restore');
 define('TEXT_BACKUP_DELETED','Backup file was deleted');
 define('TEXT_FILE_NOT_FOUD','File not found');

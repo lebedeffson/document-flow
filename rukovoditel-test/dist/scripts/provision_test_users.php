@@ -17,6 +17,20 @@ function fetch_user_by_username($username)
     return db_fetch_array($query);
 }
 
+function update_user_profile($username, array $data)
+{
+    $user = fetch_user_by_username($username);
+    if (!$user)
+    {
+        console_log("Skipped profile sync for {$username}: user not found");
+        return 0;
+    }
+
+    db_perform('app_entity_1', $data, 'update', "id='" . db_input($user['id']) . "'");
+    console_log("Updated profile {$username} (#{$user['id']})");
+    return (int) $user['id'];
+}
+
 function ensure_test_user($username, $group_id, $first_name, $last_name, $email, $password, $skin = 'light')
 {
     $language = defined('CFG_APP_LANGUAGE') ? CFG_APP_LANGUAGE : '';
@@ -56,6 +70,13 @@ function ensure_test_user($username, $group_id, $first_name, $last_name, $email,
     return $user_id;
 }
 
+update_user_profile('admin', [
+    'field_7' => 'Иван Иванович',
+    'field_8' => 'Иванов',
+    'field_9' => 'admin@example.local',
+    'date_updated' => time(),
+]);
+
 $password = 'rolepass123';
 $users = [
     [
@@ -71,6 +92,13 @@ $users = [
         'first_name' => 'Илья',
         'last_name' => 'Исполнитель',
         'email' => 'employee.test@example.local',
+    ],
+    [
+        'username' => 'user.demo',
+        'group_id' => 5,
+        'first_name' => 'Елена',
+        'last_name' => 'Пользователь',
+        'email' => 'user.demo@example.local',
     ],
     [
         'username' => 'requester.test',
@@ -102,7 +130,9 @@ foreach ($users as $user)
 
 console_log('');
 console_log('Provisioned role test users:');
+console_log('  admin / admin123  -> Иванов Иван Иванович');
 console_log('  manager.test / rolepass123');
 console_log('  employee.test / rolepass123');
+console_log('  user.demo / rolepass123');
 console_log('  requester.test / rolepass123');
 console_log('  office.test / rolepass123');

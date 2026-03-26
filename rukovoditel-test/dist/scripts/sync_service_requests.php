@@ -430,7 +430,6 @@ function ensure_doc_card_for_request($request)
     $doc_card_url = item_url(DOC_CARD_ENTITY_ID, $doc_card_id);
     $doc_card_title = trim((string) $doc_card['field_' . DOC_TITLE_FIELD_ID]);
     $doc_card_naudoc_url = normalize_naudoc_url($doc_card['field_' . DOC_NAUDOC_LINK_FIELD_ID]);
-
     if (!$request_naudoc_url && $doc_card_naudoc_url)
     {
         items::update_by_id(REQUEST_ENTITY_ID, $request_id, [

@@ -12,12 +12,17 @@
  */
 ?>
 
+<?php
+$footer_html = app_copyright_text() . app_powered_by_text();
+if(strlen(trim(strip_tags($footer_html))))
+{
+?>
 <div class="footer noprint">
     <div class="footer-inner">
-        <?= app_copyright_text() ?>
-        <?php echo app_powered_by_text() ?>
+        <?= $footer_html ?>
     </div>
 <div class="footer-tools">
 	
 </div>
 </div>
+<?php } ?>

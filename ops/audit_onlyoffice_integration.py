@@ -11,6 +11,7 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 GATEWAY_BASE = 'https://localhost:18443'
+RUKOVODITEL_ENTRY = f'{GATEWAY_BASE}/index.php?module=dashboard/'
 RUKOVODITEL_DIRECT = 'http://localhost:18081'
 SSL_CONTEXT = ssl._create_unverified_context()
 SEED_SCRIPT = ROOT_DIR / 'rukovoditel-test' / 'seed_onlyoffice_pilot.sh'
@@ -53,7 +54,7 @@ def build_opener():
 
 def login(user_agent):
     opener = build_opener()
-    req = urllib.request.Request(f'{GATEWAY_BASE}/', headers={'User-Agent': user_agent})
+    req = urllib.request.Request(RUKOVODITEL_ENTRY, headers={'User-Agent': user_agent})
     body = opener.open(req).read().decode('utf-8', 'ignore')
     token = re.search(r'name="form_session_token" id="form_session_token" value="([^"]+)"', body)
     if not token:

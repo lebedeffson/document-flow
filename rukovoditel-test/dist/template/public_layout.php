@@ -165,12 +165,17 @@
 <!-- END LOGIN -->
 
 
+<?php
+$public_footer_html = app_copyright_text() . app_powered_by_text();
+if(strlen(trim(strip_tags($public_footer_html))))
+{
+?>
 <!-- BEGIN COPYRIGHT -->
 <div class="copyright">
-    <?= app_copyright_text() ?>
-    <?php echo app_powered_by_text() ?>
+    <?= $public_footer_html ?>
 </div>
 <!-- END COPYRIGHT -->
+<?php } ?>
 
 <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
 <!-- BEGIN CORE PLUGINS -->

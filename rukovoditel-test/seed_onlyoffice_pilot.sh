@@ -9,14 +9,13 @@ DB_USER="rukovoditel"
 DB_PASS="rukovoditel"
 ENTITY_ID="25"
 ITEM_ID="1"
-FIELD_NAME="Рабочий черновик"
 FILE_NAME="pilot-onlyoffice.docx"
 
 sql_value() {
   docker exec "$DB_CONTAINER" mariadb -N -s -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "$1" | tr -d '\r'
 }
 
-FIELD_ID="$(sql_value "select id from app_fields where entities_id=${ENTITY_ID} and name='${FIELD_NAME}' and type='fieldtype_onlyoffice' limit 1;")"
+FIELD_ID="$(sql_value "select id from app_fields where entities_id=${ENTITY_ID} and type='fieldtype_onlyoffice' order by id limit 1;")"
 if [[ -z "$FIELD_ID" ]]; then
   echo "ONLYOFFICE field not found for entity ${ENTITY_ID}" >&2
   exit 1

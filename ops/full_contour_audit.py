@@ -15,6 +15,7 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 GATEWAY_BASE = "https://localhost:18443"
+RUKOVODITEL_ENTRY = f"{GATEWAY_BASE}/index.php?module=dashboard/"
 NAUDOC_BASE = f"{GATEWAY_BASE}/docs"
 BRIDGE_BASE = f"{GATEWAY_BASE}/bridge"
 SSL_CONTEXT = ssl._create_unverified_context()
@@ -23,7 +24,7 @@ ROLE_USERS = {
     "admin": {
         "username": "admin",
         "password": "admin123",
-        "expected": ["Мое рабочее место", "Операционная работа", "Документы", "Контроль руководителя", "Канцелярия"],
+        "expected": ["Главная", "Работа", "Документы", "Контроль", "Канцелярия"],
         "unexpected": [],
         "extra_urls": [
             f"{GATEWAY_BASE}/index.php?module=configuration/application",
@@ -36,29 +37,36 @@ ROLE_USERS = {
     "manager": {
         "username": "manager.test",
         "password": "rolepass123",
-        "expected": ["Мое рабочее место", "Операционная работа", "Документы", "Контроль руководителя"],
+        "expected": ["Главная", "Работа", "Документы", "Контроль"],
         "unexpected": ["Канцелярия"],
         "extra_urls": [],
     },
     "employee": {
         "username": "employee.test",
         "password": "rolepass123",
-        "expected": ["Мое рабочее место", "Операционная работа", "Документы"],
-        "unexpected": ["Контроль руководителя", "Канцелярия"],
+        "expected": ["Главная", "Работа", "Документы"],
+        "unexpected": ["Контроль", "Канцелярия"],
+        "extra_urls": [],
+    },
+    "user_demo": {
+        "username": "user.demo",
+        "password": "rolepass123",
+        "expected": ["Главная", "Работа", "Документы"],
+        "unexpected": ["Контроль", "Канцелярия", "Отчеты", "Инструменты", "Логи"],
         "extra_urls": [],
     },
     "requester": {
         "username": "requester.test",
         "password": "rolepass123",
-        "expected": ["Мое рабочее место", "Операционная работа", "Документы"],
-        "unexpected": ["Контроль руководителя", "Канцелярия"],
+        "expected": ["Главная", "Работа", "Документы"],
+        "unexpected": ["Контроль", "Канцелярия"],
         "extra_urls": [],
     },
     "office": {
         "username": "office.test",
         "password": "rolepass123",
-        "expected": ["Операционная работа", "Документы", "Канцелярия"],
-        "unexpected": ["Мое рабочее место", "Контроль руководителя"],
+        "expected": ["Главная", "Работа", "Документы", "Канцелярия"],
+        "unexpected": ["Контроль"],
         "extra_urls": [],
     },
 }
@@ -154,7 +162,7 @@ def login_rukovoditel(username, password):
         urllib.request.HTTPSHandler(context=SSL_CONTEXT),
         urllib.request.HTTPCookieProcessor(cookie_jar),
     )
-    _, login_page = http_get(f"{GATEWAY_BASE}/", opener=opener)
+    _, login_page = http_get(RUKOVODITEL_ENTRY, opener=opener)
     token = parse_login_token(decode_html(login_page))
     payload = urllib.parse.urlencode(
         {
@@ -181,7 +189,7 @@ def extract_module_links(page_html):
         clean_text = html.unescape(re.sub(r"<.*?>", "", text).strip())
         if not clean_text:
             continue
-        absolute = urllib.parse.urljoin(GATEWAY_BASE + "/", href)
+        absolute = urllib.parse.urljoin(GATEWAY_BASE + "/", html.unescape(href))
         parsed = urllib.parse.urlparse(absolute)
         if parsed.netloc != "localhost:18443":
             continue

@@ -49,8 +49,11 @@ function build_user_menu()
         $menu[] = array('title' => TEXT_CHANGE_SKIN, 'url' => url_for('users/change_skin'), 'modalbox' => true, 'class' => 'fa-picture-o');
     }
 
-    $menu[] = array('title' => TEXT_CONFIGURE_DASHBOARD, 'url' => url_for('dashboard/configure'), 'modalbox' => true, 'class' => 'fa-bars');
-    $menu[] = array('title' => TEXT_CONFIGURE_THEME, 'url' => url_for('dashboard/configure_theme'), 'modalbox' => true, 'class' => 'fa-gear');
+    if($app_user['group_id'] == 0)
+    {
+        $menu[] = array('title' => TEXT_CONFIGURE_DASHBOARD, 'url' => url_for('dashboard/configure'), 'modalbox' => true, 'class' => 'fa-bars');
+        $menu[] = array('title' => TEXT_CONFIGURE_THEME, 'url' => url_for('dashboard/configure_theme'), 'modalbox' => true, 'class' => 'fa-gear');
+    }
 
     if((!in_array($app_user['group_id'], explode(',', CFG_APP_DISABLE_CHANGE_PWD??'')) or strlen(CFG_APP_DISABLE_CHANGE_PWD??'') == 0) and CFG_USE_LDAP_LOGIN_ONLY == false)
     {
@@ -411,6 +414,7 @@ function build_main_menu()
     global $app_user;
 
     $menu = array();
+    $is_simple_user = (($app_user['username'] ?? '') === 'user.demo');
 
     if(is_ext_installed())
     {
@@ -419,21 +423,21 @@ function build_main_menu()
 
     $menu[] = array('title' => TEXT_MENU_DASHBOARD, 'url' => url_for('dashboard/dashboard'), 'class' => 'fa-home');
 
-    $menu = build_reports_groups_menu($menu);
-
     $menu = build_entities_menu($menu);
 
     $menu = build_custom_entities_menu($menu);
-    
-    $menu = build_call_history_menu($menu);
 
-    $menu = build_reports_menu($menu);
-
-    $menu = build_search_menu($menu);
-
-    if(count($plugin_menu = plugins::include_menu('menu')) > 0)
+    if(!$is_simple_user)
     {
-        $menu = array_merge($menu, $plugin_menu);
+        $menu = build_reports_groups_menu($menu);
+        $menu = build_call_history_menu($menu);
+        $menu = build_reports_menu($menu);
+        $menu = build_search_menu($menu);
+
+        if(count($plugin_menu = plugins::include_menu('menu')) > 0)
+        {
+            $menu = array_merge($menu, $plugin_menu);
+        }
     }
 
     //only administrators have access to configurations
@@ -492,18 +496,6 @@ function build_main_menu()
         $s[] = array('title' => TEXT_DASHBOARD_CONFIGURATION, 'url' => url_for('dashboard_configure/index'));
         $menu[] = array('title' => TEXT_MENU_APPLICATION_STRUCTURE, 'url' => url_for('entities/'), 'class' => 'fa-sitemap', 'submenu' => $s);
 
-        $s = plugins::include_menu('extension');
-
-        if(count($s) > 0)
-        {
-            $menu[] = array('title' => TEXT_MENU_EXTENSION, 'url' => url_for('ext/ext/'), 'submenu' => $s, 'class' => 'fa-puzzle-piece');
-        }
-        else
-        {
-            $menu[] = array('title' => TEXT_MENU_EXTENSION, 'url' => url_for('tools/extension'), 'class' => 'fa-puzzle-piece');
-        }
-
-
         //Menu Tools
         $s = array();
         $s[] = array('title' => TEXT_USERS_ALERTS, 'url' => url_for('users_alerts/users_alerts'));
@@ -533,16 +525,6 @@ function build_main_menu()
         $menu[] = array('title' => TEXT_MENU_TOOLS, 'url' => url_for('tools/db_backup'), 'submenu' => $s, 'class' => 'fa-wrench');
 
 
-        $store_language = (APP_LANGUAGE_SHORT_CODE == 'ru' ? '.ru' : '');
-
-        $s = array();
-        $s[] = array('title' => TEXT_DOCUMENTATION, 'url' => 'https://docs.rukovoditel.net' . $store_language, 'target' => '_balnk');
-        $s[] = array('title' => TEXT_MENU_REPORT_FORUM, 'url' => 'https://forum.rukovoditel.net' . $store_language, 'target' => '_balnk');
-        $s[] = array('title' => TEXT_NEWS, 'url' => (APP_LANGUAGE_SHORT_CODE == 'ru' ? 'https://vk.ru/rukovoditel_project' : 'https://www.facebook.com/RukovoditelProject/timeline'), 'target' => '_balnk');
-        $s[] = array('title' => TEXT_MENU_DONATE, 'url' => 'https://www.rukovoditel.net' . $store_language . '/donate.php', 'target' => '_balnk');
-        $s[] = array('title' => TEXT_MENU_CONTACT_US, 'url' => 'https://www.rukovoditel.net' . $store_language . '/contact_us.php', 'target' => '_balnk');
-        $menu[] = array('title' => TEXT_DOCUMENTATION, 'url' => 'https://docs.rukovoditel.net' . $store_language, 'submenu' => $s, 'class' => 'fa-book');
-        $menu[] = array('title' => TEXT_ABOUT_APP, 'url' => url_for('tools/about'), 'class' => 'fa-info');
     }
 
     return $menu;

@@ -379,6 +379,7 @@ define('TEXT_RESET_SEARCH','Сброс');
 define('TEXT_HEADING_DB_BACKUP','Резервное копирование базы данных');
 define('TEXT_BACKUP_CREATED','Резервная копия создана');
 define('TEXT_DOWNLOAD','Скачать');
+define('TEXT_OPEN_IN_EDITOR','Открыть в редакторе');
 define('TEXT_RESTORE','Восстановить');
 define('TEXT_BACKUP_DELETED','Файл удален');
 define('TEXT_FILE_NOT_FOUD','Файл не найден');
@@ -2139,7 +2140,6 @@ define('TEXT_SELECT_USER_GROUP_FOR_RULE','Выберите группы поль
 define('TEXT_ALL_USERS','Все пользователи');
 define('TEXT_RESET_TO_DEFAULT','Сбросить к значению по умолчанию');
 define('TEXT_SET_MSG_FILTERS','Установите фильтры, при которых сообщение будет отправлено.');
-
 
 
 

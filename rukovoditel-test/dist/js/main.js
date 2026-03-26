@@ -2484,9 +2484,9 @@ function appHandleCodeMirror()
             if($(this).hasClass("acitve-codemirror")) return false;
             $(this).addClass("acitve-codemirror")
                 
-            mode = $(this).attr('mode')
+            let mode = $(this).attr('mode')
             
-            size = $(this).attr('size') ? $(this).attr('size') : 300
+            let size = $(this).attr('size') ? $(this).attr('size') : 300
             
             switch(mode)
             {
@@ -2495,9 +2495,12 @@ function appHandleCodeMirror()
                     break;                
             }
             
-            id = $(this).attr('id');
+            let id = $(this).attr('id');
+            let textarea = document.getElementById(id);
+
+            if(!textarea) return;
             
-            app_code_mirror[id] = CodeMirror.fromTextArea(document.getElementById(id), {
+            app_code_mirror[id] = CodeMirror.fromTextArea(textarea, {
             mode: mode,            
             lineNumbers: true,       
             autofocus:true,

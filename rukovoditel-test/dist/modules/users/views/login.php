@@ -19,6 +19,45 @@
 <?php echo maintenance_mode::login_message() ?>
 
 <?php
+$login_modes = array(
+    array(
+        'title' => 'Администратор',
+        'description' => 'Полный контур управления: настройки, роли, логи, интеграции и рабочие модули.',
+        'username' => 'admin',
+        'password' => 'admin123',
+        'eyebrow' => 'Админский режим',
+    ),
+    array(
+        'title' => 'Пользователь',
+        'description' => 'Чистый рабочий кабинет без техразделов: заявки, проекты, документы, база и МТЗ.',
+        'username' => 'user.demo',
+        'password' => 'rolepass123',
+        'eyebrow' => 'Пользовательский режим',
+    ),
+);
+?>
+
+<div class="login-modes">
+    <?php foreach ($login_modes as $mode): ?>
+        <div class="login-mode-card">
+            <div class="login-mode-eyebrow"><?php echo $mode['eyebrow'] ?></div>
+            <h4><?php echo $mode['title'] ?></h4>
+            <p><?php echo $mode['description'] ?></p>
+            <div class="login-mode-credentials">
+                <span><?php echo $mode['username'] ?></span>
+                <span><?php echo $mode['password'] ?></span>
+            </div>
+            <button
+                type="button"
+                class="btn btn-default btn-sm login-mode-fill"
+                data-username="<?php echo $mode['username'] ?>"
+                data-password="<?php echo $mode['password'] ?>"
+            >Заполнить вход</button>
+        </div>
+    <?php endforeach; ?>
+</div>
+
+<?php
 //check if default login is enabled
 if(CFG_ENABLE_SOCIAL_LOGIN != 2)
 {
@@ -30,14 +69,14 @@ if(CFG_ENABLE_SOCIAL_LOGIN != 2)
         <label class="control-label visible-ie8 visible-ie9"><?php echo TEXT_USERNAME ?></label>
         <div class="input-icon">
             <i class="fa fa-user"></i>
-            <input class="form-control placeholder-no-fix required" type="text" autocomplete="off" placeholder="<?php echo TEXT_USERNAME ?>" name="username"/>
+            <input class="form-control placeholder-no-fix required" type="text" autocomplete="off" placeholder="<?php echo TEXT_USERNAME ?>" name="username" id="login-username"/>
         </div>
     </div>
     <div class="form-group">
         <label class="control-label visible-ie8 visible-ie9"><?php echo TEXT_PASSWORD ?></label>
         <div class="input-icon">
             <i class="fa fa-lock"></i>
-            <input class="form-control placeholder-no-fix required"  type="password" autocomplete="off" placeholder="<?php echo TEXT_PASSWORD ?>" name="password"/>
+            <input class="form-control placeholder-no-fix required"  type="password" autocomplete="off" placeholder="<?php echo TEXT_PASSWORD ?>" name="password" id="login-password"/>
         </div>
     </div>
 
@@ -106,6 +145,12 @@ if(CFG_ENABLE_SOCIAL_LOGIN != 0)
     $(function ()
     {
         $('#login_form').validate();
+
+        $('.login-mode-fill').on('click', function ()
+        {
+            $('#login-username').val($(this).data('username')).focus();
+            $('#login-password').val($(this).data('password'));
+        });
     });
 </script> 
 

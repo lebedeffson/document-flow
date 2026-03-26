@@ -199,6 +199,49 @@ echo $forms_fields_rules->apply();
 		';
                 }
 
+                if(in_array($current_entity_id, [21, 23, 25, 26, 27]))
+                {
+                    $onlyoffice_field_id = ($current_entity_id == 25 ? platform_field_id_by_type($current_entity_id, 'fieldtype_onlyoffice') : 0);
+                    $onlyoffice_file_id = 0;
+
+                    if($onlyoffice_field_id > 0 and strlen($item_info['field_' . $onlyoffice_field_id] ?? ''))
+                    {
+                        $file_ids = array_filter(array_map('trim', explode(',', $item_info['field_' . $onlyoffice_field_id])));
+                        $onlyoffice_file_id = count($file_ids) ? (int)$file_ids[0] : 0;
+                    }
+
+                    $naudoc_field_id = platform_field_id_by_name($current_entity_id, 'Ссылка на NauDoc', 'fieldtype_input_url');
+                    $naudoc_url = trim($naudoc_field_id > 0 ? ($item_info['field_' . $naudoc_field_id] ?? '') : '');
+
+                    if($onlyoffice_file_id > 0 || strlen($naudoc_url))
+                    {
+                        echo '<div class="document-primary-actions">';
+                        echo '<div class="document-primary-actions-title">Быстрые действия</div>';
+                        echo '<div class="document-primary-actions-buttons">';
+
+                        if($onlyoffice_file_id > 0)
+                        {
+                            echo link_to(
+                                '<i class="fa fa-pencil-square-o"></i> Открыть документ в редакторе',
+                                url_for('items/onlyoffice_editor', 'path=' . $_GET['path'] . '&action=open&field=' . $onlyoffice_field_id . '&file=' . $onlyoffice_file_id),
+                                ['class' => 'btn btn-info document-primary-btn', 'target' => '_blank']
+                            );
+                        }
+
+                        if(strlen($naudoc_url))
+                        {
+                            echo link_to(
+                                '<i class="fa fa-folder-open-o"></i> Открыть в NauDoc',
+                                $naudoc_url,
+                                ['class' => 'btn btn-default document-primary-btn', 'target' => '_blank']
+                            );
+                        }
+
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                }
+
 
 //Stages panels
                 echo stages_panel::render($current_entity_id, $item_info);

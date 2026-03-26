@@ -17,6 +17,7 @@
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: "Segoe UI", Tahoma, sans-serif;
@@ -301,7 +302,7 @@
 <body>
   <div class="wrap">
     <h1>{{ app_title }}</h1>
-    <p>Тестовый middleware между <strong>Rukovoditel</strong> и <strong>NauDoc</strong>: хранит ссылки на документы, статусы синхронизации и служит точкой дальнейшей интеграции.</p>
+    <p>Главная страница платформы. Здесь виден статус контура, ссылки на рабочие системы и текущие связи между <strong>Rukovoditel</strong> и <strong>NauDoc</strong>.</p>
 
     <div class="systems">
       <section class="system-box blue">
@@ -369,7 +370,7 @@
     <div class="grid">
       <section class="card">
         <h2>Создать связь</h2>
-        <p>Связываем запись из Rukovoditel с документом или карточкой документа в NauDoc. Теперь можно сохранять и промежуточные связи, когда карточка уже создана, а ссылка на NauDoc появится позже.</p>
+        <p>Связываем запись из Rukovoditel с документом или карточкой документа в NauDoc. Можно хранить промежуточные связи, когда карточка уже создана, а ссылка на NauDoc появится позже.</p>
         <form action="{{ url_for('create_link') }}" method="post">
           <label>
             Внешняя система
@@ -503,7 +504,7 @@
               <div style="margin-top: 6px; color: var(--muted);">{{ link.notes }}</div>
               {% endif %}
             </td>
-            <td><span class="status {% if link.sync_status.startswith('pending') %}pending{% elif not link.sync_status %}empty{% endif %}">{{ link.sync_status or 'n/a' }}</span></td>
+            <td><span class="status {% if link.sync_status == 'signed' %}signed{% elif link.sync_status.startswith('pending') %}pending{% elif not link.sync_status %}empty{% endif %}">{{ link.sync_status or 'n/a' }}</span></td>
             <td>{{ link.updated_at }}</td>
             <td>
               <details>
@@ -525,7 +526,11 @@
                     Комментарий
                     <textarea name="notes">{{ link.notes }}</textarea>
                   </label>
-                  <button type="submit">Сохранить</button>
+                  <label>
+                    Метаданные JSON
+                    <textarea name="metadata_json">{{ link.metadata|tojson }}</textarea>
+                  </label>
+                  <button type="submit">Сохранить изменения</button>
                 </form>
               </details>
             </td>
@@ -534,7 +539,7 @@
         </tbody>
       </table>
       {% else %}
-      <div class="empty">Пока связей нет. После первой записи таблица начнет показывать связку заявок/проектов из Rukovoditel с документами NauDoc.</div>
+      <div class="empty">По текущему фильтру связей нет.</div>
       {% endif %}
     </section>
   </div>

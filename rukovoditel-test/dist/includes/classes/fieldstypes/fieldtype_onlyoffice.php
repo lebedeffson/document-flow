@@ -404,11 +404,23 @@ class fieldtype_onlyoffice
             else
             {
                 $path = $options['field']['entities_id'] . '-' . $options['item']['id'];
-                $link = link_to($croped_name, url_for('items/onlyoffice_editor', 'path=' . $path . '&action=open&field=' . $options['field']['id']. '&file=' . $file['id']),['target'=>"_blank"]);
-                $link .= ' ' . link_to('<i class="fa fa-download"></i>', url_for('items/onlyoffice', 'path=' . $path . '&action=download&file=' . $file['id']));
-                $link .= '  <small>(' . $file_info['size'] . ')' . self::add_file_date_added($file, $cfg) . '</small>';
+                $editor_url = url_for('items/onlyoffice_editor', 'path=' . $path . '&action=open&field=' . $options['field']['id']. '&file=' . $file['id']);
+                $download_url = url_for('items/onlyoffice', 'path=' . $path . '&action=download&file=' . $file['id']);
+                $link = '
+                    <div class="onlyoffice-entry-actions">
+                        <a class="btn btn-info btn-xs onlyoffice-open-btn" href="' . $editor_url . '" target="_blank">
+                            <i class="fa fa-pencil-square-o"></i> ' . TEXT_OPEN_IN_EDITOR . '
+                        </a>
+                        <a class="btn btn-default btn-xs onlyoffice-download-btn" href="' . $download_url . '">
+                            <i class="fa fa-download"></i> ' . TEXT_DOWNLOAD . '
+                        </a>
+                    </div>
+                    <div class="onlyoffice-entry-meta">
+                        <span class="onlyoffice-entry-name">' . $croped_name . '</span>
+                        <small>(' . $file_info['size'] . ')' . self::add_file_date_added($file, $cfg) . '</small>
+                    </div>';
                 $html .= '
-                    <li style="list-style-image: url(' . url_for_file($file_info['icon']) . '); margin-left: 20px;">' . $link . '</li>
+                    <li class="onlyoffice-entry" style="list-style-image: url(' . url_for_file($file_info['icon']) . '); margin-left: 20px;">' . $link . '</li>
                   ';
             }
         }

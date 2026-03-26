@@ -279,6 +279,7 @@
     require('includes/functions/menu.php');
     require('includes/functions/sessions.php');
     require('includes/functions/urls.php');
+    require('includes/functions/platform_ecosystem.php');
     require('includes/functions/validations.php');
 
 //include libs

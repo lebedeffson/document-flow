@@ -296,7 +296,7 @@ class DirectoryNode(Base):
 
         if include_nested:
             if self.implements('IDirectoryBranch'):
-                parts = [_[1] for x in self.listParentNodes()]
+                parts = [x.id() for x in self.listParentNodes()]
                 parts.append(pid)
                 parts.insert(0, '')
                 query['id__'] = {'query': pid, 'operator': 'not'}
@@ -308,7 +308,7 @@ class DirectoryNode(Base):
         if not (include_entries and include_branches):
             query['branch__'] = include_branches
         ids = root._catalogSearch(**query)
-        items = [_[1] for id in ids]
+        items = [(id, None) for id in ids]
         return root._iterator_factory(self, items, **kw)
         return
 
@@ -567,7 +567,7 @@ class DirectoryEntry(ItemBase):
         return
 
     def listColumns(self):
-        return [_[1] for c in self.getDirectory().listColumns() if c.isEntryColumn()]
+        return [c for c in self.getDirectory().listColumns() if c.isEntryColumn()]
         return
 
     def deleteEntry(self):
@@ -640,7 +640,7 @@ class DirectoryBranch(DirectoryEntry, DirectoryNode):
         return
 
     def listColumns(self):
-        return [_[1] for c in self.getDirectory().listColumns() if c.isBranchColumn()]
+        return [c for c in self.getDirectory().listColumns() if c.isBranchColumn()]
         return
 
     icon = 'directory_branch.gif'
@@ -889,11 +889,11 @@ class Directory(ContainerBase, ContentBase, DirectoryNode, ZCatalog):
     def listColumns(self, entries=False, branches=False, builtins=False):
         columns = self.columns.objectValues()
         if not builtins:
-            columns = [_[1] for c in columns if not c.name().endswith('__')]
+            columns = [c for c in columns if not c.name().endswith('__')]
         if entries:
-            columns = [_[1] for c in columns if c.isEntryColumn()]
+            columns = [c for c in columns if c.isEntryColumn()]
         if branches:
-            columns = [_[1] for c in columns if c.isBranchColumn()]
+            columns = [c for c in columns if c.isBranchColumn()]
         return columns
         return
 
@@ -972,9 +972,9 @@ class Directory(ContainerBase, ContentBase, DirectoryNode, ZCatalog):
                 value = Moniker(value)
             return value
         elif column == 'fullcode__':
-            return (' / ').join([_[1] for e in object.listParentNodes() + [object]])
+            return (' / ').join([e.code() for e in object.listParentNodes() + [object]])
         elif column == 'fulltitle__':
-            return (' / ').join([_[1] for e in object.listParentNodes() + [object]])
+            return (' / ').join([e.title() for e in object.listParentNodes() + [object]])
         return object.getEntryAttribute(column, default, moniker=moniker)
         return
 
@@ -1161,7 +1161,7 @@ class Directory(ContainerBase, ContentBase, DirectoryNode, ZCatalog):
         catalog = self._catalog
         paths = catalog.paths
         results = catalog.searchResults(REQUEST={}, **query)
-        ids = [_[1] for r in results]
+        ids = [paths[r.data_record_id_] for r in results]
         return ids
         return
 
@@ -1285,7 +1285,7 @@ class DirectoryCatalogWrapper:
         return
 
     def path__(self):
-        path = [_[1] for p in self.__ob.listParentNodes()]
+        path = [p.id() for p in self.__ob.listParentNodes()]
         path.append(self.__ob.id())
         path.insert(0, '')
         return tuple(path)

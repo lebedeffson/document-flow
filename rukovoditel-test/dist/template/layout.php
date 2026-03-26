@@ -146,20 +146,13 @@
 
 <!-- BEGIN CONTENT -->
 <div class="page-content-wrapper">
-	<div class="page-content-wrapper">
 		<div class="page-content">			
 			<div id="ajax-modal" class="modal fade" tabindex="-1" data-replace="true" data-keyboard="false" data-backdrop="static" data-focus-on=".autofocus"></div>			
 			<!-- BEGIN PAGE CONTENT-->
 			<div class="row">
 				<div class="col-md-12">
-				
-<?php 
-//check install dir
-  if(is_dir('install'))
-  {
-    $alerts->add(TEXT_REMOVE_INSTALL_FOLDER,'warning');
-  }
 
+<?php 
 //output alerts if they exists.
   echo $alerts->output(); 
   
@@ -177,7 +170,6 @@
 			</div>
 			<!-- END PAGE CONTENT-->
 		</div>
-	</div>
 </div>
 <!-- END CONTENT -->
 </div>

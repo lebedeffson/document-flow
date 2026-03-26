@@ -30,6 +30,80 @@ echo input_hidden_tag('entity_items_listing_path', $_GET['path']);
 ?>
 
 <?php
+if(!function_exists('platform_first_entity_item_id'))
+{
+    function platform_first_entity_item_id($entity_id)
+    {
+        $row = db_fetch_array(db_query("select id from app_entity_" . (int) $entity_id . " order by id limit 1"));
+        return $row ? (int) $row['id'] : 0;
+    }
+}
+
+if(in_array($current_entity_id, [25, 26, 27]))
+{
+    $banner_title = '';
+    $banner_text = '';
+    $demo_item_url = '';
+    $demo_item_label = '';
+    if($current_entity_id == 25)
+    {
+        $onlyoffice_demo = platform_first_onlyoffice_demo(25);
+        $demo_item_url = url_for('items/items', 'path=25');
+
+        if($onlyoffice_demo['item_id'] > 0)
+        {
+            $demo_item_url = url_for('items/info', 'path=25-' . $onlyoffice_demo['item_id']);
+        }
+
+        $banner_title = 'Карточки документов';
+        $banner_text = 'Откройте карточку документа. Внутри доступны редактор ONLYOFFICE и официальный контур NauDoc.';
+        $demo_item_label = 'Открыть демонстрационный документ';
+    }
+    elseif($current_entity_id == 26)
+    {
+        $doc_base_item_id = platform_first_entity_item_id(26);
+        if($doc_base_item_id > 0)
+        {
+            $demo_item_url = url_for('items/info', 'path=26-' . $doc_base_item_id);
+        }
+
+        $banner_title = 'База документов';
+        $banner_text = 'Готовые материалы и шаблоны доступны для поиска, просмотра и перехода в официальный контур.';
+        $demo_item_label = 'Открыть пример материала';
+    }
+    elseif($current_entity_id == 27)
+    {
+        $mts_item_id = platform_first_entity_item_id(27);
+        if($mts_item_id > 0)
+        {
+            $demo_item_url = url_for('items/info', 'path=27-' . $mts_item_id);
+        }
+
+        $banner_title = 'Заявки на МТЗ';
+        $banner_text = 'Процессы обеспечения связаны с рабочим и официальным документным контуром.';
+        $demo_item_label = 'Открыть пример заявки';
+    }
+
+    echo '<div class="platform-context-banner">';
+    echo '<div class="platform-context-banner-copy">';
+    echo '<div class="platform-context-banner-title">' . $banner_title . '</div>';
+    echo '<p>' . $banner_text . '</p>';
+    echo '</div>';
+    echo '<div class="platform-context-banner-actions">';
+
+    if(strlen($demo_item_url))
+    {
+        echo link_to('<i class="fa fa-file-text-o"></i> ' . $demo_item_label, $demo_item_url, ['class' => 'btn btn-info']);
+    }
+
+    echo link_to('<i class="fa fa-archive"></i> Открыть NauDoc', '/docs/', ['class' => 'btn btn-default', 'target' => '_blank']);
+
+    echo '</div>';
+    echo '</div>';
+}
+?>
+
+<?php
 if(filters_preivew::has_default_panel_access($entity_cfg))
 {
     $filters_preivew = new filters_preivew($reports_info['id'], false);

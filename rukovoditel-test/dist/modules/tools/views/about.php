@@ -1,27 +1,23 @@
 <?php
-/**
- * Этот файл является частью программы "CRM Руководитель" - конструктор CRM систем для бизнеса
- * https://www.rukovoditel.net.ru/
- * 
- * CRM Руководитель - это свободное программное обеспечение, 
- * распространяемое на условиях GNU GPLv3 https://www.gnu.org/licenses/gpl-3.0.html
- * 
- * Автор и правообладатель программы: Харчишина Ольга Александровна (RU), Харчишин Сергей Васильевич (RU).
- * Государственная регистрация программы для ЭВМ: 2023664624
- * https://fips.ru/EGD/3b18c104-1db7-4f2d-83fb-2d38e1474ca3
- */
-
-    $img = '<img style="width: 100%; max-width: 250px;" src="images/rukovoditel_box' . (APP_LANGUAGE_SHORT_CODE == 'ru' ? '.ru' : '') . '.png">';
 ?>
-<h3 class="page-title"><?php echo TEXT_ABOUT_APP ?></h3>
+<h3 class="page-title">О системе</h3>
 
-<div class="row">    
+<div class="row">
     <div class="col-md-12">
-        <div class="col-md-3"><center><?= $img ?></center></div>
-        <div class="col-md-9">
-            <?= TEXT_ABOUT_APP_DETAILS . '<hr>' ?>
-            <?= TEXT_CURRENT_APP_VERSION . ': <b>' . PROJECT_VERSION . (strlen(PROJECT_VERSION_DEV) ? ' (' . PROJECT_VERSION_DEV . ')':'') . '</b><br>' . TEXT_UPDATE_INSTRUCTION ?>
-            
+        <div class="portlet">
+            <div class="portlet-title">
+                <div class="caption"><b>Единая платформа документооборота</b></div>
+            </div>
+            <div class="portlet-body">
+                <p>Текущая сборка объединяет рабочий кабинет, документный контур и совместное редактирование в одном веб-интерфейсе.</p>
+                <ul>
+                    <li><b>Rukovoditel</b> — рабочие процессы, заявки, проекты, контроль и карточки документов.</li>
+                    <li><b>NauDoc</b> — официальный документный контур: регистрация, архив, маршруты и хранение.</li>
+                    <li><b>ONLYOFFICE</b> — совместное редактирование черновиков документов в браузере.</li>
+                    <li><b>Bridge</b> — интеграционный слой синхронизации между контурами.</li>
+                </ul>
+                <p>Этот экран оставлен только как краткая служебная справка по текущей платформе.</p>
+            </div>
         </div>
     </div>
 </div>

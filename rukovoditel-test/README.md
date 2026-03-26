@@ -2,6 +2,25 @@
 
 This directory contains the test deployment of `Rukovoditel 3.6.4` running next to the legacy `NauDoc` stack and the new middleware bridge.
 
+## Fast entry guide
+
+Main public URLs:
+
+- Platform: `https://localhost:18443/`
+- NauDoc: `https://localhost:18443/docs/`
+- Bridge: `https://localhost:18443/bridge/`
+
+Main test accounts:
+
+- Admin mode: `admin / admin123`
+- User mode: `user.demo / rolepass123`
+- NauDoc: `admin / admin`
+
+See also:
+
+- `/home/lebedeffson/Code/Документооборот/README.md`
+- `/home/lebedeffson/Code/Документооборот/USER_QUICKSTART_GUIDE.md`
+
 ## Services
 
 - `NauDoc`: `http://localhost:18080/docs`
@@ -33,6 +52,26 @@ docker compose up -d --build
 - `Rukovoditel` is already installed.
 - `NauDoc` runs from `/home/lebedeffson/Code/Документооборот/naudoc_project`.
 - The bridge stores links between `Rukovoditel` records and `NauDoc` document URLs in its own SQLite database.
+
+## Sync NauDoc user profiles
+
+The test stand can now sync visible `NauDoc` member profiles to matching `Rukovoditel` usernames and write a local cache for the dashboard.
+
+Run:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
+bash sync_naudoc_profiles.sh
+```
+
+What it does:
+
+- reads the available members from `NauDoc`
+- matches them by username against `Rukovoditel`
+- updates the visible first/last name in `Rukovoditel`
+- writes profile links into `dist/cache/naudoc_profiles.json`
+
+This is currently a safe one-way sync for the available `NauDoc` profiles.
 
 ## Apply process model
 

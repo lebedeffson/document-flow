@@ -46,7 +46,14 @@
 
 <script>
 $(function(){    
-      var editor = CodeMirror.fromTextArea(document.getElementById("custom_css"), {
+      var textarea = document.getElementById("custom_css");
+
+      if(!textarea)
+      {
+          return;
+      }
+
+      var editor = CodeMirror.fromTextArea(textarea, {
           mode: "css",
     	  lineNumbers: true,       
     	  autofocus:true,
