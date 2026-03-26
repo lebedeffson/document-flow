@@ -228,3 +228,7 @@ bash sync_naudoc_profiles.sh
 Архивные и промежуточные планы перенесены в:
 
 - `docs/archive/`
+
+Старые дистрибутивы, PDF-мануалы и legacy-материалы вынесены в:
+
+- `docs/legacy/`
