@@ -444,6 +444,11 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
   background: linear-gradient(90deg, var(--rn-brand) 0%, var(--rn-accent) 100%);
 }
 
+.login .content.content-login {
+  width: min(1080px, calc(100% - 32px));
+  padding: 22px;
+}
+
 .login .content .form-title {
   margin-bottom: 18px;
   color: var(--rn-ink);
@@ -456,18 +461,100 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
   color: var(--rn-muted);
 }
 
+.platform-login {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.88fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.platform-login-intro,
+.platform-login-form-panel {
+  border-radius: 22px;
+  border: 1px solid rgba(219, 205, 184, 0.94);
+  background: rgba(255, 252, 247, 0.88);
+  box-shadow: 0 12px 28px rgba(32, 48, 64, 0.08);
+}
+
+.platform-login-intro {
+  padding: 26px;
+  background:
+    radial-gradient(circle at top right, rgba(31, 79, 134, 0.09), transparent 34%),
+    linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(248, 242, 234, 0.94));
+}
+
+.platform-login-form-panel {
+  padding: 24px;
+  background: rgba(255, 252, 247, 0.98);
+}
+
+.platform-login-badge,
+.platform-login-form-kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(31, 79, 134, 0.08);
+  color: var(--rn-brand);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.platform-login-badge {
+  margin-bottom: 16px;
+}
+
+.platform-login-lead {
+  max-width: 720px;
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.platform-login-form-head {
+  margin-bottom: 18px;
+}
+
+.platform-login-form-head h4 {
+  margin: 12px 0 8px;
+  color: var(--rn-ink);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.platform-login-form-head p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.platform-login-form-head {
+  display: grid;
+  gap: 8px;
+}
+
 .login-modes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  margin: 18px 0 22px;
+  margin: 0;
 }
 
 .login-mode-card {
   padding: 16px;
   border: 1px solid rgba(219, 205, 184, 0.96);
   border-radius: 18px;
-  background: rgba(255, 253, 249, 0.94);
+  background: rgba(255, 253, 249, 0.96);
+  min-height: 100%;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.login-mode-card:hover,
+.login-mode-card:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(32, 48, 64, 0.08);
 }
 
 .login-mode-eyebrow {
@@ -537,6 +624,12 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
   border: 1px solid rgba(219, 205, 184, 0.96);
   border-radius: 16px;
   padding: 0 14px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.login .content .input-icon:focus-within {
+  border-color: rgba(31, 79, 134, 0.42);
+  box-shadow: 0 0 0 4px rgba(31, 79, 134, 0.08);
 }
 
 .login .content .input-icon > i {
@@ -559,14 +652,67 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
   padding: 10px 0 0;
 }
 
-.login .content .form-actions .checkbox {
-  margin-top: 10px;
-}
-
 .login .content .form-actions .btn {
-  min-width: 140px;
   padding: 13px 20px;
   border-radius: 14px;
+}
+
+.platform-login-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.platform-login-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--rn-muted);
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.platform-login-remember input {
+  margin: 0;
+}
+
+.platform-login-submit {
+  width: 100%;
+  margin-left: 0;
+}
+
+.platform-login-secondary-actions p {
+  margin: 0;
+}
+
+.platform-login-secondary-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.platform-login-secondary-actions a {
+  font-weight: 600;
+}
+
+.platform-login-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.platform-login-register {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(31, 79, 134, 0.16);
+  background: rgba(31, 79, 134, 0.06);
+  color: var(--rn-brand-strong);
+  text-decoration: none !important;
 }
 
 .login .forget-password,
@@ -606,6 +752,14 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
   grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
   gap: 20px;
   padding: 24px;
+}
+
+.platform-home-hero-compact {
+  grid-template-columns: 1fr;
+}
+
+.platform-home-hero-main {
+  max-width: 860px;
 }
 
 .platform-home-admin-mode .platform-home-hero {
@@ -746,6 +900,7 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
 
 .platform-home-section-header p {
   margin: 8px 0 0;
+  max-width: 620px;
 }
 
 .platform-home-grid {
@@ -915,12 +1070,22 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
 }
 
 .platform-home-section-split {
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 
 .platform-home-panel {
   padding: 22px;
+}
+
+.platform-home-inline-note {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(31, 79, 134, 0.06);
+  color: var(--rn-muted);
+  line-height: 1.55;
 }
 
 .platform-home-links {
@@ -1003,6 +1168,21 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
 }
 
 @media (max-width: 767px) {
+  .login .content.content-login {
+    width: min(100%, calc(100% - 20px));
+    padding: 16px;
+  }
+
+  .platform-login {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .platform-login-intro,
+  .platform-login-form-panel {
+    padding: 18px;
+  }
+
   .login-modes {
     grid-template-columns: 1fr;
   }
@@ -1012,6 +1192,10 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
   }
 
   .platform-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-home-section-split {
     grid-template-columns: 1fr;
   }
 
@@ -1029,6 +1213,11 @@ ul.page-sidebar-menu > li > ul.sub-menu li > ul.sub-menu > li > a:hover {
   }
 
   .platform-context-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .platform-login-links {
     flex-direction: column;
     align-items: flex-start;
   }

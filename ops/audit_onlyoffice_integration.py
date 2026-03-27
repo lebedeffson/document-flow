@@ -9,18 +9,22 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
-GATEWAY_BASE = 'https://localhost:18443'
-RUKOVODITEL_ENTRY = f'{GATEWAY_BASE}/index.php?module=dashboard/'
-RUKOVODITEL_DIRECT = 'http://localhost:18081'
+from runtime_config import (
+    APP_CONTAINER,
+    DB_CONTAINER,
+    DB_NAME,
+    DB_PASS,
+    DB_USER,
+    GATEWAY_BASE,
+    JWT_SECRET,
+    ONLYOFFICE_CONTAINER,
+    ROOT_DIR,
+    RUKOVODITEL_DIRECT,
+    RUKOVODITEL_ENTRY,
+)
+
 SSL_CONTEXT = ssl._create_unverified_context()
 SEED_SCRIPT = ROOT_DIR / 'rukovoditel-test' / 'seed_onlyoffice_pilot.sh'
-APP_CONTAINER = 'rukovoditel_test'
-DB_CONTAINER = 'rukovoditel_db_test'
-DB_NAME = 'rukovoditel'
-DB_USER = 'rukovoditel'
-DB_PASS = 'rukovoditel'
-JWT_SECRET = 'onlyoffice_dev_secret'
 
 
 def run_cmd(args):
@@ -92,7 +96,7 @@ def parse_value(html, pattern, label):
 
 def assert_pk_header(url):
     cmd = [
-        'docker', 'exec', 'onlyoffice_docs_test', 'sh', '-lc',
+        'docker', 'exec', ONLYOFFICE_CONTAINER, 'sh', '-lc',
         f"curl -s '{url}' | od -An -tx1 -N4",
     ]
     magic = run_cmd(cmd).strip()

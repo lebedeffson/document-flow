@@ -2,9 +2,12 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_CONTAINER="rukovoditel_test"
+# shellcheck source=../ops/lib/runtime_env.sh
+source "${ROOT_DIR}/../ops/lib/runtime_env.sh"
+docflow_load_env "${ROOT_DIR}/.."
+docflow_export_runtime
 
-docker exec "$APP_CONTAINER" php /var/www/html/scripts/prepare_customer_demo.php
+docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/prepare_customer_demo.php
 
 bash "$ROOT_DIR/sync_service_requests.sh"
 bash "$ROOT_DIR/sync_project_documents.sh"
@@ -12,4 +15,4 @@ bash "$ROOT_DIR/pull_bridge_updates.sh" --only-linked
 
 echo
 echo "Customer demo contour prepared."
-echo "Open: https://localhost:18443/"
+echo "Open: ${DOCFLOW_PUBLIC_BASE}/"

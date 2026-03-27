@@ -1,12 +1,21 @@
-import playwright from '/home/lebedeffson/Code/Документооборот/.tmp_e2e/node_modules/playwright/index.js';
+import { resolveBrowserRuntime, buildLaunchOptions } from './playwright_runtime.mjs';
+import { publicBase } from './runtime_config.mjs';
+const base = publicBase;
+const runtime = resolveBrowserRuntime(process.env.PLAYWRIGHT_BROWSER || 'firefox');
 
-const { chromium } = playwright;
-const base = 'https://localhost:18443';
+if (!runtime.available) {
+  console.log(JSON.stringify({
+    status: 'skipped',
+    browser: runtime.browserName,
+    reason: `Browser executable for ${runtime.browserName} not found`,
+    checked: 0,
+    issues: [],
+    visited: [],
+  }, null, 2));
+  process.exit(0);
+}
 
-const browser = await chromium.launch({
-  headless: true,
-  args: ['--ignore-certificate-errors'],
-});
+const browser = await runtime.browserType.launch(buildLaunchOptions(runtime.browserName, runtime.executablePath));
 
 const context = await browser.newContext({
   ignoreHTTPSErrors: true,

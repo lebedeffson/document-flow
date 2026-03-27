@@ -4,6 +4,7 @@ define('IS_CRON', true);
 
 chdir(dirname(__DIR__));
 require 'includes/application_core.php';
+require 'includes/functions/platform_sync.php';
 
 const REQUEST_ENTITY_ID = 23;
 const DOC_CARD_ENTITY_ID = 25;
@@ -38,270 +39,50 @@ function console_log($message)
     echo $message . PHP_EOL;
 }
 
-function fetch_row_by_sql($sql)
+function report_sync_failure($message, $context = [])
 {
-    $query = db_query($sql);
-    return db_fetch_array($query);
-}
-
-function fetch_all_rows($sql)
-{
-    $rows = [];
-    $query = db_query($sql);
-    while ($row = db_fetch_array($query))
-    {
-        $rows[] = $row;
-    }
-    return $rows;
-}
-
-function get_choice_id_by_name($field_id, $name)
-{
-    $row = fetch_row_by_sql(
-        "select id from app_fields_choices where fields_id='" . (int) $field_id . "' and name='" . db_input($name) . "' limit 1"
+    $response = platform_sync_bridge_report_sync_failure(
+        'service_requests',
+        'service_requests',
+        (string) ($context['request_id'] ?? ''),
+        $message,
+        $context
     );
-
-    return $row ? (int) $row['id'] : 0;
-}
-
-function get_choice_name_by_id($field_id, $choice_id)
-{
-    if (!(int) $choice_id)
-    {
-        return '';
-    }
-
-    $row = fetch_row_by_sql(
-        "select name from app_fields_choices where fields_id='" . (int) $field_id . "' and id='" . (int) $choice_id . "' limit 1"
-    );
-
-    return $row ? $row['name'] : '';
-}
-
-function get_default_choice_id($field_id)
-{
-    $row = fetch_row_by_sql(
-        "select id from app_fields_choices where fields_id='" . (int) $field_id . "' and is_default=1 order by sort_order, id limit 1"
-    );
-
-    if ($row)
-    {
-        return (int) $row['id'];
-    }
-
-    $row = fetch_row_by_sql(
-        "select id from app_fields_choices where fields_id='" . (int) $field_id . "' order by sort_order, id limit 1"
-    );
-
-    return $row ? (int) $row['id'] : 0;
-}
-
-function item_exists($entity_id, $item_id)
-{
-    $row = fetch_row_by_sql("select id from app_entity_" . (int) $entity_id . " where id='" . (int) $item_id . "' limit 1");
-    return (bool) $row;
-}
-
-function normalize_csv_value($value)
-{
-    $value = trim((string) $value);
-    if ($value === '')
-    {
-        return '';
-    }
-
-    $parts = array_filter(array_map('trim', explode(',', $value)));
-    return implode(',', $parts);
-}
-
-function first_csv_value($value)
-{
-    $parts = array_filter(array_map('trim', explode(',', (string) $value)));
-    return count($parts) ? $parts[0] : '';
-}
-
-function public_base_url()
-{
-    return rtrim(getenv('RUKOVODITEL_PUBLIC_URL') ?: 'http://localhost:18081', '/');
-}
-
-function public_naudoc_base_url()
-{
-    return rtrim(getenv('NAUDOC_PUBLIC_URL') ?: 'https://localhost:18443/docs', '/');
-}
-
-function normalize_naudoc_url($url)
-{
-    $url = trim((string) $url);
-    if ($url === '')
-    {
-        return '';
-    }
-
-    $public_base = public_naudoc_base_url();
-    $known_bases = array_filter(array_unique([
-        rtrim($public_base, '/'),
-        'http://localhost:18080/docs',
-        'http://host.docker.internal:18080/docs',
-        'https://localhost:18443/docs',
-    ]));
-
-    foreach ($known_bases as $base)
-    {
-        $base = rtrim($base, '/');
-        if (strpos($url, $base) === 0)
-        {
-            return $public_base . substr($url, strlen($base));
-        }
-    }
-
-    return $url;
-}
-
-function bridge_base_url()
-{
-    return rtrim(getenv('BRIDGE_BASE_URL') ?: 'http://host.docker.internal:18082', '/');
-}
-
-function item_url($entity_id, $item_id)
-{
-    return public_base_url() . '/index.php?module=items/info&path=' . (int) $entity_id . '-' . (int) $item_id;
-}
-
-function http_json_request($method, $url, $payload)
-{
-    $content = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    $context = stream_context_create([
-        'http' => [
-            'method' => strtoupper($method),
-            'header' => "Content-Type: application/json\r\nAccept: application/json\r\n",
-            'content' => $content,
-            'ignore_errors' => true,
-            'timeout' => 10,
-        ],
-    ]);
-
-    $response_body = @file_get_contents($url, false, $context);
-    $headers = $http_response_header ?? [];
-    $status_code = 0;
-    if (isset($headers[0]) and preg_match('#\s(\d{3})\s#', $headers[0], $matches))
-    {
-        $status_code = (int) $matches[1];
-    }
-
-    return [
-        'status_code' => $status_code,
-        'body' => $response_body === false ? '' : $response_body,
-        'ok' => $status_code >= 200 && $status_code < 300,
-    ];
-}
-
-function http_json_get($url)
-{
-    $context = stream_context_create([
-        'http' => [
-            'method' => 'GET',
-            'header' => "Accept: application/json\r\n",
-            'ignore_errors' => true,
-            'timeout' => 10,
-        ],
-    ]);
-
-    $response_body = @file_get_contents($url, false, $context);
-    $headers = $http_response_header ?? [];
-    $status_code = 0;
-    if (isset($headers[0]) and preg_match('#\s(\d{3})\s#', $headers[0], $matches))
-    {
-        $status_code = (int) $matches[1];
-    }
-
-    return [
-        'status_code' => $status_code,
-        'body' => $response_body === false ? '' : $response_body,
-        'ok' => $status_code >= 200 && $status_code < 300,
-    ];
-}
-
-function lookup_bridge_link($external_entity, $external_item_id)
-{
-    $response = http_json_get(
-        bridge_base_url() . '/links/lookup?' . http_build_query([
-            'external_system' => 'rukovoditel',
-            'external_entity' => $external_entity,
-            'external_item_id' => (string) $external_item_id,
-        ])
-    );
-
     if (!$response['ok'])
     {
-        return null;
+        console_log('Warning: failed to write sync failure log: ' . $response['status_code'] . ' ' . $response['body']);
     }
-
-    $decoded = json_decode($response['body'], true);
-    return is_array($decoded) ? $decoded : null;
 }
 
-function choose_bridge_sync_status($external_entity, $external_item_id, $default_sync_status)
+function resolve_sync_failure($request_id, $result = [])
 {
-    $existing = lookup_bridge_link($external_entity, $external_item_id);
-    if (!$existing)
-    {
-        return $default_sync_status;
-    }
-
-    $existing_status = trim((string) ($existing['sync_status'] ?? ''));
-    if ($existing_status === '')
-    {
-        return $default_sync_status;
-    }
-
-    if ($default_sync_status === 'linked' && $existing_status !== 'pending_nau_doc')
-    {
-        return $existing_status;
-    }
-
-    if ($default_sync_status === 'pending_nau_doc' && !in_array($existing_status, ['linked', 'pending_nau_doc'], true))
-    {
-        return $existing_status;
-    }
-
-    return $default_sync_status;
-}
-
-function upsert_bridge_link($payload)
-{
-    $response = http_json_request('POST', bridge_base_url() . '/links/upsert', $payload);
+    $response = platform_sync_bridge_resolve_sync_failure(
+        'service_requests',
+        'service_requests',
+        (int) $request_id,
+        $result
+    );
     if (!$response['ok'])
     {
-        throw new RuntimeException(
-            'Bridge upsert failed with status ' . $response['status_code'] . ': ' . $response['body']
-        );
+        console_log('Warning: failed to resolve sync failure log: ' . $response['status_code'] . ' ' . $response['body']);
     }
-
-    $decoded = json_decode($response['body'], true);
-    if (!is_array($decoded))
-    {
-        throw new RuntimeException('Bridge response is not valid JSON: ' . $response['body']);
-    }
-
-    return $decoded;
 }
 
 function create_demo_request_if_needed()
 {
-    $existing = fetch_row_by_sql("select id from app_entity_" . REQUEST_ENTITY_ID . " limit 1");
+    $existing = platform_sync_fetch_row_by_sql("select id from app_entity_" . REQUEST_ENTITY_ID . " limit 1");
     if ($existing)
     {
         console_log('Demo seed skipped: service request records already exist.');
         return;
     }
 
-    $group_choice_id = get_default_choice_id(REQUEST_GROUP_FIELD_ID);
-    $type_choice_id = get_choice_id_by_name(REQUEST_TYPE_FIELD_ID, 'Документооборот');
-    $status_choice_id = get_choice_id_by_name(REQUEST_STATUS_FIELD_ID, 'Новая');
-    $channel_choice_id = get_choice_id_by_name(REQUEST_CHANNEL_FIELD_ID, 'Веб-форма');
-    $service_choice_id = get_choice_id_by_name(REQUEST_SERVICE_CATEGORY_FIELD_ID, 'Документы');
-    $priority_choice_id = get_choice_id_by_name(REQUEST_PRIORITY_FIELD_ID, 'Высокий');
+    $group_choice_id = platform_sync_default_choice_id(REQUEST_GROUP_FIELD_ID);
+    $type_choice_id = platform_sync_choice_id_by_name(REQUEST_TYPE_FIELD_ID, 'Документооборот');
+    $status_choice_id = platform_sync_choice_id_by_name(REQUEST_STATUS_FIELD_ID, 'Новая');
+    $channel_choice_id = platform_sync_choice_id_by_name(REQUEST_CHANNEL_FIELD_ID, 'Веб-форма');
+    $service_choice_id = platform_sync_choice_id_by_name(REQUEST_SERVICE_CATEGORY_FIELD_ID, 'Документы');
+    $priority_choice_id = platform_sync_choice_id_by_name(REQUEST_PRIORITY_FIELD_ID, 'Высокий');
 
     $item_id = items::insert(REQUEST_ENTITY_ID, [
         'created_by' => 1,
@@ -333,20 +114,20 @@ function resolve_doc_type_choice($request_type_name)
 {
     if ($request_type_name === 'Документооборот')
     {
-        $preferred = get_choice_id_by_name(DOC_TYPE_FIELD_ID, 'Служебная записка');
+        $preferred = platform_sync_choice_id_by_name(DOC_TYPE_FIELD_ID, 'Служебная записка');
         if ($preferred)
         {
             return $preferred;
         }
     }
 
-    $fallback = get_choice_id_by_name(DOC_TYPE_FIELD_ID, 'Иное');
+    $fallback = platform_sync_choice_id_by_name(DOC_TYPE_FIELD_ID, 'Иное');
     if ($fallback)
     {
         return $fallback;
     }
 
-    return get_default_choice_id(DOC_TYPE_FIELD_ID);
+    return platform_sync_default_choice_id(DOC_TYPE_FIELD_ID);
 }
 
 function resolve_sync_status($naudoc_url)
@@ -358,17 +139,17 @@ function ensure_doc_card_for_request($request)
 {
     $request_id = (int) $request['id'];
     $request_title = trim((string) $request['field_' . REQUEST_SUBJECT_FIELD_ID]);
-    $request_type_name = get_choice_name_by_id(REQUEST_TYPE_FIELD_ID, (int) $request['field_' . REQUEST_TYPE_FIELD_ID]);
-    $request_url = item_url(REQUEST_ENTITY_ID, $request_id);
-    $project_link = normalize_csv_value($request['field_' . REQUEST_PROJECT_LINK_FIELD_ID]);
-    $request_naudoc_url = normalize_naudoc_url($request['field_' . REQUEST_NAUDOC_LINK_FIELD_ID]);
-    $owner_id = first_csv_value($request['field_' . REQUEST_RESPONSIBLE_FIELD_ID]) ?: (string) $request['created_by'];
+    $request_type_name = platform_sync_choice_name_by_id(REQUEST_TYPE_FIELD_ID, (int) $request['field_' . REQUEST_TYPE_FIELD_ID]);
+    $request_url = platform_sync_item_url(REQUEST_ENTITY_ID, $request_id);
+    $project_link = platform_sync_normalize_csv_value($request['field_' . REQUEST_PROJECT_LINK_FIELD_ID]);
+    $request_naudoc_url = platform_sync_normalize_naudoc_url($request['field_' . REQUEST_NAUDOC_LINK_FIELD_ID]);
+    $owner_id = platform_sync_first_csv_value($request['field_' . REQUEST_RESPONSIBLE_FIELD_ID]) ?: (string) $request['created_by'];
     $doc_card_id = (int) $request['field_' . REQUEST_DOC_CARD_LINK_FIELD_ID];
 
-    $doc_status_id = get_choice_id_by_name(DOC_STATUS_FIELD_ID, 'Черновик');
+    $doc_status_id = platform_sync_choice_id_by_name(DOC_STATUS_FIELD_ID, 'Черновик');
     $doc_type_id = resolve_doc_type_choice($request_type_name);
 
-    if (!$doc_card_id || !item_exists(DOC_CARD_ENTITY_ID, $doc_card_id))
+    if (!$doc_card_id || !platform_sync_item_exists(DOC_CARD_ENTITY_ID, $doc_card_id))
     {
         $doc_card_id = items::insert(DOC_CARD_ENTITY_ID, [
             'created_by' => (int) $request['created_by'],
@@ -427,9 +208,9 @@ function ensure_doc_card_for_request($request)
         $doc_card = db_find('app_entity_' . DOC_CARD_ENTITY_ID, $doc_card_id);
     }
 
-    $doc_card_url = item_url(DOC_CARD_ENTITY_ID, $doc_card_id);
+    $doc_card_url = platform_sync_item_url(DOC_CARD_ENTITY_ID, $doc_card_id);
     $doc_card_title = trim((string) $doc_card['field_' . DOC_TITLE_FIELD_ID]);
-    $doc_card_naudoc_url = normalize_naudoc_url($doc_card['field_' . DOC_NAUDOC_LINK_FIELD_ID]);
+    $doc_card_naudoc_url = platform_sync_normalize_naudoc_url($doc_card['field_' . DOC_NAUDOC_LINK_FIELD_ID]);
     if (!$request_naudoc_url && $doc_card_naudoc_url)
     {
         items::update_by_id(REQUEST_ENTITY_ID, $request_id, [
@@ -441,18 +222,39 @@ function ensure_doc_card_for_request($request)
         $request_naudoc_url = $doc_card_naudoc_url;
     }
 
-    $sync_status = choose_bridge_sync_status(
+    $sync_status = platform_sync_bridge_choose_sync_status(
         'service_requests',
         $request_id,
         resolve_sync_status($request_naudoc_url ?: $doc_card_naudoc_url)
     );
-    $doc_card_sync_status = choose_bridge_sync_status(
+    $doc_card_sync_status = platform_sync_bridge_choose_sync_status(
         'document_cards',
         $doc_card_id,
         resolve_sync_status($doc_card_naudoc_url)
     );
 
-    upsert_bridge_link([
+    $request_source_values = [
+        'request_id' => $request_id,
+        'request_url' => $request_url,
+        'request_title' => $request_title,
+        'doc_card_id' => $doc_card_id,
+        'doc_card_url' => $doc_card_url,
+        'doc_card_title' => $doc_card_title,
+        'responsible_user_id' => $owner_id,
+    ];
+    $request_metadata = platform_sync_bridge_build_metadata_from_mappings('service_requests', $request_source_values, [
+        'request_id' => $request_id,
+        'request_url' => $request_url,
+        'doc_card_id' => $doc_card_id,
+        'doc_card_url' => $doc_card_url,
+        'responsible_user_id' => $owner_id,
+    ]);
+    $request_metadata = platform_sync_bridge_attach_naudoc_projection(
+        $request_metadata,
+        platform_sync_bridge_build_naudoc_projection('service_requests', $request_source_values)
+    );
+
+    platform_sync_bridge_upsert_link([
         'external_system' => 'rukovoditel',
         'external_entity' => 'service_requests',
         'external_item_id' => (string) $request_id,
@@ -461,16 +263,28 @@ function ensure_doc_card_for_request($request)
         'naudoc_title' => $doc_card_title,
         'sync_status' => $sync_status,
         'notes' => 'Автосвязь service request -> document card',
-        'metadata' => [
-            'request_id' => $request_id,
-            'request_url' => $request_url,
-            'doc_card_id' => $doc_card_id,
-            'doc_card_url' => $doc_card_url,
-            'responsible_user_id' => $owner_id,
-        ],
+        'metadata' => $request_metadata,
     ]);
 
-    upsert_bridge_link([
+    $doc_card_source_values = [
+        'doc_card_id' => $doc_card_id,
+        'doc_card_url' => $doc_card_url,
+        'doc_card_title' => $doc_card_title,
+        'source_request_id' => $request_id,
+        'source_request_url' => $request_url,
+    ];
+    $doc_card_metadata = platform_sync_bridge_build_metadata_from_mappings('document_cards', $doc_card_source_values, [
+        'doc_card_id' => $doc_card_id,
+        'doc_card_url' => $doc_card_url,
+        'source_request_id' => $request_id,
+        'source_request_url' => $request_url,
+    ]);
+    $doc_card_metadata = platform_sync_bridge_attach_naudoc_projection(
+        $doc_card_metadata,
+        platform_sync_bridge_build_naudoc_projection('document_cards', $doc_card_source_values)
+    );
+
+    platform_sync_bridge_upsert_link([
         'external_system' => 'rukovoditel',
         'external_entity' => 'document_cards',
         'external_item_id' => (string) $doc_card_id,
@@ -479,12 +293,7 @@ function ensure_doc_card_for_request($request)
         'naudoc_title' => $doc_card_title,
         'sync_status' => $doc_card_sync_status,
         'notes' => 'Автосвязь document card -> NauDoc bridge state',
-        'metadata' => [
-            'doc_card_id' => $doc_card_id,
-            'doc_card_url' => $doc_card_url,
-            'source_request_id' => $request_id,
-            'source_request_url' => $request_url,
-        ],
+        'metadata' => $doc_card_metadata,
     ]);
 
     return [
@@ -529,12 +338,12 @@ function fetch_requests_to_sync($request_id, $force_all)
 {
     if ($request_id > 0)
     {
-        return fetch_all_rows(
+        return platform_sync_fetch_all_rows(
             "select * from app_entity_" . REQUEST_ENTITY_ID . " where id='" . (int) $request_id . "' order by id"
         );
     }
 
-    $docflow_type_id = get_choice_id_by_name(REQUEST_TYPE_FIELD_ID, 'Документооборот');
+    $docflow_type_id = platform_sync_choice_id_by_name(REQUEST_TYPE_FIELD_ID, 'Документооборот');
     $where = [];
     if ($force_all)
     {
@@ -550,7 +359,7 @@ function fetch_requests_to_sync($request_id, $force_all)
         $where[] = "length(field_" . REQUEST_NAUDOC_LINK_FIELD_ID . ")>0";
     }
 
-    return fetch_all_rows(
+    return platform_sync_fetch_all_rows(
         "select * from app_entity_" . REQUEST_ENTITY_ID . " where " . implode(' or ', $where) . " order by id"
     );
 }
@@ -571,15 +380,36 @@ if (!count($requests))
 }
 
 $synced = 0;
+$failed = 0;
 foreach ($requests as $request)
 {
-    $result = ensure_doc_card_for_request($request);
-    $synced++;
-    console_log(
-        'Synced request #' . $result['request_id'] .
-        ' -> doc card #' . $result['doc_card_id'] .
-        ' [' . $result['sync_status'] . ']'
-    );
+    try
+    {
+        $result = ensure_doc_card_for_request($request);
+        resolve_sync_failure($result['request_id'], [
+            'doc_card_id' => $result['doc_card_id'],
+            'sync_status' => $result['sync_status'],
+        ]);
+
+        $synced++;
+        console_log(
+            'Synced request #' . $result['request_id'] .
+            ' -> doc card #' . $result['doc_card_id'] .
+            ' [' . $result['sync_status'] . ']'
+        );
+    }
+    catch (Throwable $e)
+    {
+        $failed++;
+        $request_id = (int) $request['id'];
+        report_sync_failure($e->getMessage(), [
+            'request_id' => $request_id,
+            'request_title' => trim((string) $request['field_' . REQUEST_SUBJECT_FIELD_ID]),
+            'doc_card_id' => (int) $request['field_' . REQUEST_DOC_CARD_LINK_FIELD_ID],
+            'project_link' => platform_sync_normalize_csv_value($request['field_' . REQUEST_PROJECT_LINK_FIELD_ID]),
+        ]);
+        console_log('Failed sync request #' . $request_id . ': ' . $e->getMessage());
+    }
 }
 
-console_log('Sync complete. Total processed: ' . $synced);
+console_log('Sync complete. Successful: ' . $synced . ', failed: ' . $failed);

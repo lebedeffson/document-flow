@@ -1,9 +1,14 @@
 <?php
 
 // define database connection
-  define('DB_SERVER', 'rukovoditel_db:3306'); // eg, localhost - should not be empty for productive servers
-  define('DB_SERVER_USERNAME', 'rukovoditel');
-  define('DB_SERVER_PASSWORD', 'rukovoditel');
-  define('DB_SERVER_PORT', '3306');		
-  define('DB_DATABASE', 'rukovoditel');  	  
-  
+$db_host = getenv('RUKOVODITEL_DB_HOST') ?: 'rukovoditel_db';
+$db_port = getenv('RUKOVODITEL_DB_PORT') ?: '3306';
+$db_name = getenv('RUKOVODITEL_DB_NAME') ?: 'rukovoditel';
+$db_user = getenv('RUKOVODITEL_DB_USER') ?: 'rukovoditel';
+$db_password = getenv('RUKOVODITEL_DB_PASSWORD') ?: 'rukovoditel';
+
+define('DB_SERVER', $db_host . ':' . $db_port); // eg, localhost - should not be empty for productive servers
+define('DB_SERVER_USERNAME', $db_user);
+define('DB_SERVER_PASSWORD', $db_password);
+define('DB_SERVER_PORT', $db_port);
+define('DB_DATABASE', $db_name);

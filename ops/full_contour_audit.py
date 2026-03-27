@@ -12,12 +12,19 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-
-ROOT_DIR = Path(__file__).resolve().parent.parent
-GATEWAY_BASE = "https://localhost:18443"
-RUKOVODITEL_ENTRY = f"{GATEWAY_BASE}/index.php?module=dashboard/"
-NAUDOC_BASE = f"{GATEWAY_BASE}/docs"
-BRIDGE_BASE = f"{GATEWAY_BASE}/bridge"
+from runtime_config import (
+    APP_CONTAINER,
+    BRIDGE_BASE,
+    DB_CONTAINER,
+    GATEWAY_BASE,
+    NAUDOC_BASE,
+    NAUDOC_LEGACY_CONTAINER,
+    NAUDOC_PASSWORD,
+    NAUDOC_USERNAME,
+    PUBLIC_NETLOC,
+    ROOT_DIR,
+    RUKOVODITEL_ENTRY,
+)
 SSL_CONTEXT = ssl._create_unverified_context()
 
 ROLE_USERS = {
@@ -191,7 +198,7 @@ def extract_module_links(page_html):
             continue
         absolute = urllib.parse.urljoin(GATEWAY_BASE + "/", html.unescape(href))
         parsed = urllib.parse.urlparse(absolute)
-        if parsed.netloc != "localhost:18443":
+        if parsed.netloc != PUBLIC_NETLOC:
             continue
         module = urllib.parse.parse_qs(parsed.query).get("module", [""])[0]
         if module.startswith(SAFE_RUKOVODITEL_MODULE_PREFIXES):
@@ -236,7 +243,7 @@ def check_rukovoditel_role(name, config):
 def normalize_naudoc_path(href, current_url):
     absolute = urllib.parse.urljoin(current_url, href)
     parsed = urllib.parse.urlparse(absolute)
-    if parsed.netloc != "localhost:18443":
+    if parsed.netloc != PUBLIC_NETLOC:
         return None
     if not parsed.path.startswith("/docs"):
         return None
@@ -251,7 +258,7 @@ def normalize_naudoc_path(href, current_url):
 
 def check_naudoc():
     auth_header = {
-        "Authorization": "Basic " + base64.b64encode(b"admin:admin").decode(),
+        "Authorization": "Basic " + base64.b64encode(f"{NAUDOC_USERNAME}:{NAUDOC_PASSWORD}".encode()).decode(),
     }
     to_visit = list(NAUDOC_SEED_PATHS)
     seen = []
@@ -277,7 +284,7 @@ def check_naudoc():
         if response.status != 200:
             errors.append(f"unexpected status {response.status} for {path}")
             continue
-        if "host.docker.internal" in text or "http://localhost:18443/docs" in text:
+        if "host.docker.internal" in text or f"http://{PUBLIC_NETLOC}/docs" in text:
             errors.append(f"internal or insecure docs url leak in {path}")
         if "404" in text[:600] and "NauDoc" not in text:
             errors.append(f"page looks broken for {path}")
@@ -305,7 +312,7 @@ def check_naudoc_addons():
         [
             "docker",
             "exec",
-            "naudoc34_legacy",
+            NAUDOC_LEGACY_CONTAINER,
             "bash",
             "-lc",
             "tail -n 400 /opt/naudoc/log/event.log | grep -n 'Bad magic number\\|Cannot import module\\|Could not import class' || true",
@@ -316,7 +323,7 @@ def check_naudoc_addons():
         errors.append("legacy add-ons are not loading because of bad magic number in compiled add-on packages")
 
     auth_header = {
-        "Authorization": "Basic " + base64.b64encode(b"admin:admin").decode(),
+        "Authorization": "Basic " + base64.b64encode(f"{NAUDOC_USERNAME}:{NAUDOC_PASSWORD}".encode()).decode(),
     }
 
     for path in [

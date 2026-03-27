@@ -55,6 +55,12 @@ EXPECTED_PAGES = [
         "contains": ["Заявки на МТЗ", "Открыть NauDoc"],
         "not_contains": ["Открыть DocSpace", "Открыть Workspace"],
     },
+    {
+        "name": "bridge_directory_admin",
+        "url": f"{BRIDGE_BASE}/",
+        "contains": ["Каталог пользователей", "Источники идентификации", "Hospital-роли", "Маппинг полей"],
+        "not_contains": [],
+    },
 ]
 
 EXPECTED_BRIDGE_METADATA = [
@@ -65,6 +71,10 @@ EXPECTED_BRIDGE_METADATA = [
             "request_url",
             "doc_card_url",
         ],
+        "projection_keys": [
+            ("document", "title"),
+            ("document", "source_request_url"),
+        ],
     },
     {
         "external_entity": "projects",
@@ -72,6 +82,10 @@ EXPECTED_BRIDGE_METADATA = [
         "metadata_keys": [
             "project_url",
             "doc_card_url",
+        ],
+        "projection_keys": [
+            ("document", "title"),
+            ("document", "source_project_url"),
         ],
     },
     {
@@ -81,6 +95,10 @@ EXPECTED_BRIDGE_METADATA = [
             "doc_card_url",
             "source_request_url",
         ],
+        "projection_keys": [
+            ("document", "title"),
+            ("document", "source_request_url"),
+        ],
     },
     {
         "external_entity": "document_cards",
@@ -89,8 +107,22 @@ EXPECTED_BRIDGE_METADATA = [
             "doc_card_url",
             "source_project_url",
         ],
+        "projection_keys": [
+            ("document", "title"),
+            ("document", "source_project_url"),
+        ],
     },
 ]
+
+EXPECTED_IDENTITY_SOURCES = {
+    "required_source_keys": {"rukovoditel_local", "naudoc_catalog", "hospital_ldap"},
+    "required_provider_types": {"local", "external", "ldap"},
+}
+
+EXPECTED_HOSPITAL_ROLE_MAPPINGS = {
+    "required_hospital_roles": {"hospital_admin", "department_head", "clinician", "registry_operator", "records_office"},
+    "required_source_systems": {"rukovoditel"},
+}
 
 
 def fetch_bridge_link(external_entity: str, external_item_id: str):
@@ -110,6 +142,17 @@ def fetch_bridge_link(external_entity: str, external_item_id: str):
     except Exception:
         return response.status, None
 
+    return response.status, payload
+
+
+def fetch_bridge_json(path: str):
+    response, body = http_get(f"{BRIDGE_BASE}{path}")
+    if response.status != 200:
+        return response.status, None
+    try:
+        payload = json.loads(body.decode("utf-8"))
+    except Exception:
+        return response.status, None
     return response.status, payload
 
 
@@ -147,19 +190,30 @@ def main():
         )
         metadata = payload.get("metadata") if isinstance(payload, dict) else None
         missing_keys = []
+        missing_projection = []
 
         if not isinstance(metadata, dict):
             missing_keys = list(bridge_case["metadata_keys"])
+            missing_projection = list(bridge_case.get("projection_keys", []))
         else:
             for key in bridge_case["metadata_keys"]:
                 if not metadata.get(key):
                     missing_keys.append(key)
+            projection = metadata.get("naudoc_projection")
+            if not isinstance(projection, dict):
+                missing_projection = list(bridge_case.get("projection_keys", []))
+            else:
+                for entity_name, key_name in bridge_case.get("projection_keys", []):
+                    entity_payload = projection.get(entity_name)
+                    if not isinstance(entity_payload, dict) or not entity_payload.get(key_name):
+                        missing_projection.append((entity_name, key_name))
 
         bridge_result = {
             "external_entity": bridge_case["external_entity"],
             "external_item_id": bridge_case["external_item_id"],
             "status": status,
             "missing_keys": missing_keys,
+            "missing_projection": missing_projection,
         }
         results["bridge_metadata"].append(bridge_result)
 
@@ -172,6 +226,36 @@ def main():
             results["failures"].append(
                 f"bridge {bridge_case['external_entity']}#{bridge_case['external_item_id']}: missing metadata '{key}'"
             )
+        for entity_name, key_name in missing_projection:
+            results["failures"].append(
+                f"bridge {bridge_case['external_entity']}#{bridge_case['external_item_id']}: missing naudoc projection '{entity_name}.{key_name}'"
+            )
+
+    status, identity_sources = fetch_bridge_json("/identity-sources")
+    if status != 200 or not isinstance(identity_sources, list):
+        results["failures"].append(f"bridge identity-sources: unexpected status {status}")
+    else:
+        source_keys = {item.get("source_key") for item in identity_sources}
+        provider_types = {item.get("provider_type") for item in identity_sources}
+        missing_source_keys = sorted(EXPECTED_IDENTITY_SOURCES["required_source_keys"] - source_keys)
+        missing_provider_types = sorted(EXPECTED_IDENTITY_SOURCES["required_provider_types"] - provider_types)
+        for key in missing_source_keys:
+            results["failures"].append(f"bridge identity-sources: missing source_key '{key}'")
+        for provider_type in missing_provider_types:
+            results["failures"].append(f"bridge identity-sources: missing provider_type '{provider_type}'")
+
+    status, hospital_role_mappings = fetch_bridge_json("/hospital-role-mappings")
+    if status != 200 or not isinstance(hospital_role_mappings, list):
+        results["failures"].append(f"bridge hospital-role-mappings: unexpected status {status}")
+    else:
+        hospital_roles = {item.get("hospital_role_key") for item in hospital_role_mappings}
+        source_systems = {item.get("source_system") for item in hospital_role_mappings}
+        missing_roles = sorted(EXPECTED_HOSPITAL_ROLE_MAPPINGS["required_hospital_roles"] - hospital_roles)
+        missing_systems = sorted(EXPECTED_HOSPITAL_ROLE_MAPPINGS["required_source_systems"] - source_systems)
+        for role_key in missing_roles:
+            results["failures"].append(f"bridge hospital-role-mappings: missing hospital_role_key '{role_key}'")
+        for source_system in missing_systems:
+            results["failures"].append(f"bridge hospital-role-mappings: missing source_system '{source_system}'")
 
     print(json.dumps(results, ensure_ascii=False, indent=2))
 

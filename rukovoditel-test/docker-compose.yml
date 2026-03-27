@@ -1,12 +1,14 @@
 services:
   rukovoditel_db:
     image: mariadb:10.11
-    container_name: rukovoditel_db_test
+    env_file:
+      - ../.env
+    container_name: "${RUKOVODITEL_DB_CONTAINER:-rukovoditel_db_test}"
     environment:
-      MARIADB_DATABASE: rukovoditel
-      MARIADB_USER: rukovoditel
-      MARIADB_PASSWORD: rukovoditel
-      MARIADB_ROOT_PASSWORD: root_rukovoditel
+      MARIADB_DATABASE: "${RUKOVODITEL_DB_NAME:-rukovoditel}"
+      MARIADB_USER: "${RUKOVODITEL_DB_USER:-rukovoditel}"
+      MARIADB_PASSWORD: "${RUKOVODITEL_DB_PASSWORD:-rukovoditel}"
+      MARIADB_ROOT_PASSWORD: "${RUKOVODITEL_DB_ROOT_PASSWORD:-root_rukovoditel}"
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
@@ -18,19 +20,29 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    container_name: rukovoditel_test
+    env_file:
+      - ../.env
+    container_name: "${RUKOVODITEL_CONTAINER_NAME:-rukovoditel_test}"
     depends_on:
       - rukovoditel_db
     ports:
       - "18081:80"
     environment:
       TZ: Europe/Moscow
-      RUKOVODITEL_PUBLIC_URL: https://localhost:18443
-      NAUDOC_PUBLIC_URL: https://localhost:18443/docs
-      BRIDGE_BASE_URL: http://host.docker.internal:18082
-      ONLYOFFICE_INTEGRATION_BASE_URL: http://rukovoditel
-      ONLYOFFICE_PUBLIC_JS_API_URL: https://localhost:18443/office/web-apps/apps/api/documents/api.js
-      ONLYOFFICE_JWT_SECRET: onlyoffice_dev_secret
+      RUKOVODITEL_DB_HOST: "rukovoditel_db"
+      RUKOVODITEL_DB_PORT: "3306"
+      RUKOVODITEL_DB_NAME: "${RUKOVODITEL_DB_NAME:-rukovoditel}"
+      RUKOVODITEL_DB_USER: "${RUKOVODITEL_DB_USER:-rukovoditel}"
+      RUKOVODITEL_DB_PASSWORD: "${RUKOVODITEL_DB_PASSWORD:-rukovoditel}"
+      RUKOVODITEL_PUBLIC_URL: "${RUKOVODITEL_PUBLIC_URL:-https://localhost:18443}"
+      NAUDOC_USERNAME: "${NAUDOC_USERNAME:-admin}"
+      NAUDOC_PASSWORD: "${NAUDOC_PASSWORD:-admin}"
+      NAUDOC_PUBLIC_URL: "${NAUDOC_PUBLIC_URL:-https://localhost:18443/docs}"
+      BRIDGE_BASE_URL: "${BRIDGE_BASE_URL:-http://host.docker.internal:18082}"
+      SYNC_CONTROL_TOKEN: "${BRIDGE_SYNC_CONTROL_TOKEN:-bridge_sync_control_dev}"
+      ONLYOFFICE_INTEGRATION_BASE_URL: "${ONLYOFFICE_INTEGRATION_BASE_URL:-http://rukovoditel}"
+      ONLYOFFICE_PUBLIC_JS_API_URL: "${ONLYOFFICE_PUBLIC_JS_API_URL:-https://localhost:18443/office/web-apps/apps/api/documents/api.js}"
+      ONLYOFFICE_JWT_SECRET: "${ONLYOFFICE_JWT_SECRET:-onlyoffice_dev_secret}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -39,11 +51,13 @@ services:
 
   onlyoffice_docs:
     image: onlyoffice/documentserver:latest
-    container_name: onlyoffice_docs_test
+    env_file:
+      - ../.env
+    container_name: "${ONLYOFFICE_CONTAINER_NAME:-onlyoffice_docs_test}"
     environment:
       TZ: Europe/Moscow
       JWT_ENABLED: "true"
-      JWT_SECRET: onlyoffice_dev_secret
+      JWT_SECRET: "${ONLYOFFICE_JWT_SECRET:-onlyoffice_dev_secret}"
     ports:
       - "18083:80"
     volumes:
@@ -58,16 +72,25 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    container_name: rukovoditel_sync_worker_test
+    env_file:
+      - ../.env
+    container_name: "${RUKOVODITEL_SYNC_WORKER_CONTAINER_NAME:-rukovoditel_sync_worker_test}"
     depends_on:
       - rukovoditel_db
       - rukovoditel
     environment:
       TZ: Europe/Moscow
-      RUKOVODITEL_PUBLIC_URL: https://localhost:18443
-      NAUDOC_PUBLIC_URL: https://localhost:18443/docs
-      BRIDGE_BASE_URL: http://host.docker.internal:18082
-      SYNC_INTERVAL_SECONDS: "60"
+      RUKOVODITEL_DB_HOST: "rukovoditel_db"
+      RUKOVODITEL_DB_PORT: "3306"
+      RUKOVODITEL_DB_NAME: "${RUKOVODITEL_DB_NAME:-rukovoditel}"
+      RUKOVODITEL_DB_USER: "${RUKOVODITEL_DB_USER:-rukovoditel}"
+      RUKOVODITEL_DB_PASSWORD: "${RUKOVODITEL_DB_PASSWORD:-rukovoditel}"
+      RUKOVODITEL_PUBLIC_URL: "${RUKOVODITEL_PUBLIC_URL:-https://localhost:18443}"
+      NAUDOC_USERNAME: "${NAUDOC_USERNAME:-admin}"
+      NAUDOC_PASSWORD: "${NAUDOC_PASSWORD:-admin}"
+      NAUDOC_PUBLIC_URL: "${NAUDOC_PUBLIC_URL:-https://localhost:18443/docs}"
+      BRIDGE_BASE_URL: "${BRIDGE_BASE_URL:-http://host.docker.internal:18082}"
+      SYNC_INTERVAL_SECONDS: "${SYNC_INTERVAL_SECONDS:-60}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: ["/bin/bash", "/sync-worker.sh"]

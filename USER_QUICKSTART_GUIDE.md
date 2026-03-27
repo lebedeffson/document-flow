@@ -99,7 +99,8 @@
 Открыть:
 
 - `https://localhost:18443/docs/`
-- `admin / admin`
+- логин: `admin`
+- пароль: смотреть `NAUDOC_PASSWORD` в корневом `.env`
 
 Проверить:
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=DocFlow hospital platform backup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+Environment=PROJECT_ROOT=/opt/docflow
+WorkingDirectory=/opt/docflow
+ExecStart=/opt/docflow/ops/backup_all.sh
+User=root
+Group=root

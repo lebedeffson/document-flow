@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker-legacy/Dockerfile
-    container_name: naudoc34_legacy
+    container_name: "${NAUDOC_LEGACY_CONTAINER:-naudoc34_legacy}"
     ports:
       - "18080:8080"
     user: "1000:1000"

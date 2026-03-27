@@ -10,7 +10,7 @@ server {
     }
 
     location / {
-        return 301 https://$host:${EXTERNAL_HTTPS_PORT}$request_uri;
+        return 301 https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}$request_uri;
     }
 }
 
@@ -27,11 +27,11 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers off;
 
-    proxy_set_header Host $http_host;
+    proxy_set_header Host ${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX};
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto https;
-    proxy_set_header X-Forwarded-Host $http_host;
+    proxy_set_header X-Forwarded-Host ${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX};
     proxy_set_header X-Forwarded-Port ${EXTERNAL_HTTPS_PORT};
     proxy_read_timeout 300s;
     proxy_connect_timeout 30s;
@@ -53,28 +53,28 @@ server {
     }
 
     location = /office {
-        return 302 https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/;
+        return 302 https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/;
     }
 
     location = /office/ {
-        return 302 https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/;
+        return 302 https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/;
     }
 
     location = /office/welcome/ {
-        return 302 https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/;
+        return 302 https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/;
     }
 
     location = /office/example {
-        return 302 https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/;
+        return 302 https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/;
     }
 
     location = /office/example/ {
-        return 302 https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/;
+        return 302 https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/;
     }
 
     location /office/ {
         proxy_http_version 1.1;
-        proxy_set_header Host ${SERVER_NAME}:${EXTERNAL_HTTPS_PORT};
+        proxy_set_header Host ${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX};
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header HTTPS on;
@@ -82,19 +82,19 @@ server {
         proxy_set_header X-Url-Scheme https;
         proxy_set_header Front-End-Https on;
         proxy_set_header X-Forwarded-Proto https;
-        proxy_set_header X-Forwarded-Host ${SERVER_NAME}:${EXTERNAL_HTTPS_PORT};
+        proxy_set_header X-Forwarded-Host ${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX};
         proxy_set_header X-Forwarded-Port ${EXTERNAL_HTTPS_PORT};
         proxy_set_header X-Forwarded-Prefix /office;
         proxy_pass http://${ONLYOFFICE_UPSTREAM}/;
-        proxy_redirect ~^http://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}(/office/.*)$ https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}$1;
-        proxy_redirect ~^http://${SERVER_NAME}(/office/.*)$ https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}$1;
+        proxy_redirect ~^http://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}(/office/.*)$ https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}$1;
+        proxy_redirect ~^http://${SERVER_NAME}(/office/.*)$ https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}$1;
         sub_filter_once off;
-        sub_filter_types text/html text/css application/javascript application/x-javascript text/javascript application/json;
-        sub_filter 'http://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/office/' 'https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/office/';
-        sub_filter 'http://${SERVER_NAME}/office/' 'https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/office/';
-        sub_filter 'http://${ONLYOFFICE_UPSTREAM}/' 'https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/office/';
-        sub_filter 'http%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Foffice%2F' 'https%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Foffice%2F';
-        sub_filter 'http%3A%2F%2F${SERVER_NAME}%2Foffice%2F' 'https%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Foffice%2F';
+        sub_filter_types text/css application/javascript application/x-javascript text/javascript application/json;
+        sub_filter 'http://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/office/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/office/';
+        sub_filter 'http://${SERVER_NAME}/office/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/office/';
+        sub_filter 'http://${ONLYOFFICE_UPSTREAM}/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/office/';
+        sub_filter 'http%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Foffice%2F' 'https%3A%2F%2F${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX_ESCAPED}%2Foffice%2F';
+        sub_filter 'http%3A%2F%2F${SERVER_NAME}%2Foffice%2F' 'https%3A%2F%2F${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX_ESCAPED}%2Foffice%2F';
     }
 
     location = /docs {
@@ -103,23 +103,32 @@ server {
 
     location /docs/ {
         proxy_set_header Accept-Encoding "";
-        proxy_set_header Host ${SERVER_NAME}:${EXTERNAL_HTTPS_PORT};
+        proxy_set_header Host ${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX};
         proxy_set_header HTTPS on;
         proxy_set_header X-Forwarded-Ssl on;
         proxy_set_header X-Url-Scheme https;
         proxy_set_header Front-End-Https on;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Host ${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX};
+        proxy_set_header X-Forwarded-Port ${EXTERNAL_HTTPS_PORT};
         proxy_pass http://${NAUDOC_UPSTREAM};
-        proxy_redirect ~^http://${SERVER_NAME}(/docs/.*)$ https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}$1;
+        proxy_redirect ~^http://${SERVER_NAME}(/docs/.*)$ https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}$1;
         sub_filter_once off;
-        sub_filter_types text/css application/javascript application/x-javascript text/javascript;
-        sub_filter 'http://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/docs' 'https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/docs';
-        sub_filter 'http://${NAUDOC_UPSTREAM}/docs' 'https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/docs';
-        sub_filter 'http%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Fdocs' 'https%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Fdocs';
-        sub_filter 'http%3A%2F%2F${NAUDOC_UPSTREAM_ESCAPED}%2Fdocs' 'https%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Fdocs';
+        sub_filter_types text/html text/css application/javascript application/x-javascript text/javascript;
+        sub_filter 'http://${SERVER_NAME}/docs' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/docs';
+        sub_filter 'http://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}/docs' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/docs';
+        sub_filter 'http://${NAUDOC_UPSTREAM}/docs' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/docs';
+        sub_filter 'http%3A%2F%2F${SERVER_NAME}%2Fdocs' 'https%3A%2F%2F${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX_ESCAPED}%2Fdocs';
+        sub_filter 'http%3A%2F%2F${SERVER_NAME}%3A${EXTERNAL_HTTPS_PORT}%2Fdocs' 'https%3A%2F%2F${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX_ESCAPED}%2Fdocs';
+        sub_filter 'http%3A%2F%2F${NAUDOC_UPSTREAM_ESCAPED}%2Fdocs' 'https%3A%2F%2F${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX_ESCAPED}%2Fdocs';
+    }
+
+    location = /run_sync_job.php {
+        return 404;
     }
 
     location / {
         proxy_pass http://${RUKOVODITEL_UPSTREAM};
-        proxy_redirect ~^http://${SERVER_NAME}(/.*)$ https://${SERVER_NAME}:${EXTERNAL_HTTPS_PORT}$1;
+        proxy_redirect ~^http://${SERVER_NAME}(/.*)$ https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}$1;
     }
 }

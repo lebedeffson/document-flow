@@ -17,6 +17,41 @@ function fetch_row_by_sql($sql)
     return db_fetch_array($query);
 }
 
+function get_field_id_by_name($entity_id, $name)
+{
+    $row = fetch_row_by_sql(
+        "select id from app_fields where entities_id='" . (int) $entity_id . "' and name='" . db_input($name) . "' limit 1"
+    );
+
+    return $row ? (int) $row['id'] : 0;
+}
+
+function get_choice_id_by_name($field_id, $name)
+{
+    if (!(int) $field_id)
+    {
+        return 0;
+    }
+
+    $row = fetch_row_by_sql(
+        "select id from app_fields_choices where fields_id='" . (int) $field_id . "' and name='" . db_input($name) . "' limit 1"
+    );
+
+    return $row ? (int) $row['id'] : 0;
+}
+
+function optional_field_payload($field_id, $value)
+{
+    if ((int) $field_id <= 0 || $value === '' || $value === null || (int) $value <= 0)
+    {
+        return [];
+    }
+
+    return [
+        'field_' . (int) $field_id => $value,
+    ];
+}
+
 function demo_timestamp($date)
 {
     $timestamp = strtotime($date . ' 10:00:00');
@@ -123,6 +158,13 @@ set_configuration_value(
 
 rename_field_if_exists(282, 'Совместное редактирование');
 
+$naudoc_public_url = getenv('NAUDOC_PUBLIC_URL') ?: 'https://localhost:18443/docs';
+
+$doc_route_field_id = get_field_id_by_name(25, 'Маршрут документа');
+$route_internal_order_id = get_choice_id_by_name($doc_route_field_id, 'Внутренний приказ');
+$route_outgoing_approval_id = get_choice_id_by_name($doc_route_field_id, 'Исходящее согласование');
+$route_contract_id = get_choice_id_by_name($doc_route_field_id, 'Договор и закупка');
+
 $project_primary_id = ensure_demo_item(
     21,
     158,
@@ -140,7 +182,7 @@ $project_primary_id = ensure_demo_item(
         'field_227' => 470,
         'field_228' => demo_timestamp('2026-04-15'),
         'field_229' => 55,
-        'field_230' => 'https://localhost:18443/docs',
+        'field_230' => $naudoc_public_url,
         'field_231' => 'Контрольный кейс для показа заказчику: проект, документы, согласование и публикация финальной версии.',
         'field_280' => 528,
     ],
@@ -163,7 +205,7 @@ $request_primary_id = ensure_demo_item(
         'field_237' => demo_timestamp('2026-03-28'),
         'field_238' => 410,
         'field_239' => (string) $project_primary_id,
-        'field_241' => 'https://localhost:18443/docs',
+        'field_241' => $naudoc_public_url,
         'field_276' => 394,
         'field_277' => 'Карточка документа создана, маршрут согласования завершен, ссылка на итоговый документ возвращена в рабочий контур.',
         'field_281' => 551,
@@ -175,7 +217,7 @@ $doc_request_id = ensure_demo_item(
     25,
     242,
     'Служебная записка о запуске пилотного контура',
-    [
+    array_merge([
         'date_added' => demo_timestamp('2026-03-21'),
         'date_updated' => time(),
         'field_243' => 419,
@@ -185,11 +227,11 @@ $doc_request_id = ensure_demo_item(
         'field_247' => '1',
         'field_248' => demo_timestamp('2026-12-31'),
         'field_249' => '1.0',
-        'field_250' => 'https://localhost:18443/docs',
+        'field_250' => $naudoc_public_url,
         'field_251' => '',
         'field_252' => (string) $request_primary_id,
         'field_253' => '<p>Документ оформлен по заявке на запуск пилотного контура и используется как основной демонстрационный кейс канцелярского маршрута.</p>',
-    ],
+    ], optional_field_payload($doc_route_field_id, $route_outgoing_approval_id)),
     ['Тестовая заявка на подготовку документа']
 );
 
@@ -197,7 +239,7 @@ $doc_project_id = ensure_demo_item(
     25,
     242,
     'Документ проекта: Внедрение единой платформы документооборота',
-    [
+    array_merge([
         'date_added' => demo_timestamp('2026-03-22'),
         'date_updated' => time(),
         'field_243' => 421,
@@ -207,11 +249,11 @@ $doc_project_id = ensure_demo_item(
         'field_247' => '1',
         'field_248' => demo_timestamp('2027-03-22'),
         'field_249' => '1.1',
-        'field_250' => 'https://localhost:18443/docs',
+        'field_250' => $naudoc_public_url,
         'field_251' => (string) $project_primary_id,
         'field_252' => '',
         'field_253' => '<p>Карточка проектного документа используется для показа связки проект -> документ -> NauDoc и совместной работы над черновиком.</p>',
-    ],
+    ], optional_field_payload($doc_route_field_id, $route_outgoing_approval_id)),
     ['Документ проекта: Тестовый проект цифрового документооборота']
 );
 
@@ -231,7 +273,7 @@ foreach([
 $project_secondary_id = ensure_demo_item(
     21,
     158,
-    'Подготовка регламента согласования учебных документов',
+    'Подготовка регламента согласования внутренних документов',
     [
         'date_added' => demo_timestamp('2026-03-23'),
         'date_updated' => time(),
@@ -269,7 +311,7 @@ $project_archive_id = ensure_demo_item(
         'field_227' => 470,
         'field_228' => demo_timestamp('2026-03-15'),
         'field_229' => 100,
-        'field_230' => 'https://localhost:18443/docs',
+        'field_230' => $naudoc_public_url,
         'field_231' => 'Проект завершен. Документ зарегистрирован и материалы переданы в архив.',
         'field_280' => 635,
     ]
@@ -278,13 +320,13 @@ $project_archive_id = ensure_demo_item(
 $request_secondary_id = ensure_demo_item(
     23,
     184,
-    'Подключить шаблон служебной записки для кафедр',
+    'Подключить шаблон служебной записки для отделений',
     [
         'date_added' => demo_timestamp('2026-03-24'),
         'date_updated' => time(),
         'field_182' => 389,
         'field_183' => 383,
-        'field_185' => '<p>Требуется подготовить шаблон служебной записки, дать доступ кафедрам и вывести документ в общий контур согласования.</p>',
+        'field_185' => '<p>Требуется подготовить шаблон служебной записки, дать доступ отделениям и вывести документ в общий контур согласования.</p>',
         'field_186' => 399,
         'field_235' => 406,
         'field_236' => '3',
@@ -340,7 +382,7 @@ $request_contract_id = ensure_demo_item(
         'field_237' => demo_timestamp('2026-03-30'),
         'field_238' => 410,
         'field_239' => '',
-        'field_241' => 'https://localhost:18443/docs',
+        'field_241' => $naudoc_public_url,
         'field_276' => 395,
         'field_277' => 'Карточка договора открыта, регистрация проходит через канцелярский контур.',
         'field_281' => 650,
@@ -357,7 +399,7 @@ $request_access_id = ensure_demo_item(
         'date_updated' => time(),
         'field_182' => '4',
         'field_183' => 383,
-        'field_185' => '<p>Заявка от преподавателя: требуется открыть доступ к шаблонам служебных записок и инструкциям по оформлению документов.</p>',
+        'field_185' => '<p>Заявка от сотрудника подразделения: требуется открыть доступ к шаблонам служебных записок и инструкциям по оформлению документов.</p>',
         'field_186' => 401,
         'field_235' => 407,
         'field_236' => '3',
@@ -366,7 +408,7 @@ $request_access_id = ensure_demo_item(
         'field_239' => (string) $project_secondary_id,
         'field_241' => '',
         'field_276' => 394,
-        'field_277' => 'Ожидается уточнение по кафедрам и перечню шаблонов.',
+        'field_277' => 'Ожидается уточнение по отделениям и перечню шаблонов.',
         'field_281' => 546,
     ]
 );
@@ -386,7 +428,7 @@ ensure_demo_item(
 ensure_demo_item(
     24,
     191,
-    'Замечания к регламенту согласования учебных документов',
+    'Замечания к регламенту согласования внутренних документов',
     [
         'created_by' => 2,
         'date_added' => demo_timestamp('2026-03-25'),
@@ -413,7 +455,7 @@ $doc_approval_id = ensure_demo_item(
     25,
     242,
     'Приказ о запуске пилотного контура',
-    [
+    array_merge([
         'created_by' => 2,
         'date_added' => demo_timestamp('2026-03-25'),
         'date_updated' => time(),
@@ -428,14 +470,14 @@ $doc_approval_id = ensure_demo_item(
         'field_251' => (string) $project_primary_id,
         'field_252' => '',
         'field_253' => '<p>Пример документа в статусе согласования. Используется для демонстрации маршрута согласования и отчета по документам, ожидающим решения.</p>',
-    ]
+    ], optional_field_payload($doc_route_field_id, $route_internal_order_id))
 );
 
 $doc_contract_id = ensure_demo_item(
     25,
     242,
     'Входящий договор на сопровождение платформы',
-    [
+    array_merge([
         'created_by' => 5,
         'date_added' => demo_timestamp('2026-03-25'),
         'date_updated' => time(),
@@ -446,11 +488,11 @@ $doc_contract_id = ensure_demo_item(
         'field_247' => '5',
         'field_248' => demo_timestamp('2027-03-25'),
         'field_249' => '1.0',
-        'field_250' => 'https://localhost:18443/docs',
+        'field_250' => $naudoc_public_url,
         'field_251' => '',
         'field_252' => (string) $request_contract_id,
         'field_253' => '<p>Пример зарегистрированного документа канцелярии. Нужен для показа регистрационного контура и работы со входящими договорами.</p>',
-    ]
+    ], optional_field_payload($doc_route_field_id, $route_contract_id))
 );
 
 db_perform('app_entity_23', ['field_240' => (string) $doc_contract_id], 'update', "id='" . db_input($request_contract_id) . "'");
@@ -494,7 +536,7 @@ ensure_demo_item(
 ensure_demo_item(
     22,
     168,
-    'Проверить регламент согласования учебных документов',
+    'Проверить регламент согласования внутренних документов',
     [
         'created_by' => 2,
         'date_added' => demo_timestamp('2026-03-25'),
@@ -533,7 +575,7 @@ ensure_demo_item(
         'field_176' => demo_timestamp('2026-03-29'),
         'field_232' => '5',
         'field_233' => (string) $doc_contract_id,
-        'field_234' => 'https://localhost:18443/docs',
+        'field_234' => $naudoc_public_url,
     ]
 );
 
@@ -556,7 +598,7 @@ ensure_demo_item(
         'field_176' => demo_timestamp('2026-03-24'),
         'field_232' => '1',
         'field_233' => (string) $doc_request_id,
-        'field_234' => 'https://localhost:18443/docs',
+        'field_234' => $naudoc_public_url,
     ]
 );
 
@@ -574,7 +616,7 @@ $mts_primary_id = ensure_demo_item(
         'field_270' => '5',
         'field_271' => demo_timestamp('2026-04-05'),
         'field_272' => (string) $project_primary_id,
-        'field_273' => 'https://localhost:18443/docs',
+        'field_273' => $naudoc_public_url,
         'field_274' => '<p>Демонстрационный кейс по обеспечению: заявка связана с проектом внедрения и показывает отдельный процесс МТЗ.</p>',
         'field_278' => 767,
     ]
@@ -595,7 +637,7 @@ $mts_scanner_id = ensure_demo_item(
         'field_270' => '5',
         'field_271' => demo_timestamp('2026-04-08'),
         'field_272' => (string) $project_secondary_id,
-        'field_273' => 'https://localhost:18443/docs',
+        'field_273' => $naudoc_public_url,
         'field_274' => '<p>Пример заказа оборудования: позиция согласована и уже заказана, чтобы показывать разные статусы обеспечения.</p>',
         'field_278' => '5',
     ]
@@ -616,7 +658,7 @@ $mts_license_id = ensure_demo_item(
         'field_270' => '2',
         'field_271' => demo_timestamp('2026-04-12'),
         'field_272' => (string) $project_primary_id,
-        'field_273' => 'https://localhost:18443/docs',
+        'field_273' => $naudoc_public_url,
         'field_274' => '<p>Пример заявки на программное обеспечение. Используется для показа сценария закупки лицензий и связи с проектом цифровизации.</p>',
         'field_278' => '2',
     ]
@@ -625,7 +667,7 @@ $mts_license_id = ensure_demo_item(
 $doc_base_template_id = ensure_demo_item(
     26,
     255,
-    'Шаблон служебной записки для кафедр',
+    'Шаблон служебной записки для отделений',
     [
         'created_by' => 5,
         'date_added' => demo_timestamp('2026-03-24'),
@@ -635,9 +677,9 @@ $doc_base_template_id = ensure_demo_item(
         'field_258' => '2.0',
         'field_259' => '5',
         'field_260' => demo_timestamp('2026-10-01'),
-        'field_261' => 'https://localhost:18443/docs',
-        'field_262' => 'шаблон,кафедра,служебная записка',
-        'field_263' => '<p>Готовый шаблон, который преподаватели и сотрудники используют для подготовки служебных записок внутри платформы.</p>',
+        'field_261' => $naudoc_public_url,
+        'field_262' => 'шаблон,отделение,служебная записка',
+        'field_263' => '<p>Готовый шаблон, который врачи и сотрудники используют для подготовки служебных записок внутри платформы.</p>',
     ]
 );
 
@@ -654,7 +696,7 @@ $doc_base_manager_guide_id = ensure_demo_item(
         'field_258' => '1.3',
         'field_259' => '2',
         'field_260' => demo_timestamp('2026-11-15'),
-        'field_261' => 'https://localhost:18443/docs',
+        'field_261' => $naudoc_public_url,
         'field_262' => 'руководитель,согласование,инструкция',
         'field_263' => '<p>Краткая инструкция для руководителей: как открыть документ, согласовать версию, оставить замечания и контролировать публикацию.</p>',
     ]
@@ -673,7 +715,7 @@ $doc_base_matrix_id = ensure_demo_item(
         'field_258' => '0.8',
         'field_259' => '1',
         'field_260' => demo_timestamp('2026-08-15'),
-        'field_261' => 'https://localhost:18443/docs',
+        'field_261' => $naudoc_public_url,
         'field_262' => 'роли,маршруты,документооборот',
         'field_263' => '<p>Рабочий методический материал с ролями, маршрутами согласования и зонами ответственности по документам.</p>',
     ]
@@ -691,7 +733,7 @@ $doc_base_regulation_id = ensure_demo_item(
         'field_258' => '1.1',
         'field_259' => '5',
         'field_260' => demo_timestamp('2026-09-01'),
-        'field_261' => 'https://localhost:18443/docs',
+        'field_261' => $naudoc_public_url,
         'field_262' => '',
         'field_263' => '<p>Нормативный материал для пользователей платформы: сценарий подготовки документа, согласование, публикация и архив.</p>',
     ],

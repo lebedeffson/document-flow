@@ -4,7 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-RUKOVODITEL_URL="https://localhost:18443/index.php?module=dashboard/"
+# shellcheck source=lib/runtime_env.sh
+source "${ROOT_DIR}/ops/lib/runtime_env.sh"
+docflow_load_env "${ROOT_DIR}"
+docflow_export_runtime
+
+RUKOVODITEL_URL="${DOCFLOW_PUBLIC_BASE}/index.php?module=dashboard/"
 
 echo "[smoke] stack health"
 bash ops/check_stack.sh >/tmp/dms_check_stack.log
@@ -13,6 +18,7 @@ tail -n +1 /tmp/dms_check_stack.log
 echo
 echo "[smoke] rukovoditel login via gateway"
 python3 - <<'PY'
+import os
 import re
 import ssl
 import sys
@@ -27,7 +33,8 @@ opener = urllib.request.build_opener(
     urllib.request.HTTPCookieProcessor(cj),
 )
 
-html = opener.open("https://localhost:18443/index.php?module=dashboard/").read().decode("utf-8", "ignore")
+base = os.environ["DOCFLOW_PUBLIC_BASE"]
+html = opener.open(f"{base}/index.php?module=dashboard/").read().decode("utf-8", "ignore")
 match = re.search(r'name="form_session_token" id="form_session_token" value="([^"]+)"', html)
 if not match:
     print("Rukovoditel login token not found", file=sys.stderr)
@@ -40,7 +47,7 @@ payload = urllib.parse.urlencode(
         "password": "admin123",
     }
 ).encode()
-resp = opener.open("https://localhost:18443/index.php?module=users/login&action=login", data=payload)
+resp = opener.open(f"{base}/index.php?module=users/login&action=login", data=payload)
 body = resp.read().decode("utf-8", "ignore")
 
 required = [
@@ -58,8 +65,8 @@ PY
 
 echo
 echo "[smoke] onlyoffice through gateway"
-curl -k -sf https://localhost:18443/office/healthcheck >/dev/null
-curl -k -sf https://localhost:18443/office/web-apps/apps/api/documents/api.js >/tmp/dms_onlyoffice_api.js
+curl -k -sf "${DOCFLOW_OFFICE_PUBLIC_BASE}/healthcheck" >/dev/null
+curl -k -sf "${DOCFLOW_OFFICE_PUBLIC_BASE}/web-apps/apps/api/documents/api.js" >/tmp/dms_onlyoffice_api.js
 if ! rg -q 'DocsAPI|DocEditor' /tmp/dms_onlyoffice_api.js; then
   echo "ONLYOFFICE api.js does not look correct" >&2
   exit 1
@@ -70,17 +77,17 @@ echo
 echo "[smoke] naudoc through gateway"
 NAUDOC_INDEX="$(mktemp)"
 NAUDOC_HOME="$(mktemp)"
-curl -k -s -u admin:admin https://localhost:18443/docs/ >"$NAUDOC_INDEX"
-curl -k -s -u admin:admin https://localhost:18443/docs/home >"$NAUDOC_HOME"
-curl -k -sf -u admin:admin 'https://localhost:18443/docs/inFrame?link=member_tasks' >/dev/null
-curl -k -sf -u admin:admin 'https://localhost:18443/docs/storage/view' >/dev/null
+curl -k -s -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/" >"$NAUDOC_INDEX"
+curl -k -s -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/home" >"$NAUDOC_HOME"
+curl -k -sf -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/inFrame?link=member_tasks" >/dev/null
+curl -k -sf -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/storage/view" >/dev/null
 
-if rg -q 'host\.docker\.internal|http://localhost:18443/docs' "$NAUDOC_INDEX" "$NAUDOC_HOME"; then
+if rg -q 'host\.docker\.internal' "$NAUDOC_INDEX" "$NAUDOC_HOME" || rg -Fq "http://${DOCFLOW_DOCS_BASE#https://}" "$NAUDOC_INDEX" "$NAUDOC_HOME"; then
   echo "NauDoc still exposes internal or insecure public URLs" >&2
   exit 1
 fi
 
-if ! rg -q 'https://localhost:18443/docs' "$NAUDOC_INDEX" "$NAUDOC_HOME"; then
+if ! rg -Fq "${DOCFLOW_DOCS_BASE}" "$NAUDOC_INDEX" "$NAUDOC_HOME"; then
   echo "NauDoc gateway pages do not contain the expected public https docs URL" >&2
   exit 1
 fi
@@ -100,12 +107,15 @@ echo
 echo "[smoke] bridge links"
 python3 - <<'PY'
 import json
+import os
 import ssl
 import sys
 import urllib.request
 
 ctx = ssl._create_unverified_context()
-resp = urllib.request.urlopen("https://localhost:18443/bridge/links", context=ctx)
+docs_base = os.environ["DOCFLOW_DOCS_BASE"]
+bridge_base = os.environ["DOCFLOW_BRIDGE_PUBLIC_BASE"]
+resp = urllib.request.urlopen(f"{bridge_base}/links", context=ctx)
 links = json.loads(resp.read().decode("utf-8"))
 print("links_total:", len(links))
 if len(links) < 4:
@@ -115,7 +125,7 @@ if len(links) < 4:
 bad = []
 for link in links:
     url = link.get("naudoc_url", "")
-    if url and not url.startswith("https://localhost:18443/docs"):
+    if url and not url.startswith(docs_base):
         bad.append((link.get("id"), url))
 
 print("non_public_naudoc_urls:", bad)
@@ -125,13 +135,13 @@ PY
 
 echo
 echo "[smoke] rukovoditel data consistency"
-docker exec rukovoditel_db_test mariadb -N -urukovoditel -prukovoditel rukovoditel <<'SQL'
+docker exec "${RUKOVODITEL_DB_CONTAINER}" mariadb -N -u"${RUKOVODITEL_DB_USER}" -p"${RUKOVODITEL_DB_PASSWORD}" "${RUKOVODITEL_DB_NAME}" <<SQL
 SELECT 'requests', COUNT(*) FROM app_entity_23;
 SELECT 'projects', COUNT(*) FROM app_entity_21;
 SELECT 'doc_cards', COUNT(*) FROM app_entity_25;
-SELECT 'request_urls_not_public', COUNT(*) FROM app_entity_23 WHERE length(field_241) > 0 AND field_241 NOT LIKE 'https://localhost:18443/docs%';
-SELECT 'project_urls_not_public', COUNT(*) FROM app_entity_21 WHERE length(field_230) > 0 AND field_230 NOT LIKE 'https://localhost:18443/docs%';
-SELECT 'doc_urls_not_public', COUNT(*) FROM app_entity_25 WHERE length(field_250) > 0 AND field_250 NOT LIKE 'https://localhost:18443/docs%';
+SELECT 'request_urls_not_public', COUNT(*) FROM app_entity_23 WHERE length(field_241) > 0 AND field_241 NOT LIKE '${DOCFLOW_DOCS_BASE}%';
+SELECT 'project_urls_not_public', COUNT(*) FROM app_entity_21 WHERE length(field_230) > 0 AND field_230 NOT LIKE '${DOCFLOW_DOCS_BASE}%';
+SELECT 'doc_urls_not_public', COUNT(*) FROM app_entity_25 WHERE length(field_250) > 0 AND field_250 NOT LIKE '${DOCFLOW_DOCS_BASE}%';
 SELECT 'onlyoffice_fields_doc_cards', COUNT(*) FROM app_fields WHERE entities_id=25 AND type='fieldtype_onlyoffice';
 SQL
 

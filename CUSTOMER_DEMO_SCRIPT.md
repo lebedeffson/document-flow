@@ -24,7 +24,7 @@
 1. `admin / admin123`
 2. `manager.test / rolepass123`
 3. `office.test / rolepass123`
-4. для `NauDoc`: `admin / admin`
+4. для `NauDoc`: логин `admin`, пароль брать из `NAUDOC_PASSWORD` в корневом `.env`
 
 Если нужно быстро привести стенд в порядок:
 
@@ -180,7 +180,8 @@ bash prepare_customer_demo.sh
 
 Если попросит логин:
 
-1. `admin / admin`
+1. логин `admin`
+2. пароль брать из `NAUDOC_PASSWORD` в корневом `.env`
 
 Показать:
 

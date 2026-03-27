@@ -3,21 +3,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: naudoc_gateway_test
+    env_file:
+      - ../.env
+    container_name: "${GATEWAY_CONTAINER_NAME:-naudoc_gateway_test}"
     environment:
-      SERVER_NAME: localhost
-      EXTERNAL_HTTPS_PORT: "18443"
-      TLS_CN: localhost
-      RUKOVODITEL_UPSTREAM: host.docker.internal:18081
-      BRIDGE_UPSTREAM: host.docker.internal:18082
-      NAUDOC_UPSTREAM: host.docker.internal:18080
-      NAUDOC_UPSTREAM_ESCAPED: host.docker.internal%3A18080
-      ONLYOFFICE_UPSTREAM: host.docker.internal:18083
+      SERVER_NAME: "${GATEWAY_SERVER_NAME:-localhost}"
+      EXTERNAL_HTTPS_PORT: "${GATEWAY_EXTERNAL_HTTPS_PORT:-18443}"
+      EXTERNAL_HTTP_SUFFIX: "${GATEWAY_EXTERNAL_HTTP_SUFFIX-:18090}"
+      EXTERNAL_HTTPS_SUFFIX: "${GATEWAY_EXTERNAL_HTTPS_SUFFIX-:18443}"
+      EXTERNAL_HTTPS_SUFFIX_ESCAPED: "${GATEWAY_EXTERNAL_HTTPS_SUFFIX_ESCAPED-%3A18443}"
+      TLS_CN: "${GATEWAY_TLS_CN:-localhost}"
+      RUKOVODITEL_UPSTREAM: "${GATEWAY_RUKOVODITEL_UPSTREAM:-host.docker.internal:18081}"
+      BRIDGE_UPSTREAM: "${GATEWAY_BRIDGE_UPSTREAM:-host.docker.internal:18082}"
+      NAUDOC_UPSTREAM: "${GATEWAY_NAUDOC_UPSTREAM:-host.docker.internal:18080}"
+      NAUDOC_UPSTREAM_ESCAPED: "${GATEWAY_NAUDOC_UPSTREAM_ESCAPED:-host.docker.internal%3A18080}"
+      ONLYOFFICE_UPSTREAM: "${GATEWAY_ONLYOFFICE_UPSTREAM:-host.docker.internal:18083}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "18090:80"
-      - "18443:443"
+      - "${GATEWAY_BIND_HTTP_PORT:-18090}:80"
+      - "${GATEWAY_BIND_HTTPS_PORT:-18443}:443"
     volumes:
       - gateway_certs:/etc/nginx/certs
     restart: unless-stopped

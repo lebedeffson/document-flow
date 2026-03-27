@@ -3,17 +3,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: naudoc_bridge_test
+    env_file:
+      - ../.env
+    container_name: "${BRIDGE_CONTAINER:-naudoc_bridge_test}"
     environment:
       TZ: Europe/Moscow
-      BRIDGE_DB_PATH: /data/bridge.db
-      NAUDOC_BASE_URL: http://host.docker.internal:18080/docs
-      NAUDOC_PUBLIC_URL: https://localhost:18443/docs
-      NAUDOC_USERNAME: admin
-      NAUDOC_PASSWORD: admin
-      RUKOVODITEL_BASE_URL: http://host.docker.internal:18081
-      RUKOVODITEL_PUBLIC_URL: https://localhost:18443
-      BRIDGE_REQUEST_TIMEOUT: "8"
+      BRIDGE_DB_PATH: "${BRIDGE_DB_PATH:-/data/bridge.db}"
+      NAUDOC_BASE_URL: "${NAUDOC_BASE_URL:-http://host.docker.internal:18080/docs}"
+      NAUDOC_PUBLIC_URL: "${NAUDOC_PUBLIC_URL:-https://localhost:18443/docs}"
+      NAUDOC_USERNAME: "${NAUDOC_USERNAME:-admin}"
+      NAUDOC_PASSWORD: "${NAUDOC_PASSWORD:-admin}"
+      RUKOVODITEL_BASE_URL: "${RUKOVODITEL_BASE_URL:-http://host.docker.internal:18081}"
+      RUKOVODITEL_PUBLIC_URL: "${RUKOVODITEL_PUBLIC_URL:-https://localhost:18443}"
+      SYNC_CONTROL_URL: "${SYNC_CONTROL_URL:-http://host.docker.internal:18081/run_sync_job.php}"
+      SYNC_CONTROL_TOKEN: "${BRIDGE_SYNC_CONTROL_TOKEN:-bridge_sync_control_dev}"
+      BRIDGE_REQUEST_TIMEOUT: "${BRIDGE_REQUEST_TIMEOUT:-8}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

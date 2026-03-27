@@ -59,92 +59,6 @@ if (!function_exists('platform_home_button'))
     }
 }
 
-if (!function_exists('platform_home_card'))
-{
-    function platform_home_card($title, $description, $buttons = [], $note = '')
-    {
-        $html = '<section class="platform-home-card">';
-        $html .= '<h3>' . $title . '</h3>';
-        $html .= '<p>' . $description . '</p>';
-
-        if (count($buttons))
-        {
-            $html .= '<div class="platform-home-card-actions">';
-
-            foreach ($buttons as $button)
-            {
-                $html .= platform_home_button(
-                    $button['label'],
-                    $button['url'],
-                    $button['type'] ?? 'primary',
-                    $button['external'] ?? false
-                );
-            }
-
-            $html .= '</div>';
-        }
-
-        if (strlen($note))
-        {
-            $html .= '<div class="platform-home-card-note">' . $note . '</div>';
-        }
-
-        $html .= '</section>';
-
-        return $html;
-    }
-}
-
-if (!function_exists('platform_home_contour_card'))
-{
-    function platform_home_contour_card($title, $description, $bullets = [], $buttons = [], $variant = 'blue', $note = '')
-    {
-        $html = '<section class="platform-home-contour-card platform-home-contour-card-' . $variant . '">';
-        $html .= '<div class="platform-home-contour-card-head">';
-        $html .= '<h3>' . $title . '</h3>';
-        $html .= '<p>' . $description . '</p>';
-        $html .= '</div>';
-
-        if (count($bullets))
-        {
-            $html .= '<ul class="platform-home-contour-points">';
-
-            foreach ($bullets as $bullet)
-            {
-                $html .= '<li>' . $bullet . '</li>';
-            }
-
-            $html .= '</ul>';
-        }
-
-        if (count($buttons))
-        {
-            $html .= '<div class="platform-home-card-actions">';
-
-            foreach ($buttons as $button)
-            {
-                $html .= platform_home_button(
-                    $button['label'],
-                    $button['url'],
-                    $button['type'] ?? 'primary',
-                    $button['external'] ?? false
-                );
-            }
-
-            $html .= '</div>';
-        }
-
-        if (strlen($note))
-        {
-            $html .= '<div class="platform-home-contour-note">' . $note . '</div>';
-        }
-
-        $html .= '</section>';
-
-        return $html;
-    }
-}
-
 if (!function_exists('platform_home_link_item'))
 {
     function platform_home_link_item($title, $description, $url, $external = false)
@@ -157,6 +71,26 @@ if (!function_exists('platform_home_link_item'))
                 <span class="platform-home-link-description">' . $description . '</span>
             </a>
         ';
+    }
+}
+
+if (!function_exists('platform_home_links_group'))
+{
+    function platform_home_links_group($items)
+    {
+        $html = '';
+
+        foreach ($items as $item)
+        {
+            $html .= platform_home_link_item(
+                $item['title'],
+                $item['description'],
+                $item['url'],
+                $item['external'] ?? false
+            );
+        }
+
+        return $html;
     }
 }
 
@@ -265,7 +199,6 @@ $linked_projects_url = ($is_admin || $is_manager)
 $doc_approval_url = ($is_admin || $is_manager)
     ? platform_home_named_report_url(25, 'Документы на согласовании', platform_home_entity_url(25))
     : platform_home_entity_url(25);
-$onlyoffice_demo_url = '';
 $onlyoffice_demo_item_url = platform_home_entity_url(25);
 $naudoc_profile = platform_home_current_naudoc_profile($username);
 
@@ -279,285 +212,75 @@ $requests_without_doc_count = (int) platform_home_scalar_query("select count(*) 
 $projects_without_doc_count = (int) platform_home_scalar_query("select count(*) from app_entity_21 where length(trim(coalesce(field_{$project_field_id}, '')))=0");
 $drafts_count = $onlyoffice_field_id > 0 ? (int) platform_home_scalar_query("select count(*) from app_entity_25 where length(trim(coalesce(field_{$onlyoffice_field_id}, '')))>0") : 0;
 
-if ($onlyoffice_demo['item_id'] > 0 && $onlyoffice_demo['field_id'] > 0 && $onlyoffice_demo['file_id'] > 0)
+if ($onlyoffice_demo['item_id'] > 0)
 {
     $onlyoffice_demo_item_url = url_for('items/info', 'path=25-' . $onlyoffice_demo['item_id']);
-    $onlyoffice_demo_url = url_for(
-        'items/onlyoffice_editor',
-        'path=25-' . $onlyoffice_demo['item_id'] . '&action=open&field=' . $onlyoffice_demo['field_id'] . '&file=' . $onlyoffice_demo['file_id']
-    );
 }
 
-$contour_cards = [];
-$contour_cards[] = platform_home_contour_card(
-    'Рабочий кабинет',
-    'Ежедневная работа сотрудников и руководителей: заявки, проекты, задачи и карточки документов.',
-    [
-        'Заявки, задачи и проекты',
-        'Карточки и база документов',
-    ],
-    [
-        ['label' => 'Заявки', 'url' => platform_home_entity_url(23), 'type' => 'primary'],
-        ['label' => 'Документы', 'url' => platform_home_entity_url(25), 'type' => 'secondary'],
-    ],
-    'blue',
-    'Основная навигация по разделам находится слева.'
-);
+$admin_work_links = [
+    ['title' => 'Заявки на обслуживание', 'description' => 'Рабочие обращения и сервисные запросы.', 'url' => platform_home_entity_url(23)],
+    ['title' => 'Проекты и инициативы', 'description' => 'Проекты, этапы и связанные документы.', 'url' => platform_home_entity_url(21)],
+    ['title' => 'Поручения и задачи', 'description' => 'Рабочие задачи через отчетный контур.', 'url' => $tasks_url],
+    ['title' => 'Рабочие обсуждения', 'description' => 'Обсуждения в контексте проектов.', 'url' => strlen($discussions_url) ? $discussions_url : platform_home_entity_url(21)],
+    ['title' => 'Карточки документов', 'description' => 'Основная точка работы с документом.', 'url' => platform_home_entity_url(25)],
+    ['title' => 'База документов', 'description' => 'Шаблоны, инструкции и материалы.', 'url' => platform_home_entity_url(26)],
+    ['title' => 'МТЗ', 'description' => 'Материально-техническое обеспечение.', 'url' => platform_home_entity_url(27)],
+];
 
-$contour_cards[] = platform_home_contour_card(
-    'NauDoc',
-    'Официальный контур для регистрации, маршрутов, версий и архива документов.',
-    [
-        'Регистрация и архив',
-        'Версии и маршруты',
-    ],
-    [
-        ['label' => 'Открыть NauDoc', 'url' => '/docs/', 'type' => 'primary', 'external' => true],
-    ],
-    'orange'
-);
+$admin_system_links = [
+    ['title' => 'Пользователи и роли', 'description' => 'Пользователи, группы и права.', 'url' => url_for('users_groups/users_groups')],
+    ['title' => 'Настройки приложения', 'description' => 'Общая конфигурация платформы.', 'url' => url_for('configuration/application')],
+    ['title' => 'Сущности приложения', 'description' => 'Структура модулей и форм.', 'url' => url_for('entities/entities')],
+    ['title' => 'Логи', 'description' => 'HTTP, PHP, MySQL и почта.', 'url' => url_for('logs/settings')],
+    ['title' => 'Резервные копии', 'description' => 'Ручные и автоматические бэкапы.', 'url' => url_for('tools/db_backup')],
+    ['title' => 'NauDoc', 'description' => 'Официальный документный контур.', 'url' => '/docs/', 'external' => true],
+    ['title' => 'Bridge', 'description' => 'Интеграционный слой и контроль связей.', 'url' => '/bridge/', 'external' => true],
+];
 
-$onlyoffice_card_buttons = [
-    ['label' => 'Открыть карточки документов', 'url' => platform_home_entity_url(25), 'type' => 'primary'],
+$user_work_links = [
+    ['title' => 'Заявки', 'description' => 'Создание и сопровождение обращений.', 'url' => platform_home_entity_url(23)],
+];
+
+if (!$is_office)
+{
+    $user_work_links[] = ['title' => 'Задачи', 'description' => 'Мои поручения и рабочие задачи.', 'url' => $tasks_url];
+}
+
+$user_work_links[] = ['title' => 'Проекты', 'description' => 'Проекты, этапы и связанный контур.', 'url' => platform_home_entity_url(21)];
+$user_work_links[] = ['title' => 'Карточки документов', 'description' => 'Работа с документом и переход в редактор.', 'url' => platform_home_entity_url(25)];
+$user_work_links[] = ['title' => 'База документов', 'description' => 'Шаблоны, инструкции и регламенты.', 'url' => platform_home_entity_url(26)];
+$user_work_links[] = ['title' => 'МТЗ', 'description' => 'Заявки на обеспечение и снабжение.', 'url' => platform_home_entity_url(27)];
+
+if ($is_manager)
+{
+    $user_work_links[] = ['title' => 'Контроль руководителя', 'description' => 'Ключевые отчеты по контролю и согласованию.', 'url' => platform_home_named_report_url(21, 'Проекты на контроле', platform_home_entity_url(21))];
+}
+
+$user_document_links = [
+    ['title' => 'NauDoc', 'description' => 'Регистрация, архив и официальный документ.', 'url' => '/docs/', 'external' => true],
+    ['title' => 'Карточки документов', 'description' => 'Рабочая карточка и запуск редактора.', 'url' => platform_home_entity_url(25)],
 ];
 
 if ($onlyoffice_demo['item_id'] > 0)
 {
-    $onlyoffice_card_buttons[] = ['label' => 'Открыть демо-документ', 'url' => $onlyoffice_demo_item_url, 'type' => 'secondary'];
-}
-
-$contour_cards[] = platform_home_contour_card(
-    'Редактор документов',
-    'ONLYOFFICE для совместной работы над черновиком документа в браузере.',
-    [
-        'Совместная работа в браузере',
-        'Запуск из карточки документа',
-    ],
-    $onlyoffice_card_buttons,
-    'dark',
-    'Откройте карточку документа и нажмите кнопку редактора.'
-);
-
-$primary_cards = [];
-$primary_cards[] = platform_home_card(
-    'Заявки на обслуживание',
-    'Оформление заявок, контроль исполнения и связь с карточкой документа.',
-    [
-        ['label' => 'Открыть заявки', 'url' => platform_home_entity_url(23), 'type' => 'primary'],
-    ]
-);
-
-if (!$is_office)
-{
-    $primary_cards[] = platform_home_card(
-        'Поручения и задачи',
-        'Мои рабочие поручения и контроль исполнения.',
-        [
-            ['label' => 'Открыть задачи', 'url' => $tasks_url, 'type' => 'primary'],
-        ]
-    );
-}
-
-$primary_cards[] = platform_home_card(
-    'Проекты',
-    'Проекты, связанные документы, контроль сроков и работа по этапам.',
-    [
-        ['label' => 'Открыть проекты', 'url' => platform_home_entity_url(21), 'type' => 'primary'],
-    ]
-);
-
-if (($is_admin || $is_manager || $is_employee) && strlen($discussions_url))
-{
-    $primary_cards[] = platform_home_card(
-        'Рабочие обсуждения',
-        'Внутренние обсуждения по рабочим вопросам внутри платформы.',
-        [
-            ['label' => 'Открыть обсуждения', 'url' => $discussions_url, 'type' => 'primary'],
-        ]
-    );
-}
-
-$primary_cards[] = platform_home_card(
-    'Карточки документов',
-    'Карточка документа с быстрым доступом к редактору, статусу и официальному контуру.',
-    [
-        ['label' => 'Открыть карточки', 'url' => platform_home_entity_url(25), 'type' => 'primary'],
-        ['label' => 'Открыть NauDoc', 'url' => '/docs/', 'type' => 'secondary', 'external' => true],
-    ],
-    $documents_note
-);
-
-$primary_cards[] = platform_home_card(
-    'База документов',
-    'Реестр готовых документов, шаблонов и материалов.',
-    [
-        ['label' => 'Открыть базу документов', 'url' => platform_home_entity_url(26), 'type' => 'primary'],
-    ]
-);
-
-$primary_cards[] = platform_home_card(
-    'Обеспечение',
-    'МТЗ и сопутствующие процессы обеспечения подразделений.',
-    [
-        ['label' => 'Открыть МТЗ', 'url' => platform_home_entity_url(27), 'type' => 'primary'],
-    ]
-);
-
-$integration_profile_html = '';
-if (count($naudoc_profile))
-{
-    $integration_profile_html = '
-        <section class="platform-home-profile-card">
-            <div class="platform-home-profile-heading">Связанный профиль</div>
-            <div class="platform-home-profile-name">' . htmlspecialchars($naudoc_profile['display_name']) . '</div>
-            <p>Текущий пользователь связан с официальным профилем в NauDoc. Можно быстро перейти в профиль и личную папку.</p>
-            <div class="platform-home-card-actions">
-                ' . platform_home_button('Профиль NauDoc', $naudoc_profile['profile_url'], 'primary', true) . '
-                ' . platform_home_button('Личная папка', $naudoc_profile['folder_url'], 'secondary', true) . '
-            </div>
-        </section>
-    ';
-}
-else
-{
-    $integration_profile_html = '
-        <section class="platform-home-profile-card platform-home-profile-card-muted">
-            <div class="platform-home-profile-heading">Связанный профиль</div>
-            <div class="platform-home-profile-name">Профиль NauDoc пока не найден</div>
-            <p>Рабочий кабинет открыт, но для этого пользователя еще не подтверждена связь с карточкой в NauDoc.</p>
-            <div class="platform-home-card-actions">
-                ' . platform_home_button('Открыть NauDoc', '/docs/', 'secondary', true) . '
-            </div>
-        </section>
-    ';
-}
-
-$admin_system_cards = [
-    platform_home_card(
-        'Пользователи и роли',
-        'Пользователи системы, группы доступа и роли.',
-        [
-            ['label' => 'Пользователи', 'url' => platform_home_entity_url(1), 'type' => 'primary'],
-            ['label' => 'Группы доступа', 'url' => url_for('users_groups/users_groups'), 'type' => 'secondary'],
-        ]
-    ),
-    platform_home_card(
-        'Настройки и структура',
-        'Настройки приложения, сущности, меню и конфигурация.',
-        [
-            ['label' => 'Настройки приложения', 'url' => url_for('configuration/application'), 'type' => 'primary'],
-            ['label' => 'Сущности приложения', 'url' => url_for('entities/entities'), 'type' => 'secondary'],
-        ]
-    ),
-    platform_home_card(
-        'Логи и резервные копии',
-        'Журналы, резервные копии и сопровождение платформы.',
-        [
-            ['label' => 'Логи', 'url' => url_for('logs/settings'), 'type' => 'primary'],
-            ['label' => 'Резервные копии', 'url' => url_for('tools/db_backup'), 'type' => 'secondary'],
-        ]
-    ),
-    platform_home_card(
-        'Интеграции',
-        'Рабочие внешние контуры и интеграционный слой.',
-        [
-            ['label' => 'NauDoc', 'url' => '/docs/', 'type' => 'primary', 'external' => true],
-            ['label' => 'Bridge', 'url' => '/bridge/', 'type' => 'secondary', 'external' => true],
-            ['label' => 'Карточки документов', 'url' => platform_home_entity_url(25), 'type' => 'secondary'],
-        ]
-    ),
-];
-
-$user_work_cards = [
-    platform_home_card(
-        'Заявки',
-        'Сервисные обращения и рабочие запросы.',
-        [
-            ['label' => 'Открыть заявки', 'url' => platform_home_entity_url(23), 'type' => 'primary'],
-        ]
-    ),
-    platform_home_card(
-        'Проекты',
-        'Проекты, инициативы и связанные документы.',
-        [
-            ['label' => 'Открыть проекты', 'url' => platform_home_entity_url(21), 'type' => 'primary'],
-        ]
-    ),
-    platform_home_card(
-        'Документы',
-        'Карточки документов, черновики и переход в официальный контур.',
-        [
-            ['label' => 'Карточки документов', 'url' => platform_home_entity_url(25), 'type' => 'primary'],
-            ['label' => 'NauDoc', 'url' => '/docs/', 'type' => 'secondary', 'external' => true],
-        ],
-        $documents_note
-    ),
-    platform_home_card(
-        'База документов',
-        'Шаблоны, инструкции и готовые материалы.',
-        [
-            ['label' => 'Открыть базу', 'url' => platform_home_entity_url(26), 'type' => 'primary'],
-        ]
-    ),
-    platform_home_card(
-        'МТЗ',
-        'Материально-техническое обеспечение и связанные заявки.',
-        [
-            ['label' => 'Открыть МТЗ', 'url' => platform_home_entity_url(27), 'type' => 'primary'],
-        ]
-    ),
-];
-
-if (!$is_office)
-{
-    array_splice($user_work_cards, 1, 0, [
-        platform_home_card(
-            'Задачи',
-            'Мои поручения и задачи без лишних разделов.',
-            [
-                ['label' => 'Открыть задачи', 'url' => $tasks_url, 'type' => 'primary'],
-            ]
-        ),
-    ]);
-}
-
-if ($is_manager)
-{
-    $user_work_cards[] = platform_home_card(
-        'Контроль руководителя',
-        'Быстрые отчеты по проектам, согласованию и рискам по документам.',
-        [
-            ['label' => 'Проекты на контроле', 'url' => platform_home_named_report_url(21, 'Проекты на контроле', platform_home_entity_url(21)), 'type' => 'primary'],
-            ['label' => 'Документы на согласовании', 'url' => $doc_approval_url, 'type' => 'secondary'],
-        ]
-    );
+    $user_document_links[] = ['title' => 'ONLYOFFICE', 'description' => 'Открыть демонстрационный документ через карточку.', 'url' => $onlyoffice_demo_item_url];
 }
 
 if ($is_admin)
 {
     echo '
     <div class="platform-home platform-home-admin-mode">
-        <section class="platform-home-hero">
+        <section class="platform-home-hero platform-home-hero-compact">
             <div class="platform-home-hero-main">
                 <span class="platform-home-eyebrow">Административный контур</span>
                 <h1>Центр управления платформой</h1>
                 <p>
-                    Полный режим сопровождения платформы: рабочие разделы, настройки, логи, резервные копии и интеграции.
+                    Полный режим сопровождения: рабочие модули, документы, пользователи, настройки и контроль интеграций.
                 </p>
                 <div class="platform-home-hero-actions">
                     ' . platform_home_button('Рабочие документы', platform_home_entity_url(25), 'primary') . '
                     ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
                     ' . platform_home_button('Bridge', '/bridge/', 'secondary', true) . '
-                </div>
-            </div>
-            <div class="platform-home-hero-side">
-                <div class="platform-home-callout">
-                    <div class="platform-home-callout-title">Что есть в админском режиме</div>
-                    <ul>
-                        <li>Настройки, пользователи, роли и сущности.</li>
-                        <li>Логи, резервные копии и интеграционный контроль.</li>
-                        <li>Полный доступ к рабочим модулям и отчетам.</li>
-                    </ul>
                 </div>
             </div>
         </section>
@@ -575,46 +298,47 @@ if ($is_admin)
             </div>
         </section>
 
-        <section class="platform-home-section">
-            <div class="platform-home-section-header">
-                <h2>Системные разделы</h2>
-                <p>Инструменты сопровождения и управления.</p>
+        <section class="platform-home-section platform-home-section-split">
+            <div class="platform-home-panel">
+                <div class="platform-home-section-header">
+                    <h2>Рабочие разделы</h2>
+                    <p>Основные модули платформы для ежедневной работы и контроля.</p>
+                </div>
+                <div class="platform-home-links">
+                    ' . platform_home_links_group($admin_work_links) . '
+                </div>
             </div>
-            <div class="platform-home-grid">
-                ' . implode('', $admin_system_cards) . '
+            <div class="platform-home-panel">
+                <div class="platform-home-section-header">
+                    <h2>Сопровождение и интеграции</h2>
+                    <p>Системные инструменты, администрирование и внешние контуры.</p>
+                </div>
+                <div class="platform-home-links">
+                    ' . platform_home_links_group($admin_system_links) . '
+                </div>
             </div>
-        </section>
-
-        <section class="platform-home-section">
-            <div class="platform-home-section-header">
-                <h2>Рабочий контур</h2>
-                <p>Основные рабочие модули доступны и в админском режиме.</p>
-            </div>
-            <div class="platform-home-grid">
-                ' . implode('', $primary_cards) . '
-            </div>
-        </section>
-
-        <section class="platform-home-section">
-            <div class="platform-home-section-header">
-                <h2>Связанный профиль</h2>
-                <p>Связка текущего администратора с NauDoc.</p>
-            </div>
-            ' . $integration_profile_html . '
         </section>
     </div>
     ';
 }
 else
 {
+    $document_panel_note = $documents_note;
+
+    if (count($naudoc_profile))
+    {
+        $user_document_links[] = ['title' => 'Профиль в NauDoc', 'description' => 'Связанный официальный профиль пользователя.', 'url' => $naudoc_profile['profile_url'], 'external' => true];
+        $document_panel_note = 'Связанный профиль: ' . htmlspecialchars($naudoc_profile['display_name']) . '. ' . $documents_note;
+    }
+
     echo '
     <div class="platform-home platform-home-user-mode">
-        <section class="platform-home-hero">
+        <section class="platform-home-hero platform-home-hero-compact">
             <div class="platform-home-hero-main">
                 <span class="platform-home-eyebrow">Пользовательский режим</span>
                 <h1>Рабочий кабинет</h1>
                 <p>
-                    Упрощенный режим для ' . $role_label . ': только рабочие разделы, документы и нужные переходы без административного шума.
+                    Упрощенный режим для ' . $role_label . ': основные разделы слева, документы через карточку, официальный контур через NauDoc.
                 </p>
                 <div class="platform-home-hero-actions">
                     ' . platform_home_button('Заявки', platform_home_entity_url(23), 'primary') . '
@@ -622,44 +346,28 @@ else
                     ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
                 </div>
             </div>
-            <div class="platform-home-hero-side">
-                <div class="platform-home-callout">
-                    <div class="platform-home-callout-title">Как работать</div>
-                    <ul>
-                        <li>Основные разделы находятся слева.</li>
-                        <li>Официальный документ и архив открываются через NauDoc.</li>
-                        <li>Редактирование документа запускается из карточки.</li>
-                    </ul>
+        </section>
+
+        <section class="platform-home-section platform-home-section-split">
+            <div class="platform-home-panel">
+                <div class="platform-home-section-header">
+                    <h2>Рабочие разделы</h2>
+                    <p>Короткие переходы в основные модули без лишних экранов.</p>
+                </div>
+                <div class="platform-home-links">
+                    ' . platform_home_links_group($user_work_links) . '
                 </div>
             </div>
-        </section>
-
-        <section class="platform-home-section">
-            <div class="platform-home-section-header">
-                <h2>Рабочие разделы</h2>
-                <p>Основные модули для ежедневной работы.</p>
+            <div class="platform-home-panel">
+                <div class="platform-home-section-header">
+                    <h2>Документы и согласование</h2>
+                    <p>Рабочая карточка, редактор и официальный контур документа.</p>
+                </div>
+                <div class="platform-home-links">
+                    ' . platform_home_links_group($user_document_links) . '
+                </div>
+                <div class="platform-home-inline-note">' . $document_panel_note . '</div>
             </div>
-            <div class="platform-home-grid">
-                ' . implode('', $user_work_cards) . '
-            </div>
-        </section>
-
-        <section class="platform-home-section">
-            <div class="platform-home-section-header">
-                <h2>Основные контуры</h2>
-                <p>Рабочий кабинет, официальный контур и редактор.</p>
-            </div>
-            <div class="platform-home-grid platform-home-grid-contours">
-                ' . implode('', $contour_cards) . '
-            </div>
-        </section>
-
-        <section class="platform-home-section">
-            <div class="platform-home-section-header">
-                <h2>Связанный профиль</h2>
-                <p>Связка текущего пользователя с NauDoc.</p>
-            </div>
-            ' . $integration_profile_html . '
         </section>
     </div>
     ';

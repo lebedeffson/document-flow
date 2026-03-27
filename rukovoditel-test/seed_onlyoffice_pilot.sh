@@ -2,11 +2,16 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DB_CONTAINER="rukovoditel_db_test"
-APP_CONTAINER="rukovoditel_test"
-DB_NAME="rukovoditel"
-DB_USER="rukovoditel"
-DB_PASS="rukovoditel"
+# shellcheck source=../ops/lib/runtime_env.sh
+source "${ROOT_DIR}/../ops/lib/runtime_env.sh"
+docflow_load_env "${ROOT_DIR}/.."
+docflow_export_runtime
+
+DB_CONTAINER="${RUKOVODITEL_DB_CONTAINER}"
+APP_CONTAINER="${RUKOVODITEL_CONTAINER_NAME}"
+DB_NAME="${RUKOVODITEL_DB_NAME}"
+DB_USER="${RUKOVODITEL_DB_USER}"
+DB_PASS="${RUKOVODITEL_DB_PASSWORD}"
 ENTITY_ID="25"
 ITEM_ID="1"
 FILE_NAME="pilot-onlyoffice.docx"
@@ -15,7 +20,7 @@ sql_value() {
   docker exec "$DB_CONTAINER" mariadb -N -s -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "$1" | tr -d '\r'
 }
 
-FIELD_ID="$(sql_value "select id from app_fields where entities_id=${ENTITY_ID} and type='fieldtype_onlyoffice' order by id limit 1;")"
+FIELD_ID="$(sql_value "select id from app_fields where entities_id=${ENTITY_ID} and type='fieldtype_onlyoffice' order by case when name='Совместное редактирование' then 0 when name='Рабочий черновик' then 1 else 2 end, id limit 1;")"
 if [[ -z "$FIELD_ID" ]]; then
   echo "ONLYOFFICE field not found for entity ${ENTITY_ID}" >&2
   exit 1
@@ -74,7 +79,7 @@ docker cp "$TMPFILE" "$APP_CONTAINER:/var/www/html/uploads/onlyoffice/${FOLDER}/
 docker exec -u 0 "$APP_CONTAINER" sh -lc "chown -R www-data:www-data /var/www/html/uploads/onlyoffice/${ENTITY_ID} && chmod 755 /var/www/html/uploads/onlyoffice/${ENTITY_ID} /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y) /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y)/$(date +%m) /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y)/$(date +%m)/$(date +%d) /var/www/html/uploads/onlyoffice/${FOLDER} && chmod 644 /var/www/html/uploads/onlyoffice/${FOLDER}/${FILE_NAME}"
 rm -f "$TMPFILE"
 
-FILEKEY="localhost-${FILE_ID}-$(date +%s)"
+FILEKEY="${DOCFLOW_PUBLIC_HOST}-${FILE_ID}-$(date +%s)"
 docker exec "$DB_CONTAINER" mariadb -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "update app_onlyoffice_files set folder='${FOLDER}', filekey='${FILEKEY}', filename='${FILE_NAME}' where id=${FILE_ID}; update app_entity_${ENTITY_ID} set field_${FIELD_ID}='${FILE_ID}' where id=${ITEM_ID};"
 
 echo "field_id=${FIELD_ID}"

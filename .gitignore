@@ -1,7 +1,20 @@
 .tmp_e2e/
+ops/node_modules/
+.env
+.env.local
+.env.*.local
+.env.generated
+.env.generated.*
+.env.hospital
+.env.hospital.*
+.env.production
 
 __pycache__/
 *.py[cod]
 
+backups/
+naudoc_project/var/Data.fs.before-restore.*
+
 rukovoditel-test/dist/cache/
 rukovoditel-test/dist/log/*.log
+rukovoditel-test/dist/uploads/onlyoffice/*/*/*/*/*/

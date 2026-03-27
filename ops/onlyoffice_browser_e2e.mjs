@@ -1,16 +1,22 @@
-import playwright from '/home/lebedeffson/Code/Документооборот/.tmp_e2e/node_modules/playwright/index.js';
-const browserName = process.env.PLAYWRIGHT_BROWSER || 'chromium';
-const browserType = playwright[browserName];
+import { mkdirSync } from 'node:fs';
+import { resolveBrowserRuntime, buildLaunchOptions } from './playwright_runtime.mjs';
+import { publicBase } from './runtime_config.mjs';
 
-if (!browserType) {
-  throw new Error(`Unsupported PLAYWRIGHT_BROWSER: ${browserName}`);
+const runtime = resolveBrowserRuntime(process.env.PLAYWRIGHT_BROWSER || 'firefox');
+const { browserName, browserType, executablePath, available } = runtime;
+
+if (!available) {
+  console.log(JSON.stringify({
+    status: 'skipped',
+    browser: browserName,
+    reason: `Browser executable for ${browserName} not found`,
+  }, null, 2));
+  process.exit(0);
 }
 
-const base = 'https://localhost:18443';
-const browser = await browserType.launch({
-  headless: true,
-  args: ['--ignore-certificate-errors'],
-});
+const base = publicBase;
+mkdirSync('/home/lebedeffson/Code/Документооборот/.tmp_e2e', { recursive: true });
+const browser = await browserType.launch(buildLaunchOptions(browserName, executablePath));
 const context = await browser.newContext({ ignoreHTTPSErrors: true });
 const page = await context.newPage();
 const errors = [];

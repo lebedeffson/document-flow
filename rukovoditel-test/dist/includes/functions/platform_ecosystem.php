@@ -4,14 +4,13 @@ if(!function_exists('platform_public_base_url'))
 {
     function platform_public_base_url()
     {
-        $base = trim((string) getenv('PLATFORM_PUBLIC_BASE_URL'));
-
-        if(!strlen($base))
+        if(function_exists('platform_sync_public_base_url'))
         {
-            $base = 'https://localhost:18443';
+            return rtrim(platform_sync_public_base_url(), '/') . '/';
         }
 
-        return rtrim($base, '/') . '/';
+        $base = trim((string) getenv('PLATFORM_PUBLIC_BASE_URL'));
+        return rtrim($base ?: 'https://localhost:18443', '/') . '/';
     }
 }
 
@@ -19,13 +18,9 @@ if(!function_exists('platform_field_id_by_type'))
 {
     function platform_field_id_by_type($entity_id, $field_type)
     {
-        $field_query = db_query(
-            "select id from app_fields where entities_id='" . db_input($entity_id) . "' and type='" . db_input($field_type) . "' order by id limit 1"
-        );
-
-        if($field = db_fetch_array($field_query))
+        if(function_exists('platform_sync_field_id_by_type'))
         {
-            return (int) $field['id'];
+            return platform_sync_field_id_by_type($entity_id, $field_type);
         }
 
         return 0;
@@ -36,19 +31,9 @@ if(!function_exists('platform_field_id_by_name'))
 {
     function platform_field_id_by_name($entity_id, $field_name, $field_type = '')
     {
-        $sql = "select id from app_fields where entities_id='" . db_input($entity_id) . "' and name='" . db_input($field_name) . "'";
-
-        if(strlen($field_type))
+        if(function_exists('platform_sync_field_id_by_name'))
         {
-            $sql .= " and type='" . db_input($field_type) . "'";
-        }
-
-        $sql .= " order by id limit 1";
-        $field_query = db_query($sql);
-
-        if($field = db_fetch_array($field_query))
-        {
-            return (int) $field['id'];
+            return platform_sync_field_id_by_name($entity_id, $field_name, $field_type);
         }
 
         return 0;
@@ -57,9 +42,29 @@ if(!function_exists('platform_field_id_by_name'))
 
 if(!function_exists('platform_first_onlyoffice_demo'))
 {
+    function platform_onlyoffice_field_id($entity_id)
+    {
+        $preferred_names = ['Совместное редактирование', 'Рабочий черновик'];
+
+        foreach($preferred_names as $field_name)
+        {
+            $field_id = platform_field_id_by_name($entity_id, $field_name, 'fieldtype_onlyoffice');
+
+            if($field_id > 0)
+            {
+                return $field_id;
+            }
+        }
+
+        return platform_field_id_by_type($entity_id, 'fieldtype_onlyoffice');
+    }
+}
+
+if(!function_exists('platform_first_onlyoffice_demo'))
+{
     function platform_first_onlyoffice_demo($entity_id = 25)
     {
-        $field_id = platform_field_id_by_type($entity_id, 'fieldtype_onlyoffice');
+        $field_id = platform_onlyoffice_field_id($entity_id);
 
         if($field_id <= 0)
         {

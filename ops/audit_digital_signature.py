@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 import base64
+import os
+import re
 import ssl
 import urllib.error
 import urllib.parse
 import urllib.request
 
+from runtime_config import NAUDOC_BASE, NAUDOC_USERNAME, NAUDOC_PASSWORD
 
-GATEWAY_BASE = "https://localhost:18443"
-NAUDOC_BASE = f"{GATEWAY_BASE}/docs"
+
 SSL_CONTEXT = ssl._create_unverified_context()
 AUTH_HEADER = {
-    "Authorization": "Basic " + base64.b64encode(b"admin:admin").decode(),
+    "Authorization": "Basic " + base64.b64encode(f"{NAUDOC_USERNAME}:{NAUDOC_PASSWORD}".encode()).decode(),
 }
 SMOKE_DOC_ID = "digital-signature-smoke"
 SMOKE_DOC_TITLE = "Digital Signature Smoke"
+REQUIRE_DIGITAL_SIGNATURE = os.environ.get("DOCFLOW_REQUIRE_DIGITAL_SIGNATURE", "").lower() in {"1", "true", "yes"}
 
 
 def http_open(url, data=None, headers=None):
@@ -70,8 +73,21 @@ def main():
     errors = []
 
     code, addons_html = fetch_text(f"{NAUDOC_BASE}/manage_addons_form")
-    if code == 200 and 'value="DigitalSignature"' in addons_html and "Активен" in addons_html:
+    addon_marker = 'value="DigitalSignature"'
+    addon_index = addons_html.find(addon_marker)
+    addon_window = ""
+    if addon_index != -1:
+        addon_window = addons_html[max(0, addon_index - 80): addon_index + 300]
+
+    if code == 200 and addon_index != -1 and "Активен" in addon_window:
         checks.append("DigitalSignature add-on active")
+    elif code == 200 and addon_index != -1 and "Отключен" in addon_window:
+        message = "DigitalSignature add-on is installed but disabled"
+        if REQUIRE_DIGITAL_SIGNATURE:
+            errors.append(message)
+        else:
+            print(f"[ds-audit] skipped: {message}")
+            return
     else:
         errors.append("DigitalSignature add-on is not active in manage_addons_form")
 

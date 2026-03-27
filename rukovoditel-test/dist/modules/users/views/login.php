@@ -12,12 +12,6 @@
  */
 ?>
 
-<h3 class="form-title"><?php echo ((!is_null(CFG_LOGIN_PAGE_HEADING) and strlen(CFG_LOGIN_PAGE_HEADING)) > 0 ? CFG_LOGIN_PAGE_HEADING : TEXT_HEADING_LOGIN) ?></h3>
-
-<?php echo ((!is_null(CFG_LOGIN_PAGE_CONTENT) and strlen(CFG_LOGIN_PAGE_CONTENT)) > 0 ? '<p>' . CFG_LOGIN_PAGE_CONTENT . '</p>' : '') ?>
-
-<?php echo maintenance_mode::login_message() ?>
-
 <?php
 $login_modes = array(
     array(
@@ -37,25 +31,42 @@ $login_modes = array(
 );
 ?>
 
-<div class="login-modes">
-    <?php foreach ($login_modes as $mode): ?>
-        <div class="login-mode-card">
-            <div class="login-mode-eyebrow"><?php echo $mode['eyebrow'] ?></div>
-            <h4><?php echo $mode['title'] ?></h4>
-            <p><?php echo $mode['description'] ?></p>
-            <div class="login-mode-credentials">
-                <span><?php echo $mode['username'] ?></span>
-                <span><?php echo $mode['password'] ?></span>
-            </div>
-            <button
-                type="button"
-                class="btn btn-default btn-sm login-mode-fill"
-                data-username="<?php echo $mode['username'] ?>"
-                data-password="<?php echo $mode['password'] ?>"
-            >Заполнить вход</button>
+<div class="platform-login">
+    <section class="platform-login-intro">
+        <div class="platform-login-badge">Единая платформа документооборота</div>
+        <h3 class="form-title"><?php echo ((!is_null(CFG_LOGIN_PAGE_HEADING) and strlen(CFG_LOGIN_PAGE_HEADING)) > 0 ? CFG_LOGIN_PAGE_HEADING : TEXT_HEADING_LOGIN) ?></h3>
+
+        <?php echo ((!is_null(CFG_LOGIN_PAGE_CONTENT) and strlen(CFG_LOGIN_PAGE_CONTENT)) > 0 ? '<p class="platform-login-lead">' . CFG_LOGIN_PAGE_CONTENT . '</p>' : '<p class="platform-login-lead">Один вход в рабочий кабинет сотрудников, руководителей и канцелярии. Отсюда начинаются заявки, проекты, документы и официальный контур NauDoc.</p>') ?>
+
+        <div class="login-modes">
+            <?php foreach ($login_modes as $mode): ?>
+                <div class="login-mode-card">
+                    <div class="login-mode-eyebrow"><?php echo $mode['eyebrow'] ?></div>
+                    <h4><?php echo $mode['title'] ?></h4>
+                    <p><?php echo $mode['description'] ?></p>
+                    <div class="login-mode-credentials">
+                        <span><?php echo $mode['username'] ?></span>
+                        <span><?php echo $mode['password'] ?></span>
+                    </div>
+                    <button
+                        type="button"
+                        class="btn btn-default btn-sm login-mode-fill"
+                        data-username="<?php echo $mode['username'] ?>"
+                        data-password="<?php echo $mode['password'] ?>"
+                    >Заполнить вход</button>
+                </div>
+            <?php endforeach; ?>
         </div>
-    <?php endforeach; ?>
-</div>
+    </section>
+
+    <section class="platform-login-form-panel">
+        <div class="platform-login-form-head">
+            <div class="platform-login-form-kicker">Вход в систему</div>
+            <h4>Начать работу</h4>
+            <p>Введите свой логин или выберите один из двух подготовленных режимов.</p>
+        </div>
+
+        <?php echo maintenance_mode::login_message() ?>
 
 <?php
 //check if default login is enabled
@@ -87,18 +98,22 @@ if(CFG_ENABLE_SOCIAL_LOGIN != 2)
         <?php endif ?>
 
     <div class="form-actions">
-        <?php if(CFG_LOGIN_PAGE_HIDE_REMEMBER_ME != 1): ?>
-            <label class="checkbox"> <?php echo input_checkbox_tag('remember_me', 1, array('checked' => (isset($_COOKIE['app_remember_me']) ? true : false))) . ' ' . TEXT_REMEMBER_ME ?></label>
-        <?php endif; ?>
+        <div class="platform-login-actions">
+            <button type="submit" class="btn btn-info platform-login-submit"><?php echo TEXT_BUTTON_LOGIN ?></button>
 
-        <button type="submit" class="btn btn-info pull-right"><?php echo TEXT_BUTTON_LOGIN ?></button>
+            <?php if(CFG_LOGIN_PAGE_HIDE_REMEMBER_ME != 1): ?>
+                <label class="platform-login-remember"><?php echo input_checkbox_tag('remember_me', 1, array('checked' => (isset($_COOKIE['app_remember_me']) ? true : false))) ?><span><?php echo TEXT_REMEMBER_ME ?></span></label>
+            <?php endif; ?>
+        </div>
     </div>
 
     </form>
 
-    <div class="forget-password">	
-        <?php if(CFG_USE_PUBLIC_REGISTRATION == 1) echo '<a style="float: right" class="btn btn-info btn-registration" href="' . url_for('users/registration') . '">' . (strlen(CFG_REGISTRATION_BUTTON_TITLE) ? CFG_REGISTRATION_BUTTON_TITLE : TEXT_BUTTON_REGISTRATCION) . '</a>' ?>
-        <p><a href="<?php echo url_for('users/restore_password') ?>"><?php echo TEXT_PASSWORD_FORGOTTEN ?></a></p>
+    <div class="forget-password platform-login-secondary-actions">
+        <div class="platform-login-links">
+            <a href="<?php echo url_for('users/restore_password') ?>"><?php echo TEXT_PASSWORD_FORGOTTEN ?></a>
+            <?php if(CFG_USE_PUBLIC_REGISTRATION == 1) echo '<a class="platform-login-register" href="' . url_for('users/registration') . '">' . (strlen(CFG_REGISTRATION_BUTTON_TITLE) ? CFG_REGISTRATION_BUTTON_TITLE : TEXT_BUTTON_REGISTRATCION) . '</a>' ?>
+        </div>
     </div>
 
 <?php
@@ -107,20 +122,20 @@ if(CFG_ENABLE_SOCIAL_LOGIN != 2)
 
 
 <?php if(CFG_2STEP_VERIFICATION_ENABLED == 1 and CFG_LOGIN_BY_PHONE_NUMBER == 1 and CFG_2STEP_VERIFICATION_TYPE == 'sms'): ?>
-    <div class="create-account">
+    <div class="create-account platform-login-secondary-actions">
         <p><a href="<?php echo url_for('users/login_by_phone') ?>"><?php echo TEXT_LOGIN_BY_PHONE_NUMBER ?></a></p>
     </div>
 <?php endif ?>
 
 <?php if(strlen(CFG_LOGIN_DIGITAL_SIGNATURE_MODULE??'')): ?>
-    <div class="create-account">
+    <div class="create-account platform-login-secondary-actions">
         <p><a href="<?php echo url_for('users/signature_login') ?>"><?php echo TEXT_DIGITAL_SIGNATURE_LOGIN ?></a></p>
     </div>
 <?php endif ?>
 
 
 <?php if(CFG_LDAP_USE == 1): ?>
-    <div class="create-account">
+    <div class="create-account platform-login-secondary-actions">
         <p><a href="<?php echo url_for('users/ldap_login') ?>"><?php echo TEXT_MENU_LDAP_LOGIN ?></a></p>
     </div>
 <?php endif ?>
@@ -138,6 +153,8 @@ if(CFG_ENABLE_SOCIAL_LOGIN != 0)
     include(component_path('users/social_login'));
 }
 ?>
+    </section>
+</div>
 
 
 

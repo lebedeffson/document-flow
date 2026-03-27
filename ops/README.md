@@ -2,6 +2,21 @@
 
 Минимальный набор эксплуатационных скриптов для production-lite контура.
 
+Опорный документ по доведению платформы до больничного production:
+
+- [HOSPITAL_PRODUCTION_ROADMAP.md](/home/lebedeffson/Code/Документооборот/HOSPITAL_PRODUCTION_ROADMAP.md)
+
+Важно для standalone-сборки подпроектов:
+
+1. корневой `.env` должен существовать
+2. при ручном `docker compose up` для отдельных каталогов лучше явно передавать:
+
+```bash
+docker compose --env-file /home/lebedeffson/Code/Документооборот/.env -f middleware/docker-compose.yml up -d --build
+```
+
+Иначе легко поднять сервис с fallback-значениями вместо актуальных production-like секретов.
+
 ## Backup
 
 ```bash
@@ -21,11 +36,88 @@ cd /home/lebedeffson/Code/Документооборот/ops
 2. `bridge.db`
 3. `NauDoc Data.fs`
 
+## Backup Timer
+
+Для production-сервера можно поставить systemd-таймер:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+sudo ops/install_backup_timer.sh
+sudo systemctl daemon-reload
+sudo systemctl enable --now docflow-backup.timer
+```
+
+Шаблоны:
+
+1. [docflow-backup.service](/home/lebedeffson/Code/Документооборот/ops/systemd/docflow-backup.service)
+2. [docflow-backup.timer](/home/lebedeffson/Code/Документооборот/ops/systemd/docflow-backup.timer)
+
+## Generate Production Env
+
+Для hospital production можно сгенерировать candidate `.env` с безопасными секретами:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/generate_prod_env.sh
+```
+
+По умолчанию будет создан файл:
+
+1. `/home/lebedeffson/Code/Документооборот/.env.generated.hospital`
+
+Важно:
+
+1. файл не коммитится
+2. перед переносом на сервер его нужно проверить и переименовать в `.env`
+3. по умолчанию используется домен `docflow.hospital.local`, при необходимости можно передать свой через `DOCFLOW_DOMAIN`
+
+## Rotate NauDoc Password
+
+Для production нельзя оставлять дефолтный пароль `NauDoc`. Теперь есть безопасный сценарий ротации:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/rotate_naudoc_password.sh
+```
+
+Что делает скрипт:
+
+1. проверяет текущие credentials `NauDoc`
+2. делает pre-rotation backup
+3. меняет пароль штатным `NauDoc`-механизмом
+4. обновляет `NAUDOC_PASSWORD` в `.env`
+5. пересоздает зависимые контейнеры
+6. валидирует новую авторизацию
+7. при ошибке пытается откатиться автоматически
+
+Важно:
+
+1. новый пароль не печатается в stdout
+2. актуальное значение остается только в `.env`
+3. для явного значения можно передать пароль первым аргументом:
+
+```bash
+bash ops/rotate_naudoc_password.sh 'your-strong-password'
+```
+
 ## Restore
 
 ```bash
 cd /home/lebedeffson/Code/Документооборот/ops
 ./restore_all.sh /home/lebedeffson/Code/Документооборот/backups/20260324-120000
+```
+
+Проверить backup без изменения данных:
+
+```bash
+./restore_all.sh /home/lebedeffson/Code/Документооборот/backups/20260324-120000 --verify-only
+```
+
+Полный restore drill:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/restore_drill.sh
 ```
 
 ## Health checks
@@ -49,6 +141,47 @@ cd /home/lebedeffson/Code/Документооборот/ops
 3. публикацию `NauDoc` через `HTTPS`
 4. sync-сценарии `request/project -> doc card -> bridge -> pull`
 5. согласованность публичных `NauDoc`-ссылок
+
+## Full Verification
+
+```bash
+cd /home/lebedeffson/Code/Документооборот/ops
+./run_full_verification.sh
+```
+
+Скрипт выполняет полный production-lite прогон:
+
+1. `check_stack`
+2. `smoke_test_stack`
+3. синхронизацию профилей `NauDoc -> Rukovoditel`
+4. `full_contour_audit`
+5. аудит интеграции и `ONLYOFFICE`
+6. browser e2e в `Firefox` и `Chromium`
+7. глубокий browser-аудит модулей
+8. сбор runtime-логов в `.tmp_e2e/logs`
+
+## Production Readiness Audit
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+python3 ops/prod_readiness_audit.py
+```
+
+Проверить candidate env без подмены текущего `.env`:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+DOCFLOW_ENV_FILE=/home/lebedeffson/Code/Документооборот/.env.generated.hospital python3 ops/prod_readiness_audit.py
+```
+
+Скрипт проверяет базовые production-риски:
+
+1. не остались ли `localhost` и demo-public URLs
+2. не используются ли дефолтные пароли и dev-secrets
+3. существует ли `.env`
+4. на месте ли базовые ops-скрипты
+
+Это не заменяет полный приемочный запуск, но дает честный быстрый стоп-лист перед переносом на сервер больницы.
 
 ## Full Contour Audit
 
@@ -79,6 +212,130 @@ cd /home/lebedeffson/Code/Документооборот/ops
 3. что у пользователя доступен выбор сертификата в `personalize_form`
 4. что у `HTMLDocument` есть вкладка `Подписи`
 5. что форма `document_signatures_form` отдается корректно
+
+## Журнал Sync-Ошибок
+
+В `Bridge` теперь есть рабочий журнал sync-ошибок:
+
+1. страница: `https://localhost:18443/bridge/`
+2. раздел: `Журнал ошибок синхронизации`
+3. кнопка `Повторить` запускает реальный внутренний sync-job
+4. кнопка `Закрыть` переводит запись в `resolved` после ручной проверки
+
+Источник повторного запуска защищен и не публикуется наружу через gateway:
+
+1. публичный `https://localhost:18443/run_sync_job.php` возвращает `404`
+2. внутренний endpoint используется только `Bridge`
+
+## LDAP-first groundwork
+
+В `Bridge` теперь есть два новых GUI-слоя под единый каталог пользователей:
+
+1. `Источники идентификации`
+2. `Hospital-роли`
+
+Что это дает уже сейчас:
+
+1. админ видит, какие каталоги участвуют в платформе:
+   - локальный `Rukovoditel`
+   - `NauDoc`
+   - будущий `LDAP/AD`
+2. админ может через GUI настраивать:
+   - provider type
+   - sync mode
+   - host / port / DN
+   - атрибуты `login / email / department / role`
+   - bind DN и имя env-ключа для секрета
+3. hospital-роли отделены от технических ролей источников:
+   - `ИТ-администратор`
+   - `Заведующий отделением`
+   - `Врач`
+   - `Регистратура`
+   - `Канцелярия`
+
+Важно:
+
+1. пароль LDAP не хранится в `Bridge`
+2. секреты остаются в корневом `.env`
+3. это groundwork для `LDAP/SSO`, а не уже готовый SSO
+
+## GUI-Маппинг Статусов
+
+В `Bridge` теперь есть GUI-настройка маппинга статусов:
+
+1. страница: `https://localhost:18443/bridge/`
+2. раздел: `Маппинг статусов`
+3. администратор может:
+   - добавлять правило
+   - менять тип совпадения `contains / exact / prefix`
+   - задавать статус заявки
+   - задавать статус документа
+   - задавать статус интеграции
+   - включать и выключать правило
+   - менять порядок применения
+
+Эти правила используются в `pull_bridge_updates.php`, то есть влияют на реальную обратную синхронизацию статусов в `Rukovoditel`.
+
+## GUI-Маппинг Полей
+
+В `Bridge` теперь есть GUI-настройка маппинга полей:
+
+1. страница: `https://localhost:18443/bridge/`
+2. раздел: `Маппинг полей`
+3. администратор может:
+   - добавлять правило
+   - менять источник и назначение
+   - задавать направление `push / pull / bidirectional`
+   - отмечать обязательные поля
+   - включать и выключать правило
+
+Сейчас эти правила уже используются:
+
+1. при записи metadata из `Rukovoditel` в `Bridge`
+2. при формировании честной проекции полей для `NauDoc` внутри `Bridge`
+
+Важно:
+
+1. на текущем этапе это уже реальная GUI-настройка полей
+2. но это еще не прямой write-back в `NauDoc`
+3. `Bridge` хранит и показывает, какие значения должны попасть в документный контур
+
+## Ручная Перевязка Связей
+
+В `Bridge` теперь есть рабочая `manual relink`-механика:
+
+1. страница: `https://localhost:18443/bridge/`
+2. раздел: `Текущие связи`
+3. действие: `Ручная перевязка`
+
+Администратор может вручную поменять:
+
+1. внешнюю сущность
+2. внешний ID
+3. название записи
+4. комментарий
+5. metadata JSON
+
+При перевязке обновляется не только сама связь, но и привязанные записи `sync_failures`.
+
+## Каталог Пользователей
+
+В `Bridge` теперь есть groundwork для единого каталога пользователей:
+
+1. страница: `https://localhost:18443/bridge/`
+2. раздел: `Каталог пользователей`
+3. источник данных:
+   - `sync_naudoc_profiles.sh`
+4. уже доступны:
+   - matched/unmatched профили
+   - `needs_review` профили
+   - ссылка на профиль в `NauDoc`
+   - роль и email связанного профиля
+   - подсказка по вероятному сопоставлению
+   - кнопка `Принять подсказку`
+   - ручное сопоставление профиля в GUI
+
+Это еще не `SSO`, но уже рабочая база для дальнейшего перехода к единому каталогу пользователей.
 
 ## ONLYOFFICE Audit
 
@@ -111,3 +368,5 @@ cd /home/lebedeffson/Code/Документооборот/ops
 1. `restore_all.sh` меняет рабочие данные
 2. перед восстановлением лучше сделать свежий backup
 3. для локального стенда gateway работает с self-signed сертификатом
+4. для production переменные и секреты нужно брать из `.env`, шаблон лежит в [`.env.example`](/home/lebedeffson/Code/Документооборот/.env.example)
+5. первый успешный локальный restore drill зафиксирован в [RESTORE_DRILL_REPORT.md](/home/lebedeffson/Code/Документооборот/docs/reference/RESTORE_DRILL_REPORT.md)

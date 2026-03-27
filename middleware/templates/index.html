@@ -132,7 +132,7 @@
       color: var(--ink);
     }
 
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       margin-top: 6px;
       border: 1px solid var(--line);
@@ -141,6 +141,13 @@
       background: #fffdf9;
       font: inherit;
       color: var(--ink);
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0 8px 0 0;
+      padding: 0;
+      vertical-align: middle;
     }
 
     textarea {
@@ -195,9 +202,40 @@
       color: #9a5a0f;
     }
 
+    .status.review {
+      background: rgba(33,79,139,0.12);
+      color: var(--brand);
+    }
+
     .status.empty {
       background: rgba(91,107,121,0.12);
       color: #5b6b79;
+    }
+
+    .profile-meta {
+      display: grid;
+      gap: 4px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .profile-meta small {
+      display: block;
+    }
+
+    .suggestion-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px dashed #8fb0d8;
+      border-radius: 12px;
+      background: rgba(220,235,255,0.45);
+    }
+
+    .suggestion-box strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--brand);
     }
 
     .empty {
@@ -218,7 +256,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 14px;
       margin-top: 22px;
     }
@@ -259,6 +297,43 @@
       background: linear-gradient(180deg, rgba(255,236,207,0.9), rgba(255,250,244,0.92));
     }
 
+    .danger-card {
+      background: linear-gradient(180deg, rgba(255,228,228,0.92), rgba(255,250,244,0.92));
+    }
+
+    .status.error {
+      background: rgba(180, 52, 52, 0.14);
+      color: #9a1f1f;
+    }
+
+    .status.inactive {
+      background: rgba(91,107,121,0.12);
+      color: #5b6b79;
+    }
+
+    .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .inline-actions button,
+    .inline-actions a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .secondary-button {
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
     details {
       margin-top: 10px;
     }
@@ -290,8 +365,22 @@
       font-size: 13px;
     }
 
+    .mapping-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .mapping-cell small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+    }
+
     @media (max-width: 980px) {
       .grid,
+      .mapping-grid,
       .systems,
       .stats {
         grid-template-columns: 1fr;
@@ -318,7 +407,7 @@
         <ul>
           <li>Хранение связей</li>
           <li>Healthcheck двух систем</li>
-          <li>Подготовка к синхронизации статусов</li>
+          <li>GUI-маппинг статусов и полей</li>
         </ul>
       </section>
       <section class="system-box orange">
@@ -354,6 +443,34 @@
       <section class="stat">
         <strong>{{ summary_counts.signed_count }}</strong>
         <span>Подписаны</span>
+      </section>
+      <section class="stat">
+        <strong>{{ failure_summary.open_count + failure_summary.retry_failed_count }}</strong>
+        <span>Ошибки синхронизации</span>
+      </section>
+      <section class="stat">
+        <strong>{{ user_profile_summary.matched_count }}</strong>
+        <span>Профили пользователей связаны</span>
+      </section>
+      <section class="stat">
+        <strong>{{ user_profile_summary.manual_match_count }}</strong>
+        <span>Связаны вручную</span>
+      </section>
+      <section class="stat">
+        <strong>{{ user_profile_summary.needs_review_count }}</strong>
+        <span>Нужна проверка</span>
+      </section>
+      <section class="stat">
+        <strong>{{ user_profile_summary.unmatched_count }}</strong>
+        <span>Профили требуют сопоставления</span>
+      </section>
+      <section class="stat">
+        <strong>{{ identity_source_summary.active_count }}</strong>
+        <span>Активные источники идентификации</span>
+      </section>
+      <section class="stat">
+        <strong>{{ hospital_role_summary.hospital_role_count }}</strong>
+        <span>Hospital-ролей в маппинге</span>
       </section>
     </div>
 
@@ -469,6 +586,958 @@
       {% endif %}
     </section>
 
+    <section class="card danger-card" style="margin-top: 22px;">
+      <h2>Журнал ошибок синхронизации</h2>
+      <p>Здесь фиксируются реальные сбои sync-процессов. Из этого раздела администратор может повторить обработку или закрыть запись после ручной проверки.</p>
+      {% if sync_failures %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Процесс</th>
+            <th>Ошибка</th>
+            <th>Статус</th>
+            <th>Повторы</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for failure in sync_failures %}
+          <tr>
+            <td>#{{ failure.id }}</td>
+            <td>
+              <strong>{{ failure.job_name }}</strong><br>
+              <span>{{ failure.external_entity or 'system' }}{% if failure.external_item_id %} / {{ failure.external_item_id }}{% endif %}</span>
+            </td>
+            <td>
+              {{ failure.message }}
+              {% if failure.context %}
+              <details>
+                <summary>Контекст</summary>
+                <pre style="white-space: pre-wrap; margin: 8px 0 0;">{{ failure.context|tojson(indent=2) }}</pre>
+              </details>
+              {% endif %}
+            </td>
+            <td><span class="status error">{{ failure.status }}</span></td>
+            <td>{{ failure.retry_count }}</td>
+            <td>
+              <div class="inline-actions">
+                {% if sync_control_enabled %}
+                <form action="{{ url_for('retry_sync_failure_route', failure_id=failure.id) }}" method="post">
+                  <button type="submit">Повторить</button>
+                </form>
+                {% endif %}
+                <form action="{{ url_for('resolve_sync_failure_route', failure_id=failure.id) }}" method="post">
+                  <button type="submit" class="secondary-button">Закрыть</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Открытых ошибок синхронизации сейчас нет.</div>
+      {% endif %}
+    </section>
+
+    <section class="card" style="margin-top: 22px;">
+      <h2>Каталог пользователей</h2>
+      <p>Это groundwork для единого каталога пользователей. Сейчас сюда собираются профили из `NauDoc` и их соответствие пользователям `Rukovoditel`. Администратор уже может вручную зафиксировать соответствие и статус сопоставления.</p>
+      {% if user_profiles %}
+      <table>
+        <thead>
+          <tr>
+            <th>Источник</th>
+            <th>Связанный профиль</th>
+            <th>Статус</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for profile in user_profiles %}
+          <tr>
+            <td>
+              <strong>{{ profile.source_system }} / {{ profile.source_username }}</strong><br>
+              <span>{{ profile.source_display_name or 'Без отображаемого имени' }}</span>
+              {% if profile.source_email or profile.source_role_label or profile.source_department %}
+              <div class="profile-meta">
+                {% if profile.source_email %}<small>Email: {{ profile.source_email }}</small>{% endif %}
+                {% if profile.source_role_label %}<small>Роль: {{ profile.source_role_label }}</small>{% endif %}
+                {% if profile.source_department %}<small>Подразделение: {{ profile.source_department }}</small>{% endif %}
+              </div>
+              {% endif %}
+              {% if profile.source_profile_url %}
+              <div style="margin-top: 6px;">
+                <a href="{{ profile.source_profile_url }}" target="_blank" rel="noreferrer">Профиль в источнике</a>
+              </div>
+              {% endif %}
+            </td>
+            <td>
+              {% if profile.linked_username or profile.linked_user_id %}
+              <strong>{{ profile.linked_username or ('ID ' ~ profile.linked_user_id) }}</strong><br>
+              <span>{{ profile.linked_display_name or 'Без отображаемого имени' }}</span>
+              {% if profile.linked_email or profile.linked_role_label or profile.linked_department %}
+              <div class="profile-meta">
+                {% if profile.linked_email %}<small>Email: {{ profile.linked_email }}</small>{% endif %}
+                {% if profile.linked_role_label %}<small>Роль: {{ profile.linked_role_label }}</small>{% endif %}
+                {% if profile.linked_department %}<small>Подразделение: {{ profile.linked_department }}</small>{% endif %}
+              </div>
+              {% endif %}
+              {% else %}
+              <span style="color: var(--muted);">Пока не сопоставлен</span>
+              {% endif %}
+              {% if profile.metadata.suggested_username and profile.sync_status != 'matched' %}
+              <div class="suggestion-box">
+                <strong>Подсказка Bridge</strong>
+                <div>{{ profile.metadata.suggested_username }}{% if profile.metadata.suggested_display_name %} — {{ profile.metadata.suggested_display_name }}{% endif %}</div>
+                {% if profile.metadata.suggested_role_label %}
+                <div style="margin-top: 4px; color: var(--muted);">Роль: {{ profile.metadata.suggested_role_label }}</div>
+                {% endif %}
+                <form action="{{ url_for('accept_user_profile_suggestion_route', profile_id=profile.id) }}" method="post" style="margin-top: 8px;">
+                  <button type="submit">Принять подсказку</button>
+                </form>
+              </div>
+              {% endif %}
+              {% if profile.notes %}
+              <div style="margin-top: 6px; color: var(--muted);">{{ profile.notes }}</div>
+              {% endif %}
+              {% if profile.source_hospital_role or profile.linked_hospital_role %}
+              <div class="suggestion-box" style="margin-top: 10px;">
+                <strong>Hospital-роль</strong>
+                {% if profile.source_hospital_role %}
+                <div>Источник: {{ profile.source_hospital_role.hospital_role_label }}</div>
+                {% endif %}
+                {% if profile.linked_hospital_role %}
+                <div>Платформа: {{ profile.linked_hospital_role.hospital_role_label }}</div>
+                <div style="margin-top: 4px; color: var(--muted);">Scope: {{ profile.linked_hospital_role.access_scope }}</div>
+                {% endif %}
+              </div>
+              {% endif %}
+            </td>
+            <td>
+              <span class="status {% if profile.sync_status == 'needs_review' %}review{% elif profile.sync_status != 'matched' and profile.sync_status != 'manual_match' %}pending{% endif %}">
+                {{ profile.sync_status }}
+              </span>
+            </td>
+            <td>
+              <details>
+                <summary>Обновить сопоставление</summary>
+                <form class="inline-form" action="{{ url_for('update_user_profile_route', profile_id=profile.id) }}" method="post">
+                  <label>
+                    Связанная система
+                    <select name="linked_system">
+                      <option value="" {% if not profile.linked_system %}selected{% endif %}>не задано</option>
+                      <option value="rukovoditel" {% if profile.linked_system == 'rukovoditel' %}selected{% endif %}>rukovoditel</option>
+                      <option value="naudoc" {% if profile.linked_system == 'naudoc' %}selected{% endif %}>naudoc</option>
+                    </select>
+                  </label>
+                  <label>
+                    ID пользователя
+                    <input name="linked_user_id" value="{{ profile.linked_user_id }}">
+                  </label>
+                  <label>
+                    Логин пользователя
+                    <input name="linked_username" value="{{ profile.linked_username }}">
+                  </label>
+                  <label>
+                    Отображаемое имя
+                    <input name="linked_display_name" value="{{ profile.linked_display_name }}">
+                  </label>
+                  <label>
+                    Email
+                    <input name="linked_email" value="{{ profile.linked_email }}">
+                  </label>
+                  <label>
+                    Роль
+                    <input name="linked_role_label" value="{{ profile.linked_role_label }}">
+                  </label>
+                  <label>
+                    Подразделение
+                    <input name="linked_department" value="{{ profile.linked_department }}">
+                  </label>
+                  <label>
+                    Статус
+                    <select name="sync_status">
+                      <option value="matched" {% if profile.sync_status == 'matched' %}selected{% endif %}>matched</option>
+                      <option value="unmatched" {% if profile.sync_status == 'unmatched' %}selected{% endif %}>unmatched</option>
+                      <option value="manual_match" {% if profile.sync_status == 'manual_match' %}selected{% endif %}>manual_match</option>
+                      <option value="needs_review" {% if profile.sync_status == 'needs_review' %}selected{% endif %}>needs_review</option>
+                    </select>
+                  </label>
+                  <label>
+                    Комментарий
+                    <textarea name="notes">{{ profile.notes }}</textarea>
+                  </label>
+                  <div class="inline-actions">
+                    <button type="submit">Сохранить</button>
+                  </div>
+                </form>
+              </details>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Каталог пользователей пока пуст. После синхронизации профилей из `NauDoc` здесь появятся matched и unmatched профили.</div>
+      {% endif %}
+    </section>
+
+    <div class="mapping-grid">
+      <section class="card" style="margin-top: 22px;">
+        <h2>Источники идентификации</h2>
+        <p>Здесь администратор задает, из каких каталогов платформа берет пользователей. Это база для `LDAP-first`: сами секреты остаются в `.env`, а структура источников и атрибутов управляется через GUI.</p>
+        {% if identity_sources %}
+        <table>
+          <thead>
+            <tr>
+              <th>Источник</th>
+              <th>Подключение</th>
+              <th>Атрибуты</th>
+              <th>Состояние</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for source in identity_sources %}
+            <tr>
+              <td class="mapping-cell">
+                <strong>{{ source.source_label }}</strong>
+                <small><code>{{ source.source_key }}</code> / {{ source.source_system }}</small>
+                {% if source.notes %}
+                <small>{{ source.notes }}</small>
+                {% endif %}
+              </td>
+              <td class="mapping-cell">
+                <small>{{ source.provider_type }} / {{ source.sync_mode }}</small>
+                <small>{{ source.ssl_mode }}{% if source.host %} — {{ source.host }}{% endif %}{% if source.port %}:{{ source.port }}{% endif %}</small>
+                {% if source.bind_dn or source.bind_password_env_key %}
+                <small>Bind: {{ source.bind_dn or 'не задан' }}{% if source.bind_password_env_key %} / {{ source.bind_password_env_key }}{% endif %}</small>
+                {% endif %}
+              </td>
+              <td class="mapping-cell">
+                <small>login: {{ source.login_attribute }}</small>
+                <small>name: {{ source.display_name_attribute }}</small>
+                <small>email: {{ source.email_attribute }}</small>
+                <small>department: {{ source.department_attribute }}</small>
+                <small>role: {{ source.role_attribute }}</small>
+              </td>
+              <td>
+                <span class="status {% if not source.is_active %}inactive{% endif %}">
+                  {{ 'включено' if source.is_active else 'выключено' }}
+                </span>
+                {% if source.is_default %}
+                <small>по умолчанию</small>
+                {% endif %}
+              </td>
+              <td>
+                <details>
+                  <summary>Изменить</summary>
+                  <form class="inline-form" action="{{ url_for('update_identity_source_route', source_id=source.id) }}" method="post">
+                    <label>
+                      Ключ
+                      <input name="source_key" value="{{ source.source_key }}">
+                    </label>
+                    <label>
+                      Название
+                      <input name="source_label" value="{{ source.source_label }}">
+                    </label>
+                    <label>
+                      Provider
+                      <select name="provider_type">
+                        <option value="local" {% if source.provider_type == 'local' %}selected{% endif %}>local</option>
+                        <option value="external" {% if source.provider_type == 'external' %}selected{% endif %}>external</option>
+                        <option value="ldap" {% if source.provider_type == 'ldap' %}selected{% endif %}>ldap</option>
+                        <option value="sso" {% if source.provider_type == 'sso' %}selected{% endif %}>sso</option>
+                        <option value="manual" {% if source.provider_type == 'manual' %}selected{% endif %}>manual</option>
+                      </select>
+                    </label>
+                    <label>
+                      Source system
+                      <input name="source_system" value="{{ source.source_system }}">
+                    </label>
+                    <label>
+                      Sync mode
+                      <select name="sync_mode">
+                        <option value="manual" {% if source.sync_mode == 'manual' %}selected{% endif %}>manual</option>
+                        <option value="pull" {% if source.sync_mode == 'pull' %}selected{% endif %}>pull</option>
+                        <option value="push" {% if source.sync_mode == 'push' %}selected{% endif %}>push</option>
+                        <option value="sso" {% if source.sync_mode == 'sso' %}selected{% endif %}>sso</option>
+                      </select>
+                    </label>
+                    <label>
+                      Host
+                      <input name="host" value="{{ source.host }}">
+                    </label>
+                    <label>
+                      Port
+                      <input name="port" type="number" value="{{ source.port }}">
+                    </label>
+                    <label>
+                      SSL mode
+                      <select name="ssl_mode">
+                        <option value="none" {% if source.ssl_mode == 'none' %}selected{% endif %}>none</option>
+                        <option value="http" {% if source.ssl_mode == 'http' %}selected{% endif %}>http</option>
+                        <option value="https" {% if source.ssl_mode == 'https' %}selected{% endif %}>https</option>
+                        <option value="ldap" {% if source.ssl_mode == 'ldap' %}selected{% endif %}>ldap</option>
+                        <option value="starttls" {% if source.ssl_mode == 'starttls' %}selected{% endif %}>starttls</option>
+                        <option value="ldaps" {% if source.ssl_mode == 'ldaps' %}selected{% endif %}>ldaps</option>
+                      </select>
+                    </label>
+                    <label>
+                      Base DN
+                      <input name="base_dn" value="{{ source.base_dn }}">
+                    </label>
+                    <label>
+                      User Base DN
+                      <input name="user_base_dn" value="{{ source.user_base_dn }}">
+                    </label>
+                    <label>
+                      Group Base DN
+                      <input name="group_base_dn" value="{{ source.group_base_dn }}">
+                    </label>
+                    <label>
+                      Login attr
+                      <input name="login_attribute" value="{{ source.login_attribute }}">
+                    </label>
+                    <label>
+                      Name attr
+                      <input name="display_name_attribute" value="{{ source.display_name_attribute }}">
+                    </label>
+                    <label>
+                      Email attr
+                      <input name="email_attribute" value="{{ source.email_attribute }}">
+                    </label>
+                    <label>
+                      Department attr
+                      <input name="department_attribute" value="{{ source.department_attribute }}">
+                    </label>
+                    <label>
+                      Role attr
+                      <input name="role_attribute" value="{{ source.role_attribute }}">
+                    </label>
+                    <label>
+                      Bind DN
+                      <input name="bind_dn" value="{{ source.bind_dn }}">
+                    </label>
+                    <label>
+                      Env key for password
+                      <input name="bind_password_env_key" value="{{ source.bind_password_env_key }}">
+                    </label>
+                    <label>
+                      Комментарий
+                      <textarea name="notes">{{ source.notes }}</textarea>
+                    </label>
+                    <label>
+                      <input name="is_active" type="checkbox" value="1" {% if source.is_active %}checked{% endif %}>
+                      Активно
+                    </label>
+                    <label>
+                      <input name="is_default" type="checkbox" value="1" {% if source.is_default %}checked{% endif %}>
+                      По умолчанию
+                    </label>
+                    <div class="inline-actions">
+                      <button type="submit">Сохранить</button>
+                    </div>
+                  </form>
+                  <form class="inline-form" action="{{ url_for('delete_identity_source_route', source_id=source.id) }}" method="post">
+                    <button type="submit" class="secondary-button">Удалить</button>
+                  </form>
+                </details>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Источники идентификации пока не заведены.</div>
+        {% endif %}
+      </section>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Добавить источник</h2>
+        <p>Для LDAP/AD здесь задаются host, DN и атрибуты. Секреты и bind-password хранятся только в `.env`.</p>
+        <form action="{{ url_for('create_identity_source_route') }}" method="post">
+          <label>
+            Ключ
+            <input name="source_key" placeholder="hospital_ldap">
+          </label>
+          <label>
+            Название
+            <input name="source_label" placeholder="Корпоративный LDAP/AD">
+          </label>
+          <label>
+            Provider
+            <select name="provider_type">
+              <option value="ldap">ldap</option>
+              <option value="local">local</option>
+              <option value="external">external</option>
+              <option value="sso">sso</option>
+              <option value="manual">manual</option>
+            </select>
+          </label>
+          <label>
+            Source system
+            <input name="source_system" value="ldap">
+          </label>
+          <label>
+            Sync mode
+            <select name="sync_mode">
+              <option value="sso">sso</option>
+              <option value="pull">pull</option>
+              <option value="push">push</option>
+              <option value="manual">manual</option>
+            </select>
+          </label>
+          <label>
+            Host
+            <input name="host" placeholder="ldap.hospital.local">
+          </label>
+          <label>
+            Port
+            <input name="port" type="number" value="636">
+          </label>
+          <label>
+            SSL mode
+            <select name="ssl_mode">
+              <option value="ldaps">ldaps</option>
+              <option value="starttls">starttls</option>
+              <option value="ldap">ldap</option>
+              <option value="https">https</option>
+              <option value="http">http</option>
+              <option value="none">none</option>
+            </select>
+          </label>
+          <label>
+            Base DN
+            <input name="base_dn" placeholder="dc=hospital,dc=local">
+          </label>
+          <label>
+            User Base DN
+            <input name="user_base_dn" placeholder="ou=Users,dc=hospital,dc=local">
+          </label>
+          <label>
+            Group Base DN
+            <input name="group_base_dn" placeholder="ou=Groups,dc=hospital,dc=local">
+          </label>
+          <label>
+            Login attr
+            <input name="login_attribute" value="uid">
+          </label>
+          <label>
+            Name attr
+            <input name="display_name_attribute" value="cn">
+          </label>
+          <label>
+            Email attr
+            <input name="email_attribute" value="mail">
+          </label>
+          <label>
+            Department attr
+            <input name="department_attribute" value="department">
+          </label>
+          <label>
+            Role attr
+            <input name="role_attribute" value="title">
+          </label>
+          <label>
+            Bind DN
+            <input name="bind_dn" placeholder="cn=svc-docflow,...">
+          </label>
+          <label>
+            Env key for password
+            <input name="bind_password_env_key" value="LDAP_BIND_PASSWORD">
+          </label>
+          <label>
+            Комментарий
+            <textarea name="notes" placeholder="Когда и как источник используется"></textarea>
+          </label>
+          <label>
+            <input name="is_active" type="checkbox" value="1">
+            Активно
+          </label>
+          <label>
+            <input name="is_default" type="checkbox" value="1">
+            По умолчанию
+          </label>
+          <button type="submit">Добавить источник</button>
+        </form>
+      </section>
+    </div>
+
+    <div class="mapping-grid">
+      <section class="card" style="margin-top: 22px;">
+        <h2>Hospital-роли</h2>
+        <p>Этот слой отделяет технические роли источников от реальных ролей больницы. Так мы не смешиваем группы `Rukovoditel`, `NauDoc` и будущий LDAP в одну неуправляемую семантику.</p>
+        {% if hospital_role_mappings %}
+        <table>
+          <thead>
+            <tr>
+              <th>Источник</th>
+              <th>Hospital-роль</th>
+              <th>Порядок</th>
+              <th>Состояние</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mapping in hospital_role_mappings %}
+            <tr>
+              <td class="mapping-cell">
+                <strong>{{ mapping.source_system }}</strong>
+                <small>{{ mapping.source_role_key or '—' }}{% if mapping.source_role_label %} / {{ mapping.source_role_label }}{% endif %}</small>
+              </td>
+              <td class="mapping-cell">
+                <small>{{ mapping.hospital_role_key }}</small>
+                <small>{{ mapping.hospital_role_label }}</small>
+                <small>Scope: {{ mapping.access_scope }}</small>
+                {% if mapping.notes %}
+                <small>{{ mapping.notes }}</small>
+                {% endif %}
+              </td>
+              <td>{{ mapping.sort_order }}</td>
+              <td>
+                <span class="status {% if not mapping.is_active %}inactive{% endif %}">
+                  {{ 'включено' if mapping.is_active else 'выключено' }}
+                </span>
+              </td>
+              <td>
+                <details>
+                  <summary>Изменить</summary>
+                  <form class="inline-form" action="{{ url_for('update_hospital_role_mapping_route', mapping_id=mapping.id) }}" method="post">
+                    <label>
+                      Source system
+                      <input name="source_system" value="{{ mapping.source_system }}">
+                    </label>
+                    <label>
+                      Source role key
+                      <input name="source_role_key" value="{{ mapping.source_role_key }}">
+                    </label>
+                    <label>
+                      Source role label
+                      <input name="source_role_label" value="{{ mapping.source_role_label }}">
+                    </label>
+                    <label>
+                      Hospital role key
+                      <input name="hospital_role_key" value="{{ mapping.hospital_role_key }}">
+                    </label>
+                    <label>
+                      Hospital role label
+                      <input name="hospital_role_label" value="{{ mapping.hospital_role_label }}">
+                    </label>
+                    <label>
+                      Access scope
+                      <select name="access_scope">
+                        <option value="full" {% if mapping.access_scope == 'full' %}selected{% endif %}>full</option>
+                        <option value="department" {% if mapping.access_scope == 'department' %}selected{% endif %}>department</option>
+                        <option value="own" {% if mapping.access_scope == 'own' %}selected{% endif %}>own</option>
+                        <option value="registry" {% if mapping.access_scope == 'registry' %}selected{% endif %}>registry</option>
+                        <option value="office" {% if mapping.access_scope == 'office' %}selected{% endif %}>office</option>
+                        <option value="custom" {% if mapping.access_scope == 'custom' %}selected{% endif %}>custom</option>
+                      </select>
+                    </label>
+                    <label>
+                      Порядок
+                      <input name="sort_order" type="number" value="{{ mapping.sort_order }}">
+                    </label>
+                    <label>
+                      Комментарий
+                      <textarea name="notes">{{ mapping.notes }}</textarea>
+                    </label>
+                    <label>
+                      <input name="is_active" type="checkbox" value="1" {% if mapping.is_active %}checked{% endif %}>
+                      Активно
+                    </label>
+                    <div class="inline-actions">
+                      <button type="submit">Сохранить</button>
+                    </div>
+                  </form>
+                  <form class="inline-form" action="{{ url_for('delete_hospital_role_mapping_route', mapping_id=mapping.id) }}" method="post">
+                    <button type="submit" class="secondary-button">Удалить</button>
+                  </form>
+                </details>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Hospital-роли пока не настроены.</div>
+        {% endif %}
+      </section>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Добавить hospital-роль</h2>
+        <p>Это позволяет свести разные источники к одной понятной больничной модели доступа.</p>
+        <form action="{{ url_for('create_hospital_role_mapping_route') }}" method="post">
+          <label>
+            Source system
+            <input name="source_system" value="rukovoditel">
+          </label>
+          <label>
+            Source role key
+            <input name="source_role_key" placeholder="employee">
+          </label>
+          <label>
+            Source role label
+            <input name="source_role_label" placeholder="Врач / сотрудник подразделения">
+          </label>
+          <label>
+            Hospital role key
+            <input name="hospital_role_key" placeholder="clinician">
+          </label>
+          <label>
+            Hospital role label
+            <input name="hospital_role_label" placeholder="Врач / сотрудник подразделения">
+          </label>
+          <label>
+            Access scope
+            <select name="access_scope">
+              <option value="department">department</option>
+              <option value="own">own</option>
+              <option value="full">full</option>
+              <option value="registry">registry</option>
+              <option value="office">office</option>
+              <option value="custom">custom</option>
+            </select>
+          </label>
+          <label>
+            Порядок
+            <input name="sort_order" type="number" value="100">
+          </label>
+          <label>
+            Комментарий
+            <textarea name="notes" placeholder="Какой доступ и для какого подразделения дает эта роль"></textarea>
+          </label>
+          <label>
+            <input name="is_active" type="checkbox" value="1" checked>
+            Активно
+          </label>
+          <button type="submit">Добавить роль</button>
+        </form>
+      </section>
+    </div>
+
+    <div class="mapping-grid">
+      <section class="card" style="margin-top: 22px;">
+        <h2>Маппинг статусов</h2>
+        <p>Здесь администратор настраивает, как статусы из Bridge переводятся в статусы заявок, документов и интеграционного контура. Это уже рабочая GUI-настройка без правки PHP-кода.</p>
+        {% if status_mappings %}
+        <table>
+          <thead>
+            <tr>
+              <th>Правило</th>
+              <th>Результат</th>
+              <th>Порядок</th>
+              <th>Состояние</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mapping in status_mappings %}
+            <tr>
+              <td class="mapping-cell">
+                <strong>{{ mapping.match_type }}: {{ mapping.match_value }}</strong>
+                {% if mapping.notes %}
+                <small>{{ mapping.notes }}</small>
+                {% endif %}
+              </td>
+              <td class="mapping-cell">
+                <small>Заявка: {{ mapping.request_status_name or '—' }}</small>
+                <small>Документ: {{ mapping.doc_status_name or '—' }}</small>
+                <small>Интеграция: {{ mapping.integration_status_name or '—' }}</small>
+              </td>
+              <td>{{ mapping.sort_order }}</td>
+              <td>
+                <span class="status {% if not mapping.is_active %}inactive{% endif %}">
+                  {{ 'включено' if mapping.is_active else 'выключено' }}
+                </span>
+              </td>
+              <td>
+                <details>
+                  <summary>Изменить</summary>
+                  <form class="inline-form" action="{{ url_for('update_status_mapping_route', mapping_id=mapping.id) }}" method="post">
+                    <label>
+                      Тип совпадения
+                      <select name="match_type">
+                        <option value="contains" {% if mapping.match_type == 'contains' %}selected{% endif %}>contains</option>
+                        <option value="exact" {% if mapping.match_type == 'exact' %}selected{% endif %}>exact</option>
+                        <option value="prefix" {% if mapping.match_type == 'prefix' %}selected{% endif %}>prefix</option>
+                      </select>
+                    </label>
+                    <label>
+                      Значение
+                      <input name="match_value" value="{{ mapping.match_value }}">
+                    </label>
+                    <label>
+                      Статус заявки
+                      <input name="request_status_name" value="{{ mapping.request_status_name }}">
+                    </label>
+                    <label>
+                      Статус документа
+                      <input name="doc_status_name" value="{{ mapping.doc_status_name }}">
+                    </label>
+                    <label>
+                      Статус интеграции
+                      <input name="integration_status_name" value="{{ mapping.integration_status_name }}">
+                    </label>
+                    <label>
+                      Порядок
+                      <input name="sort_order" type="number" value="{{ mapping.sort_order }}">
+                    </label>
+                    <label>
+                      Комментарий
+                      <textarea name="notes">{{ mapping.notes }}</textarea>
+                    </label>
+                    <label>
+                      <input name="is_active" type="checkbox" value="1" {% if mapping.is_active %}checked{% endif %}>
+                      Активно
+                    </label>
+                    <div class="inline-actions">
+                      <button type="submit">Сохранить</button>
+                    </div>
+                  </form>
+                  <form class="inline-form" action="{{ url_for('delete_status_mapping_route', mapping_id=mapping.id) }}" method="post">
+                    <button type="submit" class="secondary-button">Удалить</button>
+                  </form>
+                </details>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Правила маппинга еще не созданы.</div>
+        {% endif %}
+      </section>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Добавить правило</h2>
+        <p>Новое правило сразу участвует в pull-синхронизации. Чем меньше `sort_order`, тем раньше правило будет применено.</p>
+        <form action="{{ url_for('create_status_mapping_route') }}" method="post">
+          <label>
+            Тип совпадения
+            <select name="match_type">
+              <option value="contains">contains</option>
+              <option value="exact">exact</option>
+              <option value="prefix">prefix</option>
+            </select>
+          </label>
+          <label>
+            Значение статуса
+            <input name="match_value" placeholder="linked, sign, register, ошиб">
+          </label>
+          <label>
+            Статус заявки
+            <input name="request_status_name" placeholder="На согласовании">
+          </label>
+          <label>
+            Статус документа
+            <input name="doc_status_name" placeholder="Подписан">
+          </label>
+          <label>
+            Статус интеграции
+            <input name="integration_status_name" placeholder="Связано">
+          </label>
+          <label>
+            Порядок
+            <input name="sort_order" type="number" value="100">
+          </label>
+          <label>
+            Комментарий
+            <textarea name="notes" placeholder="Для каких переходов это правило используется"></textarea>
+          </label>
+          <label>
+            <input name="is_active" type="checkbox" value="1" checked>
+            Активно
+          </label>
+          <button type="submit">Добавить правило</button>
+        </form>
+      </section>
+    </div>
+
+    <div class="mapping-grid">
+      <section class="card" style="margin-top: 22px;">
+        <h2>Маппинг полей</h2>
+        <p>Здесь администратор задает, какие поля рабочего контура попадают в metadata `Bridge`, а какие собираются в проекцию для `NauDoc`. Это уже реальный GUI-слой интеграции без правки PHP-кода.</p>
+        {% if field_mappings %}
+        <table>
+          <thead>
+            <tr>
+              <th>Источник</th>
+              <th>Назначение</th>
+              <th>Порядок</th>
+              <th>Состояние</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mapping in field_mappings %}
+            <tr>
+              <td class="mapping-cell">
+                <strong>{{ mapping.source_system }} / {{ mapping.source_entity }}</strong>
+                <small>{{ mapping.source_field_key }}</small>
+              </td>
+              <td class="mapping-cell">
+                <small>{{ mapping.direction }} -> {{ mapping.target_system }} / {{ mapping.target_entity }}</small>
+                <small>{{ mapping.target_field_key }}</small>
+                {% if mapping.notes %}
+                <small>{{ mapping.notes }}</small>
+                {% endif %}
+              </td>
+              <td>{{ mapping.sort_order }}</td>
+              <td>
+                <span class="status {% if not mapping.is_active %}inactive{% endif %}">
+                  {{ 'включено' if mapping.is_active else 'выключено' }}
+                </span>
+                {% if mapping.is_required %}
+                <small>обязательное</small>
+                {% endif %}
+              </td>
+              <td>
+                <details>
+                  <summary>Изменить</summary>
+                  <form class="inline-form" action="{{ url_for('update_field_mapping_route', mapping_id=mapping.id) }}" method="post">
+                    <label>
+                      Источник
+                      <select name="source_system">
+                        <option value="rukovoditel" {% if mapping.source_system == 'rukovoditel' %}selected{% endif %}>rukovoditel</option>
+                        <option value="bridge" {% if mapping.source_system == 'bridge' %}selected{% endif %}>bridge</option>
+                        <option value="naudoc" {% if mapping.source_system == 'naudoc' %}selected{% endif %}>naudoc</option>
+                      </select>
+                    </label>
+                    <label>
+                      Сущность источника
+                      <input name="source_entity" value="{{ mapping.source_entity }}">
+                    </label>
+                    <label>
+                      Поле источника
+                      <input name="source_field_key" value="{{ mapping.source_field_key }}">
+                    </label>
+                    <label>
+                      Назначение
+                      <select name="target_system">
+                        <option value="bridge" {% if mapping.target_system == 'bridge' %}selected{% endif %}>bridge</option>
+                        <option value="rukovoditel" {% if mapping.target_system == 'rukovoditel' %}selected{% endif %}>rukovoditel</option>
+                        <option value="naudoc" {% if mapping.target_system == 'naudoc' %}selected{% endif %}>naudoc</option>
+                      </select>
+                    </label>
+                    <label>
+                      Сущность назначения
+                      <input name="target_entity" value="{{ mapping.target_entity }}">
+                    </label>
+                    <label>
+                      Поле назначения
+                      <input name="target_field_key" value="{{ mapping.target_field_key }}">
+                    </label>
+                    <label>
+                      Направление
+                      <select name="direction">
+                        <option value="push" {% if mapping.direction == 'push' %}selected{% endif %}>push</option>
+                        <option value="pull" {% if mapping.direction == 'pull' %}selected{% endif %}>pull</option>
+                        <option value="bidirectional" {% if mapping.direction == 'bidirectional' %}selected{% endif %}>bidirectional</option>
+                      </select>
+                    </label>
+                    <label>
+                      Порядок
+                      <input name="sort_order" type="number" value="{{ mapping.sort_order }}">
+                    </label>
+                    <label>
+                      Комментарий
+                      <textarea name="notes">{{ mapping.notes }}</textarea>
+                    </label>
+                    <label>
+                      <input name="is_required" type="checkbox" value="1" {% if mapping.is_required %}checked{% endif %}>
+                      Обязательное поле
+                    </label>
+                    <label>
+                      <input name="is_active" type="checkbox" value="1" {% if mapping.is_active %}checked{% endif %}>
+                      Активно
+                    </label>
+                    <div class="inline-actions">
+                      <button type="submit">Сохранить</button>
+                    </div>
+                  </form>
+                  <form class="inline-form" action="{{ url_for('delete_field_mapping_route', mapping_id=mapping.id) }}" method="post">
+                    <button type="submit" class="secondary-button">Удалить</button>
+                  </form>
+                </details>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Правила маппинга полей еще не созданы.</div>
+        {% endif %}
+      </section>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Добавить маппинг поля</h2>
+        <p>Правила применяются в sync-скриптах при записи metadata в `Bridge` и при формировании проекции `NauDoc`. Для проекции укажите <code>target_system=naudoc</code> и, например, <code>target_entity=document</code>.</p>
+        <form action="{{ url_for('create_field_mapping_route') }}" method="post">
+          <label>
+            Источник
+            <select name="source_system">
+              <option value="rukovoditel">rukovoditel</option>
+              <option value="bridge">bridge</option>
+              <option value="naudoc">naudoc</option>
+            </select>
+          </label>
+          <label>
+            Сущность источника
+            <input name="source_entity" placeholder="service_requests, projects, document_cards">
+          </label>
+          <label>
+            Поле источника
+            <input name="source_field_key" placeholder="request_id, doc_card_url">
+          </label>
+          <label>
+            Назначение
+            <select name="target_system">
+              <option value="bridge">bridge</option>
+              <option value="rukovoditel">rukovoditel</option>
+              <option value="naudoc">naudoc</option>
+            </select>
+          </label>
+          <label>
+            Сущность назначения
+            <input name="target_entity" value="metadata">
+          </label>
+          <label>
+            Поле назначения
+            <input name="target_field_key" placeholder="request_id, source_project_url">
+          </label>
+          <label>
+            Направление
+            <select name="direction">
+              <option value="push">push</option>
+              <option value="pull">pull</option>
+              <option value="bidirectional">bidirectional</option>
+            </select>
+          </label>
+          <label>
+            Порядок
+            <input name="sort_order" type="number" value="100">
+          </label>
+          <label>
+            Комментарий
+            <textarea name="notes" placeholder="Для какой связи и зачем нужно это поле"></textarea>
+          </label>
+          <label>
+            <input name="is_required" type="checkbox" value="1">
+            Обязательное поле
+          </label>
+          <label>
+            <input name="is_active" type="checkbox" value="1" checked>
+            Активно
+          </label>
+          <button type="submit">Добавить маппинг</button>
+        </form>
+      </section>
+    </div>
+
     <section class="card" style="margin-top: 22px;">
       <h2>Текущие связи</h2>
       {% if selected_filters.view != 'all' or selected_filters.external_entity or selected_filters.sync_status %}
@@ -503,6 +1572,12 @@
               {% if link.notes %}
               <div style="margin-top: 6px; color: var(--muted);">{{ link.notes }}</div>
               {% endif %}
+              {% if link.metadata.get('naudoc_projection') %}
+              <details>
+                <summary>Проекция в NauDoc</summary>
+                <pre style="white-space: pre-wrap; margin: 8px 0 0;">{{ link.metadata.get('naudoc_projection')|tojson(indent=2) }}</pre>
+              </details>
+              {% endif %}
             </td>
             <td><span class="status {% if link.sync_status == 'signed' %}signed{% elif link.sync_status.startswith('pending') %}pending{% elif not link.sync_status %}empty{% endif %}">{{ link.sync_status or 'n/a' }}</span></td>
             <td>{{ link.updated_at }}</td>
@@ -531,6 +1606,36 @@
                     <textarea name="metadata_json">{{ link.metadata|tojson }}</textarea>
                   </label>
                   <button type="submit">Сохранить изменения</button>
+                </form>
+              </details>
+              <details>
+                <summary>Ручная перевязка</summary>
+                <form class="inline-form" action="{{ url_for('relink_link_route', link_id=link.id) }}" method="post">
+                  <label>
+                    Внешняя система
+                    <input name="external_system" value="{{ link.external_system }}">
+                  </label>
+                  <label>
+                    Сущность
+                    <input name="external_entity" value="{{ link.external_entity }}">
+                  </label>
+                  <label>
+                    ID записи
+                    <input name="external_item_id" value="{{ link.external_item_id }}">
+                  </label>
+                  <label>
+                    Название записи
+                    <input name="external_title" value="{{ link.external_title }}">
+                  </label>
+                  <label>
+                    Комментарий
+                    <textarea name="notes">{{ link.notes }}</textarea>
+                  </label>
+                  <label>
+                    Метаданные JSON
+                    <textarea name="metadata_json">{{ link.metadata|tojson }}</textarea>
+                  </label>
+                  <button type="submit">Перевязать запись</button>
                 </form>
               </details>
             </td>

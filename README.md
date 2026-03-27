@@ -61,9 +61,25 @@
 ### NauDoc
 
 - логин: `admin`
-- пароль: `admin`
+- пароль не фиксируется в документации
+- актуальное значение хранится в корневом `.env` в переменной `NAUDOC_PASSWORD`
 
 Это отдельная авторизация для официального документного контура.
+
+### Каталог пользователей и роли
+
+В `Bridge` уже есть рабочая база для единого каталога пользователей:
+
+1. профили из `NauDoc` подтягиваются через `sync_naudoc_profiles.sh`
+2. exact-match по `username` связывает профиль автоматически
+3. если username не совпадает, `Bridge` может показать подсказку по отображаемому имени
+4. администратор может принять подсказку прямо в GUI
+5. в каталоге уже видно:
+   - роль связанного профиля
+   - email
+   - статус `matched / manual_match / needs_review / unmatched`
+
+Это еще не `LDAP/SSO`, но уже рабочий переходный слой к hospital-production модели доступа.
 
 ---
 
@@ -202,12 +218,37 @@ cd /home/lebedeffson/Code/Документооборот
 bash ops/run_full_verification.sh
 ```
 
+Проверить production-readiness базового контура:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+python3 ops/prod_readiness_audit.py
+```
+
+Шаблон production-переменных:
+
+```bash
+cp .env.example .env
+```
+
 Синхронизировать профили из `NauDoc`:
 
 ```bash
 cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
 bash sync_naudoc_profiles.sh
 ```
+
+После этого в `Bridge` обновится раздел `Каталог пользователей`.
+
+Обновить GUI-маппинг полей и проекцию в `NauDoc`:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
+bash sync_service_requests.sh --force-all
+bash sync_project_documents.sh --force-all
+```
+
+После этого в связях `Bridge` появится актуальная `Проекция в NauDoc` для заявок, проектов и карточек документов.
 
 ---
 
@@ -218,6 +259,14 @@ bash sync_naudoc_profiles.sh
 - [README.md](/home/lebedeffson/Code/Документооборот/README.md)
 - [USER_QUICKSTART_GUIDE.md](/home/lebedeffson/Code/Документооборот/USER_QUICKSTART_GUIDE.md)
 - [CUSTOMER_DEMO_SCRIPT.md](/home/lebedeffson/Code/Документооборот/CUSTOMER_DEMO_SCRIPT.md)
+- [HOSPITAL_PRODUCTION_ROADMAP.md](/home/lebedeffson/Code/Документооборот/HOSPITAL_PRODUCTION_ROADMAP.md)
+- [UNIFIED_PROD_PLATFORM_PLAN.md](/home/lebedeffson/Code/Документооборот/UNIFIED_PROD_PLATFORM_PLAN.md)
+
+Если нужна именно production-картина по больничному внедрению, основной опорный документ сейчас:
+
+- [HOSPITAL_PRODUCTION_ROADMAP.md](/home/lebedeffson/Code/Документооборот/HOSPITAL_PRODUCTION_ROADMAP.md)
+- [HOSPITAL_NEXT_STEPS_PLAN.md](/home/lebedeffson/Code/Документооборот/docs/reference/HOSPITAL_NEXT_STEPS_PLAN.md)
+- [HOSPITAL_TARGET_OPERATING_MODEL.md](/home/lebedeffson/Code/Документооборот/docs/reference/HOSPITAL_TARGET_OPERATING_MODEL.md)
 - [UNIFIED_PROD_PLATFORM_PLAN.md](/home/lebedeffson/Code/Документооборот/UNIFIED_PROD_PLATFORM_PLAN.md)
 - [DEMO_DATA_CATALOG.md](/home/lebedeffson/Code/Документооборот/DEMO_DATA_CATALOG.md)
 
