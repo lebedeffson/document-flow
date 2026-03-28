@@ -671,6 +671,7 @@ console_log('Provisioning process model for Rukovoditel...');
 
 $manager_group_id = ensure_access_group('Заведующий отделением / руководитель подразделения', 10, 4, 'Согласование, утверждение и управленческий контроль по подразделению.');
 $employee_group_id = ensure_access_group('Врач / сотрудник подразделения', 20, 5, 'Ежедневная работа с документами, заявками, задачами и проектами подразделения.');
+$nurse_group_id = ensure_access_group('Старшая медсестра / координатор отделения', 25, 8, 'Координация документооборота отделения, контроль исполнения и сопровождение маршрутов внутри подразделения.');
 $requester_group_id = ensure_access_group('Регистратура / заявитель', 30, 6, 'Подача обращений, регистрация входящих запросов и отслеживание собственных кейсов.');
 $office_group_id = ensure_access_group('Канцелярия / делопроизводство', 40, 7, 'Регистрация документов, контроль маршрутов, номенклатуры и архива.');
 
@@ -848,6 +849,7 @@ $project_curator_id = ensure_custom_field(21, 'Заведующий / курат
     'comments_status' => 1,
     'comments_sort_order' => 4,
 ], ['Куратор / преподаватель']);
+// Legacy academic aliases below are kept only to migrate older demo databases without duplicating fields or choices.
 $project_department_id = ensure_custom_field(21, 'Подразделение / отделение', 'fieldtype_dropdown', $project_main_tab, [
     'is_required' => 1,
     'configuration' => config_json(['width' => 'input-large']),
@@ -1388,13 +1390,13 @@ sync_field_choices(25, $doc_type_id, [
 ]);
 sync_field_choices(25, $doc_route_id, [
     ['name' => 'Входящая регистрация', 'sort_order' => 1, 'bg_color' => '#d8f3dc'],
-    ['name' => 'Исходящее согласование', 'sort_order' => 2, 'bg_color' => '#bde0fe'],
-    ['name' => 'Внутренний приказ', 'sort_order' => 3, 'is_default' => 1, 'bg_color' => '#e9ecef'],
-    ['name' => 'Маршрут медицинского документа', 'sort_order' => 4, 'bg_color' => '#f8edeb'],
-    ['name' => 'Маршрут пациента / направления', 'sort_order' => 5, 'bg_color' => '#ffd6a5'],
-    ['name' => 'Договор и закупка', 'sort_order' => 6, 'bg_color' => '#cdb4db'],
+    ['name' => 'Исходящее письмо / согласование', 'sort_order' => 2, 'bg_color' => '#bde0fe', 'legacy_names' => ['Исходящее согласование']],
+    ['name' => 'Внутренний приказ / распоряжение', 'sort_order' => 3, 'is_default' => 1, 'bg_color' => '#e9ecef', 'legacy_names' => ['Внутренний приказ']],
+    ['name' => 'Медицинская документация отделения', 'sort_order' => 4, 'bg_color' => '#f8edeb', 'legacy_names' => ['Маршрут медицинского документа']],
+    ['name' => 'Пациент / направление / выписка', 'sort_order' => 5, 'bg_color' => '#ffd6a5', 'legacy_names' => ['Маршрут пациента / направления']],
+    ['name' => 'Договор / закупка / МТЗ', 'sort_order' => 6, 'bg_color' => '#cdb4db', 'legacy_names' => ['Договор и закупка']],
     ['name' => 'Ознакомление персонала', 'sort_order' => 7, 'bg_color' => '#cce3de'],
-    ['name' => 'Архивный маршрут', 'sort_order' => 8, 'bg_color' => '#adb5bd'],
+    ['name' => 'Архив / закрытие', 'sort_order' => 8, 'bg_color' => '#adb5bd', 'legacy_names' => ['Архивный маршрут']],
 ]);
 sync_field_choices(25, $doc_status_id, [
     ['name' => 'Черновик', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#dee2e6'],
@@ -1611,13 +1613,13 @@ sync_field_choices(27, $mts_status_id, [
 ]);
 
 $access_map = [
-    21 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned', $office_group_id => 'view,reports'],
-    22 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned,update', $office_group_id => 'view,reports'],
-    23 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned,create,update,reports', $office_group_id => 'view,reports'],
-    24 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view_assigned,create,update,delete,reports', $requester_group_id => '', $office_group_id => ''],
-    25 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned,create', $office_group_id => 'view,create,update,reports'],
-    26 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $requester_group_id => 'view,reports', $office_group_id => 'view,create,update,reports'],
-    27 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $requester_group_id => 'create,view_assigned,update,reports', $office_group_id => 'view,reports'],
+    21 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $nurse_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned', $office_group_id => 'view,reports'],
+    22 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $nurse_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned,update', $office_group_id => 'view,reports'],
+    23 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $nurse_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned,create,update,reports', $office_group_id => 'view,reports'],
+    24 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view_assigned,create,update,delete,reports', $nurse_group_id => 'view_assigned,create,update,reports', $requester_group_id => '', $office_group_id => ''],
+    25 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $nurse_group_id => 'view,create,update,reports', $requester_group_id => 'view_assigned,create', $office_group_id => 'view,create,update,reports'],
+    26 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $nurse_group_id => 'view,reports', $requester_group_id => 'view,reports', $office_group_id => 'view,create,update,reports'],
+    27 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $nurse_group_id => 'view,create,update,reports', $requester_group_id => 'create,view_assigned,update,reports', $office_group_id => 'view,reports'],
 ];
 
 foreach ($access_map as $entity_id => $groups)
@@ -1679,7 +1681,7 @@ $request_doc_attention_choices = array_filter([
 
 $employee_tasks_report = ensure_common_report(22, 'Мои задачи в работе', [
     'description' => 'Задачи и поручения, которые требуют моего внимания прямо сейчас.',
-    'users_groups' => '0,' . $manager_group_id . ',' . $employee_group_id . ',' . $requester_group_id,
+    'users_groups' => '0,' . $manager_group_id . ',' . $employee_group_id . ',' . $nurse_group_id . ',' . $requester_group_id,
     'in_dashboard' => 1,
     'in_dashboard_counter' => 1,
     'dashboard_sort_order' => 10,
@@ -1693,7 +1695,7 @@ sync_report_filters($employee_tasks_report, [
 
 $work_discussions_report = ensure_common_report(24, 'Рабочие обсуждения', [
     'description' => 'Внутренние обсуждения и договоренности по рабочим вопросам.',
-    'users_groups' => '0,' . $manager_group_id . ',' . $employee_group_id,
+    'users_groups' => '0,' . $manager_group_id . ',' . $employee_group_id . ',' . $nurse_group_id,
     'in_dashboard' => 0,
     'in_dashboard_counter' => 0,
     'dashboard_sort_order' => 0,
@@ -1704,7 +1706,7 @@ $work_discussions_report = ensure_common_report(24, 'Рабочие обсужд
 
 $employee_requests_report = ensure_common_report(23, 'Мои заявки', [
     'description' => 'Собственные заявки и обращения, которые еще находятся в работе.',
-    'users_groups' => '0,' . $manager_group_id . ',' . $employee_group_id . ',' . $requester_group_id,
+    'users_groups' => '0,' . $manager_group_id . ',' . $employee_group_id . ',' . $nurse_group_id . ',' . $requester_group_id,
     'in_dashboard' => 1,
     'in_dashboard_counter' => 1,
     'dashboard_sort_order' => 20,
@@ -1809,6 +1811,9 @@ sync_report_filters($office_documents_report, [
 sync_fields_access(21, $employee_group_id, [
     $project_manager_note_id => 'view_inform',
 ]);
+sync_fields_access(21, $nurse_group_id, [
+    $project_manager_note_id => 'view_inform',
+]);
 sync_fields_access(23, $requester_group_id, [
     $request_status_id => 'view_inform',
     $request_responsible_id => 'view_inform',
@@ -1827,7 +1832,7 @@ sync_fields_access(25, $requester_group_id, [
     $doc_nau_link_id => 'view_inform',
 ]);
 
-foreach ([$manager_group_id, $employee_group_id, $requester_group_id, $office_group_id] as $restricted_group_id)
+foreach ([$manager_group_id, $employee_group_id, $nurse_group_id, $requester_group_id, $office_group_id] as $restricted_group_id)
 {
     sync_fields_access(21, $restricted_group_id, [
         $project_docspace_link_id => 'hide',

@@ -22,6 +22,10 @@ echo "[verify] naudoc profiles"
 bash rukovoditel-test/sync_naudoc_profiles.sh
 
 echo
+echo "[verify] document cards sync"
+bash rukovoditel-test/sync_document_cards.sh --force-all
+
+echo
 echo "[verify] smoke"
 bash ops/smoke_test_stack.sh
 
@@ -30,12 +34,24 @@ echo "[verify] full contour"
 python3 ops/full_contour_audit.py
 
 echo
+echo "[verify] database integrity"
+python3 ops/audit_database_integrity.py
+
+echo
 echo "[verify] ecosystem"
 python3 ops/audit_ecosystem_integration.py
 
 echo
 echo "[verify] onlyoffice backend"
 python3 ops/audit_onlyoffice_integration.py
+
+echo
+echo "[verify] monitoring snapshot"
+python3 ops/monitoring_snapshot.py
+
+echo
+echo "[verify] identity integration"
+python3 ops/audit_identity_integration.py
 
 echo
 echo "[verify] onlyoffice firefox"

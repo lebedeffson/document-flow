@@ -218,6 +218,37 @@ cd /home/lebedeffson/Code/Документооборот
 bash ops/run_full_verification.sh
 ```
 
+---
+
+## 10. Как перенести платформу на сервер с флешки
+
+Если нужно один раз собрать платформу на рабочей машине и потом перенести ее на Linux-сервер без сложной установки из интернета, используйте offline bundle:
+
+Проверка готовности bundle:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/create_portable_bundle.sh --verify-only --with-local-ldap
+```
+
+Полная сборка bundle:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/create_portable_bundle.sh --with-local-ldap
+```
+
+Установка на сервере:
+
+```bash
+cd /path/to/bundle
+bash install_from_bundle.sh /opt/docflow
+```
+
+Полный runbook:
+
+- [OFFLINE_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFLINE_INSTALL_RUNBOOK.md)
+
 Проверить production-readiness базового контура:
 
 ```bash
@@ -244,11 +275,12 @@ bash sync_naudoc_profiles.sh
 
 ```bash
 cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
+bash sync_document_cards.sh --force-all
 bash sync_service_requests.sh --force-all
 bash sync_project_documents.sh --force-all
 ```
 
-После этого в связях `Bridge` появится актуальная `Проекция в NauDoc` для заявок, проектов и карточек документов.
+После этого в связях `Bridge` появится актуальная `Проекция в NauDoc` для карточек документов, заявок и проектов, включая карточки, созданные вручную.
 
 ---
 

@@ -71,6 +71,54 @@ bash ops/generate_prod_env.sh
 2. перед переносом на сервер его нужно проверить и переименовать в `.env`
 3. по умолчанию используется домен `docflow.hospital.local`, при необходимости можно передать свой через `DOCFLOW_DOMAIN`
 
+## Generate Staging Env
+
+Для отдельного staging-контура теперь есть отдельный генератор:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/generate_staging_env.sh
+```
+
+По умолчанию он создает:
+
+1. `/home/lebedeffson/Code/Документооборот/.env.generated.staging`
+2. домен `staging.docflow.hospital.local`
+3. отдельные bind-порты, чтобы staging не конфликтовал с production
+
+Опорный runbook:
+
+- [STAGING_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/STAGING_RUNBOOK.md)
+
+## Portable Offline Bundle
+
+Если нужно принести платформу на флешке и развернуть на Linux-сервере без лишних ручных шагов, теперь есть отдельный bundle-сценарий.
+
+Проверить, что bundle соберется корректно:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/create_portable_bundle.sh --verify-only --with-local-ldap
+```
+
+Собрать полный переносимый bundle:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/create_portable_bundle.sh --with-local-ldap
+```
+
+На сервере установить bundle:
+
+```bash
+cd /path/to/bundle
+bash install_from_bundle.sh /opt/docflow
+```
+
+Подробный сценарий:
+
+- [OFFLINE_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFLINE_INSTALL_RUNBOOK.md)
+
 ## Rotate NauDoc Password
 
 Для production нельзя оставлять дефолтный пароль `NauDoc`. Теперь есть безопасный сценарий ротации:
@@ -98,6 +146,12 @@ bash ops/rotate_naudoc_password.sh
 
 ```bash
 bash ops/rotate_naudoc_password.sh 'your-strong-password'
+```
+
+Если `.env` уже уехал вперед, а реальный текущий пароль `NauDoc` другой, можно явно передать его через override:
+
+```bash
+NAUDOC_CURRENT_PASSWORD='current-live-password' bash ops/rotate_naudoc_password.sh
 ```
 
 ## Restore
@@ -182,6 +236,96 @@ DOCFLOW_ENV_FILE=/home/lebedeffson/Code/Документооборот/.env.gene
 4. на месте ли базовые ops-скрипты
 
 Это не заменяет полный приемочный запуск, но дает честный быстрый стоп-лист перед переносом на сервер больницы.
+
+## Database Integrity Audit
+
+Перед любым переносом на production и перед изменением схемы теперь нужно прогонять отдельный аудит БД:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+python3 ops/audit_database_integrity.py
+```
+
+Опорный документ:
+
+- [DATABASE_PRODUCTION_READINESS.md](/home/lebedeffson/Code/Документооборот/docs/reference/DATABASE_PRODUCTION_READINESS.md)
+
+## Monitoring Snapshot
+
+Легкий monitoring baseline теперь можно получать без тяжелого стека:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+python3 ops/monitoring_snapshot.py
+```
+
+Скрипт:
+
+1. пишет JSON-снимок состояния
+2. проверяет `gateway`, `Bridge`, `ONLYOFFICE`
+3. считает открытые `sync_failures`
+4. показывает количество несопоставленных профилей
+5. показывает свежесть последнего backup
+
+По умолчанию snapshot сохраняется в:
+
+- `/home/lebedeffson/Code/Документооборот/runtime/monitoring/latest_status.json`
+
+## Local LDAP Baseline
+
+Для `LDAP-first` стенда теперь можно поднять локальный production-like LDAP-контур отдельным профилем:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/bootstrap_local_ldap.sh
+```
+
+Что делает скрипт:
+
+1. дописывает недостающие `LDAP_*` секреты в корневой `.env`
+2. рендерит bootstrap LDIF для hospital-ролей и тестовых пользователей
+3. поднимает `hospital_ldap` как отдельный compose profile `identity`
+4. перенастраивает `hospital_ldap` source в `Bridge`
+5. запускает `test + sync` для LDAP-каталога
+
+Важно:
+
+1. это не заменяет реальный `LDAP/AD` больницы
+2. это production-like контур для staging/pilot и честной проверки `LDAP-first` интеграции
+3. локальный LDAP поднимается отдельно и не ломает основной стек
+
+## Monitor Timer
+
+Для Linux-сервера можно поставить systemd-таймер мониторинга:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+sudo ops/install_monitor_timer.sh
+sudo systemctl daemon-reload
+sudo systemctl enable --now docflow-monitor.timer
+```
+
+Шаблоны:
+
+1. [docflow-monitor.service](/home/lebedeffson/Code/Документооборот/ops/systemd/docflow-monitor.service)
+2. [docflow-monitor.timer](/home/lebedeffson/Code/Документооборот/ops/systemd/docflow-monitor.timer)
+
+## Identity Audit
+
+Проверка `LDAP-first` слоя теперь есть и отдельно:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+python3 ops/audit_identity_integration.py
+```
+
+Поведение:
+
+1. если `hospital_ldap` не активирован, audit вернет `skipped`
+2. если активирован и настроен, audit проверит:
+   - bind
+   - sync
+   - наличие обязательных LDAP-профилей
 
 ## Full Contour Audit
 
@@ -293,12 +437,17 @@ cd /home/lebedeffson/Code/Документооборот/ops
 
 1. при записи metadata из `Rukovoditel` в `Bridge`
 2. при формировании честной проекции полей для `NauDoc` внутри `Bridge`
+3. при прямом `Bridge -> NauDoc` write-back для `document_cards`
+4. при обратной передаче конкретного `NauDoc` URL в `service_requests` и `projects`
 
 Важно:
 
 1. на текущем этапе это уже реальная GUI-настройка полей
-2. но это еще не прямой write-back в `NauDoc`
-3. `Bridge` хранит и показывает, какие значения должны попасть в документный контур
+2. `Bridge` уже не только хранит projection, но и создает/обновляет реальные объекты `NauDoc`
+3. write-back сейчас доведен для маршрута:
+   - `document_cards -> NauDoc object`
+   - `service_requests/projects -> reuse конкретного NauDoc URL карточки`
+4. следующим шагом остается доведение business-логики write-back под финальные hospital-маршруты
 
 ## Ручная Перевязка Связей
 
@@ -336,6 +485,20 @@ cd /home/lebedeffson/Code/Документооборот/ops
    - ручное сопоставление профиля в GUI
 
 Это еще не `SSO`, но уже рабочая база для дальнейшего перехода к единому каталогу пользователей.
+
+## Document Cards Sync
+
+Для production-контура отдельные карточки документов синхронизируются не только косвенно через заявки и проекты, но и напрямую:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
+bash sync_document_cards.sh --force-all
+```
+
+Что это дает:
+1. вручную созданные карточки тоже получают конкретный объект в `NauDoc`
+2. ссылка `Ссылка на NauDoc` доезжает обратно в `Rukovoditel`
+3. `Bridge` хранит конкретную связь `document_cards -> NauDoc`, а не только общую ссылку на `/docs`
 
 ## ONLYOFFICE Audit
 
