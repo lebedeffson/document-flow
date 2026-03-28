@@ -1,0 +1,135 @@
+dn: ou=Users,__LDAP_BASE_DN__
+objectClass: top
+objectClass: organizationalUnit
+ou: Users
+
+dn: ou=Groups,__LDAP_BASE_DN__
+objectClass: top
+objectClass: organizationalUnit
+ou: Groups
+
+dn: ou=Service Accounts,__LDAP_BASE_DN__
+objectClass: top
+objectClass: organizationalUnit
+ou: Service Accounts
+
+dn: cn=svc-docflow,ou=Service Accounts,__LDAP_BASE_DN__
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: svc-docflow
+description: Service account for Bridge LDAP synchronization
+userPassword: __LDAP_BIND_PASSWORD__
+
+dn: uid=admin,ou=Users,__LDAP_BASE_DN__
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Иван Иванович Иванов
+sn: Иванов
+uid: admin
+displayName: Иван Иванович Иванов
+mail: admin@example.local
+ou: Администрация
+title: ИТ-администратор / администратор платформы
+userPassword: local-admin-password
+
+dn: uid=__DOCFLOW_MANAGER_USERNAME__,ou=Users,__LDAP_BASE_DN__
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Мария Заведующая
+sn: Заведующая
+uid: __DOCFLOW_MANAGER_USERNAME__
+displayName: Мария Заведующая
+mail: __DOCFLOW_MANAGER_USERNAME__@hospital.local
+ou: Кардиология
+title: Заведующий отделением / руководитель подразделения
+userPassword: local-manager-password
+
+dn: uid=__DOCFLOW_EMPLOYEE_USERNAME__,ou=Users,__LDAP_BASE_DN__
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Илья Врач
+sn: Врач
+uid: __DOCFLOW_EMPLOYEE_USERNAME__
+displayName: Илья Врач
+mail: __DOCFLOW_EMPLOYEE_USERNAME__@hospital.local
+ou: Кардиология
+title: Врач / сотрудник подразделения
+userPassword: local-employee-password
+
+dn: uid=__DOCFLOW_NURSE_USERNAME__,ou=Users,__LDAP_BASE_DN__
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Наталья Старшая медсестра
+sn: Медсестра
+uid: __DOCFLOW_NURSE_USERNAME__
+displayName: Наталья Старшая медсестра
+mail: __DOCFLOW_NURSE_USERNAME__@hospital.local
+ou: Кардиология
+title: Старшая медсестра / координатор отделения
+userPassword: local-nurse-password
+
+dn: uid=__DOCFLOW_REQUESTER_USERNAME__,ou=Users,__LDAP_BASE_DN__
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Ольга Регистратор
+sn: Регистратор
+uid: __DOCFLOW_REQUESTER_USERNAME__
+displayName: Ольга Регистратор
+mail: __DOCFLOW_REQUESTER_USERNAME__@hospital.local
+ou: Регистратура
+title: Регистратура / заявитель
+userPassword: local-requester-password
+
+dn: uid=__DOCFLOW_OFFICE_USERNAME__,ou=Users,__LDAP_BASE_DN__
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Анна Делопроизводитель
+sn: Делопроизводитель
+uid: __DOCFLOW_OFFICE_USERNAME__
+displayName: Анна Делопроизводитель
+mail: __DOCFLOW_OFFICE_USERNAME__@hospital.local
+ou: Канцелярия
+title: Канцелярия / делопроизводство
+userPassword: local-office-password
+
+dn: cn=ИТ-администраторы,ou=Groups,__LDAP_BASE_DN__
+objectClass: groupOfUniqueNames
+cn: ИТ-администраторы
+uniqueMember: uid=admin,ou=Users,__LDAP_BASE_DN__
+
+dn: cn=Руководители подразделений,ou=Groups,__LDAP_BASE_DN__
+objectClass: groupOfUniqueNames
+cn: Руководители подразделений
+uniqueMember: uid=__DOCFLOW_MANAGER_USERNAME__,ou=Users,__LDAP_BASE_DN__
+
+dn: cn=Врачи,ou=Groups,__LDAP_BASE_DN__
+objectClass: groupOfUniqueNames
+cn: Врачи
+uniqueMember: uid=__DOCFLOW_EMPLOYEE_USERNAME__,ou=Users,__LDAP_BASE_DN__
+
+dn: cn=Координаторы отделений,ou=Groups,__LDAP_BASE_DN__
+objectClass: groupOfUniqueNames
+cn: Координаторы отделений
+uniqueMember: uid=__DOCFLOW_NURSE_USERNAME__,ou=Users,__LDAP_BASE_DN__
+
+dn: cn=Регистратура,ou=Groups,__LDAP_BASE_DN__
+objectClass: groupOfUniqueNames
+cn: Регистратура
+uniqueMember: uid=__DOCFLOW_REQUESTER_USERNAME__,ou=Users,__LDAP_BASE_DN__
+
+dn: cn=Канцелярия,ou=Groups,__LDAP_BASE_DN__
+objectClass: groupOfUniqueNames
+cn: Канцелярия
+uniqueMember: uid=__DOCFLOW_OFFICE_USERNAME__,ou=Users,__LDAP_BASE_DN__

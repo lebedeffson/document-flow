@@ -32,6 +32,15 @@ function stripTrailingSlash(value) {
   return value.replace(/\/+$/, '');
 }
 
+function boolFromEnv(name, fallback = false) {
+  const raw = process.env[name];
+  if (typeof raw !== 'string') {
+    return fallback;
+  }
+
+  return ['1', 'true', 'yes', 'on'].includes(raw.trim().toLowerCase());
+}
+
 export const publicBase = stripTrailingSlash(
   process.env.DOCFLOW_PUBLIC_BASE ||
     process.env.RUKOVODITEL_PUBLIC_URL ||
@@ -49,8 +58,33 @@ export const bridgeBase = stripTrailingSlash(
     `${publicBase}/bridge`
 );
 
+export const docspaceBase = stripTrailingSlash(
+  process.env.DOCFLOW_DOCSPACE_PUBLIC_BASE ||
+    process.env.DOCSPACE_PUBLIC_URL ||
+    `${publicBase}/docspace`
+);
+
+export const workspaceBase = stripTrailingSlash(
+  process.env.DOCFLOW_WORKSPACE_PUBLIC_BASE ||
+    process.env.WORKSPACE_PUBLIC_URL ||
+    `${publicBase}/workspace`
+);
+
 export const naudocUsername = process.env.NAUDOC_USERNAME || 'admin';
 export const naudocPassword = process.env.NAUDOC_PASSWORD || 'admin';
+export const showDemoLoginModes = boolFromEnv('DOCFLOW_SHOW_DEMO_LOGIN_MODES', false);
+export const docspaceEnabled = boolFromEnv('DOCSPACE_ENABLED', true);
+export const workspaceEnabled = boolFromEnv('WORKSPACE_ENABLED', true);
+export const docspaceTargetUrl = stripTrailingSlash(process.env.DOCSPACE_TARGET_URL || '');
+export const workspaceTargetUrl = stripTrailingSlash(process.env.WORKSPACE_TARGET_URL || '');
+export const adminUsername = process.env.DOCFLOW_ADMIN_USERNAME || 'admin';
+export const adminPassword = process.env.DOCFLOW_ADMIN_PASSWORD || 'admin123';
+export const roleDefaultPassword = process.env.DOCFLOW_ROLE_DEFAULT_PASSWORD || 'rolepass123';
+export const managerUsername = process.env.DOCFLOW_MANAGER_USERNAME || 'department.head';
+export const employeeUsername = process.env.DOCFLOW_EMPLOYEE_USERNAME || 'clinician.primary';
+export const requesterUsername = process.env.DOCFLOW_REQUESTER_USERNAME || 'registry.operator';
+export const officeUsername = process.env.DOCFLOW_OFFICE_USERNAME || 'records.office';
+export const nurseUsername = process.env.DOCFLOW_NURSE_USERNAME || 'nurse.coordinator';
 
 export const officeBase = stripTrailingSlash(
   process.env.DOCFLOW_OFFICE_PUBLIC_BASE ||

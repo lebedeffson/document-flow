@@ -164,6 +164,7 @@ function rukovoditel_role_meta($user)
         0 => ['role_key' => 'admin', 'role_label' => 'Администратор платформы'],
         4 => ['role_key' => 'manager', 'role_label' => 'Заведующий отделением / руководитель подразделения'],
         5 => ['role_key' => 'employee', 'role_label' => 'Врач / сотрудник подразделения'],
+        8 => ['role_key' => 'nurse_coordinator', 'role_label' => 'Старшая медсестра / координатор отделения'],
         6 => ['role_key' => 'requester', 'role_label' => 'Регистратура / заявитель'],
         7 => ['role_key' => 'office', 'role_label' => 'Канцелярия / делопроизводство'],
     ];

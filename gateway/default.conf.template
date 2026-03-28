@@ -47,6 +47,22 @@ server {
         return 301 /bridge/;
     }
 
+    location = /docspace {
+        return 301 /docspace/;
+    }
+
+    location = /workspace {
+        return 301 /workspace/;
+    }
+
+    location = /docspace/ {
+        rewrite ^ /index.php?module=dashboard/ecosystem&service=docspace last;
+    }
+
+    location = /workspace/ {
+        rewrite ^ /index.php?module=dashboard/ecosystem&service=workspace last;
+    }
+
     location /bridge/ {
         proxy_set_header X-Forwarded-Prefix /bridge;
         proxy_pass http://${BRIDGE_UPSTREAM}/;

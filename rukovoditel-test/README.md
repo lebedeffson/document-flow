@@ -12,9 +12,9 @@ Main public URLs:
 
 Main test accounts:
 
-- Admin mode: `admin / admin123`
-- User mode: `user.demo / rolepass123`
-- NauDoc: `admin / admin`
+- Admin mode: `admin / password from DOCFLOW_ADMIN_PASSWORD`
+- Role users: usernames from `DOCFLOW_*_USERNAME`, password from `DOCFLOW_ROLE_DEFAULT_PASSWORD`
+- NauDoc: `admin / password from NAUDOC_PASSWORD`
 
 See also:
 
@@ -45,7 +45,7 @@ docker compose up -d --build
 - DB User: `rukovoditel`
 - DB Password: `rukovoditel`
 - Admin login: `admin`
-- Admin password: `admin123`
+- Admin password: `DOCFLOW_ADMIN_PASSWORD`
 
 ## Notes
 

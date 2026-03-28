@@ -1,12 +1,30 @@
 import json
 import os
+import re
 import sqlite3
+import ssl
+import urllib.parse
 from contextlib import closing
 from datetime import datetime, timezone
+from html import escape as html_escape
 
 import requests
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
+
+try:
+    from ldap3 import ALL_ATTRIBUTES, AUTO_BIND_NO_TLS, AUTO_BIND_TLS_BEFORE_BIND, Connection, Server, SUBTREE, Tls
+
+    LDAP3_AVAILABLE = True
+except ImportError:
+    ALL_ATTRIBUTES = None
+    AUTO_BIND_NO_TLS = None
+    AUTO_BIND_TLS_BEFORE_BIND = None
+    Connection = None
+    Server = None
+    SUBTREE = None
+    Tls = None
+    LDAP3_AVAILABLE = False
 
 
 APP_TITLE = "NauDoc Bridge"
@@ -20,6 +38,7 @@ RUKOVODITEL_PUBLIC_URL = os.environ.get("RUKOVODITEL_PUBLIC_URL", RUKOVODITEL_BA
 SYNC_CONTROL_URL = os.environ.get("SYNC_CONTROL_URL", f"{RUKOVODITEL_BASE_URL.rstrip('/')}/run_sync_job.php")
 SYNC_CONTROL_TOKEN = os.environ.get("SYNC_CONTROL_TOKEN", "")
 REQUEST_TIMEOUT = float(os.environ.get("BRIDGE_REQUEST_TIMEOUT", "8"))
+LDAP_REQUEST_TIMEOUT = max(int(REQUEST_TIMEOUT), 1)
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
@@ -275,6 +294,17 @@ DEFAULT_FIELD_MAPPINGS = [
     {
         "source_system": "rukovoditel",
         "source_entity": "service_requests",
+        "source_field_key": "document_route",
+        "target_system": "bridge",
+        "target_entity": "metadata",
+        "target_field_key": "document_route",
+        "direction": "push",
+        "notes": "Маршрут связанного документа по заявке",
+        "sort_order": 45,
+    },
+    {
+        "source_system": "rukovoditel",
+        "source_entity": "service_requests",
         "source_field_key": "responsible_user_id",
         "target_system": "bridge",
         "target_entity": "metadata",
@@ -315,6 +345,17 @@ DEFAULT_FIELD_MAPPINGS = [
         "direction": "push",
         "notes": "Проекция ссылки на карточку документа в NauDoc",
         "sort_order": 80,
+    },
+    {
+        "source_system": "rukovoditel",
+        "source_entity": "service_requests",
+        "source_field_key": "document_route",
+        "target_system": "naudoc",
+        "target_entity": "workflow",
+        "target_field_key": "route_label",
+        "direction": "push",
+        "notes": "Проекция hospital-маршрута документа в NauDoc",
+        "sort_order": 90,
     },
     {
         "source_system": "rukovoditel",
@@ -365,6 +406,17 @@ DEFAULT_FIELD_MAPPINGS = [
     {
         "source_system": "rukovoditel",
         "source_entity": "projects",
+        "source_field_key": "document_route",
+        "target_system": "bridge",
+        "target_entity": "metadata",
+        "target_field_key": "document_route",
+        "direction": "push",
+        "notes": "Маршрут связанного документа проекта",
+        "sort_order": 145,
+    },
+    {
+        "source_system": "rukovoditel",
+        "source_entity": "projects",
         "source_field_key": "manager_user_id",
         "target_system": "bridge",
         "target_entity": "metadata",
@@ -405,6 +457,17 @@ DEFAULT_FIELD_MAPPINGS = [
         "direction": "push",
         "notes": "Проекция ссылки на карточку проекта в NauDoc",
         "sort_order": 180,
+    },
+    {
+        "source_system": "rukovoditel",
+        "source_entity": "projects",
+        "source_field_key": "document_route",
+        "target_system": "naudoc",
+        "target_entity": "workflow",
+        "target_field_key": "route_label",
+        "direction": "push",
+        "notes": "Проекция hospital-маршрута документа проекта в NauDoc",
+        "sort_order": 190,
     },
     {
         "source_system": "rukovoditel",
@@ -476,6 +539,17 @@ DEFAULT_FIELD_MAPPINGS = [
     {
         "source_system": "rukovoditel",
         "source_entity": "document_cards",
+        "source_field_key": "document_route",
+        "target_system": "bridge",
+        "target_entity": "metadata",
+        "target_field_key": "document_route",
+        "direction": "push",
+        "notes": "Маршрут документа из карточки",
+        "sort_order": 265,
+    },
+    {
+        "source_system": "rukovoditel",
+        "source_entity": "document_cards",
         "source_field_key": "doc_card_title",
         "target_system": "naudoc",
         "target_entity": "document",
@@ -516,6 +590,17 @@ DEFAULT_FIELD_MAPPINGS = [
         "direction": "push",
         "notes": "Проекция ссылки на исходный проект в NauDoc",
         "sort_order": 300,
+    },
+    {
+        "source_system": "rukovoditel",
+        "source_entity": "document_cards",
+        "source_field_key": "document_route",
+        "target_system": "naudoc",
+        "target_entity": "workflow",
+        "target_field_key": "route_label",
+        "direction": "push",
+        "notes": "Проекция маршрута документа в NauDoc",
+        "sort_order": 310,
     },
 ]
 
@@ -627,6 +712,17 @@ DEFAULT_HOSPITAL_ROLE_MAPPINGS = [
     },
     {
         "source_system": "rukovoditel",
+        "source_role_key": "nurse_coordinator",
+        "source_role_label": "Старшая медсестра / координатор отделения",
+        "hospital_role_key": "nurse_coordinator",
+        "hospital_role_label": "Старшая медсестра / координатор отделения",
+        "access_scope": "department",
+        "notes": "Координация маршрутов отделения, сопровождение документов и контроль исполнения на уровне поста/отделения.",
+        "is_active": 1,
+        "sort_order": 35,
+    },
+    {
+        "source_system": "rukovoditel",
         "source_role_key": "requester",
         "source_role_label": "Регистратура / заявитель",
         "hospital_role_key": "registry_operator",
@@ -646,6 +742,187 @@ DEFAULT_HOSPITAL_ROLE_MAPPINGS = [
         "notes": "Официальная регистрация, контроль и архивный контур.",
         "is_active": 1,
         "sort_order": 50,
+    },
+    {
+        "source_system": "ldap",
+        "source_role_key": "",
+        "source_role_label": "ИТ-администратор / администратор платформы",
+        "hospital_role_key": "hospital_admin",
+        "hospital_role_label": "ИТ-администратор / администратор платформы",
+        "access_scope": "full",
+        "notes": "Сопоставление role/title из LDAP для администратора платформы.",
+        "is_active": 1,
+        "sort_order": 110,
+    },
+    {
+        "source_system": "ldap",
+        "source_role_key": "",
+        "source_role_label": "Заведующий отделением / руководитель подразделения",
+        "hospital_role_key": "department_head",
+        "hospital_role_label": "Заведующий отделением / руководитель подразделения",
+        "access_scope": "department",
+        "notes": "Сопоставление role/title из LDAP для руководителя подразделения.",
+        "is_active": 1,
+        "sort_order": 120,
+    },
+    {
+        "source_system": "ldap",
+        "source_role_key": "",
+        "source_role_label": "Врач / сотрудник подразделения",
+        "hospital_role_key": "clinician",
+        "hospital_role_label": "Врач / сотрудник подразделения",
+        "access_scope": "own",
+        "notes": "Сопоставление role/title из LDAP для врача и сотрудника подразделения.",
+        "is_active": 1,
+        "sort_order": 130,
+    },
+    {
+        "source_system": "ldap",
+        "source_role_key": "",
+        "source_role_label": "Старшая медсестра / координатор отделения",
+        "hospital_role_key": "nurse_coordinator",
+        "hospital_role_label": "Старшая медсестра / координатор отделения",
+        "access_scope": "department",
+        "notes": "Сопоставление role/title из LDAP для старшей медсестры и координатора.",
+        "is_active": 1,
+        "sort_order": 135,
+    },
+    {
+        "source_system": "ldap",
+        "source_role_key": "",
+        "source_role_label": "Регистратура / заявитель",
+        "hospital_role_key": "registry_operator",
+        "hospital_role_label": "Регистратура / заявитель",
+        "access_scope": "registry",
+        "notes": "Сопоставление role/title из LDAP для регистратуры.",
+        "is_active": 1,
+        "sort_order": 140,
+    },
+    {
+        "source_system": "ldap",
+        "source_role_key": "",
+        "source_role_label": "Канцелярия / делопроизводство",
+        "hospital_role_key": "records_office",
+        "hospital_role_label": "Канцелярия / делопроизводство",
+        "access_scope": "office",
+        "notes": "Сопоставление role/title из LDAP для канцелярии.",
+        "is_active": 1,
+        "sort_order": 150,
+    },
+]
+
+DEFAULT_DOCUMENT_ROUTE_DEFINITIONS = [
+    {
+        "route_key": "incoming_registration",
+        "route_label": "Входящая регистрация",
+        "route_group": "hospital",
+        "default_doc_status_name": "На регистрации",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Черновик", "На регистрации", "Зарегистрирован", "На ознакомлении", "Архивирован"],
+        "participant_role_keys": ["registry_operator", "records_office"],
+        "requires_registration": 1,
+        "requires_approval": 0,
+        "notes": "Канцелярский маршрут для входящих документов и первичного учета.",
+        "is_active": 1,
+        "sort_order": 10,
+    },
+    {
+        "route_key": "outgoing_approval",
+        "route_label": "Исходящее письмо / согласование",
+        "route_group": "hospital",
+        "default_doc_status_name": "На согласовании",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Черновик", "На согласовании", "На утверждении", "Подписан", "На регистрации", "Зарегистрирован", "Архивирован"],
+        "participant_role_keys": ["clinician", "department_head", "records_office"],
+        "requires_registration": 1,
+        "requires_approval": 1,
+        "notes": "Исходящий документ с согласованием подразделения и регистрацией через канцелярский контур.",
+        "is_active": 1,
+        "sort_order": 20,
+    },
+    {
+        "route_key": "internal_order",
+        "route_label": "Внутренний приказ / распоряжение",
+        "route_group": "hospital",
+        "default_doc_status_name": "На согласовании",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Черновик", "На согласовании", "На утверждении", "Подписан", "На ознакомлении", "Архивирован"],
+        "participant_role_keys": ["department_head", "records_office"],
+        "requires_registration": 0,
+        "requires_approval": 1,
+        "notes": "Внутренний маршрут приказа или распоряжения по подразделению.",
+        "is_active": 1,
+        "sort_order": 30,
+    },
+    {
+        "route_key": "clinical_document",
+        "route_label": "Медицинская документация отделения",
+        "route_group": "hospital",
+        "default_doc_status_name": "На согласовании",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Черновик", "На согласовании", "На утверждении", "Подписан", "На регистрации", "Зарегистрирован", "Архивирован"],
+        "participant_role_keys": ["clinician", "nurse_coordinator", "department_head", "records_office"],
+        "requires_registration": 1,
+        "requires_approval": 1,
+        "notes": "Маршрут для документов отделения и внутренней медицинской документации.",
+        "is_active": 1,
+        "sort_order": 40,
+    },
+    {
+        "route_key": "patient_route",
+        "route_label": "Пациент / направление / выписка",
+        "route_group": "hospital",
+        "default_doc_status_name": "На согласовании",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Черновик", "На согласовании", "На утверждении", "Подписан", "На регистрации", "Зарегистрирован", "Архивирован"],
+        "participant_role_keys": ["clinician", "nurse_coordinator", "department_head", "registry_operator", "records_office"],
+        "requires_registration": 1,
+        "requires_approval": 1,
+        "notes": "Маршрут пациента, направления и выписки с участием регистратора и отделения.",
+        "is_active": 1,
+        "sort_order": 50,
+    },
+    {
+        "route_key": "contract_procurement",
+        "route_label": "Договор / закупка / МТЗ",
+        "route_group": "hospital",
+        "default_doc_status_name": "На согласовании",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Черновик", "На согласовании", "На утверждении", "Подписан", "На регистрации", "Зарегистрирован", "Архивирован"],
+        "participant_role_keys": ["nurse_coordinator", "department_head", "records_office"],
+        "requires_registration": 1,
+        "requires_approval": 1,
+        "notes": "Договорной и закупочный маршрут, включая заявки МТЗ.",
+        "is_active": 1,
+        "sort_order": 60,
+    },
+    {
+        "route_key": "staff_acknowledgement",
+        "route_label": "Ознакомление персонала",
+        "route_group": "hospital",
+        "default_doc_status_name": "На ознакомлении",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Черновик", "На согласовании", "На утверждении", "Подписан", "На ознакомлении", "Архивирован"],
+        "participant_role_keys": ["department_head", "nurse_coordinator", "clinician"],
+        "requires_registration": 0,
+        "requires_approval": 1,
+        "notes": "Ознакомление персонала с внутренними документами и приказами.",
+        "is_active": 1,
+        "sort_order": 70,
+    },
+    {
+        "route_key": "archive_closure",
+        "route_label": "Архив / закрытие",
+        "route_group": "hospital",
+        "default_doc_status_name": "Архивирован",
+        "final_doc_status_name": "Архивирован",
+        "status_sequence": ["Зарегистрирован", "Архивирован"],
+        "participant_role_keys": ["records_office", "hospital_admin"],
+        "requires_registration": 1,
+        "requires_approval": 0,
+        "notes": "Финальный архивный маршрут для закрытых документов и завершенных кейсов.",
+        "is_active": 1,
+        "sort_order": 80,
     },
 ]
 
@@ -712,6 +989,23 @@ HOSPITAL_ROLE_MAPPING_DB_FIELDS = (
     "hospital_role_key",
     "hospital_role_label",
     "access_scope",
+    "notes",
+    "is_active",
+    "sort_order",
+    "created_at",
+    "updated_at",
+)
+
+DOCUMENT_ROUTE_DEFINITION_DB_FIELDS = (
+    "route_key",
+    "route_label",
+    "route_group",
+    "default_doc_status_name",
+    "final_doc_status_name",
+    "status_sequence_json",
+    "participant_role_keys_json",
+    "requires_registration",
+    "requires_approval",
     "notes",
     "is_active",
     "sort_order",
@@ -969,6 +1263,45 @@ def ensure_db():
             ON hospital_role_mappings (is_active, source_system, sort_order, id)
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS document_route_definitions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                route_key TEXT NOT NULL,
+                route_label TEXT NOT NULL,
+                route_group TEXT NOT NULL DEFAULT 'hospital',
+                default_doc_status_name TEXT NOT NULL DEFAULT '',
+                final_doc_status_name TEXT NOT NULL DEFAULT '',
+                status_sequence_json TEXT NOT NULL DEFAULT '[]',
+                participant_role_keys_json TEXT NOT NULL DEFAULT '[]',
+                requires_registration INTEGER NOT NULL DEFAULT 0,
+                requires_approval INTEGER NOT NULL DEFAULT 0,
+                notes TEXT NOT NULL DEFAULT '',
+                is_active INTEGER NOT NULL DEFAULT 1,
+                sort_order INTEGER NOT NULL DEFAULT 100,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_document_route_definitions_key
+            ON document_route_definitions (route_key)
+            """
+        )
+        conn.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_document_route_definitions_label
+            ON document_route_definitions (route_label)
+            """
+        )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_document_route_definitions_active
+            ON document_route_definitions (is_active, route_group, sort_order, id)
+            """
+        )
         ensure_column(conn, "user_directory_profiles", "source_email", "TEXT NOT NULL DEFAULT ''")
         ensure_column(conn, "user_directory_profiles", "source_department", "TEXT NOT NULL DEFAULT ''")
         ensure_column(conn, "user_directory_profiles", "source_role_key", "TEXT NOT NULL DEFAULT ''")
@@ -977,10 +1310,18 @@ def ensure_db():
         ensure_column(conn, "user_directory_profiles", "linked_department", "TEXT NOT NULL DEFAULT ''")
         ensure_column(conn, "user_directory_profiles", "linked_role_key", "TEXT NOT NULL DEFAULT ''")
         ensure_column(conn, "user_directory_profiles", "linked_role_label", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(conn, "identity_sources", "last_check_at", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(conn, "identity_sources", "last_check_status", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(conn, "identity_sources", "last_check_message", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(conn, "identity_sources", "last_sync_at", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(conn, "identity_sources", "last_sync_status", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(conn, "identity_sources", "last_sync_message", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(conn, "identity_sources", "last_synced_count", "INTEGER NOT NULL DEFAULT 0")
         seed_default_status_mappings(conn)
         seed_default_field_mappings(conn)
         seed_default_identity_sources(conn)
         seed_default_hospital_role_mappings(conn)
+        seed_default_document_route_definitions(conn)
         for row in conn.execute("SELECT id, naudoc_url FROM document_links").fetchall():
             link_id, naudoc_url = row[0], row[1]
             normalized_url = normalize_naudoc_url(naudoc_url)
@@ -1022,6 +1363,7 @@ def identity_source_row_to_dict(row):
     item = dict(row)
     item["is_active"] = bool(item.get("is_active"))
     item["is_default"] = bool(item.get("is_default"))
+    item["last_synced_count"] = normalize_int(item.get("last_synced_count")) or 0
     item["metadata"] = json.loads(item.pop("metadata_json") or "{}")
     return item
 
@@ -1029,6 +1371,16 @@ def identity_source_row_to_dict(row):
 def hospital_role_mapping_row_to_dict(row):
     item = dict(row)
     item["is_active"] = bool(item.get("is_active"))
+    return item
+
+
+def document_route_definition_row_to_dict(row):
+    item = dict(row)
+    item["is_active"] = bool(item.get("is_active"))
+    item["requires_registration"] = bool(item.get("requires_registration"))
+    item["requires_approval"] = bool(item.get("requires_approval"))
+    item["status_sequence"] = json.loads(item.pop("status_sequence_json") or "[]")
+    item["participant_role_keys"] = json.loads(item.pop("participant_role_keys_json") or "[]")
     return item
 
 
@@ -1068,6 +1420,25 @@ def normalize_bool(value, default=False):
 
 def normalize_lower(value):
     return normalize_text(value).casefold()
+
+
+def normalize_text_list(value):
+    if isinstance(value, list):
+        raw_items = value
+    else:
+        raw_items = re.split(r"[\n,;]+", normalize_text(value))
+    result = []
+    seen = set()
+    for item in raw_items:
+        normalized = normalize_text(item)
+        if not normalized:
+            continue
+        key = normalized.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(normalized)
+    return result
 
 
 def ensure_column(conn, table_name, column_name, column_definition):
@@ -1398,6 +1769,54 @@ def seed_default_hospital_role_mappings(conn):
         )
 
 
+def seed_default_document_route_definitions(conn):
+    existing_keys = {
+        row[0]
+        for row in conn.execute("SELECT route_key FROM document_route_definitions").fetchall()
+    }
+    now = utcnow_iso()
+    for row in DEFAULT_DOCUMENT_ROUTE_DEFINITIONS:
+        if row["route_key"] in existing_keys:
+            continue
+
+        conn.execute(
+            """
+            INSERT INTO document_route_definitions (
+                route_key,
+                route_label,
+                route_group,
+                default_doc_status_name,
+                final_doc_status_name,
+                status_sequence_json,
+                participant_role_keys_json,
+                requires_registration,
+                requires_approval,
+                notes,
+                is_active,
+                sort_order,
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                row["route_key"],
+                row["route_label"],
+                row.get("route_group", "hospital"),
+                row.get("default_doc_status_name", ""),
+                row.get("final_doc_status_name", ""),
+                json.dumps(row.get("status_sequence", []), ensure_ascii=False),
+                json.dumps(row.get("participant_role_keys", []), ensure_ascii=False),
+                1 if normalize_bool(row.get("requires_registration"), False) else 0,
+                1 if normalize_bool(row.get("requires_approval"), False) else 0,
+                row.get("notes", ""),
+                1 if normalize_bool(row.get("is_active"), True) else 0,
+                normalize_int(row.get("sort_order")) or 100,
+                now,
+                now,
+            ),
+        )
+
+
 def normalize_naudoc_url(value):
     url = normalize_text(value)
     if not url:
@@ -1418,24 +1837,408 @@ def normalize_naudoc_url(value):
     return url
 
 
+def naudoc_internal_url(relative_path=""):
+    base = NAUDOC_BASE_URL.rstrip("/")
+    relative_path = normalize_text(relative_path).lstrip("/")
+    return f"{base}/{relative_path}" if relative_path else base
+
+
+def naudoc_public_url(relative_path=""):
+    base = NAUDOC_PUBLIC_URL.rstrip("/")
+    relative_path = normalize_text(relative_path).lstrip("/")
+    return normalize_naudoc_url(f"{base}/{relative_path}" if relative_path else base)
+
+
+def extract_naudoc_relative_path(url):
+    normalized = normalize_naudoc_url(url)
+    if not normalized:
+        return ""
+
+    known_bases = [
+        NAUDOC_PUBLIC_URL.rstrip("/"),
+        NAUDOC_BASE_URL.rstrip("/"),
+        "http://localhost:18080/docs",
+        "http://host.docker.internal:18080/docs",
+        "https://localhost:18443/docs",
+    ]
+
+    for base in dict.fromkeys(filter(None, known_bases)):
+        if not normalized.startswith(base):
+            continue
+        relative = normalized[len(base):].strip("/")
+        if not relative:
+            return ""
+        return relative
+
+    return ""
+
+
+def is_specific_naudoc_object_url(url):
+    relative_path = extract_naudoc_relative_path(url)
+    if not relative_path:
+        return False
+    return relative_path not in {"storage", "home"}
+
+
+def naudoc_form_encode(payload):
+    items = []
+    for key, value in payload.items():
+        if value is None:
+            continue
+        if isinstance(value, (list, tuple)):
+            for entry in value:
+                if entry is None:
+                    continue
+                items.append((key, str(entry)))
+            continue
+        items.append((key, str(value)))
+
+    return urllib.parse.urlencode(
+        items,
+        doseq=True,
+        encoding="cp1251",
+        errors="xmlcharrefreplace",
+    ).encode("ascii")
+
+
+def naudoc_request(method, url, *, form_data=None, allow_redirects=True):
+    headers = {}
+    data = None
+    if form_data is not None:
+        data = naudoc_form_encode(form_data)
+        headers["Content-Type"] = "application/x-www-form-urlencoded; charset=windows-1251"
+
+    return requests.request(
+        method,
+        url,
+        data=data,
+        headers=headers,
+        auth=(NAUDOC_USERNAME, NAUDOC_PASSWORD),
+        timeout=REQUEST_TIMEOUT,
+        verify=False,
+        allow_redirects=allow_redirects,
+    )
+
+
+def naudoc_decode_response_text(response):
+    charset = "cp1251"
+    content_type = normalize_text(response.headers.get("Content-Type"))
+    match = re.search(r"charset=([A-Za-z0-9_-]+)", content_type, re.IGNORECASE)
+    if match:
+        charset = match.group(1)
+    return response.content.decode(charset, "ignore")
+
+
+def naudoc_get_text(url):
+    response = naudoc_request("GET", url)
+    response.raise_for_status()
+    return naudoc_decode_response_text(response)
+
+
+def naudoc_object_exists(relative_path):
+    relative_path = normalize_text(relative_path).strip("/")
+    if not relative_path:
+        return False
+    response = naudoc_request("GET", naudoc_internal_url(relative_path))
+    return response.ok
+
+
+def safe_naudoc_fragment(value):
+    value = normalize_lower(value)
+    if not value:
+        return "item"
+    value = re.sub(r"[^a-z0-9]+", "_", value)
+    return value.strip("_") or "item"
+
+
+def build_naudoc_document_id(link):
+    entity = safe_naudoc_fragment(link["external_entity"])
+    item_id = safe_naudoc_fragment(link["external_item_id"])
+    return f"bridge_{entity}_{item_id}"
+
+
+def build_naudoc_document_title(link):
+    metadata = link.get("metadata") or {}
+    projection = metadata.get("naudoc_projection") or {}
+    document_projection = projection.get("document") or {}
+    return (
+        normalize_text(document_projection.get("title"))
+        or normalize_text(link.get("naudoc_title"))
+        or normalize_text(link.get("external_title"))
+        or f"Bridge {link['external_entity']} #{link['external_item_id']}"
+    )
+
+
+def build_naudoc_document_description(link):
+    title = build_naudoc_document_title(link)
+    return (
+        f"Автоматическая публикация Bridge для {link['external_entity']} #{link['external_item_id']}."
+        f" Источник: {title}"
+    )
+
+
+def extract_link_document_route_context(link):
+    metadata = link.get("metadata") or {}
+    projection = metadata.get("naudoc_projection") or {}
+    workflow_projection = projection.get("workflow") or {}
+
+    route_label = normalize_text(
+        workflow_projection.get("route_label")
+        or metadata.get("document_route")
+    )
+    route_key = normalize_text(workflow_projection.get("route_key"))
+
+    if not route_label and not route_key:
+        return None
+
+    with closing(db_connection()) as conn:
+        definition = resolve_document_route_definition(
+            fetch_active_document_route_definitions(conn),
+            route_label,
+            route_key,
+        )
+
+    return {
+        "route_label": route_label or (definition.get("route_label") if definition else ""),
+        "route_key": route_key or (definition.get("route_key") if definition else ""),
+        "definition": definition,
+    }
+
+
+def build_naudoc_document_body(link):
+    metadata = link.get("metadata") or {}
+    projection = metadata.get("naudoc_projection") or {}
+    document_projection = projection.get("document") or {}
+    route_context = extract_link_document_route_context(link)
+
+    source_links = []
+    for key in (
+        "source_request_url",
+        "source_project_url",
+        "source_doc_card_url",
+        "request_url",
+        "project_url",
+        "doc_card_url",
+    ):
+        value = normalize_text(document_projection.get(key) or metadata.get(key))
+        if value and value not in source_links:
+            source_links.append(value)
+
+    details = [
+        ("Источник", f"{link['external_system']} / {link['external_entity']} / {link['external_item_id']}"),
+        ("Статус синхронизации", normalize_text(link.get("sync_status")) or "pending_nau_doc"),
+        ("Название записи", normalize_text(link.get("external_title"))),
+        ("Название документа", build_naudoc_document_title(link)),
+    ]
+
+    table_rows = "\n".join(
+        f"<tr><th align=\"left\">{html_escape(label)}</th><td>{html_escape(value)}</td></tr>"
+        for label, value in details
+        if value
+    )
+
+    links_html = ""
+    if source_links:
+        links_html = "<ul>" + "".join(
+            f"<li><a href=\"{html_escape(url)}\">{html_escape(url)}</a></li>"
+            for url in source_links
+        ) + "</ul>"
+
+    route_html = "<p>Маршрут документа пока не задан в рабочей карточке.</p>"
+    if route_context:
+        definition = route_context.get("definition") or {}
+        participants = definition.get("participant_role_keys") or []
+        status_sequence = definition.get("status_sequence") or []
+        route_rows = [
+            ("Маршрут", route_context.get("route_label")),
+            ("Ключ маршрута", route_context.get("route_key")),
+            ("Стартовый статус", definition.get("default_doc_status_name")),
+            ("Финальный статус", definition.get("final_doc_status_name")),
+            ("Регистрация обязательна", "Да" if definition.get("requires_registration") else "Нет"),
+            ("Утверждение обязательно", "Да" if definition.get("requires_approval") else "Нет"),
+        ]
+        route_table_rows = "\n".join(
+            f"<tr><th align=\"left\">{html_escape(label)}</th><td>{html_escape(value)}</td></tr>"
+            for label, value in route_rows
+            if value
+        )
+        participants_html = "<p>Участники маршрута не заданы.</p>"
+        if participants:
+            participants_html = "<ul>" + "".join(
+                f"<li>{html_escape(role_key)}</li>" for role_key in participants
+            ) + "</ul>"
+        statuses_html = "<p>Последовательность статусов пока не задана.</p>"
+        if status_sequence:
+            statuses_html = "<ol>" + "".join(
+                f"<li>{html_escape(status_name)}</li>" for status_name in status_sequence
+            ) + "</ol>"
+        route_html = (
+            f"<table>{route_table_rows}</table>"
+            "<h4>Участники маршрута</h4>"
+            f"{participants_html}"
+            "<h4>Последовательность статусов</h4>"
+            f"{statuses_html}"
+        )
+
+    projection_json = html_escape(
+        json.dumps(projection, ensure_ascii=False, indent=2, sort_keys=True)
+        if projection
+        else "{}"
+    )
+
+    return (
+        "<h2>Связка с рабочим контуром</h2>"
+        "<p>Документ автоматически создан или обновлен из единой платформы документооборота.</p>"
+        f"<table>{table_rows}</table>"
+        "<h3>Маршрут документа</h3>"
+        f"{route_html}"
+        "<h3>Исходные ссылки</h3>"
+        f"{links_html or '<p>Прямые ссылки источника пока не переданы.</p>'}"
+        "<h3>Проекция полей</h3>"
+        f"<pre>{projection_json}</pre>"
+    )
+
+
+def fetch_naudoc_safety_belt(relative_path):
+    html = naudoc_get_text(naudoc_internal_url(f"{relative_path}/document_edit_form"))
+    match = re.search(r'name="SafetyBelt" value="([^"]*)"', html)
+    if not match:
+        raise RuntimeError(f"Failed to read NauDoc SafetyBelt for '{relative_path}'")
+    return match.group(1)
+
+
+def ensure_naudoc_document_path(link):
+    existing_relative_path = extract_naudoc_relative_path(link.get("naudoc_url"))
+    if is_specific_naudoc_object_url(link.get("naudoc_url")) and naudoc_object_exists(existing_relative_path):
+        return existing_relative_path, False
+
+    doc_id = build_naudoc_document_id(link)
+    relative_path = f"storage/{doc_id}"
+    if naudoc_object_exists(relative_path):
+        return relative_path, False
+
+    response = naudoc_request(
+        "POST",
+        naudoc_internal_url("storage/invoke_factory"),
+        form_data={
+            "type_name": "HTMLDocument",
+            "id": doc_id,
+            "title": build_naudoc_document_title(link),
+            "cat_id": "Document",
+        },
+    )
+    response.raise_for_status()
+
+    if not naudoc_object_exists(relative_path):
+        raise RuntimeError(f"NauDoc did not create expected object '{relative_path}'")
+
+    return relative_path, True
+
+
+def update_naudoc_document(relative_path, *, title, description, body):
+    metadata_response = naudoc_request(
+        "POST",
+        naudoc_internal_url(f"{relative_path}/metadata_edit"),
+        form_data={
+            "title": title,
+            "description": description,
+        },
+    )
+    metadata_response.raise_for_status()
+
+    safety_belt = fetch_naudoc_safety_belt(relative_path)
+    body_response = naudoc_request(
+        "POST",
+        naudoc_internal_url(f"{relative_path}/document_edit"),
+        form_data={
+            "text:text": body,
+            "text_format": "html",
+            "SafetyBelt": safety_belt,
+        },
+    )
+    body_response.raise_for_status()
+
+
+def promote_writeback_sync_status(sync_status):
+    current = normalize_text(sync_status)
+    if not current or current == "pending_nau_doc":
+        return "linked"
+    return current
+
+
+def writeback_link_to_naudoc(conn, link_id):
+    existing = get_link_by_id(conn, link_id)
+    if existing is None:
+        raise RuntimeError("Link not found")
+
+    link = row_to_dict(existing)
+    relative_path, created = ensure_naudoc_document_path(link)
+    title = build_naudoc_document_title(link)
+    description = build_naudoc_document_description(link)
+    body = build_naudoc_document_body(link)
+
+    update_naudoc_document(
+        relative_path,
+        title=title,
+        description=description,
+        body=body,
+    )
+
+    metadata = dict(link.get("metadata") or {})
+    metadata["naudoc_writeback"] = {
+        "status": "created" if created else "updated",
+        "relative_path": relative_path,
+        "updated_at": utcnow_iso(),
+    }
+
+    public_url = naudoc_public_url(relative_path)
+    conn.execute(
+        """
+        UPDATE document_links
+        SET naudoc_url = ?,
+            naudoc_title = ?,
+            sync_status = ?,
+            metadata_json = ?,
+            updated_at = ?
+        WHERE id = ?
+        """,
+        (
+            public_url,
+            title,
+            promote_writeback_sync_status(existing["sync_status"]),
+            json.dumps(metadata, ensure_ascii=False, sort_keys=True),
+            utcnow_iso(),
+            link_id,
+        ),
+    )
+    row = get_link_by_id(conn, link_id)
+    return row_to_dict(row), {
+        "status": metadata["naudoc_writeback"]["status"],
+        "relative_path": relative_path,
+        "public_url": public_url,
+        "title": title,
+    }
+
+
 def fetch_nau_doc_status():
+    health_url = naudoc_internal_url("manage_users_form")
     try:
         response = requests.get(
-            NAUDOC_BASE_URL,
+            health_url,
             auth=(NAUDOC_USERNAME, NAUDOC_PASSWORD),
             timeout=REQUEST_TIMEOUT,
         )
         return {
             "ok": response.ok,
             "status_code": response.status_code,
-            "url": NAUDOC_BASE_URL,
-            "title_hint": "NauDoc" if "NauDoc" in response.text or "docs" in response.url else "",
+            "url": health_url,
+            "title_hint": "NauDoc" if "manage_users_form" in response.url or "docs" in response.url else "",
         }
     except requests.RequestException as exc:
         return {
             "ok": False,
             "status_code": None,
-            "url": NAUDOC_BASE_URL,
+            "url": health_url,
             "error": str(exc),
         }
 
@@ -1766,6 +2569,445 @@ def fetch_hospital_role_mapping_summary(conn):
     ).fetchone()
 
 
+def fetch_document_route_definition_summary(conn):
+    return conn.execute(
+        """
+        SELECT
+            COUNT(*) AS total_count,
+            COALESCE(SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END), 0) AS active_count,
+            COALESCE(SUM(CASE WHEN requires_registration = 1 AND is_active = 1 THEN 1 ELSE 0 END), 0) AS registration_count,
+            COALESCE(SUM(CASE WHEN requires_approval = 1 AND is_active = 1 THEN 1 ELSE 0 END), 0) AS approval_count
+        FROM document_route_definitions
+        """
+    ).fetchone()
+
+
+def parse_json_object(value):
+    if isinstance(value, dict):
+        return value
+    if not value:
+        return {}
+    try:
+        parsed = json.loads(value)
+    except (TypeError, json.JSONDecodeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def identity_source_metadata(source):
+    return parse_json_object(source.get("metadata_json") if isinstance(source, dict) else source["metadata_json"])
+
+
+def resolve_secret_from_env(env_key):
+    env_key = normalize_text(env_key)
+    if not env_key:
+        return ""
+    return os.environ.get(env_key, "")
+
+
+def update_identity_source_runtime_fields(conn, source_id, fields):
+    if not fields:
+        return fetch_table_row_by_id(conn, "identity_sources", source_id)
+
+    assignments = ", ".join(f"{field_name} = ?" for field_name in fields.keys())
+    values = tuple(fields.values()) + (source_id,)
+    conn.execute(f"UPDATE identity_sources SET {assignments} WHERE id = ?", values)
+    return fetch_table_row_by_id(conn, "identity_sources", source_id)
+
+
+def mark_identity_source_check_result(conn, source_id, status, message):
+    now = utcnow_iso()
+    return update_identity_source_runtime_fields(
+        conn,
+        source_id,
+        {
+            "last_check_at": now,
+            "last_check_status": normalize_text(status),
+            "last_check_message": normalize_text(message),
+            "updated_at": now,
+        },
+    )
+
+
+def mark_identity_source_sync_result(conn, source_id, status, message, synced_count=0):
+    now = utcnow_iso()
+    return update_identity_source_runtime_fields(
+        conn,
+        source_id,
+        {
+            "last_sync_at": now,
+            "last_sync_status": normalize_text(status),
+            "last_sync_message": normalize_text(message),
+            "last_synced_count": normalize_int(synced_count) or 0,
+            "updated_at": now,
+        },
+    )
+
+
+def first_directory_value(payload, attribute_name):
+    if not attribute_name:
+        return ""
+    raw_value = payload.get(attribute_name)
+    if isinstance(raw_value, (list, tuple)):
+        raw_value = raw_value[0] if raw_value else ""
+    return normalize_text(raw_value)
+
+
+def default_ldap_port(ssl_mode):
+    return 636 if normalize_text(ssl_mode) == "ldaps" else 389
+
+
+def connect_ldap_source(source):
+    if not LDAP3_AVAILABLE:
+        return None, "ldap3 is not installed"
+
+    host = normalize_text(source["host"])
+    if not host:
+        return None, "Host is not configured"
+
+    ssl_mode = normalize_text(source["ssl_mode"]) or "none"
+    use_ssl = ssl_mode == "ldaps"
+    tls_config = Tls(validate=ssl.CERT_NONE) if use_ssl else None
+    port = normalize_int(source["port"]) or default_ldap_port(ssl_mode)
+    bind_dn = normalize_text(source["bind_dn"])
+    password = resolve_secret_from_env(source["bind_password_env_key"])
+
+    try:
+        server = Server(
+            host,
+            port=port,
+            use_ssl=use_ssl,
+            connect_timeout=LDAP_REQUEST_TIMEOUT,
+            tls=tls_config,
+        )
+        auto_bind = AUTO_BIND_TLS_BEFORE_BIND if ssl_mode == "starttls" else AUTO_BIND_NO_TLS
+        connection = Connection(
+            server,
+            user=bind_dn or None,
+            password=password or None,
+            auto_bind=auto_bind,
+            receive_timeout=LDAP_REQUEST_TIMEOUT,
+        )
+        return connection, None
+    except Exception as exc:
+        return None, str(exc)
+
+
+def test_identity_source_provider(source):
+    provider_type = normalize_text(source["provider_type"])
+    if provider_type != "ldap":
+        return {
+            "ok": False,
+            "status": "unsupported",
+            "message": f"Provider {provider_type or 'unknown'} is not supported for runtime checks",
+        }
+
+    connection, error = connect_ldap_source(source)
+    if error:
+        return {"ok": False, "status": "error", "message": error}
+
+    try:
+        base_dn = normalize_text(source["user_base_dn"]) or normalize_text(source["base_dn"])
+        if base_dn:
+            connection.search(
+                search_base=base_dn,
+                search_filter="(objectClass=*)",
+                search_scope=SUBTREE,
+                attributes=[],
+                size_limit=1,
+            )
+        return {
+            "ok": True,
+            "status": "ok",
+            "message": f"LDAP bind successful for {normalize_text(source['source_label']) or normalize_text(source['source_key'])}",
+        }
+    except Exception as exc:
+        return {"ok": False, "status": "error", "message": str(exc)}
+    finally:
+        try:
+            connection.unbind()
+        except Exception:
+            pass
+
+
+def unique_profile_match(rows):
+    return rows[0] if len(rows) == 1 else None
+
+
+def lookup_profile_suggestion(conn, username, email, *, exclude_profile_id=None):
+    username = normalize_text(username)
+    email = normalize_lower(email)
+
+    if username:
+        where = """
+            (source_username = ? OR linked_username = ?)
+        """
+        values = [username, username]
+        if exclude_profile_id is not None:
+            where += " AND id != ?"
+            values.append(exclude_profile_id)
+        rows = conn.execute(
+            f"""
+            SELECT *
+            FROM user_directory_profiles
+            WHERE {where}
+            ORDER BY id ASC
+            LIMIT 2
+            """,
+            tuple(values),
+        ).fetchall()
+        matched_row = unique_profile_match(rows)
+        if matched_row is not None:
+            return matched_row, "username"
+
+    if email:
+        where = """
+            (lower(source_email) = ? OR lower(linked_email) = ?)
+        """
+        values = [email, email]
+        if exclude_profile_id is not None:
+            where += " AND id != ?"
+            values.append(exclude_profile_id)
+        rows = conn.execute(
+            f"""
+            SELECT *
+            FROM user_directory_profiles
+            WHERE {where}
+            ORDER BY id ASC
+            LIMIT 2
+            """,
+            tuple(values),
+        ).fetchall()
+        matched_row = unique_profile_match(rows)
+        if matched_row is not None:
+            return matched_row, "email"
+
+    return None, ""
+
+
+def build_profile_link_payload_from_suggestion(row):
+    linked_username = normalize_text(row["linked_username"])
+    linked_user_id = normalize_text(row["linked_user_id"])
+    linked_display_name = normalize_text(row["linked_display_name"])
+    linked_email = normalize_text(row["linked_email"])
+    linked_department = normalize_text(row["linked_department"])
+    linked_role_key = normalize_text(row["linked_role_key"])
+    linked_role_label = normalize_text(row["linked_role_label"])
+
+    if not linked_username and not linked_user_id and normalize_text(row["source_system"]) == "rukovoditel":
+        linked_username = normalize_text(row["source_username"])
+        linked_display_name = linked_display_name or normalize_text(row["source_display_name"])
+        linked_email = linked_email or normalize_text(row["source_email"])
+        linked_department = linked_department or normalize_text(row["source_department"])
+        linked_role_key = linked_role_key or normalize_text(row["source_role_key"])
+        linked_role_label = linked_role_label or normalize_text(row["source_role_label"])
+
+    return {
+        "linked_system": "rukovoditel" if (linked_username or linked_user_id) else "",
+        "linked_user_id": linked_user_id,
+        "linked_username": linked_username,
+        "linked_display_name": linked_display_name,
+        "linked_email": linked_email,
+        "linked_department": linked_department,
+        "linked_role_key": linked_role_key,
+        "linked_role_label": linked_role_label,
+    }
+
+
+def build_directory_profile_url(source, username):
+    metadata = identity_source_metadata(source)
+    template = normalize_text(metadata.get("profile_url_template"))
+    if not template:
+        return ""
+    return (
+        template.replace("{username}", username)
+        .replace("{source_key}", normalize_text(source["source_key"]))
+    )
+
+
+def fetch_identity_source_profiles(source):
+    provider_type = normalize_text(source["provider_type"])
+    if provider_type != "ldap":
+        return None, f"Provider {provider_type or 'unknown'} is not supported for sync"
+
+    connection, error = connect_ldap_source(source)
+    if error:
+        return None, error
+
+    metadata = identity_source_metadata(source)
+    search_base = normalize_text(source["user_base_dn"]) or normalize_text(source["base_dn"])
+    if not search_base:
+        return None, "user_base_dn or base_dn must be configured"
+
+    search_filter = normalize_text(metadata.get("search_filter")) or "(objectClass=person)"
+    sync_limit = normalize_int(metadata.get("sync_limit")) or 100
+    attributes = [
+        attribute_name
+        for attribute_name in {
+            normalize_text(source["login_attribute"]),
+            normalize_text(source["display_name_attribute"]),
+            normalize_text(source["email_attribute"]),
+            normalize_text(source["department_attribute"]),
+            normalize_text(source["role_attribute"]),
+        }
+        if attribute_name
+    ] or ALL_ATTRIBUTES
+
+    try:
+        connection.search(
+            search_base=search_base,
+            search_filter=search_filter,
+            search_scope=SUBTREE,
+            attributes=attributes,
+            size_limit=sync_limit,
+        )
+        profiles = []
+        for entry in connection.entries:
+            entry_payload = entry.entry_attributes_as_dict
+            username = first_directory_value(entry_payload, source["login_attribute"])
+            if not username:
+                continue
+
+            role_value = first_directory_value(entry_payload, source["role_attribute"])
+            profiles.append(
+                {
+                    "username": username,
+                    "display_name": first_directory_value(entry_payload, source["display_name_attribute"]),
+                    "email": first_directory_value(entry_payload, source["email_attribute"]),
+                    "department": first_directory_value(entry_payload, source["department_attribute"]),
+                    "role_key": role_value,
+                    "role_label": role_value,
+                    "profile_url": build_directory_profile_url(source, username),
+                    "entry_dn": normalize_text(getattr(entry, "entry_dn", "")),
+                }
+            )
+        return profiles, None
+    except Exception as exc:
+        return None, str(exc)
+    finally:
+        try:
+            connection.unbind()
+        except Exception:
+            pass
+
+
+def sync_identity_source_profiles(conn, source):
+    profiles, error = fetch_identity_source_profiles(source)
+    if error:
+        mark_identity_source_sync_result(conn, source["id"], "error", error, 0)
+        return None, {"error": error}
+
+    synced_count = 0
+    matched_count = 0
+    needs_review_count = 0
+
+    for profile in profiles:
+        current_row = conn.execute(
+            """
+            SELECT *
+            FROM user_directory_profiles
+            WHERE source_system = ? AND source_username = ?
+            LIMIT 1
+            """,
+            (normalize_text(source["source_system"]) or "ldap", profile["username"]),
+        ).fetchone()
+        current_profile_id = current_row["id"] if current_row is not None else None
+        suggestion_row, match_method = lookup_profile_suggestion(
+            conn,
+            profile["username"],
+            profile["email"],
+            exclude_profile_id=current_profile_id,
+        )
+        metadata = {
+            "source": "identity_source_sync",
+            "identity_source_key": normalize_text(source["source_key"]),
+            "provider_type": normalize_text(source["provider_type"]),
+            "entry_dn": profile["entry_dn"],
+        }
+        link_payload = {
+            "linked_system": "",
+            "linked_user_id": "",
+            "linked_username": "",
+            "linked_display_name": "",
+            "linked_email": "",
+            "linked_department": "",
+            "linked_role_key": "",
+            "linked_role_label": "",
+        }
+        sync_status = "unmatched"
+        notes = "Профиль импортирован из LDAP."
+
+        if current_row is not None and (normalize_text(current_row["linked_username"]) or normalize_text(current_row["linked_user_id"])):
+            link_payload = build_profile_link_payload_from_suggestion(current_row)
+            sync_status = normalize_text(current_row["sync_status"]) or "matched"
+            metadata["match_method"] = normalize_text(parse_json_object(current_row["metadata_json"]).get("match_method")) or "preserved"
+            notes = normalize_text(current_row["notes"]) or "Профиль импортирован из LDAP."
+            matched_count += 1
+
+        elif suggestion_row is not None:
+            suggestion = build_profile_link_payload_from_suggestion(suggestion_row)
+            if suggestion["linked_username"] or suggestion["linked_user_id"]:
+                link_payload = suggestion
+                sync_status = "matched"
+                matched_count += 1
+                metadata["match_method"] = f"auto_{match_method}"
+                notes = "Профиль автоматически сопоставлен по данным каталога."
+            else:
+                metadata.update(
+                    {
+                        "suggested_username": normalize_text(suggestion_row["source_username"]),
+                        "suggested_display_name": normalize_text(suggestion_row["source_display_name"]),
+                        "suggested_email": normalize_text(suggestion_row["source_email"]),
+                        "suggested_department": normalize_text(suggestion_row["source_department"]),
+                        "suggested_role_key": normalize_text(suggestion_row["source_role_key"]),
+                        "suggested_role_label": normalize_text(suggestion_row["source_role_label"]),
+                        "match_method": f"suggested_{match_method}",
+                    }
+                )
+                sync_status = "needs_review"
+                needs_review_count += 1
+
+        row, _ = upsert_user_profile(
+            conn,
+            {
+                "source_system": normalize_text(source["source_system"]) or "ldap",
+                "source_username": profile["username"],
+                "source_display_name": profile["display_name"],
+                "source_email": profile["email"],
+                "source_department": profile["department"],
+                "source_role_key": profile["role_key"],
+                "source_role_label": profile["role_label"],
+                "source_profile_url": profile["profile_url"],
+                "linked_system": link_payload["linked_system"],
+                "linked_user_id": link_payload["linked_user_id"],
+                "linked_username": link_payload["linked_username"],
+                "linked_display_name": link_payload["linked_display_name"],
+                "linked_email": link_payload["linked_email"],
+                "linked_department": link_payload["linked_department"],
+                "linked_role_key": link_payload["linked_role_key"],
+                "linked_role_label": link_payload["linked_role_label"],
+                "sync_status": sync_status,
+                "notes": notes,
+                "metadata": metadata,
+            },
+        )
+        if row is not None:
+            synced_count += 1
+
+    summary_message = (
+        f"Синхронизировано профилей: {synced_count}. "
+        f"Автосопоставлено: {matched_count}. "
+        f"Требуют проверки: {needs_review_count}."
+    )
+    mark_identity_source_sync_result(conn, source["id"], "ok", summary_message, synced_count)
+    return {
+        "synced_count": synced_count,
+        "matched_count": matched_count,
+        "needs_review_count": needs_review_count,
+        "message": summary_message,
+    }, None
+
+
 def build_status_mapping_payload(payload):
     now = utcnow_iso()
     return {
@@ -1923,6 +3165,26 @@ def build_hospital_role_mapping_payload(payload):
     }
 
 
+def build_document_route_definition_payload(payload):
+    now = utcnow_iso()
+    return {
+        "route_key": normalize_text(payload.get("route_key")),
+        "route_label": normalize_text(payload.get("route_label")),
+        "route_group": normalize_text(payload.get("route_group")) or "hospital",
+        "default_doc_status_name": normalize_text(payload.get("default_doc_status_name")),
+        "final_doc_status_name": normalize_text(payload.get("final_doc_status_name")),
+        "status_sequence_json": json.dumps(normalize_text_list(payload.get("status_sequence")), ensure_ascii=False),
+        "participant_role_keys_json": json.dumps(normalize_text_list(payload.get("participant_role_keys")), ensure_ascii=False),
+        "requires_registration": 1 if normalize_bool(payload.get("requires_registration"), False) else 0,
+        "requires_approval": 1 if normalize_bool(payload.get("requires_approval"), False) else 0,
+        "notes": normalize_text(payload.get("notes")),
+        "is_active": 1 if normalize_bool(payload.get("is_active"), True) else 0,
+        "sort_order": normalize_int(payload.get("sort_order")) or 100,
+        "created_at": now,
+        "updated_at": now,
+    }
+
+
 def validate_user_profile_payload(payload):
     missing = []
     for key in ("source_system", "source_username"):
@@ -1970,6 +3232,25 @@ def validate_hospital_role_mapping_payload(payload):
     return True, None
 
 
+def validate_document_route_definition_payload(payload):
+    missing = []
+    for key in ("route_key", "route_label"):
+        if not normalize_text(payload.get(key)):
+            missing.append(key)
+    if missing:
+        return False, {"error": "Missing required fields", "fields": missing}
+
+    status_sequence = normalize_text_list(payload.get("status_sequence"))
+    if not status_sequence:
+        return False, {"error": "status_sequence must contain at least one status"}
+
+    route_group = normalize_text(payload.get("route_group")) or "hospital"
+    if route_group not in {"hospital", "office", "clinical", "custom"}:
+        return False, {"error": "route_group must be one of hospital, office, clinical, custom"}
+
+    return True, None
+
+
 def create_status_mapping(conn, payload):
     return create_configured_row(
         conn,
@@ -2007,6 +3288,16 @@ def create_hospital_role_mapping(conn, payload):
         "hospital_role_mappings",
         HOSPITAL_ROLE_MAPPING_DB_FIELDS,
         build_hospital_role_mapping_payload,
+        payload,
+    )
+
+
+def create_document_route_definition(conn, payload):
+    return create_configured_row(
+        conn,
+        "document_route_definitions",
+        DOCUMENT_ROUTE_DEFINITION_DB_FIELDS,
+        build_document_route_definition_payload,
         payload,
     )
 
@@ -2052,6 +3343,17 @@ def update_hospital_role_mapping(conn, mapping_id, payload):
         mapping_id,
         HOSPITAL_ROLE_MAPPING_DB_FIELDS,
         build_hospital_role_mapping_payload,
+        payload,
+    )
+
+
+def update_document_route_definition(conn, route_definition_id, payload):
+    return update_configured_row(
+        conn,
+        "document_route_definitions",
+        route_definition_id,
+        DOCUMENT_ROUTE_DEFINITION_DB_FIELDS,
+        build_document_route_definition_payload,
         payload,
     )
 
@@ -2223,6 +3525,17 @@ HOSPITAL_ROLE_MAPPING_ROUTE_SPEC = {
     "duplicate_error": "Hospital role mapping already exists",
 }
 
+DOCUMENT_ROUTE_DEFINITION_ROUTE_SPEC = {
+    "checkbox_fields": ("is_active", "requires_registration", "requires_approval"),
+    "validator": validate_document_route_definition_payload,
+    "create_func": create_document_route_definition,
+    "update_func": update_document_route_definition,
+    "serializer": document_route_definition_row_to_dict,
+    "response_key": "route_definition",
+    "not_found_error": "Document route definition not found",
+    "duplicate_error": "Document route definition already exists",
+}
+
 
 def parse_model_payload(checkbox_fields=()):
     payload, error_response = parse_payload()
@@ -2342,6 +3655,29 @@ def resolve_hospital_role_mapping(role_mapping_rows, source_system, role_key, ro
         label_matches = bool(mapping_label and mapping_label == role_label_normalized)
         if key_matches or label_matches:
             return hospital_role_mapping_row_to_dict(row)
+    return None
+
+
+def fetch_active_document_route_definitions(conn):
+    return conn.execute(
+        """
+        SELECT *
+        FROM document_route_definitions
+        WHERE is_active = 1
+        ORDER BY sort_order ASC, id ASC
+        """
+    ).fetchall()
+
+
+def resolve_document_route_definition(route_definition_rows, route_label, route_key=""):
+    route_label_normalized = normalize_lower(route_label)
+    route_key_normalized = normalize_lower(route_key)
+
+    for row in route_definition_rows:
+        if route_key_normalized and normalize_lower(row["route_key"]) == route_key_normalized:
+            return document_route_definition_row_to_dict(row)
+        if route_label_normalized and normalize_lower(row["route_label"]) == route_label_normalized:
+            return document_route_definition_row_to_dict(row)
     return None
 
 
@@ -2487,7 +3823,7 @@ def resolve_sync_failures(conn, payload):
     if len(where) <= 3:
         return 0
 
-    values.extend([utcnow_iso(), json.dumps(payload.get("result") or {}, ensure_ascii=False, sort_keys=True)])
+    update_values = [utcnow_iso(), json.dumps(payload.get("result") or {}, ensure_ascii=False, sort_keys=True)]
     cursor = conn.execute(
         f"""
         UPDATE sync_failures
@@ -2496,7 +3832,7 @@ def resolve_sync_failures(conn, payload):
             last_result_json = ?
         WHERE {' AND '.join(where)}
         """,
-        values,
+        update_values + values,
     )
     return cursor.rowcount
 
@@ -2649,6 +3985,14 @@ def index():
             """
         ).fetchall()
         hospital_role_summary = fetch_hospital_role_mapping_summary(conn)
+        document_route_definition_rows = conn.execute(
+            """
+            SELECT *
+            FROM document_route_definitions
+            ORDER BY route_group ASC, sort_order ASC, id ASC
+            """
+        ).fetchall()
+        document_route_summary = fetch_document_route_definition_summary(conn)
         active_hospital_role_rows = [row for row in hospital_role_mapping_rows if row["is_active"]]
 
     user_profiles = build_enriched_user_profiles(user_profile_rows, active_hospital_role_rows)
@@ -2672,6 +4016,8 @@ def index():
         identity_source_summary=dict(identity_source_summary),
         hospital_role_mappings=[hospital_role_mapping_row_to_dict(row) for row in hospital_role_mapping_rows],
         hospital_role_summary=dict(hospital_role_summary),
+        document_route_definitions=[document_route_definition_row_to_dict(row) for row in document_route_definition_rows],
+        document_route_summary=dict(document_route_summary),
     )
 
 
@@ -2921,6 +4267,22 @@ def relink_link_route(link_id):
     return jsonify({"status": "relinked", "link": row_to_dict(row)})
 
 
+@app.post("/links/<int:link_id>/writeback")
+def writeback_link_route(link_id):
+    try:
+        with closing(db_connection()) as conn:
+            row, result = writeback_link_to_naudoc(conn, link_id)
+            conn.commit()
+    except requests.RequestException as exc:
+        return jsonify({"error": f"NauDoc write-back request failed: {exc}"}), 502
+    except RuntimeError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    if request.form:
+        return redirect(url_for("index"))
+    return jsonify({"status": "ok", "link": row, "writeback": result})
+
+
 @app.patch("/links/<int:link_id>")
 @app.put("/links/<int:link_id>")
 def update_link(link_id):
@@ -3074,6 +4436,31 @@ def list_hospital_role_mappings():
     return jsonify([hospital_role_mapping_row_to_dict(row) for row in rows])
 
 
+@app.get("/document-route-definitions")
+def list_document_route_definitions():
+    sql = "SELECT * FROM document_route_definitions"
+    values = []
+    where = []
+
+    route_group = normalize_text(request.args.get("route_group"))
+    active_only = normalize_bool(request.args.get("active"), False)
+
+    if route_group:
+        where.append("route_group = ?")
+        values.append(route_group)
+    if active_only:
+        where.append("is_active = 1")
+
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+
+    sql += " ORDER BY route_group ASC, sort_order ASC, id ASC"
+
+    with closing(db_connection()) as conn:
+        rows = conn.execute(sql, values).fetchall()
+    return jsonify([document_route_definition_row_to_dict(row) for row in rows])
+
+
 @app.post("/status-mappings")
 def create_status_mapping_route():
     return handle_create_model_route(STATUS_MAPPING_ROUTE_SPEC)
@@ -3094,6 +4481,11 @@ def create_hospital_role_mapping_route():
     return handle_create_model_route(HOSPITAL_ROLE_MAPPING_ROUTE_SPEC)
 
 
+@app.post("/document-route-definitions")
+def create_document_route_definition_route():
+    return handle_create_model_route(DOCUMENT_ROUTE_DEFINITION_ROUTE_SPEC)
+
+
 @app.post("/status-mappings/<int:mapping_id>/update")
 def update_status_mapping_route(mapping_id):
     return handle_update_model_route(mapping_id, STATUS_MAPPING_ROUTE_SPEC)
@@ -3112,6 +4504,49 @@ def update_identity_source_route(source_id):
 @app.post("/hospital-role-mappings/<int:mapping_id>/update")
 def update_hospital_role_mapping_route(mapping_id):
     return handle_update_model_route(mapping_id, HOSPITAL_ROLE_MAPPING_ROUTE_SPEC)
+
+
+@app.post("/document-route-definitions/<int:route_definition_id>/update")
+def update_document_route_definition_route(route_definition_id):
+    return handle_update_model_route(route_definition_id, DOCUMENT_ROUTE_DEFINITION_ROUTE_SPEC)
+
+
+@app.post("/identity-sources/<int:source_id>/test")
+def test_identity_source_route(source_id):
+    with closing(db_connection()) as conn:
+        source = fetch_table_row_by_id(conn, "identity_sources", source_id)
+        if source is None:
+            return jsonify({"error": "Identity source not found"}), 404
+
+        result = test_identity_source_provider(source)
+        mark_identity_source_check_result(conn, source_id, result["status"], result["message"])
+        conn.commit()
+
+    status_code = 200 if result["ok"] else (400 if result["status"] == "unsupported" else 502)
+    if request.form:
+        return redirect(url_for("index"))
+    return jsonify(result), status_code
+
+
+@app.post("/identity-sources/<int:source_id>/sync")
+def sync_identity_source_route(source_id):
+    with closing(db_connection()) as conn:
+        source = fetch_table_row_by_id(conn, "identity_sources", source_id)
+        if source is None:
+            return jsonify({"error": "Identity source not found"}), 404
+
+        summary, error = sync_identity_source_profiles(conn, source)
+        conn.commit()
+
+    if error:
+        status_code = 400 if "not supported" in error["error"] else 502
+        if request.form:
+            return redirect(url_for("index"))
+        return jsonify(error), status_code
+
+    if request.form:
+        return redirect(url_for("index"))
+    return jsonify({"status": "ok", **summary})
 
 
 @app.post("/status-mappings/<int:mapping_id>/delete")
@@ -3164,6 +4599,19 @@ def delete_hospital_role_mapping_route(mapping_id):
     if request.form:
         return redirect(url_for("index"))
     return jsonify({"status": "deleted", "id": mapping_id})
+
+
+@app.post("/document-route-definitions/<int:route_definition_id>/delete")
+def delete_document_route_definition_route(route_definition_id):
+    with closing(db_connection()) as conn:
+        cursor = conn.execute("DELETE FROM document_route_definitions WHERE id = ?", (route_definition_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Document route definition not found"}), 404
+
+    if request.form:
+        return redirect(url_for("index"))
+    return jsonify({"status": "deleted", "id": route_definition_id})
 
 
 @app.get("/sync-failures")

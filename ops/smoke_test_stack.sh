@@ -11,45 +11,69 @@ docflow_export_runtime
 
 RUKOVODITEL_URL="${DOCFLOW_PUBLIC_BASE}/index.php?module=dashboard/"
 
+curl_docflow() {
+  local url="${1:-}"
+  shift || true
+
+  local scheme host port path probe_ip
+  scheme="$(docflow_url_field "${url}" scheme)"
+  host="$(docflow_url_field "${url}" host)"
+  port="$(docflow_url_field "${url}" port)"
+  path="$(docflow_url_field "${url}" path)"
+  probe_ip="$(docflow_local_probe_ip)"
+
+  if [[ -z "${scheme}" || -z "${host}" || -z "${port}" ]]; then
+    echo "[smoke] ERROR: failed to parse url: ${url}" >&2
+    return 1
+  fi
+
+  curl --resolve "${host}:${port}:${probe_ip}" "$@" "${scheme}://${host}:${port}${path}"
+}
+
 echo "[smoke] stack health"
 bash ops/check_stack.sh >/tmp/dms_check_stack.log
 tail -n +1 /tmp/dms_check_stack.log
 
 echo
 echo "[smoke] rukovoditel login via gateway"
-python3 - <<'PY'
-import os
+COOKIE_JAR="$(mktemp)"
+LOGIN_PAGE="$(mktemp)"
+LOGIN_BODY="$(mktemp)"
+curl_docflow "${DOCFLOW_PUBLIC_BASE}/index.php?module=dashboard/" -k -sS -L -c "${COOKIE_JAR}" -b "${COOKIE_JAR}" > "${LOGIN_PAGE}"
+
+LOGIN_TOKEN="$(python3 - "${LOGIN_PAGE}" <<'PY'
+from pathlib import Path
 import re
-import ssl
 import sys
-import urllib.parse
-import urllib.request
-import http.cookiejar
 
-ctx = ssl._create_unverified_context()
-cj = http.cookiejar.CookieJar()
-opener = urllib.request.build_opener(
-    urllib.request.HTTPSHandler(context=ctx),
-    urllib.request.HTTPCookieProcessor(cj),
-)
-
-base = os.environ["DOCFLOW_PUBLIC_BASE"]
-html = opener.open(f"{base}/index.php?module=dashboard/").read().decode("utf-8", "ignore")
+html = Path(sys.argv[1]).read_text(encoding="utf-8", errors="ignore")
 match = re.search(r'name="form_session_token" id="form_session_token" value="([^"]+)"', html)
-if not match:
-    print("Rukovoditel login token not found", file=sys.stderr)
-    sys.exit(1)
+print(match.group(1) if match else "", end="")
+PY
+)"
 
-payload = urllib.parse.urlencode(
-    {
-        "form_session_token": match.group(1),
-        "username": "admin",
-        "password": "admin123",
-    }
-).encode()
-resp = opener.open(f"{base}/index.php?module=users/login&action=login", data=payload)
-body = resp.read().decode("utf-8", "ignore")
+if [ -z "${LOGIN_TOKEN}" ]; then
+  echo "Rukovoditel login token not found" >&2
+  exit 1
+fi
 
+LOGIN_FINAL_URL="$(
+  curl_docflow "${DOCFLOW_PUBLIC_BASE}/index.php?module=users/login&action=login" \
+    -k -sS -L \
+    -c "${COOKIE_JAR}" \
+    -b "${COOKIE_JAR}" \
+    -o "${LOGIN_BODY}" \
+    -w '%{url_effective}' \
+    --data-urlencode "form_session_token=${LOGIN_TOKEN}" \
+    --data-urlencode "username=${DOCFLOW_ADMIN_USERNAME:-admin}" \
+    --data-urlencode "password=${DOCFLOW_ADMIN_PASSWORD:-admin123}"
+)"
+
+python3 - "${LOGIN_BODY}" "${LOGIN_FINAL_URL}" <<'PY'
+from pathlib import Path
+import sys
+
+body = Path(sys.argv[1]).read_text(encoding="utf-8", errors="ignore")
 required = [
     "Главная",
     "Работа",
@@ -57,7 +81,7 @@ required = [
     "Контроль",
 ]
 missing = [item for item in required if item not in body]
-print("final_url:", resp.geturl())
+print("final_url:", sys.argv[2])
 print("missing_menu_items:", missing)
 if missing:
     sys.exit(1)
@@ -65,8 +89,8 @@ PY
 
 echo
 echo "[smoke] onlyoffice through gateway"
-curl -k -sf "${DOCFLOW_OFFICE_PUBLIC_BASE}/healthcheck" >/dev/null
-curl -k -sf "${DOCFLOW_OFFICE_PUBLIC_BASE}/web-apps/apps/api/documents/api.js" >/tmp/dms_onlyoffice_api.js
+curl_docflow "${DOCFLOW_OFFICE_PUBLIC_BASE}/healthcheck" -k -sf >/dev/null
+curl_docflow "${DOCFLOW_OFFICE_PUBLIC_BASE}/web-apps/apps/api/documents/api.js" -k -sf >/tmp/dms_onlyoffice_api.js
 if ! rg -q 'DocsAPI|DocEditor' /tmp/dms_onlyoffice_api.js; then
   echo "ONLYOFFICE api.js does not look correct" >&2
   exit 1
@@ -77,10 +101,10 @@ echo
 echo "[smoke] naudoc through gateway"
 NAUDOC_INDEX="$(mktemp)"
 NAUDOC_HOME="$(mktemp)"
-curl -k -s -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/" >"$NAUDOC_INDEX"
-curl -k -s -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/home" >"$NAUDOC_HOME"
-curl -k -sf -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/inFrame?link=member_tasks" >/dev/null
-curl -k -sf -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" "${DOCFLOW_DOCS_BASE}/storage/view" >/dev/null
+curl_docflow "${DOCFLOW_DOCS_BASE}/" -k -s -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" >"$NAUDOC_INDEX"
+curl_docflow "${DOCFLOW_DOCS_BASE}/home" -k -s -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" >"$NAUDOC_HOME"
+curl_docflow "${DOCFLOW_DOCS_BASE}/inFrame?link=member_tasks" -k -sf -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" >/dev/null
+curl_docflow "${DOCFLOW_DOCS_BASE}/storage/view" -k -sf -u "${NAUDOC_USERNAME}:${NAUDOC_PASSWORD}" >/dev/null
 
 if rg -q 'host\.docker\.internal' "$NAUDOC_INDEX" "$NAUDOC_HOME" || rg -Fq "http://${DOCFLOW_DOCS_BASE#https://}" "$NAUDOC_INDEX" "$NAUDOC_HOME"; then
   echo "NauDoc still exposes internal or insecure public URLs" >&2
@@ -98,25 +122,24 @@ echo
 echo "[smoke] sync scripts"
 bash rukovoditel-test/sync_service_requests.sh >/tmp/dms_sync_requests.log
 bash rukovoditel-test/sync_project_documents.sh >/tmp/dms_sync_projects.log
+bash rukovoditel-test/sync_document_cards.sh --force-all >/tmp/dms_sync_doc_cards.log
 bash rukovoditel-test/pull_bridge_updates.sh --only-linked >/tmp/dms_pull_bridge.log
 cat /tmp/dms_sync_requests.log
 cat /tmp/dms_sync_projects.log
+cat /tmp/dms_sync_doc_cards.log
 cat /tmp/dms_pull_bridge.log
 
 echo
 echo "[smoke] bridge links"
-python3 - <<'PY'
+BRIDGE_LINKS_JSON="$(mktemp)"
+curl_docflow "${DOCFLOW_BRIDGE_PUBLIC_BASE}/links" -k -sS -f > "${BRIDGE_LINKS_JSON}"
+python3 - "${BRIDGE_LINKS_JSON}" "${DOCFLOW_DOCS_BASE}" <<'PY'
 import json
-import os
-import ssl
+from pathlib import Path
 import sys
-import urllib.request
 
-ctx = ssl._create_unverified_context()
-docs_base = os.environ["DOCFLOW_DOCS_BASE"]
-bridge_base = os.environ["DOCFLOW_BRIDGE_PUBLIC_BASE"]
-resp = urllib.request.urlopen(f"{bridge_base}/links", context=ctx)
-links = json.loads(resp.read().decode("utf-8"))
+links = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+docs_base = sys.argv[2]
 print("links_total:", len(links))
 if len(links) < 4:
     print("Expected at least 4 integration links", file=sys.stderr)

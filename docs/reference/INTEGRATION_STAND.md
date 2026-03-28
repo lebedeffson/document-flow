@@ -32,7 +32,7 @@ Unified public entrypoints through the gateway:
 ### Rukovoditel
 
 - login: `admin`
-- password: `admin123`
+- password: from `DOCFLOW_ADMIN_PASSWORD`
 
 ## Running containers
 
@@ -135,7 +135,18 @@ cd /home/lebedeffson/Code/Документооборот/ops
 
 ```bash
 cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
-./seed_onlyoffice_pilot.sh
+./seed_onlyoffice_document.sh
+```
+
+### Seed the ONLYOFFICE spreadsheet pilot
+
+```bash
+cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
+source /home/lebedeffson/Code/Документооборот/ops/lib/runtime_env.sh
+docflow_load_env /home/lebedeffson/Code/Документооборот
+docflow_export_runtime
+ITEM_ID="$(docker exec "${RUKOVODITEL_DB_CONTAINER}" mariadb -N -s -u"${RUKOVODITEL_DB_USER}" -p"${RUKOVODITEL_DB_PASSWORD}" "${RUKOVODITEL_DB_NAME}" -e "select id from app_entity_25 where field_242='Таблица дежурств отделения: апрель 2026' order by id desc limit 1;" | tr -d '\r')"
+./seed_onlyoffice_document.sh "${ITEM_ID}" duty-schedule-april-2026.xlsx "Дежурные врачи" "Старшая медсестра смены" "Контрольная таблица для проверки Excel-сценария в ONLYOFFICE."
 ```
 
 ### Audit the ONLYOFFICE flow
@@ -143,6 +154,13 @@ cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
 ```bash
 cd /home/lebedeffson/Code/Документооборот/ops
 ./audit_onlyoffice_integration.py
+```
+
+### Export a LAN manual test packet
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/export_lan_manual_test_packet.sh
 ```
 
 ### Create backup

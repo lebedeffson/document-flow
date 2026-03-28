@@ -30,16 +30,24 @@
 15. GUI-маппинг hospital-ролей
 16. backup/restore scripts
 17. production readiness audit
+18. GUI-реестр hospital-маршрутов документов
+19. route-aware `Bridge -> NauDoc` write-back с описанием маршрута в официальном контуре
+20. локальный `LDAP-first` baseline:
+   - отдельный `hospital_ldap` профиль в compose
+   - bootstrap hospital-пользователей
+   - живой `Bridge -> LDAP test/sync`
+   - identity audit в полном verify
 
 Но для hospital production все еще не закрыты:
 
-1. единый каталог пользователей или `LDAP/SSO`
-2. прямой write-back в `NauDoc` по GUI-маппингу
-3. финальные hospital-маршруты
-4. синхронизация подразделений и role-assignment не только для demo-профилей
-5. перенос и активация боевого `.env` на сервере больницы
-6. мониторинг и staging
-7. пилотный регламент эксплуатации
+1. реальный hospital `LDAP/AD` или `SSO`, а не локальный baseline
+2. финальные hospital-маршруты
+3. синхронизация подразделений и role-assignment не только для demo-профилей
+4. перенос и активация боевого `.env` на сервере больницы
+5. мониторинг и staging
+6. пилотный регламент эксплуатации
+7. доведение прямого write-back в `NauDoc` до финальной business-логики учреждения
+8. ограниченное live-внедрение `DocSpace` и `Workspace` для первой production-волны
 
 ---
 
@@ -76,6 +84,7 @@
 5. сделать первый restore drill
 6. закрыть лишние наружные порты
 7. оформить базовый ops-runbook
+8. подготовить production/staging URL для `DocSpace` и `Workspace`, если они входят в первую волну
 
 ### Что уже закрыто частично
 
@@ -94,6 +103,7 @@
 2. проверить запуск контейнеров на hospital `.env`
 3. повторить backup + restore drill на staging-контуре больницы
 4. прописать runbook для ИТ-службы
+5. поднять ограниченные инстансы `DocSpace` и `Workspace` для первой волны, если они входят в operating model
 
 ### Критерий приемки
 
@@ -101,6 +111,7 @@
 2. система поднимается из `.env`
 3. backup проходит по таймеру
 4. restore drill подтвержден на production-like контуре
+5. если `DocSpace/Workspace` входят в первую волну, они доступны по согласованным URL и не ломают основной контур
 
 ---
 
@@ -141,6 +152,8 @@
 4. suggestion flow по отображаемому имени уже поддерживается
 5. администратор уже может принять подсказку через GUI без правки БД
 6. администратор уже может через GUI описывать источники идентификации и отделять hospital-роли от технических ролей источников
+7. есть локальный `LDAP-first` runtime baseline с живым bind/test/sync
+8. полный verify уже проверяет `identity integration`
 
 ### Критерий приемки
 
@@ -192,10 +205,10 @@
 
 ### Что входит
 
-1. прямой write-back в `NauDoc` по GUI-маппингу полей
-2. более умный manual relink
-3. GUI-конструктор связей между сущностями
-4. прозрачная диагностика того, что и куда синхронизируется
+1. более умный manual relink
+2. GUI-конструктор связей между сущностями
+3. прозрачная диагностика того, что и куда синхронизируется
+4. доведение базового `Bridge -> NauDoc` write-back до hospital business-логики
 
 ### Что уже есть как основа
 
@@ -203,10 +216,12 @@
 2. GUI-маппинг полей
 3. `naudoc_projection`
 4. manual relink базового уровня
+5. рабочий прямой `document_cards -> NauDoc` write-back
+6. GUI-слой route definitions для hospital-маршрутов
 
 ### Что именно доделать
 
-1. научить `Bridge` не только хранить projection, но и выполнять прикладное обновление `NauDoc`
+1. закрепить write-back под финальные hospital document routes
 2. добавить ручной выбор сущности при relink
 3. добавить подсказки, с чем лучше связать запись
 4. логировать изменения интеграционных правил
@@ -232,6 +247,14 @@
 3. алерты по sync-ошибкам
 4. health dashboard
 5. регулярный prod-readiness прогон перед релизом
+
+Что уже закрыто базово:
+
+1. есть `generate_staging_env.sh`
+2. bind-порты сервисов вынесены в env
+3. есть `monitoring_snapshot.py`
+4. есть systemd timer для monitoring snapshot
+5. есть отдельный [STAGING_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/STAGING_RUNBOOK.md)
 
 ### Критерий приемки
 
@@ -291,7 +314,8 @@
 2. restore drill
 3. hospital role matrix в коде и меню
 4. user directory improvements
-5. подготовку к прямому `Bridge -> NauDoc` write-back
+5. финализацию hospital-маршрутов
+6. staging и monitoring
 
 Это самый рациональный путь, который одновременно:
 

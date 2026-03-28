@@ -21,16 +21,16 @@
 
 Под рукой держать логины:
 
-1. `admin / admin123`
-2. `manager.test / rolepass123`
-3. `office.test / rolepass123`
+1. `admin / пароль из DOCFLOW_ADMIN_PASSWORD`
+2. `manager.test / пароль из DOCFLOW_ROLE_DEFAULT_PASSWORD`
+3. `office.test / пароль из DOCFLOW_ROLE_DEFAULT_PASSWORD`
 4. для `NauDoc`: логин `admin`, пароль брать из `NAUDOC_PASSWORD` в корневом `.env`
 
 Если нужно быстро привести стенд в порядок:
 
 ```bash
 cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
-bash prepare_customer_demo.sh
+bash prepare_hospital_baseline.sh
 ```
 
 ## 3. Структура показа
@@ -69,7 +69,7 @@ bash prepare_customer_demo.sh
 
 Войти под:
 
-1. `admin / admin123`
+1. `admin / пароль из DOCFLOW_ADMIN_PASSWORD`
 
 Открыть разделы:
 

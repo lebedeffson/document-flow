@@ -1,0 +1,11 @@
+[Unit]
+Description=Run DocFlow monitoring snapshot every 5 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Unit=docflow-monitor.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

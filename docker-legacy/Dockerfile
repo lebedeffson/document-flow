@@ -55,7 +55,7 @@ RUN groupadd -g 1000 zope \
  && useradd -m -u 1000 -g 1000 -s /bin/bash zope \
  && chown -R 1000:1000 ${INSTANCE_HOME} ${PY24_PREFIX} ${ZOPE_PREFIX}
 
-COPY docker-legacy/entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 WORKDIR /opt/naudoc

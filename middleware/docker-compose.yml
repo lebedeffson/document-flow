@@ -1,5 +1,6 @@
 services:
   middleware:
+    image: "${BRIDGE_IMAGE:-docflow/bridge:local}"
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,13 +19,41 @@ services:
       SYNC_CONTROL_URL: "${SYNC_CONTROL_URL:-http://host.docker.internal:18081/run_sync_job.php}"
       SYNC_CONTROL_TOKEN: "${BRIDGE_SYNC_CONTROL_TOKEN:-bridge_sync_control_dev}"
       BRIDGE_REQUEST_TIMEOUT: "${BRIDGE_REQUEST_TIMEOUT:-8}"
+      LDAP_BIND_PASSWORD: "${LDAP_BIND_PASSWORD:-ldap_bind_dev}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "18082:8000"
+      - "${BRIDGE_BIND_PORT:-18082}:8000"
     volumes:
       - bridge_data:/data
     restart: unless-stopped
 
+  hospital_ldap:
+    image: "${LDAP_IMAGE:-osixia/openldap:1.5.0}"
+    profiles:
+      - identity
+    env_file:
+      - ../.env
+    container_name: "${LDAP_CONTAINER_NAME:-docflow_hospital_ldap}"
+    environment:
+      LDAP_ORGANISATION: "${LDAP_ORGANISATION:-Hospital_DocFlow}"
+      LDAP_DOMAIN: "${LDAP_DOMAIN:-hospital.local}"
+      LDAP_ADMIN_PASSWORD: "${LDAP_ADMIN_PASSWORD:-ldap_admin_dev}"
+      LDAP_CONFIG_PASSWORD: "${LDAP_CONFIG_PASSWORD:-ldap_config_dev}"
+      LDAP_TLS: "false"
+      KEEP_EXISTING_CONFIG: "false"
+    command: --copy-service --loglevel info
+    volumes:
+      - bridge_ldap_data:/var/lib/ldap
+      - bridge_ldap_config:/etc/ldap/slapd.d
+      - ./runtime/ldap/bootstrap:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
+    networks:
+      default:
+        aliases:
+          - ldap.hospital.local
+    restart: unless-stopped
+
 volumes:
   bridge_data:
+  bridge_ldap_data:
+  bridge_ldap_config:

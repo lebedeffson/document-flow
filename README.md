@@ -31,7 +31,7 @@
 ### Администратор
 
 - логин: `admin`
-- пароль: `admin123`
+- пароль: из `DOCFLOW_ADMIN_PASSWORD`
 
 Это полный контур сопровождения:
 
@@ -44,8 +44,8 @@
 
 ### Простой пользователь
 
-- логин: `user.demo`
-- пароль: `rolepass123`
+- логин: рабочая учетная запись сотрудника
+- пароль: из `DOCFLOW_ROLE_DEFAULT_PASSWORD`
 
 Это чистый пользовательский режим:
 
@@ -88,7 +88,7 @@
 Войти:
 
 - `https://localhost:18443/`
-- `admin / admin123`
+- `admin / пароль из DOCFLOW_ADMIN_PASSWORD`
 
 Проверить:
 
@@ -123,7 +123,7 @@
 Войти:
 
 - `https://localhost:18443/`
-- `user.demo / rolepass123`
+- рабочая учетная запись сотрудника / пароль из `DOCFLOW_ROLE_DEFAULT_PASSWORD`
 
 Проверить:
 
@@ -141,6 +141,12 @@
 9. Открытие документа в редакторе
 
 Пользовательский режим нужен для проверки того, что платформа понятна без технического шума.
+
+Краткая матрица пользовательских возможностей:
+
+- [USER_CAPABILITY_MATRIX.md](/home/lebedeffson/Code/Документооборот/docs/reference/USER_CAPABILITY_MATRIX.md)
+- [PILOT_USER_LIST_TEMPLATE.md](/home/lebedeffson/Code/Документооборот/docs/reference/PILOT_USER_LIST_TEMPLATE.md)
+- [pilot_users_template.csv](/home/lebedeffson/Code/Документооборот/docs/reference/pilot_users_template.csv)
 
 ---
 
@@ -169,7 +175,20 @@
 3. открыть карточку документа
 4. нажать `Открыть документ в редакторе`
 
-Для теста можно использовать демонстрационный документ в разделе `Карточки документов`.
+Для контрольной проверки удобно использовать рабочий документ в разделе `Карточки документов`.
+
+Самый простой контрольный сценарий:
+
+1. открыть `Рабочий документ отделения: Иван Иванов`
+2. нажать `Открыть документ в редакторе`
+3. внести любую правку
+4. убедиться, что карточка и ссылка `NauDoc` остались доступными
+
+Дополнительные простые hospital-сценарии:
+
+1. `Направление пациента: Иван Иванов`
+2. `Медицинская запись отделения: Иван Иванов`
+3. `Внутренний приказ отделения: график обходов`
 
 ---
 
@@ -182,10 +201,9 @@
 3. `ONLYOFFICE Docs` как встроенный веб-редактор
 4. `Bridge` как интеграционный слой
 
-Пока не развернуты как отдельные сервисы:
-
-1. `ONLYOFFICE DocSpace`
-2. `ONLYOFFICE Workspace`
+`DocSpace` и `Workspace` теперь входят в scope первой production-волны, но ограниченно.
+При этом в текущем стенде они еще не подняты как живые отдельные сервисы, поэтому до релиза их нужно развернуть и проверить отдельно.
+`Workspace` по-прежнему должен закрывать только те офисные функции, которых нет в `Rukovoditel`.
 
 ---
 
@@ -204,11 +222,11 @@
 
 ## 9. Как быстро привести стенд в порядок перед тестом
 
-Обновить demo-данные:
+Обновить рабочий baseline:
 
 ```bash
 cd /home/lebedeffson/Code/Документооборот/rukovoditel-test
-bash prepare_customer_demo.sh
+bash prepare_hospital_baseline.sh
 ```
 
 Прогнать полный verify:
@@ -248,6 +266,17 @@ bash install_from_bundle.sh /opt/docflow
 Полный runbook:
 
 - [OFFLINE_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFLINE_INSTALL_RUNBOOK.md)
+
+Если нужно не только установить стенд, но и подготовить пакет для пилота на одном подразделении:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/create_pilot_package.sh
+```
+
+Опорный документ:
+
+- [PILOT_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/PILOT_RUNBOOK.md)
 
 Проверить production-readiness базового контура:
 
@@ -290,7 +319,7 @@ bash sync_project_documents.sh --force-all
 
 - [README.md](/home/lebedeffson/Code/Документооборот/README.md)
 - [USER_QUICKSTART_GUIDE.md](/home/lebedeffson/Code/Документооборот/USER_QUICKSTART_GUIDE.md)
-- [CUSTOMER_DEMO_SCRIPT.md](/home/lebedeffson/Code/Документооборот/CUSTOMER_DEMO_SCRIPT.md)
+- [CUSTOMER_PRESENTATION_SCRIPT.md](/home/lebedeffson/Code/Документооборот/CUSTOMER_PRESENTATION_SCRIPT.md)
 - [HOSPITAL_PRODUCTION_ROADMAP.md](/home/lebedeffson/Code/Документооборот/HOSPITAL_PRODUCTION_ROADMAP.md)
 - [UNIFIED_PROD_PLATFORM_PLAN.md](/home/lebedeffson/Code/Документооборот/UNIFIED_PROD_PLATFORM_PLAN.md)
 
@@ -299,8 +328,9 @@ bash sync_project_documents.sh --force-all
 - [HOSPITAL_PRODUCTION_ROADMAP.md](/home/lebedeffson/Code/Документооборот/HOSPITAL_PRODUCTION_ROADMAP.md)
 - [HOSPITAL_NEXT_STEPS_PLAN.md](/home/lebedeffson/Code/Документооборот/docs/reference/HOSPITAL_NEXT_STEPS_PLAN.md)
 - [HOSPITAL_TARGET_OPERATING_MODEL.md](/home/lebedeffson/Code/Документооборот/docs/reference/HOSPITAL_TARGET_OPERATING_MODEL.md)
+- [HOSPITAL_RELEASE_CHECKLIST.md](/home/lebedeffson/Code/Документооборот/docs/reference/HOSPITAL_RELEASE_CHECKLIST.md)
 - [UNIFIED_PROD_PLATFORM_PLAN.md](/home/lebedeffson/Code/Документооборот/UNIFIED_PROD_PLATFORM_PLAN.md)
-- [DEMO_DATA_CATALOG.md](/home/lebedeffson/Code/Документооборот/DEMO_DATA_CATALOG.md)
+- [REFERENCE_DATA_CATALOG.md](/home/lebedeffson/Code/Документооборот/REFERENCE_DATA_CATALOG.md)
 
 Технические отчеты и справочные матрицы перенесены в:
 

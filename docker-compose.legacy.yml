@@ -1,12 +1,16 @@
 services:
   naudoc_legacy:
+    image: "${NAUDOC_LEGACY_IMAGE:-docflow/naudoc-legacy:local}"
     build:
-      context: .
-      dockerfile: docker-legacy/Dockerfile
+      context: ./docker-legacy
+      dockerfile: Dockerfile
     container_name: "${NAUDOC_LEGACY_CONTAINER:-naudoc34_legacy}"
+    environment:
+      NAUDOC_USERNAME: "${NAUDOC_USERNAME:-admin}"
+      NAUDOC_PASSWORD: "${NAUDOC_PASSWORD:-admin}"
     ports:
-      - "18080:8080"
+      - "${NAUDOC_BIND_PORT:-18080}:8080"
     user: "1000:1000"
     volumes:
-      - ./naudoc_project:/mnt/naudoc:ro
+      - ./naudoc_project:/mnt/naudoc
     restart: unless-stopped

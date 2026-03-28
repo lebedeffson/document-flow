@@ -17,7 +17,7 @@ DB_PASSWORD="${RUKOVODITEL_DB_PASSWORD:-rukovoditel}"
 BRIDGE_CONTAINER="${BRIDGE_CONTAINER:-naudoc_bridge_test}"
 NAUDOC_LEGACY_CONTAINER="${NAUDOC_LEGACY_CONTAINER:-naudoc34_legacy}"
 
-mkdir -p "${TARGET_DIR}/mariadb" "${TARGET_DIR}/bridge" "${TARGET_DIR}/naudoc"
+mkdir -p "${TARGET_DIR}/mariadb" "${TARGET_DIR}/bridge" "${TARGET_DIR}/naudoc" "${TARGET_DIR}/uploads"
 
 echo "[backup] target: ${TARGET_DIR}"
 
@@ -32,6 +32,9 @@ docker cp "${BRIDGE_CONTAINER}:/data/bridge.db" "${TARGET_DIR}/bridge/bridge.db"
 echo "[backup] copying NauDoc Data.fs"
 cp "${ROOT_DIR}/naudoc_project/var/Data.fs" "${TARGET_DIR}/naudoc/Data.fs"
 
+echo "[backup] archiving Rukovoditel uploads"
+tar -C "${ROOT_DIR}/rukovoditel-test/dist" -czf "${TARGET_DIR}/uploads/rukovoditel_uploads.tar.gz" uploads
+
 cat > "${TARGET_DIR}/manifest.txt" <<EOF
 created_at=${STAMP}
 source_root=${ROOT_DIR}
@@ -40,12 +43,13 @@ files=
   mariadb/rukovoditel.sql
   bridge/bridge.db
   naudoc/Data.fs
+  uploads/rukovoditel_uploads.tar.gz
 EOF
 
 if command -v sha256sum >/dev/null 2>&1; then
   (
     cd "${TARGET_DIR}"
-    sha256sum mariadb/rukovoditel.sql bridge/bridge.db naudoc/Data.fs > SHA256SUMS
+    sha256sum mariadb/rukovoditel.sql bridge/bridge.db naudoc/Data.fs uploads/rukovoditel_uploads.tar.gz > SHA256SUMS
   )
 fi
 

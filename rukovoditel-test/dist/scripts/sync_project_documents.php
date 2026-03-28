@@ -33,6 +33,25 @@ const DOC_PROJECT_LINK_FIELD_ID = 251;
 const DOC_REQUEST_LINK_FIELD_ID = 252;
 const DOC_DESCRIPTION_FIELD_ID = 253;
 
+function get_doc_route_field_id()
+{
+    static $field_id = null;
+
+    if ($field_id === null)
+    {
+        $field_id = platform_sync_field_id_by_name(DOC_CARD_ENTITY_ID, 'Маршрут документа');
+    }
+
+    if (!(int) $field_id)
+    {
+        throw new RuntimeException(
+            "Field 'Маршрут документа' was not found for document cards. Run apply_process_model.sh first."
+        );
+    }
+
+    return (int) $field_id;
+}
+
 function console_log($message)
 {
     echo $message . PHP_EOL;
@@ -178,10 +197,19 @@ function ensure_doc_card_for_project($project)
 
     $doc_status_id = platform_sync_choice_id_by_name(DOC_STATUS_FIELD_ID, 'Черновик');
     $doc_type_id = resolve_project_doc_type_choice();
+    $doc_route_field_id = get_doc_route_field_id();
+    $inferred_doc_route_label = platform_sync_infer_project_doc_route_label(
+        $project_title,
+        (string) $project['field_' . PROJECT_DESCRIPTION_FIELD_ID]
+    );
+    $inferred_doc_route_id = platform_sync_doc_route_choice_id_by_label(
+        $doc_route_field_id,
+        $inferred_doc_route_label
+    );
 
     if (!$doc_card_id || !platform_sync_item_exists(DOC_CARD_ENTITY_ID, $doc_card_id))
     {
-        $doc_card_id = items::insert(DOC_CARD_ENTITY_ID, [
+        $insert_data = [
             'created_by' => (int) $project['created_by'],
             'parent_item_id' => 0,
             'field_' . DOC_TITLE_FIELD_ID => $project_doc_title,
@@ -194,7 +222,14 @@ function ensure_doc_card_for_project($project)
             'field_' . DOC_PROJECT_LINK_FIELD_ID => (string) $project_id,
             'field_' . DOC_REQUEST_LINK_FIELD_ID => '',
             'field_' . DOC_DESCRIPTION_FIELD_ID => '<p>Карточка создана автоматически из проекта #' . $project_id . '.</p>' . ($project['field_' . PROJECT_DESCRIPTION_FIELD_ID] ?: ''),
-        ]);
+        ];
+
+        if ($inferred_doc_route_id > 0)
+        {
+            $insert_data['field_' . $doc_route_field_id] = (string) $inferred_doc_route_id;
+        }
+
+        $doc_card_id = items::insert(DOC_CARD_ENTITY_ID, $insert_data);
 
         if (!$doc_card_id)
         {
@@ -233,6 +268,13 @@ function ensure_doc_card_for_project($project)
     {
         $doc_updates['field_' . DOC_OWNER_FIELD_ID] = (string) $owner_id;
     }
+    if (
+        $inferred_doc_route_id > 0 &&
+        (int) ($doc_card['field_' . $doc_route_field_id] ?? 0) <= 0
+    )
+    {
+        $doc_updates['field_' . $doc_route_field_id] = (string) $inferred_doc_route_id;
+    }
 
     if ($doc_updates)
     {
@@ -246,6 +288,10 @@ function ensure_doc_card_for_project($project)
     $doc_card_url = platform_sync_item_url(DOC_CARD_ENTITY_ID, $doc_card_id);
     $doc_card_title = trim((string) $doc_card['field_' . DOC_TITLE_FIELD_ID]);
     $doc_card_naudoc_url = platform_sync_normalize_naudoc_url($doc_card['field_' . DOC_NAUDOC_LINK_FIELD_ID]);
+    $doc_route_name = platform_sync_choice_name_by_id(
+        $doc_route_field_id,
+        (int) ($doc_card['field_' . $doc_route_field_id] ?? 0)
+    );
     if (!$project_naudoc_url && $doc_card_naudoc_url)
     {
         items::update_by_id(PROJECT_ENTITY_ID, $project_id, [
@@ -276,6 +322,7 @@ function ensure_doc_card_for_project($project)
         'doc_card_url' => $doc_card_url,
         'doc_card_title' => $doc_card_title,
         'manager_user_id' => $owner_id,
+        'document_route' => $doc_route_name,
     ];
     $project_metadata = platform_sync_bridge_build_metadata_from_mappings('projects', $project_source_values, [
         'project_id' => $project_id,
@@ -283,13 +330,14 @@ function ensure_doc_card_for_project($project)
         'doc_card_id' => $doc_card_id,
         'doc_card_url' => $doc_card_url,
         'manager_user_id' => $owner_id,
+        'document_route' => $doc_route_name,
     ]);
     $project_metadata = platform_sync_bridge_attach_naudoc_projection(
         $project_metadata,
         platform_sync_bridge_build_naudoc_projection('projects', $project_source_values)
     );
 
-    platform_sync_bridge_upsert_link([
+    $project_link_payload = [
         'external_system' => 'rukovoditel',
         'external_entity' => 'projects',
         'external_item_id' => (string) $project_id,
@@ -299,7 +347,8 @@ function ensure_doc_card_for_project($project)
         'sync_status' => $sync_status,
         'notes' => 'Автосвязь project -> document card',
         'metadata' => $project_metadata,
-    ]);
+    ];
+    platform_sync_bridge_upsert_link($project_link_payload);
 
     $doc_card_source_values = [
         'doc_card_id' => $doc_card_id,
@@ -307,19 +356,21 @@ function ensure_doc_card_for_project($project)
         'doc_card_title' => $doc_card_title,
         'source_project_id' => $project_id,
         'source_project_url' => $project_url,
+        'document_route' => $doc_route_name,
     ];
     $doc_card_metadata = platform_sync_bridge_build_metadata_from_mappings('document_cards', $doc_card_source_values, [
         'doc_card_id' => $doc_card_id,
         'doc_card_url' => $doc_card_url,
         'source_project_id' => $project_id,
         'source_project_url' => $project_url,
+        'document_route' => $doc_route_name,
     ]);
     $doc_card_metadata = platform_sync_bridge_attach_naudoc_projection(
         $doc_card_metadata,
         platform_sync_bridge_build_naudoc_projection('document_cards', $doc_card_source_values)
     );
 
-    platform_sync_bridge_upsert_link([
+    $doc_card_link_result = platform_sync_bridge_upsert_link([
         'external_system' => 'rukovoditel',
         'external_entity' => 'document_cards',
         'external_item_id' => (string) $doc_card_id,
@@ -330,6 +381,41 @@ function ensure_doc_card_for_project($project)
         'notes' => 'Автосвязь document card -> NauDoc bridge state (project)',
         'metadata' => $doc_card_metadata,
     ]);
+
+    $doc_card_link_id = (int) ($doc_card_link_result['link']['id'] ?? 0);
+    if ($doc_card_link_id)
+    {
+        $writeback_result = platform_sync_bridge_writeback_link($doc_card_link_id);
+        $written_naudoc_url = platform_sync_normalize_naudoc_url($writeback_result['link']['naudoc_url'] ?? '');
+
+        if ($written_naudoc_url && $written_naudoc_url !== $doc_card_naudoc_url)
+        {
+            items::update_by_id(DOC_CARD_ENTITY_ID, $doc_card_id, [
+                'field_' . DOC_NAUDOC_LINK_FIELD_ID => $written_naudoc_url,
+            ], [
+                'run_email_rules' => false,
+                'run_process' => false,
+            ]);
+            $doc_card_naudoc_url = $written_naudoc_url;
+            $doc_card_sync_status = resolve_sync_status($doc_card_naudoc_url);
+        }
+
+        if ($written_naudoc_url && $written_naudoc_url !== $project_naudoc_url)
+        {
+            items::update_by_id(PROJECT_ENTITY_ID, $project_id, [
+                'field_' . PROJECT_NAUDOC_LINK_FIELD_ID => $written_naudoc_url,
+            ], [
+                'run_email_rules' => false,
+                'run_process' => false,
+            ]);
+            $project_naudoc_url = $written_naudoc_url;
+            $sync_status = resolve_sync_status($project_naudoc_url);
+
+            $project_link_payload['naudoc_url'] = $project_naudoc_url;
+            $project_link_payload['sync_status'] = $sync_status;
+            platform_sync_bridge_upsert_link($project_link_payload);
+        }
+    }
 
     return [
         'project_id' => $project_id,

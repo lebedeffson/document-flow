@@ -43,6 +43,82 @@ class onlyoffice
         return strlen($base_url) ? rtrim($base_url, '/') : '';
     }
 
+    static function getDocumentServerInternalBaseUrl()
+    {
+        $base_url = trim((string) getenv('ONLYOFFICE_INTERNAL_BASE_URL'));
+        if (strlen($base_url))
+        {
+            return rtrim($base_url, '/');
+        }
+
+        $upstream = trim((string) getenv('GATEWAY_ONLYOFFICE_UPSTREAM'));
+        if (!strlen($upstream))
+        {
+            return '';
+        }
+
+        if (!preg_match('/^https?:\\/\\//i', $upstream))
+        {
+            $upstream = 'http://' . $upstream;
+        }
+
+        return rtrim($upstream, '/');
+    }
+
+    static function getDocumentServerFetchUrl($url)
+    {
+        $url = trim((string) $url);
+        if (!strlen($url))
+        {
+            return $url;
+        }
+
+        $base_url = self::getDocumentServerInternalBaseUrl();
+        if (!strlen($base_url) || !preg_match('/^https?:\\/\\//i', $url))
+        {
+            return $url;
+        }
+
+        $url_parts = parse_url($url);
+        $base_parts = parse_url($base_url);
+
+        if (!$url_parts || !$base_parts)
+        {
+            return $url;
+        }
+
+        $path = $url_parts['path'] ?? '';
+        if (strpos($path, '/office/') === 0)
+        {
+            $path = substr($path, strlen('/office'));
+            if (!strlen($path))
+            {
+                $path = '/';
+            }
+        }
+
+        $result = ($base_parts['scheme'] ?? 'http') . '://' . ($base_parts['host'] ?? '');
+
+        if (isset($base_parts['port']))
+        {
+            $result .= ':' . $base_parts['port'];
+        }
+
+        $result .= $path;
+
+        if (isset($url_parts['query']) && strlen($url_parts['query']))
+        {
+            $result .= '?' . $url_parts['query'];
+        }
+
+        if (isset($url_parts['fragment']) && strlen($url_parts['fragment']))
+        {
+            $result .= '#' . $url_parts['fragment'];
+        }
+
+        return $result;
+    }
+
     static function buildAbsoluteUrl($url, $base_url = '')
     {
         if (!strlen($url))
@@ -205,6 +281,289 @@ class onlyoffice
         }
         
         return $mode;
+    }
+
+    static function xml_escape($value)
+    {
+        return htmlspecialchars((string) $value, ENT_XML1 | ENT_COMPAT, 'UTF-8');
+    }
+
+    static function build_package_content($entries)
+    {
+        $tmp_file = tempnam(sys_get_temp_dir(), 'onlyoffice_blank_');
+        $zip = new ZipArchive();
+
+        if($zip->open($tmp_file, ZipArchive::OVERWRITE) !== true)
+        {
+            @unlink($tmp_file);
+            return false;
+        }
+
+        foreach($entries as $path => $content)
+        {
+            $zip->addFromString($path, $content);
+        }
+
+        $zip->close();
+
+        $data = file_get_contents($tmp_file);
+        @unlink($tmp_file);
+
+        return $data;
+    }
+
+    static function build_blank_docx()
+    {
+        return self::build_package_content([
+            '[Content_Types].xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>',
+            '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>',
+            'word/document.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/2006/relationships" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" mc:Ignorable="w14 w15 wp14">
+  <w:body>
+    <w:p/>
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>',
+            'word/_rels/document.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>',
+        ]);
+    }
+
+    static function build_blank_xlsx()
+    {
+        return self::build_package_content([
+            '[Content_Types].xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>',
+            '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>',
+            'docProps/app.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>DocFlow</Application>
+</Properties>',
+            'docProps/core.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>Blank spreadsheet</dc:title>
+  <dc:creator>DocFlow</dc:creator>
+</cp:coreProperties>',
+            'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <bookViews>
+    <workbookView xWindow="0" yWindow="0" windowWidth="28800" windowHeight="18120"/>
+  </bookViews>
+  <sheets>
+    <sheet name="Лист1" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>',
+            'xl/_rels/workbook.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>',
+            'xl/styles.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>
+  <fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
+  <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>
+  <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>',
+            'xl/worksheets/sheet1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="A1"/>
+  <sheetViews><sheetView workbookViewId="0"/></sheetViews>
+  <sheetFormatPr defaultRowHeight="15"/>
+  <sheetData/>
+</worksheet>',
+        ]);
+    }
+
+    static function build_blank_file_content($file_type)
+    {
+        switch(strtolower($file_type))
+        {
+            case 'docx':
+                return self::build_blank_docx();
+            case 'xlsx':
+                return self::build_blank_xlsx();
+            default:
+                return false;
+        }
+    }
+
+    protected function can_update_item($item)
+    {
+        global $app_user;
+
+        $access_rules = new access_rules($this->entity_id, $item);
+        $access_schema = $access_rules->get_access_schema();
+
+        if(users::has_access('update', $access_schema))
+        {
+            return true;
+        }
+
+        if(
+            users::has_access('update_creator', $access_schema)
+            && (int) ($item['created_by'] ?? 0) === (int) ($app_user['id'] ?? 0)
+        )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function can_edit_blank_by_field($field, $item)
+    {
+        if(!is_array($field) || !is_array($item) || (int) ($item['id'] ?? 0) <= 0)
+        {
+            return false;
+        }
+
+        $cfg = new settings($field['configuration'] ?? '');
+
+        return self::getMode($cfg, $this->entity_id, (int) $item['id']) === 'edit';
+    }
+
+    protected function can_create_blank_for_field($field, $item, $file_type = 'docx')
+    {
+        $file_type = strtolower(trim((string) $file_type));
+
+        if(!in_array($file_type, ['docx', 'xlsx'], true))
+        {
+            return false;
+        }
+
+        if(!$this->can_edit_blank_by_field($field, $item))
+        {
+            return false;
+        }
+
+        $cfg = new fields_types_cfg($field['configuration'] ?? '');
+        $allowed_extensions = is_array($cfg->get('allowed_extensions')) ? $cfg->get('allowed_extensions') : ['.docx', '.xlsx'];
+
+        return in_array('.' . $file_type, $allowed_extensions, true);
+    }
+
+    function can_create_blank($field_id, $item, $file_type = 'docx')
+    {
+        $field_query = db_query(
+            "select * from app_fields where id='" . db_input($field_id) . "' and entities_id='" . db_input($this->entity_id) . "' and type='fieldtype_onlyoffice'"
+        );
+
+        if(!$field = db_fetch_array($field_query))
+        {
+            return false;
+        }
+
+        return $this->can_create_blank_for_field($field, $item, $file_type);
+    }
+
+    function create_blank($field_id, $item_id, $file_type = 'docx')
+    {
+        global $app_user;
+
+        $field_query = db_query("select * from app_fields where id='" . db_input($field_id) . "' and entities_id='" . db_input($this->entity_id) . "' and type='fieldtype_onlyoffice'");
+        if(!$field = db_fetch_array($field_query))
+        {
+            redirect_to_404();
+        }
+
+        $item_query = db_query("select * from app_entity_" . (int) $this->entity_id . " where id='" . db_input($item_id) . "'");
+        if(!$item = db_fetch_array($item_query))
+        {
+            redirect_to_404();
+        }
+
+        $file_type = strtolower(trim((string) $file_type));
+        if(!$this->can_create_blank_for_field($field, $item, $file_type))
+        {
+            redirect_to_forbidden();
+        }
+
+        $binary_content = self::build_blank_file_content($file_type);
+        if($binary_content === false)
+        {
+            redirect_to_404();
+        }
+
+        $timestamp = date('Ymd-His');
+        $base_filename = ($file_type === 'xlsx' ? 'blank-spreadsheet-' : 'blank-document-') . $timestamp . '.' . $file_type;
+        $filename = $this->remove_special_characters($base_filename);
+
+        $sql_data = [
+            'entity_id' => $this->entity_id,
+            'field_id' => $field_id,
+            'form_token' => '',
+            'filename' => $filename,
+            'date_added' => time(),
+            'created_by' => $app_user['id'],
+        ];
+
+        db_perform('app_onlyoffice_files', $sql_data);
+        $file_id = db_insert_id();
+
+        $folder = $this->prepare_file_folder($filename);
+        if(!is_dir(DIR_WS_ONLYOFFICE . $folder . '/' . $file_id))
+        {
+            mkdir(DIR_WS_ONLYOFFICE . $folder . '/' . $file_id);
+            $folder = $folder . '/' . $file_id;
+        }
+
+        $file_path = DIR_WS_ONLYOFFICE . $folder . '/' . $filename;
+        if(file_put_contents($file_path, $binary_content) === false)
+        {
+            db_delete_row('app_onlyoffice_files', $file_id);
+            exit('Unable to create ONLYOFFICE file');
+        }
+
+        db_perform('app_onlyoffice_files', [
+            'folder' => $folder,
+            'filekey' => self::genFileKey($file_id),
+        ], 'update', 'id=' . $file_id);
+
+        $field_key = 'field_' . $field_id;
+        $existing_files = array_filter(array_map('trim', explode(',', (string) ($item[$field_key] ?? ''))));
+        array_unshift($existing_files, (string) $file_id);
+        $existing_files = array_values(array_unique($existing_files));
+
+        db_perform('app_entity_' . (int) $this->entity_id, [
+            $field_key => implode(',', $existing_files),
+            'date_updated' => time(),
+        ], 'update', "id='" . db_input($item_id) . "'");
+
+        return [
+            'file_id' => $file_id,
+            'filename' => $filename,
+            'editor_url' => url_for(
+                'items/onlyoffice_editor',
+                'path=' . (int) $this->entity_id . '-' . (int) $item_id . '&action=open&field=' . (int) $field_id . '&file=' . (int) $file_id
+            ),
+        ];
     }
     
     function upload()

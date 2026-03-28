@@ -4,6 +4,8 @@ set -euo pipefail
 INSTANCE_HOME="${INSTANCE_HOME:-/opt/naudoc}"
 PY24_BIN="/opt/python2.4/bin/python2.4"
 MX_BASE_VERSION="3.2.9"
+NAUDOC_USERNAME="${NAUDOC_USERNAME:-admin}"
+NAUDOC_PASSWORD="${NAUDOC_PASSWORD:-admin}"
 
 if [ -d /mnt/naudoc/Products ]; then
   echo "[entrypoint] Syncing Products"
@@ -22,6 +24,23 @@ fi
 if [ -f /mnt/naudoc/var/Data.fs ]; then
   echo "[entrypoint] Installing Data.fs"
   cp /mnt/naudoc/var/Data.fs "${INSTANCE_HOME}/var/Data.fs"
+fi
+
+if [ -n "${NAUDOC_USERNAME}" ] && [ -n "${NAUDOC_PASSWORD}" ]; then
+  echo "[entrypoint] Writing inituser for ${NAUDOC_USERNAME}"
+  "${PY24_BIN}" - "${INSTANCE_HOME}/inituser" "${NAUDOC_USERNAME}" "${NAUDOC_PASSWORD}" <<'PY'
+import binascii
+import os
+import sha
+import sys
+
+inituser_path, username, password = sys.argv[1:4]
+digest = binascii.b2a_base64(sha.new(password).digest())[:-1]
+handle = open(inituser_path, 'w')
+handle.write('%s:{SHA}%s\n' % (username, digest))
+handle.close()
+os.chmod(inituser_path, 0644)
+PY
 fi
 
 if ! "${PY24_BIN}" -c "import mx.DateTime" >/dev/null 2>&1; then

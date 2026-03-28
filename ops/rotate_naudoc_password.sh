@@ -17,15 +17,13 @@ if [ ! -f "${ENV_FILE}" ]; then
 fi
 
 USERNAME="${NAUDOC_USERNAME:-admin}"
-CURRENT_PASSWORD="${NAUDOC_PASSWORD:-}"
+CURRENT_PASSWORD="${NAUDOC_CURRENT_PASSWORD:-${NAUDOC_PASSWORD:-}}"
 NEW_PASSWORD="${1:-$(docflow_random_secret 24)}"
 VERIFY_URL="${DOCFLOW_DOCS_BASE}/manage_users_form"
-CHANGE_URL="${DOCFLOW_DOCS_BASE}/change_password"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="${ROOT_DIR}/backups/pre-naudoc-password-rotation-${STAMP}"
 ENV_BACKUP_FILE="${BACKUP_DIR}/env/.env.before"
 
-PASSWORD_ROTATED=0
 ENV_UPDATED=0
 SERVICES_RESTARTED=0
 
@@ -37,47 +35,17 @@ verify_credentials() {
   [ "${code}" = "200" ]
 }
 
-change_password() {
-  local current_password="${1}"
-  local target_password="${2}"
-  local output_file
-  output_file="$(mktemp)"
-  local code
-  code="$(
-    curl -k -s -o "${output_file}" -w '%{http_code}' \
-      -u "${USERNAME}:${current_password}" \
-      -X POST "${CHANGE_URL}" \
-      --data-urlencode "userid=${USERNAME}" \
-      --data-urlencode "password=${target_password}" \
-      --data-urlencode "confirm=${target_password}" \
-      || true
-  )"
-
-  if [ "${code}" != "200" ]; then
-    echo "[rotate-naudoc] password change returned HTTP ${code}" >&2
-    rm -f "${output_file}"
-    return 1
-  fi
-
-  rm -f "${output_file}"
-}
-
 recreate_dependents() {
   (
     cd "${ROOT_DIR}"
-    docker compose -p "${MIDDLEWARE_COMPOSE_PROJECT_NAME}" -f middleware/docker-compose.yml up -d --no-build --force-recreate middleware >/dev/null
-    docker compose -p "${RUKOVODITEL_COMPOSE_PROJECT_NAME}" -f rukovoditel-test/docker-compose.yml up -d --no-build --force-recreate rukovoditel rukovoditel_sync_worker >/dev/null
+    docker compose --env-file "${ENV_FILE}" -p "${NAUDOC_LEGACY_COMPOSE_PROJECT}" -f docker-compose.legacy.yml up -d --no-build --force-recreate naudoc_legacy >/dev/null
+    docker compose --env-file "${ENV_FILE}" -p "${MIDDLEWARE_COMPOSE_PROJECT_NAME}" -f middleware/docker-compose.yml up -d --no-build --force-recreate middleware >/dev/null
+    docker compose --env-file "${ENV_FILE}" -p "${RUKOVODITEL_COMPOSE_PROJECT_NAME}" -f rukovoditel-test/docker-compose.yml up -d --no-build --force-recreate rukovoditel rukovoditel_sync_worker >/dev/null
   )
 }
 
 rollback_rotation() {
   echo "[rotate-naudoc] rollback started" >&2
-
-  if [ "${PASSWORD_ROTATED}" = "1" ]; then
-    if verify_credentials "${USERNAME}" "${NEW_PASSWORD}"; then
-      change_password "${NEW_PASSWORD}" "${CURRENT_PASSWORD}" || true
-    fi
-  fi
 
   if [ "${ENV_UPDATED}" = "1" ] && [ -f "${ENV_BACKUP_FILE}" ]; then
     cp "${ENV_BACKUP_FILE}" "${ENV_FILE}" || true
@@ -112,22 +80,13 @@ echo "[rotate-naudoc] creating pre-rotation backup: ${BACKUP_DIR}"
 bash "${ROOT_DIR}/ops/backup_all.sh" "${BACKUP_DIR}/full-backup" >/dev/null
 cp "${ENV_FILE}" "${ENV_BACKUP_FILE}"
 
-echo "[rotate-naudoc] changing NauDoc password"
-change_password "${CURRENT_PASSWORD}" "${NEW_PASSWORD}"
-PASSWORD_ROTATED=1
-
-if ! verify_credentials "${USERNAME}" "${NEW_PASSWORD}"; then
-  echo "[rotate-naudoc] new NauDoc credentials did not verify" >&2
-  exit 1
-fi
-
 docflow_set_env_value "${ENV_FILE}" "NAUDOC_PASSWORD" "${NEW_PASSWORD}"
 ENV_UPDATED=1
 
 docflow_load_env "${ROOT_DIR}"
 docflow_export_runtime
 
-echo "[rotate-naudoc] recreating dependent containers"
+echo "[rotate-naudoc] recreating NauDoc and dependent containers"
 recreate_dependents
 SERVICES_RESTARTED=1
 

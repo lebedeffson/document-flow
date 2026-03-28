@@ -79,11 +79,14 @@ $data = \Firebase\JWT\JWT::decode($data["token"],$cfg->get('secret_key'),["HS256
  */
 if( in_array($data->status,[2,3]) and !empty($data->url))
 {
-    $url = $data->url;
+    $url = onlyoffice::getDocumentServerFetchUrl($data->url);
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 60);
     $content = curl_exec($curl);
     curl_close($curl);
     

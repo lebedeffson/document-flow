@@ -82,19 +82,23 @@ function update_ecosystem_links($entity_id, $item_id)
 
     if($docspace_field_id > 0)
     {
-        $sql_data['field_' . $docspace_field_id] = '';
+        $sql_data['field_' . $docspace_field_id] = platform_service_enabled('docspace')
+            ? platform_ecosystem_url('docspace', $entity_id, $item_id, true)
+            : '';
     }
 
     if($workspace_field_id > 0)
     {
-        $sql_data['field_' . $workspace_field_id] = '';
+        $sql_data['field_' . $workspace_field_id] = platform_service_enabled('workspace')
+            ? platform_ecosystem_url('workspace', $entity_id, $item_id, true)
+            : '';
     }
 
     if(count($sql_data))
     {
         $sql_data['date_updated'] = time();
         db_perform('app_entity_' . (int) $entity_id, $sql_data, 'update', "id='" . db_input($item_id) . "'");
-        console_log("Reset optional ecosystem links for entity {$entity_id} item #{$item_id}");
+        console_log("Updated office ecosystem links for entity {$entity_id} item #{$item_id}");
     }
 }
 
@@ -137,23 +141,23 @@ function ensure_demo_item($entity_id, $title_field_id, $target_title, array $dat
     {
         db_perform('app_entity_' . (int) $entity_id, $sql_data);
         $item_id = db_insert_id();
-        console_log("Created demo item {$target_title} (#{$item_id}) in entity {$entity_id}");
+        console_log("Created baseline item {$target_title} (#{$item_id}) in entity {$entity_id}");
         return (int) $item_id;
     }
 
     $item_id = (int) $item['id'];
     unset($sql_data['date_added']);
     db_perform('app_entity_' . (int) $entity_id, $sql_data, 'update', "id='" . db_input($item_id) . "'");
-    console_log("Updated demo item {$target_title} (#{$item_id}) in entity {$entity_id}");
+    console_log("Updated baseline item {$target_title} (#{$item_id}) in entity {$entity_id}");
     return $item_id;
 }
 
 set_configuration_value('CFG_APP_NAME', 'Единая платформа документооборота');
 set_configuration_value('CFG_APP_SHORT_NAME', 'Документооборот');
-set_configuration_value('CFG_LOGIN_PAGE_HEADING', 'Демонстрационный контур платформы документооборота');
+set_configuration_value('CFG_LOGIN_PAGE_HEADING', 'Рабочий контур платформы документооборота');
 set_configuration_value(
     'CFG_LOGIN_PAGE_CONTENT',
-    'Проекты, заявки, совместная работа над документами, маршруты согласования и архив в едином веб-контуре.'
+    'Проекты, заявки, совместная работа над документами, маршруты согласования и архив в едином рабочем веб-контуре.'
 );
 
 rename_field_if_exists(282, 'Совместное редактирование');
@@ -161,9 +165,11 @@ rename_field_if_exists(282, 'Совместное редактирование')
 $naudoc_public_url = getenv('NAUDOC_PUBLIC_URL') ?: 'https://localhost:18443/docs';
 
 $doc_route_field_id = get_field_id_by_name(25, 'Маршрут документа');
-$route_internal_order_id = get_choice_id_by_name($doc_route_field_id, 'Внутренний приказ');
-$route_outgoing_approval_id = get_choice_id_by_name($doc_route_field_id, 'Исходящее согласование');
-$route_contract_id = get_choice_id_by_name($doc_route_field_id, 'Договор и закупка');
+$route_internal_order_id = get_choice_id_by_name($doc_route_field_id, 'Внутренний приказ / распоряжение');
+$route_outgoing_approval_id = get_choice_id_by_name($doc_route_field_id, 'Исходящее письмо / согласование');
+$route_contract_id = get_choice_id_by_name($doc_route_field_id, 'Договор / закупка / МТЗ');
+$route_clinical_document_id = get_choice_id_by_name($doc_route_field_id, 'Медицинская документация отделения');
+$route_patient_route_id = get_choice_id_by_name($doc_route_field_id, 'Пациент / направление / выписка');
 
 $project_primary_id = ensure_demo_item(
     21,
@@ -257,6 +263,121 @@ $doc_project_id = ensure_demo_item(
     ['Документ проекта: Тестовый проект цифрового документооборота']
 );
 
+$doc_simple_test_id = ensure_demo_item(
+    25,
+    242,
+    'Рабочий документ отделения: Иван Иванов',
+    array_merge([
+        'created_by' => 3,
+        'date_added' => demo_timestamp('2026-03-24'),
+        'date_updated' => time(),
+        'field_243' => 419,
+        'field_244' => 427,
+        'field_245' => 'РД-2026-014',
+        'field_246' => demo_timestamp('2026-03-24'),
+        'field_247' => '1',
+        'field_248' => demo_timestamp('2026-12-31'),
+        'field_249' => '1.0',
+        'field_250' => $naudoc_public_url,
+        'field_251' => '',
+        'field_252' => '',
+        'field_253' => '<p>Простой рабочий документ для контрольного пользовательского сценария: открыть карточку, найти документ, запустить ONLYOFFICE, внести правку и проверить публикацию в NauDoc.</p><p>Исполнитель: Иван Иванов.</p>',
+    ], optional_field_payload($doc_route_field_id, $route_outgoing_approval_id)),
+    ['Тестовый документ Иван Иванов', 'Тестовый документ: Иван Иванов']
+);
+
+$doc_patient_route_id = ensure_demo_item(
+    25,
+    242,
+    'Направление пациента: Иван Иванов',
+    array_merge([
+        'created_by' => 3,
+        'date_added' => demo_timestamp('2026-03-25'),
+        'date_updated' => time(),
+        'field_243' => 419,
+        'field_244' => 427,
+        'field_245' => 'НП-2026-021',
+        'field_246' => demo_timestamp('2026-03-25'),
+        'field_247' => '1',
+        'field_248' => demo_timestamp('2026-12-31'),
+        'field_249' => '1.0',
+        'field_250' => $naudoc_public_url,
+        'field_251' => '',
+        'field_252' => '',
+        'field_253' => '<p>Простой hospital-кейс: направление пациента оформляется в рабочем контуре, редактируется в ONLYOFFICE и получает официальный объект в NauDoc.</p><p>Пациент: Иван Иванов.</p>',
+    ], optional_field_payload($doc_route_field_id, $route_patient_route_id)),
+    ['Направление пациента Иван Иванов']
+);
+
+$doc_clinical_note_id = ensure_demo_item(
+    25,
+    242,
+    'Медицинская запись отделения: Иван Иванов',
+    array_merge([
+        'created_by' => 7,
+        'date_added' => demo_timestamp('2026-03-25'),
+        'date_updated' => time(),
+        'field_243' => 421,
+        'field_244' => 427,
+        'field_245' => 'МЗ-2026-009',
+        'field_246' => demo_timestamp('2026-03-25'),
+        'field_247' => '1',
+        'field_248' => demo_timestamp('2026-12-31'),
+        'field_249' => '1.0',
+        'field_250' => $naudoc_public_url,
+        'field_251' => '',
+        'field_252' => '',
+        'field_253' => '<p>Простой клинический документ для теста hospital-маршрута: подготовка внутренней медицинской записи отделения, совместная правка и публикация в официальный контур.</p><p>Ответственный сотрудник: Иван Иванов.</p>',
+    ], optional_field_payload($doc_route_field_id, $route_clinical_document_id)),
+    ['Медицинская запись Иван Иванов']
+);
+
+$doc_internal_order_simple_id = ensure_demo_item(
+    25,
+    242,
+    'Внутренний приказ отделения: график обходов',
+    array_merge([
+        'created_by' => 2,
+        'date_added' => demo_timestamp('2026-03-26'),
+        'date_updated' => time(),
+        'field_243' => 421,
+        'field_244' => 427,
+        'field_245' => 'ПР-2026-018',
+        'field_246' => demo_timestamp('2026-03-26'),
+        'field_247' => '1',
+        'field_248' => demo_timestamp('2026-12-31'),
+        'field_249' => '1.0',
+        'field_250' => $naudoc_public_url,
+        'field_251' => '',
+        'field_252' => '',
+        'field_253' => '<p>Внутренний приказ подразделения для теста сценария согласования и ознакомления персонала. Используется как простой понятный кейс для заведующего и сотрудников.</p>',
+    ], optional_field_payload($doc_route_field_id, $route_internal_order_id)),
+    ['Внутренний приказ отделения график обходов']
+);
+
+$doc_duty_schedule_id = ensure_demo_item(
+    25,
+    242,
+    'Таблица дежурств отделения: апрель 2026',
+    array_merge([
+        'created_by' => 2,
+        'date_added' => demo_timestamp('2026-03-27'),
+        'date_updated' => time(),
+        'field_243' => 421,
+        'field_244' => 427,
+        'field_245' => 'ТА-2026-022',
+        'field_246' => demo_timestamp('2026-03-27'),
+        'field_247' => '1',
+        'field_248' => demo_timestamp('2026-12-31'),
+        'field_249' => '1.0',
+        'field_250' => $naudoc_public_url,
+        'field_251' => '',
+        'field_252' => '',
+        'field_253' => '<p>Контрольная таблица отделения для проверки ONLYOFFICE Spreadsheet Editor: открыть карточку, запустить таблицу, изменить значение, сохранить и убедиться, что совместная работа не ломается.</p><p>Сценарий удобен для заведующего и старшей медсестры.</p>',
+    ], optional_field_payload($doc_route_field_id, $route_internal_order_id)),
+    ['Таблица дежурств отделения', 'График дежурств отделения']
+);
+
 db_perform('app_entity_21', ['field_279' => (string) $doc_project_id], 'update', "id='" . db_input($project_primary_id) . "'");
 db_perform('app_entity_23', ['field_240' => (string) $doc_request_id], 'update', "id='" . db_input($request_primary_id) . "'");
 
@@ -265,6 +386,10 @@ foreach([
     [23, $request_primary_id],
     [25, $doc_request_id],
     [25, $doc_project_id],
+    [25, $doc_simple_test_id],
+    [25, $doc_patient_route_id],
+    [25, $doc_clinical_note_id],
+    [25, $doc_internal_order_simple_id],
 ] as $ecosystem_item)
 {
     update_ecosystem_links($ecosystem_item[0], $ecosystem_item[1]);
@@ -617,7 +742,7 @@ $mts_primary_id = ensure_demo_item(
         'field_271' => demo_timestamp('2026-04-05'),
         'field_272' => (string) $project_primary_id,
         'field_273' => $naudoc_public_url,
-        'field_274' => '<p>Демонстрационный кейс по обеспечению: заявка связана с проектом внедрения и показывает отдельный процесс МТЗ.</p>',
+        'field_274' => '<p>Контрольный кейс по обеспечению: заявка связана с проектом внедрения и показывает отдельный процесс МТЗ.</p>',
         'field_278' => 767,
     ]
 );
@@ -683,6 +808,86 @@ $doc_base_template_id = ensure_demo_item(
     ]
 );
 
+$doc_base_simple_template_id = ensure_demo_item(
+    26,
+    255,
+    'Простой шаблон документа: Иван Иванов',
+    [
+        'created_by' => 3,
+        'date_added' => demo_timestamp('2026-03-24'),
+        'date_updated' => time(),
+        'field_256' => 754,
+        'field_257' => 758,
+        'field_258' => '1.0',
+        'field_259' => '3',
+        'field_260' => demo_timestamp('2026-12-31'),
+        'field_261' => $naudoc_public_url,
+        'field_262' => 'тест,иван иванов,простой шаблон',
+        'field_263' => '<p>Обычный рабочий шаблон для быстрой подготовки документа. Можно открыть, скопировать как основу, заполнить данными пациента или подразделения и передать в согласование.</p><p>Пример исполнителя: Иван Иванов.</p>',
+    ],
+    ['Простой тестовый шаблон Иван Иванов']
+);
+
+$doc_base_patient_template_id = ensure_demo_item(
+    26,
+    255,
+    'Шаблон направления пациента',
+    [
+        'created_by' => 3,
+        'date_added' => demo_timestamp('2026-03-25'),
+        'date_updated' => time(),
+        'field_256' => 754,
+        'field_257' => 758,
+        'field_258' => '1.0',
+        'field_259' => '3',
+        'field_260' => demo_timestamp('2026-12-31'),
+        'field_261' => $naudoc_public_url,
+        'field_262' => 'пациент,направление,врач',
+        'field_263' => '<p>Простой шаблон направления пациента для hospital pilot. Используется как основа для теста сценария врача: заполнить, согласовать и передать в официальный контур.</p>',
+    ],
+    ['Шаблон направления пациента Иван Иванов']
+);
+
+$doc_base_clinical_template_id = ensure_demo_item(
+    26,
+    255,
+    'Шаблон медицинской записи отделения',
+    [
+        'created_by' => 7,
+        'date_added' => demo_timestamp('2026-03-25'),
+        'date_updated' => time(),
+        'field_256' => 754,
+        'field_257' => 758,
+        'field_258' => '1.0',
+        'field_259' => '3',
+        'field_260' => demo_timestamp('2026-12-31'),
+        'field_261' => $naudoc_public_url,
+        'field_262' => 'медицинская запись,отделение,врач',
+        'field_263' => '<p>Шаблон внутренней медицинской записи отделения. Подходит для быстрого теста ввода данных, редактирования и хранения медицинской служебной документации.</p>',
+    ],
+    ['Шаблон медицинской записи']
+);
+
+$doc_base_internal_order_template_id = ensure_demo_item(
+    26,
+    255,
+    'Шаблон внутреннего приказа отделения',
+    [
+        'created_by' => 2,
+        'date_added' => demo_timestamp('2026-03-26'),
+        'date_updated' => time(),
+        'field_256' => 756,
+        'field_257' => 759,
+        'field_258' => '1.0',
+        'field_259' => '2',
+        'field_260' => demo_timestamp('2026-12-31'),
+        'field_261' => $naudoc_public_url,
+        'field_262' => 'приказ,отделение,руководитель',
+        'field_263' => '<p>Шаблон внутреннего приказа подразделения. Используется для теста маршрута руководителя: подготовить документ, утвердить и довести до сотрудников.</p>',
+    ],
+    ['Шаблон приказа отделения']
+);
+
 $doc_base_manager_guide_id = ensure_demo_item(
     26,
     255,
@@ -745,23 +950,39 @@ foreach([
     [27, $mts_scanner_id],
     [27, $mts_license_id],
     [26, $doc_base_template_id],
+    [26, $doc_base_simple_template_id],
+    [26, $doc_base_patient_template_id],
+    [26, $doc_base_clinical_template_id],
+    [26, $doc_base_internal_order_template_id],
     [26, $doc_base_manager_guide_id],
     [26, $doc_base_matrix_id],
     [26, $doc_base_regulation_id],
+    [25, $doc_simple_test_id],
+    [25, $doc_patient_route_id],
+    [25, $doc_clinical_note_id],
+    [25, $doc_internal_order_simple_id],
 ] as $ecosystem_item)
 {
     update_ecosystem_links($ecosystem_item[0], $ecosystem_item[1]);
 }
 
 console_log('');
-console_log('Customer demo data prepared.');
+console_log('Hospital baseline data prepared.');
 console_log('Primary project ID: ' . $project_primary_id);
 console_log('Primary request ID: ' . $request_primary_id);
 console_log('Request document ID: ' . $doc_request_id);
 console_log('Project document ID: ' . $doc_project_id);
+console_log('Simple test document ID: ' . $doc_simple_test_id);
+console_log('Patient route document ID: ' . $doc_patient_route_id);
+console_log('Clinical note document ID: ' . $doc_clinical_note_id);
+console_log('Internal order test document ID: ' . $doc_internal_order_simple_id);
 console_log('Secondary project ID: ' . $project_secondary_id);
 console_log('Secondary request ID: ' . $request_secondary_id);
 console_log('Archive project ID: ' . $project_archive_id);
 console_log('Approval document ID: ' . $doc_approval_id);
 console_log('Contract request ID: ' . $request_contract_id);
 console_log('Contract document ID: ' . $doc_contract_id);
+console_log('Simple template ID: ' . $doc_base_simple_template_id);
+console_log('Patient template ID: ' . $doc_base_patient_template_id);
+console_log('Clinical template ID: ' . $doc_base_clinical_template_id);
+console_log('Internal order template ID: ' . $doc_base_internal_order_template_id);

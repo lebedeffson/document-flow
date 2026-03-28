@@ -37,6 +37,13 @@
 - исполнение поручений
 - подготовка материалов и вложений
 
+### `8` Старшая медсестра / координатор отделения
+
+- координация документооборота внутри отделения
+- контроль исполнения поручений и готовности документов
+- сопровождение заявок, маршрутов и оперативных согласований
+- рабочий доступ к документам и задачам подразделения без полномочий системного администратора
+
 ### `6` Регистратура / заявитель
 
 - подача заявок
@@ -61,15 +68,15 @@
 
 ## 4. Текущая матрица доступа
 
-| Сущность | Entity ID | Admin | Руководитель подразделения | Врач / сотрудник | Регистратура / заявитель | Канцелярия |
-|---|---:|---|---|---|---|---|
-| Проекты и инициативы | `21` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view_assigned` | `view,reports` |
-| Поручения и задачи | `22` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view_assigned,update` | `view,reports` |
-| Заявки на обслуживание | `23` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view_assigned,create,update,reports` | `view,reports` |
-| Рабочие обсуждения | `24` | full | `view,create,update,delete,reports` | `view_assigned,create,update,delete,reports` | нет | нет |
-| Карточки документов | `25` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view_assigned,create` | `view,create,update,reports` |
-| База документов | `26` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view,reports` | `view,create,update,reports` |
-| Заявки на МТЗ | `27` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `create,view_assigned,update,reports` | `view,reports` |
+| Сущность | Entity ID | Admin | Руководитель подразделения | Врач / сотрудник | Старшая медсестра / координатор | Регистратура / заявитель | Канцелярия |
+|---|---:|---|---|---|---|---|---|
+| Проекты и инициативы | `21` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view,create,update,reports` | `view_assigned` | `view,reports` |
+| Поручения и задачи | `22` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view,create,update,reports` | `view_assigned,update` | `view,reports` |
+| Заявки на обслуживание | `23` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view,create,update,reports` | `view_assigned,create,update,reports` | `view,reports` |
+| Рабочие обсуждения | `24` | full | `view,create,update,delete,reports` | `view_assigned,create,update,delete,reports` | `view_assigned,create,update,reports` | нет | нет |
+| Карточки документов | `25` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view,create,update,reports` | `view_assigned,create` | `view,create,update,reports` |
+| База документов | `26` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view,reports` | `view,reports` | `view,create,update,reports` |
+| Заявки на МТЗ | `27` | full | `view,create,update,delete,reports` | `view,create,update,reports` | `view,create,update,reports` | `create,view_assigned,update,reports` | `view,reports` |
 
 ## 5. Практический смысл ролей
 
@@ -96,6 +103,15 @@
 2. утверждающий
 3. контролер сроков и нагрузки
 4. владелец отчетов и панелей
+
+### Старшая медсестра / координатор отделения
+
+Работает как:
+
+1. координатор внутренних документов отделения
+2. организатор исполнения задач и ознакомления персонала
+3. помощник заведующего по маршрутам и срокам
+4. владелец оперативного рабочего контура без системных полномочий
 
 ### Заявитель
 
@@ -126,8 +142,9 @@
 
 1. группа `4` Заведующий отделением / руководитель подразделения
 2. группа `5` Врач / сотрудник подразделения
-3. группа `6` Регистратура / заявитель
-4. группа `7` Канцелярия / делопроизводство
+3. группа `8` Старшая медсестра / координатор отделения
+4. группа `6` Регистратура / заявитель
+5. группа `7` Канцелярия / делопроизводство
 
 Также заведены:
 
@@ -142,6 +159,7 @@
 2. проверить видимость меню для каждой роли
 3. проверить реальные сценарии:
    - сотрудник
+   - старшая медсестра / координатор
    - руководитель
    - канцелярия
 4. отключить тестовые учетные записи там, где это возможно

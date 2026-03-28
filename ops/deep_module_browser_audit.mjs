@@ -1,6 +1,17 @@
 import { mkdirSync } from 'node:fs';
 import { resolveBrowserRuntime, buildLaunchOptions } from './playwright_runtime.mjs';
-import { publicBase, docsBase, bridgeBase, naudocUsername, naudocPassword } from './runtime_config.mjs';
+import {
+  publicBase,
+  docsBase,
+  bridgeBase,
+  naudocUsername,
+  naudocPassword,
+  adminUsername,
+  adminPassword,
+  employeeUsername,
+  nurseUsername,
+  roleDefaultPassword,
+} from './runtime_config.mjs';
 
 const base = publicBase;
 const runtime = resolveBrowserRuntime(process.env.PLAYWRIGHT_BROWSER || 'chromium');
@@ -29,6 +40,10 @@ const textErrorPatterns = [
   /parse error/i,
   /traceback/i,
   /nameerror/i,
+  /unauthorized/i,
+  /not found/i,
+  /не авторизованы/i,
+  /неправильн.*парол/i,
   /внутренняя ошибка сервера/i,
   /при выполнении вашей операции произошла внутренняя ошибка сервера/i,
   /загрузка не удалась/i,
@@ -325,14 +340,30 @@ const userRoutes = [
   { label: 'mts-form', url: `${base}/index.php?module=items/form&path=27` },
 ];
 
+const nurseRoutes = [
+  { label: 'dashboard', url: `${base}/index.php?module=dashboard/dashboard` },
+  { label: 'requests-list', url: `${base}/index.php?module=items/items&path=23` },
+  { label: 'requests-form', url: `${base}/index.php?module=items/form&path=23` },
+  { label: 'tasks-report', url: `${base}/index.php?module=reports/view&reports_id=78` },
+  { label: 'projects-list', url: `${base}/index.php?module=items/items&path=21` },
+  { label: 'documents-list', url: `${base}/index.php?module=items/items&path=25` },
+  { label: 'documents-card', url: `${base}/index.php?module=items/info&path=25-1` },
+  { label: 'documents-form', url: `${base}/index.php?module=items/form&path=25` },
+  { label: 'document-base-list', url: `${base}/index.php?module=items/items&path=26` },
+  { label: 'mts-list', url: `${base}/index.php?module=items/items&path=27` },
+  { label: 'mts-form', url: `${base}/index.php?module=items/form&path=27` },
+];
+
 const issues = [];
 const visited = [];
 
 try {
-  await auditRukovoditelRole({ label: 'admin', username: 'admin', password: 'admin123' }, adminRoutes, issues, visited);
-  await auditOnlyoffice({ label: 'admin', username: 'admin', password: 'admin123' }, issues, visited);
-  await auditRukovoditelRole({ label: 'user.demo', username: 'user.demo', password: 'rolepass123' }, userRoutes, issues, visited);
-  await auditOnlyoffice({ label: 'user.demo', username: 'user.demo', password: 'rolepass123' }, issues, visited);
+  await auditRukovoditelRole({ label: 'admin', username: adminUsername, password: adminPassword }, adminRoutes, issues, visited);
+  await auditOnlyoffice({ label: 'admin', username: adminUsername, password: adminPassword }, issues, visited);
+  await auditRukovoditelRole({ label: 'employee', username: employeeUsername, password: roleDefaultPassword }, userRoutes, issues, visited);
+  await auditOnlyoffice({ label: 'employee', username: employeeUsername, password: roleDefaultPassword }, issues, visited);
+  await auditRukovoditelRole({ label: 'nurse', username: nurseUsername, password: roleDefaultPassword }, nurseRoutes, issues, visited);
+  await auditOnlyoffice({ label: 'nurse', username: nurseUsername, password: roleDefaultPassword }, issues, visited);
   await auditNauDoc(issues, visited);
   await auditBridge(issues, visited);
 

@@ -1,5 +1,6 @@
 services:
   gateway:
+    image: "${GATEWAY_IMAGE:-docflow/gateway:local}"
     build:
       context: .
       dockerfile: Dockerfile

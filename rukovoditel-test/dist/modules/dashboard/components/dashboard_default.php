@@ -186,7 +186,7 @@ elseif ($is_requester)
     $role_label = 'заявителя';
 }
 
-$documents_note = 'Чтобы редактировать документ совместно, откройте карточку документа и нажмите кнопку "Открыть документ в редакторе".';
+$documents_note = 'Чтобы начать работу, откройте карточку документа и используйте кнопки "Создать пустой документ", "Создать пустую таблицу" или "Открыть документ в редакторе".';
 $tasks_url = platform_home_named_report_url(22, 'Мои задачи в работе', platform_home_entity_url(21));
 $discussions_url = platform_home_named_report_url(24, 'Рабочие обсуждения', '');
 $onlyoffice_demo = platform_first_onlyoffice_demo(25);
@@ -200,6 +200,9 @@ $doc_approval_url = ($is_admin || $is_manager)
     ? platform_home_named_report_url(25, 'Документы на согласовании', platform_home_entity_url(25))
     : platform_home_entity_url(25);
 $onlyoffice_demo_item_url = platform_home_entity_url(25);
+$onlyoffice_demo_editor_url = '';
+$docspace_entry_url = platform_service_enabled('docspace') ? platform_ecosystem_url('docspace') : '';
+$workspace_entry_url = platform_service_enabled('workspace') ? platform_ecosystem_url('workspace') : '';
 $naudoc_profile = platform_home_current_naudoc_profile($username);
 
 $doc_field_id = 250;
@@ -215,6 +218,22 @@ $drafts_count = $onlyoffice_field_id > 0 ? (int) platform_home_scalar_query("sel
 if ($onlyoffice_demo['item_id'] > 0)
 {
     $onlyoffice_demo_item_url = url_for('items/info', 'path=25-' . $onlyoffice_demo['item_id']);
+    if (platform_service_enabled('docspace'))
+    {
+        $docspace_entry_url = platform_ecosystem_url('docspace', 25, $onlyoffice_demo['item_id']);
+    }
+    if (platform_service_enabled('workspace'))
+    {
+        $workspace_entry_url = platform_ecosystem_url('workspace', 25, $onlyoffice_demo['item_id']);
+    }
+
+    if ((int) $onlyoffice_demo['field_id'] > 0 && (int) $onlyoffice_demo['file_id'] > 0)
+    {
+        $onlyoffice_demo_editor_url = url_for(
+            'items/onlyoffice_editor',
+            'path=25-' . $onlyoffice_demo['item_id'] . '&action=open&field=' . (int) $onlyoffice_demo['field_id'] . '&file=' . (int) $onlyoffice_demo['file_id']
+        );
+    }
 }
 
 $admin_work_links = [
@@ -228,7 +247,9 @@ $admin_work_links = [
 ];
 
 $admin_system_links = [
-    ['title' => 'Пользователи и роли', 'description' => 'Пользователи, группы и права.', 'url' => url_for('users_groups/users_groups')],
+    ['title' => 'Пользователи', 'description' => 'Список сотрудников, учетные записи и профили.', 'url' => platform_home_entity_url(1)],
+    ['title' => 'Создать пользователя', 'description' => 'Быстро завести нового сотрудника без поиска по техразделам.', 'url' => url_for('items/form', 'path=1')],
+    ['title' => 'Группы и права', 'description' => 'Группы доступа, роли и схема прав.', 'url' => url_for('users_groups/users_groups')],
     ['title' => 'Настройки приложения', 'description' => 'Общая конфигурация платформы.', 'url' => url_for('configuration/application')],
     ['title' => 'Сущности приложения', 'description' => 'Структура модулей и форм.', 'url' => url_for('entities/entities')],
     ['title' => 'Логи', 'description' => 'HTTP, PHP, MySQL и почта.', 'url' => url_for('logs/settings')],
@@ -236,6 +257,16 @@ $admin_system_links = [
     ['title' => 'NauDoc', 'description' => 'Официальный документный контур.', 'url' => '/docs/', 'external' => true],
     ['title' => 'Bridge', 'description' => 'Интеграционный слой и контроль связей.', 'url' => '/bridge/', 'external' => true],
 ];
+
+if (strlen($docspace_entry_url))
+{
+    $admin_system_links[] = ['title' => 'DocSpace', 'description' => 'Встроенный collaboration-контур первой волны.', 'url' => $docspace_entry_url];
+}
+
+if (strlen($workspace_entry_url))
+{
+    $admin_system_links[] = ['title' => 'Workspace', 'description' => 'Встроенный сервисный слой первой волны.', 'url' => $workspace_entry_url];
+}
 
 $user_work_links = [
     ['title' => 'Заявки', 'description' => 'Создание и сопровождение обращений.', 'url' => platform_home_entity_url(23)],
@@ -261,9 +292,19 @@ $user_document_links = [
     ['title' => 'Карточки документов', 'description' => 'Рабочая карточка и запуск редактора.', 'url' => platform_home_entity_url(25)],
 ];
 
+if (strlen($docspace_entry_url))
+{
+    $user_document_links[] = ['title' => 'DocSpace', 'description' => 'Встроенный collaboration-контур вокруг карточки документа.', 'url' => $docspace_entry_url];
+}
+
+if (strlen($workspace_entry_url))
+{
+    $user_document_links[] = ['title' => 'Workspace', 'description' => 'Встроенный сервисный слой для сопутствующей работы.', 'url' => $workspace_entry_url];
+}
+
 if ($onlyoffice_demo['item_id'] > 0)
 {
-    $user_document_links[] = ['title' => 'ONLYOFFICE', 'description' => 'Открыть демонстрационный документ через карточку.', 'url' => $onlyoffice_demo_item_url];
+    $user_document_links[] = ['title' => 'ONLYOFFICE', 'description' => 'Открыть рабочий документ через карточку.', 'url' => $onlyoffice_demo_item_url];
 }
 
 if ($is_admin)
@@ -279,6 +320,9 @@ if ($is_admin)
                 </p>
                 <div class="platform-home-hero-actions">
                     ' . platform_home_button('Рабочие документы', platform_home_entity_url(25), 'primary') . '
+                    ' . platform_home_button('Создать пользователя', url_for('items/form', 'path=1'), 'secondary') . '
+                    ' . (strlen($docspace_entry_url) ? platform_home_button('DocSpace', $docspace_entry_url, 'secondary') : '') . '
+                    ' . (strlen($workspace_entry_url) ? platform_home_button('Workspace', $workspace_entry_url, 'secondary') : '') . '
                     ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
                     ' . platform_home_button('Bridge', '/bridge/', 'secondary', true) . '
                 </div>
@@ -327,8 +371,13 @@ else
 
     if (count($naudoc_profile))
     {
-        $user_document_links[] = ['title' => 'Профиль в NauDoc', 'description' => 'Связанный официальный профиль пользователя.', 'url' => $naudoc_profile['profile_url'], 'external' => true];
+    $user_document_links[] = ['title' => 'Профиль в NauDoc', 'description' => 'Связанный официальный профиль пользователя.', 'url' => $naudoc_profile['profile_url'], 'external' => true];
         $document_panel_note = 'Связанный профиль: ' . htmlspecialchars($naudoc_profile['display_name']) . '. ' . $documents_note;
+    }
+
+    if (strlen($onlyoffice_demo_editor_url))
+    {
+        $user_document_links[] = ['title' => 'ONLYOFFICE', 'description' => 'Сразу открыть редактор на рабочем документе.', 'url' => $onlyoffice_demo_editor_url, 'external' => true];
     }
 
     echo '
@@ -343,6 +392,9 @@ else
                 <div class="platform-home-hero-actions">
                     ' . platform_home_button('Заявки', platform_home_entity_url(23), 'primary') . '
                     ' . platform_home_button('Документы', platform_home_entity_url(25), 'secondary') . '
+                    ' . (strlen($onlyoffice_demo_editor_url) ? platform_home_button('ONLYOFFICE', $onlyoffice_demo_editor_url, 'secondary', true) : '') . '
+                    ' . (strlen($docspace_entry_url) ? platform_home_button('DocSpace', $docspace_entry_url, 'secondary') : '') . '
+                    ' . (strlen($workspace_entry_url) ? platform_home_button('Workspace', $workspace_entry_url, 'secondary') : '') . '
                     ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
                 </div>
             </div>
@@ -366,7 +418,7 @@ else
                 <div class="platform-home-links">
                     ' . platform_home_links_group($user_document_links) . '
                 </div>
-                <div class="platform-home-inline-note">' . $document_panel_note . '</div>
+                <div class="platform-home-inline-note">' . $document_panel_note . ' Найти документ можно через поиск в списке карточек, а загрузить файл — через кнопку создания карточки и поле "Вложения".</div>
             </div>
         </section>
     </div>

@@ -90,6 +90,44 @@ bash ops/generate_staging_env.sh
 
 - [STAGING_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/STAGING_RUNBOOK.md)
 
+## Office Wave 1
+
+Для `DocSpace/Workspace` первой волны теперь есть отдельный конфигурационный сценарий.
+
+Перевести оба сервиса в рабочий `shell-only` режим и обновить baseline-ссылки:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/configure_office_wave1.sh --docspace-shell-only --workspace-shell-only
+```
+
+Подключить реальные внешние target URL:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/configure_office_wave1.sh \
+  --docspace-target https://docspace.hospital.local/ \
+  --workspace-target https://workspace.hospital.local/
+```
+
+Что делает скрипт:
+
+1. обновляет `DOCSPACE/WORKSPACE` настройки в `.env`
+2. фиксирует public URLs первой волны
+3. при необходимости включает `shell-only` или `live_target` режим
+4. по умолчанию перезаполняет baseline-ссылки в карточках, проектах, заявках и МТЗ
+
+Проверить, хватает ли текущего host под vendor-развертывание:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+python3 ops/office_wave1_host_audit.py
+```
+
+Опорный production-runbook:
+
+- [OFFICE_WAVE1_DEPLOYMENT.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFICE_WAVE1_DEPLOYMENT.md)
+
 ## Portable Offline Bundle
 
 Если нужно принести платформу на флешке и развернуть на Linux-сервере без лишних ручных шагов, теперь есть отдельный bundle-сценарий.
@@ -118,6 +156,26 @@ bash install_from_bundle.sh /opt/docflow
 Подробный сценарий:
 
 - [OFFLINE_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFLINE_INSTALL_RUNBOOK.md)
+
+## Pilot Package
+
+Для пилота на одном подразделении теперь можно собрать отдельный пакет документов и скриншотов:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/create_pilot_package.sh
+```
+
+Пакет складывается в `runtime/pilot-packages/...` и включает:
+
+1. quickstart и эксплуатационные документы
+2. roadmap и gap analysis
+3. ключевые скриншоты платформы
+4. отдельный pilot runbook
+
+Опорный документ:
+
+- [PILOT_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/PILOT_RUNBOOK.md)
 
 ## Rotate NauDoc Password
 
@@ -180,6 +238,8 @@ bash ops/restore_drill.sh
 cd /home/lebedeffson/Code/Документооборот/ops
 ./check_stack.sh
 ```
+
+Скрипт теперь умеет честно проверять и основной контур, и staging даже без прописанного DNS, если gateway опубликован на локальные bind-порты.
 
 ## Smoke Test
 

@@ -1,6 +1,16 @@
 import { mkdirSync } from 'node:fs';
 import { resolveBrowserRuntime, buildLaunchOptions } from './playwright_runtime.mjs';
-import { publicBase, docsBase, bridgeBase, naudocUsername, naudocPassword } from './runtime_config.mjs';
+import {
+  publicBase,
+  docsBase,
+  bridgeBase,
+  naudocUsername,
+  naudocPassword,
+  adminUsername,
+  adminPassword,
+  employeeUsername,
+  roleDefaultPassword,
+} from './runtime_config.mjs';
 
 const runtime = resolveBrowserRuntime(process.env.PLAYWRIGHT_BROWSER || 'chromium');
 const base = publicBase;
@@ -38,7 +48,7 @@ async function screenshotAdmin() {
     ignoreHTTPSErrors: true,
     viewport: { width: 1440, height: 1200 },
   });
-  const page = await loginRukovoditel(context, 'admin', 'admin123');
+  const page = await loginRukovoditel(context, adminUsername, adminPassword);
 
   await page.goto(`${base}/index.php?module=dashboard/dashboard`, { waitUntil: 'networkidle' });
   await page.screenshot({ path: `${outDir}/02-admin-dashboard.png`, fullPage: true });
@@ -75,7 +85,7 @@ async function screenshotUser() {
     ignoreHTTPSErrors: true,
     viewport: { width: 1440, height: 1200 },
   });
-  const page = await loginRukovoditel(context, 'user.demo', 'rolepass123');
+  const page = await loginRukovoditel(context, employeeUsername, roleDefaultPassword);
 
   await page.goto(`${base}/index.php?module=dashboard/dashboard`, { waitUntil: 'networkidle' });
   await page.screenshot({ path: `${outDir}/11-user-dashboard.png`, fullPage: true });

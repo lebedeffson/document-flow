@@ -13,24 +13,84 @@ import urllib.request
 from pathlib import Path
 
 from runtime_config import (
+    ADMIN_PASSWORD,
+    ADMIN_USERNAME,
     APP_CONTAINER,
     BRIDGE_BASE,
     DB_CONTAINER,
+    EMPLOYEE_USERNAME,
     GATEWAY_BASE,
+    MANAGER_USERNAME,
     NAUDOC_BASE,
     NAUDOC_LEGACY_CONTAINER,
     NAUDOC_PASSWORD,
     NAUDOC_USERNAME,
+    NURSE_USERNAME,
+    OFFICE_USERNAME,
+    LOCAL_PROBE_IP,
     PUBLIC_NETLOC,
+    REQUESTER_USERNAME,
     ROOT_DIR,
+    ROLE_DEFAULT_PASSWORD,
     RUKOVODITEL_ENTRY,
 )
 SSL_CONTEXT = ssl._create_unverified_context()
 
+
+def build_probe_request(url, data=None, headers=None):
+    parsed = urllib.parse.urlparse(url)
+    if not parsed.scheme or not parsed.hostname or not LOCAL_PROBE_IP:
+        request = urllib.request.Request(url, data=data)
+    else:
+        netloc = LOCAL_PROBE_IP
+        if parsed.port:
+            netloc = f"{LOCAL_PROBE_IP}:{parsed.port}"
+
+        probe_url = urllib.parse.urlunparse(
+            (
+                parsed.scheme,
+                netloc,
+                parsed.path or "/",
+                parsed.params,
+                parsed.query,
+                parsed.fragment,
+            )
+        )
+        request = urllib.request.Request(probe_url, data=data)
+        request.add_header("Host", parsed.netloc)
+
+    for name, value in (headers or {}).items():
+        request.add_header(name, value)
+
+    return request
+
+
+class LocalProbeRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        data = req.data if code in (307, 308) else None
+        redirected = build_probe_request(newurl, data=data)
+        for name, value in req.header_items():
+            if name.lower() == "host":
+                continue
+            if name.lower() == "content-length" and data is None:
+                continue
+            redirected.add_header(name, value)
+        return redirected
+
+
+def build_audit_opener(cookie_jar=None):
+    handlers = [
+        urllib.request.HTTPSHandler(context=SSL_CONTEXT),
+        LocalProbeRedirectHandler(),
+    ]
+    if cookie_jar is not None:
+        handlers.append(urllib.request.HTTPCookieProcessor(cookie_jar))
+    return urllib.request.build_opener(*handlers)
+
 ROLE_USERS = {
     "admin": {
-        "username": "admin",
-        "password": "admin123",
+        "username": ADMIN_USERNAME,
+        "password": ADMIN_PASSWORD,
         "expected": ["Главная", "Работа", "Документы", "Контроль", "Канцелярия"],
         "unexpected": [],
         "extra_urls": [
@@ -42,38 +102,38 @@ ROLE_USERS = {
         ],
     },
     "manager": {
-        "username": "manager.test",
-        "password": "rolepass123",
+        "username": MANAGER_USERNAME,
+        "password": ROLE_DEFAULT_PASSWORD,
         "expected": ["Главная", "Работа", "Документы", "Контроль"],
         "unexpected": ["Канцелярия"],
         "extra_urls": [],
     },
     "employee": {
-        "username": "employee.test",
-        "password": "rolepass123",
+        "username": EMPLOYEE_USERNAME,
+        "password": ROLE_DEFAULT_PASSWORD,
         "expected": ["Главная", "Работа", "Документы"],
         "unexpected": ["Контроль", "Канцелярия"],
         "extra_urls": [],
     },
-    "user_demo": {
-        "username": "user.demo",
-        "password": "rolepass123",
-        "expected": ["Главная", "Работа", "Документы"],
-        "unexpected": ["Контроль", "Канцелярия", "Отчеты", "Инструменты", "Логи"],
-        "extra_urls": [],
-    },
     "requester": {
-        "username": "requester.test",
-        "password": "rolepass123",
+        "username": REQUESTER_USERNAME,
+        "password": ROLE_DEFAULT_PASSWORD,
         "expected": ["Главная", "Работа", "Документы"],
         "unexpected": ["Контроль", "Канцелярия"],
         "extra_urls": [],
     },
     "office": {
-        "username": "office.test",
-        "password": "rolepass123",
+        "username": OFFICE_USERNAME,
+        "password": ROLE_DEFAULT_PASSWORD,
         "expected": ["Главная", "Работа", "Документы", "Канцелярия"],
         "unexpected": ["Контроль"],
+        "extra_urls": [],
+    },
+    "nurse": {
+        "username": NURSE_USERNAME,
+        "password": ROLE_DEFAULT_PASSWORD,
+        "expected": ["Главная", "Работа", "Документы"],
+        "unexpected": ["Контроль", "Канцелярия"],
         "extra_urls": [],
     },
 }
@@ -135,12 +195,10 @@ def run_cmd(args):
 
 
 def http_get(url, opener=None, headers=None):
-    request = urllib.request.Request(url)
-    for name, value in (headers or {}).items():
-        request.add_header(name, value)
+    request = build_probe_request(url, headers=headers)
 
     if opener is None:
-        opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=SSL_CONTEXT))
+        opener = build_audit_opener()
 
     response = opener.open(request)
     body = response.read()
@@ -165,10 +223,7 @@ def parse_login_token(html_text):
 
 def login_rukovoditel(username, password):
     cookie_jar = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(
-        urllib.request.HTTPSHandler(context=SSL_CONTEXT),
-        urllib.request.HTTPCookieProcessor(cookie_jar),
-    )
+    opener = build_audit_opener(cookie_jar)
     _, login_page = http_get(RUKOVODITEL_ENTRY, opener=opener)
     token = parse_login_token(decode_html(login_page))
     payload = urllib.parse.urlencode(
@@ -179,7 +234,7 @@ def login_rukovoditel(username, password):
         }
     ).encode()
     response = opener.open(
-        urllib.request.Request(
+        build_probe_request(
             f"{GATEWAY_BASE}/index.php?module=users/login&action=login",
             data=payload,
         )

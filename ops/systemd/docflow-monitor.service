@@ -1,0 +1,9 @@
+[Unit]
+Description=DocFlow monitoring snapshot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/docflow
+ExecStart=/usr/bin/env python3 /opt/docflow/ops/monitoring_snapshot.py --output /var/log/docflow/monitoring/latest_status.json

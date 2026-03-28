@@ -10,6 +10,8 @@
    - `/` -> `Rukovoditel`
    - `/docs/` -> `NauDoc`
    - `/bridge/` -> `middleware`
+   - `/docspace/` -> встроенный вход `ONLYOFFICE DocSpace`
+   - `/workspace/` -> встроенный вход `ONLYOFFICE Workspace`
 
 ## Запуск
 
@@ -24,6 +26,8 @@ docker compose up -d --build
 curl -I http://localhost:18090
 curl -k https://localhost:18443/healthz
 curl -k https://localhost:18443/bridge/health
+curl -k -I https://localhost:18443/docspace/
+curl -k -I https://localhost:18443/workspace/
 ```
 
 ## Примечания

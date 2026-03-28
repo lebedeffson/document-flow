@@ -39,13 +39,29 @@ if(!function_exists('platform_first_entity_item_id'))
     }
 }
 
-if(in_array($current_entity_id, [25, 26, 27]))
+if(in_array($current_entity_id, [1, 25, 26, 27]))
 {
     $banner_title = '';
     $banner_text = '';
     $demo_item_url = '';
     $demo_item_label = '';
-    if($current_entity_id == 25)
+    $demo_editor_url = '';
+    $docspace_url = '';
+    $workspace_url = '';
+    $create_item_url = url_for('items/form', 'path=' . $_GET['path']);
+    if($current_entity_id == 1)
+    {
+        $user_item_id = platform_first_entity_item_id(1);
+        if($user_item_id > 0)
+        {
+            $demo_item_url = url_for('items/info', 'path=1-' . $user_item_id);
+        }
+
+        $banner_title = 'Пользователи';
+        $banner_text = 'Здесь администратор заводит новых сотрудников, находит существующие профили, назначает роли и ведет рабочий каталог пользователей.';
+        $demo_item_label = 'Открыть профиль пользователя';
+    }
+    elseif($current_entity_id == 25)
     {
         $onlyoffice_demo = platform_first_onlyoffice_demo(25);
         $demo_item_url = url_for('items/items', 'path=25');
@@ -56,8 +72,26 @@ if(in_array($current_entity_id, [25, 26, 27]))
         }
 
         $banner_title = 'Карточки документов';
-        $banner_text = 'Откройте карточку документа. Внутри доступны редактор ONLYOFFICE и официальный контур NauDoc.';
-        $demo_item_label = 'Открыть демонстрационный документ';
+        $banner_text = 'Создайте карточку документа, откройте ее и используйте кнопки "Создать пустой документ" или "Создать пустую таблицу". Готовый файл сразу открывается в ONLYOFFICE.';
+        $demo_item_label = 'Открыть рабочий документ';
+
+        if($onlyoffice_demo['item_id'] > 0 and $onlyoffice_demo['field_id'] > 0 and $onlyoffice_demo['file_id'] > 0)
+        {
+            $demo_editor_url = url_for(
+                'items/onlyoffice_editor',
+                'path=25-' . $onlyoffice_demo['item_id'] . '&action=open&field=' . (int) $onlyoffice_demo['field_id'] . '&file=' . (int) $onlyoffice_demo['file_id']
+            );
+        }
+
+        if(platform_service_enabled('docspace'))
+        {
+            $docspace_url = platform_ecosystem_url('docspace', 25, (int) $onlyoffice_demo['item_id']);
+        }
+
+        if(platform_service_enabled('workspace'))
+        {
+            $workspace_url = platform_ecosystem_url('workspace', 25, (int) $onlyoffice_demo['item_id']);
+        }
     }
     elseif($current_entity_id == 26)
     {
@@ -70,6 +104,16 @@ if(in_array($current_entity_id, [25, 26, 27]))
         $banner_title = 'База документов';
         $banner_text = 'Готовые материалы и шаблоны доступны для поиска, просмотра и перехода в официальный контур.';
         $demo_item_label = 'Открыть пример материала';
+
+        if(platform_service_enabled('docspace'))
+        {
+            $docspace_url = platform_ecosystem_url('docspace', 26, $doc_base_item_id);
+        }
+
+        if(platform_service_enabled('workspace'))
+        {
+            $workspace_url = platform_ecosystem_url('workspace', 26, $doc_base_item_id);
+        }
     }
     elseif($current_entity_id == 27)
     {
@@ -82,6 +126,16 @@ if(in_array($current_entity_id, [25, 26, 27]))
         $banner_title = 'Заявки на МТЗ';
         $banner_text = 'Процессы обеспечения связаны с рабочим и официальным документным контуром.';
         $demo_item_label = 'Открыть пример заявки';
+
+        if(platform_service_enabled('docspace'))
+        {
+            $docspace_url = platform_ecosystem_url('docspace', 27, $mts_item_id);
+        }
+
+        if(platform_service_enabled('workspace'))
+        {
+            $workspace_url = platform_ecosystem_url('workspace', 27, $mts_item_id);
+        }
     }
 
     echo '<div class="platform-context-banner">';
@@ -94,6 +148,31 @@ if(in_array($current_entity_id, [25, 26, 27]))
     if(strlen($demo_item_url))
     {
         echo link_to('<i class="fa fa-file-text-o"></i> ' . $demo_item_label, $demo_item_url, ['class' => 'btn btn-info']);
+    }
+
+    if($current_entity_id == 1)
+    {
+        echo link_to('<i class="fa fa-user-plus"></i> Создать пользователя', $create_item_url, ['class' => 'btn btn-primary']);
+        echo link_to('<i class="fa fa-users"></i> Группы доступа', url_for('users_groups/users_groups'), ['class' => 'btn btn-default']);
+    }
+    elseif($current_entity_id == 25)
+    {
+        echo link_to('<i class="fa fa-plus"></i> Создать карточку документа', $create_item_url, ['class' => 'btn btn-primary']);
+
+        if(strlen($demo_editor_url))
+        {
+            echo link_to('<i class="fa fa-pencil-square-o"></i> Открыть ONLYOFFICE', $demo_editor_url, ['class' => 'btn btn-default', 'target' => '_blank']);
+        }
+    }
+
+    if(strlen($docspace_url))
+    {
+        echo link_to('<i class="fa fa-users"></i> Открыть DocSpace', $docspace_url, ['class' => 'btn btn-default']);
+    }
+
+    if(strlen($workspace_url))
+    {
+        echo link_to('<i class="fa fa-briefcase"></i> Открыть Workspace', $workspace_url, ['class' => 'btn btn-default']);
     }
 
     echo link_to('<i class="fa fa-archive"></i> Открыть NauDoc', '/docs/', ['class' => 'btn btn-default', 'target' => '_blank']);

@@ -80,6 +80,101 @@ if (!function_exists('platform_sync_default_choice_id'))
     }
 }
 
+if (!function_exists('platform_sync_doc_route_choice_id_by_label'))
+{
+    function platform_sync_doc_route_choice_id_by_label($field_id, $label)
+    {
+        return platform_sync_choice_id_by_name((int) $field_id, (string) $label);
+    }
+}
+
+if (!function_exists('platform_sync_contains_any'))
+{
+    function platform_sync_contains_any($value, array $needles)
+    {
+        $value = mb_strtolower(trim((string) $value), 'UTF-8');
+        if ($value === '')
+        {
+            return false;
+        }
+
+        foreach ($needles as $needle)
+        {
+            $needle = mb_strtolower(trim((string) $needle), 'UTF-8');
+            if ($needle !== '' && mb_strpos($value, $needle, 0, 'UTF-8') !== false)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+if (!function_exists('platform_sync_infer_project_doc_route_label'))
+{
+    function platform_sync_infer_project_doc_route_label($project_title, $project_description = '')
+    {
+        $haystack = trim((string) $project_title . ' ' . (string) $project_description);
+
+        if (platform_sync_contains_any($haystack, ['архив', 'закрыт', 'завершен']))
+        {
+            return 'Архив / закрытие';
+        }
+
+        if (platform_sync_contains_any($haystack, ['приказ', 'распоряжен']))
+        {
+            return 'Внутренний приказ / распоряжение';
+        }
+
+        return 'Исходящее письмо / согласование';
+    }
+}
+
+if (!function_exists('platform_sync_infer_request_doc_route_label'))
+{
+    function platform_sync_infer_request_doc_route_label($request_type_name, $request_title, $request_description = '')
+    {
+        $request_type_name = trim((string) $request_type_name);
+        $haystack = trim((string) $request_title . ' ' . (string) $request_description . ' ' . $request_type_name);
+
+        if (platform_sync_contains_any($haystack, ['архив', 'закрыт', 'завершен']))
+        {
+            return 'Архив / закрытие';
+        }
+
+        if (platform_sync_contains_any($haystack, ['пациент', 'направлен', 'выписк']))
+        {
+            return 'Пациент / направление / выписка';
+        }
+
+        if ($request_type_name === 'Медицинская документация' || platform_sync_contains_any($haystack, ['медицин']))
+        {
+            return 'Медицинская документация отделения';
+        }
+
+        if (
+            $request_type_name === 'Хозяйственный запрос' ||
+            platform_sync_contains_any($haystack, ['договор', 'закуп', 'мтз', 'принтер', 'мфу', 'оборудован'])
+        )
+        {
+            return 'Договор / закупка / МТЗ';
+        }
+
+        if (platform_sync_contains_any($haystack, ['приказ', 'распоряжен']))
+        {
+            return 'Внутренний приказ / распоряжение';
+        }
+
+        if (platform_sync_contains_any($haystack, ['ознаком', 'инструктаж']))
+        {
+            return 'Ознакомление персонала';
+        }
+
+        return 'Исходящее письмо / согласование';
+    }
+}
+
 if (!function_exists('platform_sync_item_exists'))
 {
     function platform_sync_item_exists($entity_id, $item_id)
@@ -613,6 +708,33 @@ if (!function_exists('platform_sync_bridge_upsert_link'))
         if (!is_array($decoded))
         {
             throw new RuntimeException('Bridge response is not valid JSON: ' . $response['body']);
+        }
+
+        return $decoded;
+    }
+}
+
+if (!function_exists('platform_sync_bridge_writeback_link'))
+{
+    function platform_sync_bridge_writeback_link($link_id)
+    {
+        $response = platform_sync_http_json_request(
+            'POST',
+            platform_sync_bridge_base_url() . '/links/' . (int) $link_id . '/writeback',
+            []
+        );
+
+        if (!$response['ok'])
+        {
+            throw new RuntimeException(
+                'Bridge write-back failed with status ' . $response['status_code'] . ': ' . $response['body']
+            );
+        }
+
+        $decoded = json_decode($response['body'], true);
+        if (!is_array($decoded))
+        {
+            throw new RuntimeException('Bridge write-back response is not valid JSON: ' . $response['body']);
         }
 
         return $decoded;

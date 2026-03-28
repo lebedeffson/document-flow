@@ -13,6 +13,19 @@
 
 switch ($app_module_action)
 {    
+    case 'create_blank':
+        $file_type = isset($_GET['file_type']) ? _GETS('file_type') : 'docx';
+        $redirect = isset($_GET['redirect']) ? _GETS('redirect') : '';
+        $result = (new onlyoffice($current_entity_id))->create_blank(_GET('field_id'), $current_item_id, $file_type);
+
+        if($redirect === 'editor' && strlen($result['editor_url'] ?? ''))
+        {
+            header('Location: ' . $result['editor_url']);
+            exit();
+        }
+
+        redirect_to('items/info', 'path=' . $current_entity_id . '-' . $current_item_id);
+        break;
     case 'upload':
         (new onlyoffice($current_entity_id))->upload();
         exit();

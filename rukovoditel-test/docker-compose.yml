@@ -1,6 +1,6 @@
 services:
   rukovoditel_db:
-    image: mariadb:10.11
+    image: "${MARIADB_IMAGE:-mariadb:10.11}"
     env_file:
       - ../.env
     container_name: "${RUKOVODITEL_DB_CONTAINER:-rukovoditel_db_test}"
@@ -17,6 +17,7 @@ services:
     restart: unless-stopped
 
   rukovoditel:
+    image: "${RUKOVODITEL_APP_IMAGE:-docflow/rukovoditel-app:local}"
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -26,7 +27,7 @@ services:
     depends_on:
       - rukovoditel_db
     ports:
-      - "18081:80"
+      - "${RUKOVODITEL_BIND_PORT:-18081}:80"
     environment:
       TZ: Europe/Moscow
       RUKOVODITEL_DB_HOST: "rukovoditel_db"
@@ -50,7 +51,7 @@ services:
     restart: unless-stopped
 
   onlyoffice_docs:
-    image: onlyoffice/documentserver:latest
+    image: "${ONLYOFFICE_IMAGE:-onlyoffice/documentserver:latest}"
     env_file:
       - ../.env
     container_name: "${ONLYOFFICE_CONTAINER_NAME:-onlyoffice_docs_test}"
@@ -59,7 +60,7 @@ services:
       JWT_ENABLED: "true"
       JWT_SECRET: "${ONLYOFFICE_JWT_SECRET:-onlyoffice_dev_secret}"
     ports:
-      - "18083:80"
+      - "${ONLYOFFICE_BIND_PORT:-18083}:80"
     volumes:
       - onlyoffice_data:/var/www/onlyoffice/Data
       - onlyoffice_logs:/var/log/onlyoffice
@@ -69,6 +70,7 @@ services:
     restart: unless-stopped
 
   rukovoditel_sync_worker:
+    image: "${RUKOVODITEL_APP_IMAGE:-docflow/rukovoditel-app:local}"
     build:
       context: .
       dockerfile: docker/Dockerfile

@@ -13,20 +13,34 @@
 ?>
 
 <?php
+function docflow_login_env_value($key, $default = '')
+{
+    $value = getenv($key);
+
+    if ($value === false)
+    {
+        return $default;
+    }
+
+    $value = trim((string) $value);
+    return strlen($value) ? $value : $default;
+}
+
+$show_demo_login_modes = docflow_login_env_value('DOCFLOW_SHOW_DEMO_LOGIN_MODES', '0') === '1';
 $login_modes = array(
     array(
         'title' => 'Администратор',
         'description' => 'Полный контур управления: настройки, роли, логи, интеграции и рабочие модули.',
-        'username' => 'admin',
-        'password' => 'admin123',
         'eyebrow' => 'Админский режим',
+        'username' => docflow_login_env_value('DOCFLOW_ADMIN_USERNAME', 'admin'),
+        'password' => docflow_login_env_value('DOCFLOW_ADMIN_PASSWORD', 'admin123'),
     ),
     array(
         'title' => 'Пользователь',
         'description' => 'Чистый рабочий кабинет без техразделов: заявки, проекты, документы, база и МТЗ.',
-        'username' => 'user.demo',
-        'password' => 'rolepass123',
         'eyebrow' => 'Пользовательский режим',
+        'username' => docflow_login_env_value('DOCFLOW_EMPLOYEE_USERNAME', 'clinician.primary'),
+        'password' => docflow_login_env_value('DOCFLOW_ROLE_DEFAULT_PASSWORD', 'rolepass123'),
     ),
 );
 ?>
@@ -44,16 +58,22 @@ $login_modes = array(
                     <div class="login-mode-eyebrow"><?php echo $mode['eyebrow'] ?></div>
                     <h4><?php echo $mode['title'] ?></h4>
                     <p><?php echo $mode['description'] ?></p>
-                    <div class="login-mode-credentials">
-                        <span><?php echo $mode['username'] ?></span>
-                        <span><?php echo $mode['password'] ?></span>
-                    </div>
-                    <button
-                        type="button"
-                        class="btn btn-default btn-sm login-mode-fill"
-                        data-username="<?php echo $mode['username'] ?>"
-                        data-password="<?php echo $mode['password'] ?>"
-                    >Заполнить вход</button>
+                    <?php if($show_demo_login_modes): ?>
+                        <div class="login-mode-credentials">
+                            <span><?php echo $mode['username'] ?></span>
+                            <span><?php echo $mode['password'] ?></span>
+                        </div>
+                        <button
+                            type="button"
+                            class="btn btn-default btn-sm login-mode-fill"
+                            data-username="<?php echo $mode['username'] ?>"
+                            data-password="<?php echo $mode['password'] ?>"
+                        >Заполнить вход</button>
+                    <?php else: ?>
+                        <div class="login-mode-credentials">
+                            <span>Используйте персональную учетную запись</span>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -63,7 +83,7 @@ $login_modes = array(
         <div class="platform-login-form-head">
             <div class="platform-login-form-kicker">Вход в систему</div>
             <h4>Начать работу</h4>
-            <p>Введите свой логин или выберите один из двух подготовленных режимов.</p>
+            <p><?php echo $show_demo_login_modes ? 'Введите свой логин или выберите один из двух подготовленных режимов.' : 'Введите персональные учетные данные, выданные администратором или корпоративным каталогом.' ?></p>
         </div>
 
         <?php echo maintenance_mode::login_message() ?>

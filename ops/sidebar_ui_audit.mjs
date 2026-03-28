@@ -1,5 +1,5 @@
 import { resolveBrowserRuntime, buildLaunchOptions } from './playwright_runtime.mjs';
-import { publicBase } from './runtime_config.mjs';
+import { publicBase, adminUsername, adminPassword } from './runtime_config.mjs';
 const base = publicBase;
 const runtime = resolveBrowserRuntime(process.env.PLAYWRIGHT_BROWSER || 'firefox');
 
@@ -50,8 +50,8 @@ page.on('console', msg => {
 
 try {
   await page.goto(`${base}/index.php?module=users/login`, { waitUntil: 'networkidle' });
-  await page.locator('input[name="username"]').fill('admin');
-  await page.locator('input[name="password"]').fill('admin123');
+  await page.locator('input[name="username"]').fill(adminUsername);
+  await page.locator('input[name="password"]').fill(adminPassword);
   await Promise.all([
     page.waitForNavigation({ waitUntil: 'networkidle' }),
     page.locator('button[type="submit"], input[type="submit"]').first().click(),

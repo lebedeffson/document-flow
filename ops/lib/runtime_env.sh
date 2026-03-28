@@ -64,12 +64,57 @@ docflow_bridge_public_base() {
   printf '%s/bridge\n' "$(docflow_public_base)"
 }
 
+docflow_docspace_public_base() {
+  if [ -n "${DOCSPACE_PUBLIC_URL:-}" ]; then
+    docflow_trim_trailing_slash "${DOCSPACE_PUBLIC_URL}"
+    return 0
+  fi
+
+  printf '%s/docspace\n' "$(docflow_public_base)"
+}
+
+docflow_workspace_public_base() {
+  if [ -n "${WORKSPACE_PUBLIC_URL:-}" ]; then
+    docflow_trim_trailing_slash "${WORKSPACE_PUBLIC_URL}"
+    return 0
+  fi
+
+  printf '%s/workspace\n' "$(docflow_public_base)"
+}
+
 docflow_office_public_base() {
   printf '%s/office\n' "$(docflow_public_base)"
 }
 
 docflow_http_base() {
   docflow_build_url "http" "$(docflow_public_host)" "$(docflow_gateway_http_port)"
+}
+
+docflow_local_probe_ip() {
+  printf '%s\n' "${DOCFLOW_LOCAL_PROBE_IP:-127.0.0.1}"
+}
+
+docflow_url_field() {
+  local url="${1:-}"
+  local field="${2:-}"
+
+  python3 - "${url}" "${field}" <<'PY'
+from urllib.parse import urlparse
+import sys
+
+url = sys.argv[1]
+field = sys.argv[2]
+parsed = urlparse(url)
+
+default_port = 443 if parsed.scheme == "https" else 80
+values = {
+    "scheme": parsed.scheme,
+    "host": parsed.hostname or "",
+    "port": str(parsed.port or default_port),
+    "path": (parsed.path or "/") + (f"?{parsed.query}" if parsed.query else ""),
+}
+print(values.get(field, ""), end="")
+PY
 }
 
 docflow_env_file_path() {
@@ -154,6 +199,12 @@ docflow_export_runtime() {
   export DOCFLOW_BRIDGE_PUBLIC_BASE
   DOCFLOW_BRIDGE_PUBLIC_BASE="$(docflow_bridge_public_base)"
 
+  export DOCFLOW_DOCSPACE_PUBLIC_BASE
+  DOCFLOW_DOCSPACE_PUBLIC_BASE="$(docflow_docspace_public_base)"
+
+  export DOCFLOW_WORKSPACE_PUBLIC_BASE
+  DOCFLOW_WORKSPACE_PUBLIC_BASE="$(docflow_workspace_public_base)"
+
   export DOCFLOW_OFFICE_PUBLIC_BASE
   DOCFLOW_OFFICE_PUBLIC_BASE="$(docflow_office_public_base)"
 
@@ -161,6 +212,7 @@ docflow_export_runtime() {
   DOCFLOW_HTTP_BASE="$(docflow_http_base)"
 
   export GATEWAY_CONTAINER_NAME="${GATEWAY_CONTAINER_NAME:-naudoc_gateway_test}"
+  export GATEWAY_COMPOSE_PROJECT_NAME="${GATEWAY_COMPOSE_PROJECT_NAME:-docflow_gateway}"
   export MIDDLEWARE_COMPOSE_PROJECT_NAME="${MIDDLEWARE_COMPOSE_PROJECT_NAME:-middleware}"
   export RUKOVODITEL_COMPOSE_PROJECT_NAME="${RUKOVODITEL_COMPOSE_PROJECT_NAME:-rukovoditel-test}"
   export BRIDGE_CONTAINER="${BRIDGE_CONTAINER:-naudoc_bridge_test}"
@@ -169,6 +221,7 @@ docflow_export_runtime() {
   export ONLYOFFICE_CONTAINER_NAME="${ONLYOFFICE_CONTAINER_NAME:-onlyoffice_docs_test}"
   export RUKOVODITEL_SYNC_WORKER_CONTAINER_NAME="${RUKOVODITEL_SYNC_WORKER_CONTAINER_NAME:-rukovoditel_sync_worker_test}"
   export NAUDOC_LEGACY_CONTAINER="${NAUDOC_LEGACY_CONTAINER:-naudoc34_legacy}"
+  export NAUDOC_LEGACY_COMPOSE_PROJECT="${NAUDOC_LEGACY_COMPOSE_PROJECT:-docflow_legacy}"
   export NAUDOC_USERNAME="${NAUDOC_USERNAME:-admin}"
   export NAUDOC_PASSWORD="${NAUDOC_PASSWORD:-admin}"
   export RUKOVODITEL_DB_NAME="${RUKOVODITEL_DB_NAME:-rukovoditel}"
@@ -176,6 +229,28 @@ docflow_export_runtime() {
   export RUKOVODITEL_DB_PASSWORD="${RUKOVODITEL_DB_PASSWORD:-rukovoditel}"
   export RUKOVODITEL_DB_ROOT_PASSWORD="${RUKOVODITEL_DB_ROOT_PASSWORD:-root_rukovoditel}"
   export ONLYOFFICE_JWT_SECRET="${ONLYOFFICE_JWT_SECRET:-onlyoffice_dev_secret}"
+  export LDAP_DOMAIN="${LDAP_DOMAIN:-hospital.local}"
+  export LDAP_ORGANISATION="${LDAP_ORGANISATION:-Hospital_DocFlow}"
+  export LDAP_ADMIN_PASSWORD="${LDAP_ADMIN_PASSWORD:-ldap_admin_dev}"
+  export LDAP_CONFIG_PASSWORD="${LDAP_CONFIG_PASSWORD:-ldap_config_dev}"
+  export LDAP_BIND_PASSWORD="${LDAP_BIND_PASSWORD:-ldap_bind_dev}"
+  export DOCFLOW_SHOW_DEMO_LOGIN_MODES="${DOCFLOW_SHOW_DEMO_LOGIN_MODES:-0}"
+  export DOCFLOW_ADMIN_USERNAME="${DOCFLOW_ADMIN_USERNAME:-admin}"
+  export DOCFLOW_ADMIN_PASSWORD="${DOCFLOW_ADMIN_PASSWORD:-admin123}"
+  export DOCFLOW_ROLE_DEFAULT_PASSWORD="${DOCFLOW_ROLE_DEFAULT_PASSWORD:-rolepass123}"
+  export DOCFLOW_MANAGER_USERNAME="${DOCFLOW_MANAGER_USERNAME:-department.head}"
+  export DOCFLOW_EMPLOYEE_USERNAME="${DOCFLOW_EMPLOYEE_USERNAME:-clinician.primary}"
+  export DOCFLOW_REQUESTER_USERNAME="${DOCFLOW_REQUESTER_USERNAME:-registry.operator}"
+  export DOCFLOW_OFFICE_USERNAME="${DOCFLOW_OFFICE_USERNAME:-records.office}"
+  export DOCFLOW_NURSE_USERNAME="${DOCFLOW_NURSE_USERNAME:-nurse.coordinator}"
+  export LDAP_CONTAINER_NAME="${LDAP_CONTAINER_NAME:-docflow_hospital_ldap}"
+  export GATEWAY_IMAGE="${GATEWAY_IMAGE:-docflow/gateway:local}"
+  export BRIDGE_IMAGE="${BRIDGE_IMAGE:-docflow/bridge:local}"
+  export RUKOVODITEL_APP_IMAGE="${RUKOVODITEL_APP_IMAGE:-docflow/rukovoditel-app:local}"
+  export NAUDOC_LEGACY_IMAGE="${NAUDOC_LEGACY_IMAGE:-docflow/naudoc-legacy:local}"
+  export MARIADB_IMAGE="${MARIADB_IMAGE:-mariadb:10.11}"
+  export ONLYOFFICE_IMAGE="${ONLYOFFICE_IMAGE:-onlyoffice/documentserver:latest}"
+  export LDAP_IMAGE="${LDAP_IMAGE:-osixia/openldap:1.5.0}"
 }
 
 docflow_random_secret() {

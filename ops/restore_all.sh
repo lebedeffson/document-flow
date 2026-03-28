@@ -40,8 +40,9 @@ fi
 SQL_FILE="${BACKUP_DIR}/mariadb/rukovoditel.sql"
 BRIDGE_FILE="${BACKUP_DIR}/bridge/bridge.db"
 DATA_FS_FILE="${BACKUP_DIR}/naudoc/Data.fs"
+UPLOADS_ARCHIVE="${BACKUP_DIR}/uploads/rukovoditel_uploads.tar.gz"
 
-for required in "${SQL_FILE}" "${BRIDGE_FILE}" "${DATA_FS_FILE}"; do
+for required in "${SQL_FILE}" "${BRIDGE_FILE}" "${DATA_FS_FILE}" "${UPLOADS_ARCHIVE}"; do
   if [ ! -f "${required}" ]; then
     echo "[restore] missing file: ${required}" >&2
     exit 1
@@ -95,5 +96,14 @@ if [ -f "${ROOT_DIR}/naudoc_project/var/Data.fs" ]; then
 fi
 cp "${DATA_FS_FILE}" "${ROOT_DIR}/naudoc_project/var/Data.fs"
 start_naudoc_legacy
+
+echo "[restore] restoring Rukovoditel uploads"
+if [ -d "${ROOT_DIR}/rukovoditel-test/dist/uploads" ]; then
+  mv "${ROOT_DIR}/rukovoditel-test/dist/uploads" "${ROOT_DIR}/rukovoditel-test/dist/uploads.before-restore.${RESTORE_STAMP}"
+fi
+mkdir -p "${ROOT_DIR}/rukovoditel-test/dist"
+tar -xzf "${UPLOADS_ARCHIVE}" -C "${ROOT_DIR}/rukovoditel-test/dist"
+docker exec "${RUKOVODITEL_CONTAINER_NAME}" sh -lc \
+  "chown -R www-data:www-data /var/www/html/uploads && chmod -R ug+rwX /var/www/html/uploads"
 
 echo "[restore] done"

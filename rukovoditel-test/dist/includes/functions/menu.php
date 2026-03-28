@@ -414,7 +414,8 @@ function build_main_menu()
     global $app_user;
 
     $menu = array();
-    $is_simple_user = (($app_user['username'] ?? '') === 'user.demo');
+    $simple_user_groups = array(5, 6, 8);
+    $is_simple_user = in_array((int) ($app_user['group_id'] ?? 0), $simple_user_groups, true);
 
     if(is_ext_installed())
     {

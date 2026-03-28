@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+export DOCFLOW_ENV_MODE="${DOCFLOW_ENV_MODE:-staging}"
+export DOCFLOW_DOMAIN="${DOCFLOW_DOMAIN:-staging.docflow.hospital.local}"
+export DOCFLOW_PROJECT_ROOT="${DOCFLOW_PROJECT_ROOT:-/opt/docflow-staging}"
+export DOCFLOW_NAME_PREFIX="${DOCFLOW_NAME_PREFIX:-docflow_staging}"
+export DOCFLOW_HTTP_BIND_PORT="${DOCFLOW_HTTP_BIND_PORT:-28090}"
+export DOCFLOW_HTTPS_BIND_PORT="${DOCFLOW_HTTPS_BIND_PORT:-28443}"
+export DOCFLOW_RUKOVODITEL_BIND_PORT="${DOCFLOW_RUKOVODITEL_BIND_PORT:-28081}"
+export DOCFLOW_BRIDGE_BIND_PORT="${DOCFLOW_BRIDGE_BIND_PORT:-28082}"
+export DOCFLOW_NAUDOC_BIND_PORT="${DOCFLOW_NAUDOC_BIND_PORT:-28080}"
+export DOCFLOW_ONLYOFFICE_BIND_PORT="${DOCFLOW_ONLYOFFICE_BIND_PORT:-28083}"
+
+OUTPUT_FILE="${1:-${ROOT_DIR}/.env.generated.staging}"
+
+exec bash "${SCRIPT_DIR}/generate_prod_env.sh" "${OUTPUT_FILE}"
