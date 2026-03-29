@@ -1,0 +1,9 @@
+downloaded_at=2026-03-29T18:59:24+03:00
+refresh=0
+docspace:
+  docspace-install.sh <- https://download.onlyoffice.com/docspace/docspace-install.sh
+  install-Docker.sh <- https://download.onlyoffice.com/docspace/install-Docker.sh
+  install-Docker-args.sh <- https://download.onlyoffice.com/docspace/install-Docker-args.sh
+workspace:
+  workspace-install.sh <- https://download.onlyoffice.com/install/workspace-install.sh
+  install.sh <- http://download.onlyoffice.com/install/install.sh

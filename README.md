@@ -203,7 +203,30 @@
 
 `DocSpace` и `Workspace` теперь входят в scope первой production-волны, но ограниченно.
 При этом в текущем стенде они еще не подняты как живые отдельные сервисы, поэтому до релиза их нужно развернуть и проверить отдельно.
-`Workspace` по-прежнему должен закрывать только те офисные функции, которых нет в `Rukovoditel`.
+
+Зафиксированный минимальный scope первой волны такой:
+
+1. `DocSpace`:
+   - `Collaboration rooms`
+   - `Public rooms`
+   - при необходимости `Form filling rooms`
+2. `Workspace`:
+   - `Calendar`
+   - опционально `Community` как новости или база знаний
+   - по умолчанию первая волна держит lean-mode: `Calendar` включен всегда, `Community` включается отдельным env-флагом
+
+Что не берем в первую волну:
+
+1. `Workspace Mail`
+2. `Workspace CRM`
+3. `Workspace Projects`
+4. `Workspace Documents`
+
+Это сделано специально, чтобы не дублировать `Rukovoditel` и не перегружать внедрение.
+
+Для закрытой локальной сети и выездной выкладки теперь есть отдельный короткий go-live checklist:
+
+- [CLOSED_LAN_GO_LIVE_CHECKLIST.md](/home/lebedeffson/Code/Документооборот/docs/reference/CLOSED_LAN_GO_LIVE_CHECKLIST.md)
 
 ---
 

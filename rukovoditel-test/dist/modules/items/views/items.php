@@ -48,6 +48,9 @@ if(in_array($current_entity_id, [1, 25, 26, 27]))
     $demo_editor_url = '';
     $docspace_url = '';
     $workspace_url = '';
+    $workspace_calendar_url = '';
+    $workspace_create_meeting_url = '';
+    $workspace_community_url = '';
     $create_item_url = url_for('items/form', 'path=' . $_GET['path']);
     if($current_entity_id == 1)
     {
@@ -85,12 +88,15 @@ if(in_array($current_entity_id, [1, 25, 26, 27]))
 
         if(platform_service_enabled('docspace'))
         {
-            $docspace_url = platform_ecosystem_url('docspace', 25, (int) $onlyoffice_demo['item_id']);
+            $docspace_url = platform_service_entry_url('docspace', 25, (int) $onlyoffice_demo['item_id']);
         }
 
         if(platform_service_enabled('workspace'))
         {
-            $workspace_url = platform_ecosystem_url('workspace', 25, (int) $onlyoffice_demo['item_id']);
+            $workspace_url = platform_service_entry_url('workspace', 25, (int) $onlyoffice_demo['item_id']);
+            $workspace_calendar_url = platform_service_module_entry_url('workspace', 'calendar', 25, (int) $onlyoffice_demo['item_id']);
+            $workspace_create_meeting_url = platform_workspace_create_meeting_url(25, (int) $onlyoffice_demo['item_id']);
+            $workspace_community_url = platform_service_module_entry_url('workspace', 'community', 25, (int) $onlyoffice_demo['item_id']);
         }
     }
     elseif($current_entity_id == 26)
@@ -107,12 +113,15 @@ if(in_array($current_entity_id, [1, 25, 26, 27]))
 
         if(platform_service_enabled('docspace'))
         {
-            $docspace_url = platform_ecosystem_url('docspace', 26, $doc_base_item_id);
+            $docspace_url = platform_service_entry_url('docspace', 26, $doc_base_item_id);
         }
 
         if(platform_service_enabled('workspace'))
         {
-            $workspace_url = platform_ecosystem_url('workspace', 26, $doc_base_item_id);
+            $workspace_url = platform_service_entry_url('workspace', 26, $doc_base_item_id);
+            $workspace_calendar_url = platform_service_module_entry_url('workspace', 'calendar', 26, $doc_base_item_id);
+            $workspace_create_meeting_url = platform_workspace_create_meeting_url(26, $doc_base_item_id);
+            $workspace_community_url = platform_service_module_entry_url('workspace', 'community', 26, $doc_base_item_id);
         }
     }
     elseif($current_entity_id == 27)
@@ -129,12 +138,15 @@ if(in_array($current_entity_id, [1, 25, 26, 27]))
 
         if(platform_service_enabled('docspace'))
         {
-            $docspace_url = platform_ecosystem_url('docspace', 27, $mts_item_id);
+            $docspace_url = platform_service_entry_url('docspace', 27, $mts_item_id);
         }
 
         if(platform_service_enabled('workspace'))
         {
-            $workspace_url = platform_ecosystem_url('workspace', 27, $mts_item_id);
+            $workspace_url = platform_service_entry_url('workspace', 27, $mts_item_id);
+            $workspace_calendar_url = platform_service_module_entry_url('workspace', 'calendar', 27, $mts_item_id);
+            $workspace_create_meeting_url = platform_workspace_create_meeting_url(27, $mts_item_id);
+            $workspace_community_url = platform_service_module_entry_url('workspace', 'community', 27, $mts_item_id);
         }
     }
 
@@ -173,6 +185,21 @@ if(in_array($current_entity_id, [1, 25, 26, 27]))
     if(strlen($workspace_url))
     {
         echo link_to('<i class="fa fa-briefcase"></i> Открыть Workspace', $workspace_url, ['class' => 'btn btn-default']);
+    }
+
+    if(strlen($workspace_calendar_url))
+    {
+        echo link_to('<i class="fa fa-calendar"></i> Встречи Workspace', $workspace_calendar_url, ['class' => 'btn btn-default']);
+    }
+
+    if(strlen($workspace_create_meeting_url))
+    {
+        echo link_to('<i class="fa fa-calendar-plus-o"></i> Создать встречу', $workspace_create_meeting_url, ['class' => 'btn btn-default']);
+    }
+
+    if(strlen($workspace_community_url) && $current_entity_id == 26)
+    {
+        echo link_to('<i class="fa fa-book"></i> Workspace Community', $workspace_community_url, ['class' => 'btn btn-default']);
     }
 
     echo link_to('<i class="fa fa-archive"></i> Открыть NauDoc', '/docs/', ['class' => 'btn btn-default', 'target' => '_blank']);

@@ -23,61 +23,61 @@ EXPECTED_PAGES = [
     {
         "name": "document_card",
         "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-1",
-        "contains": ["Быстрые действия", "Открыть документ в редакторе", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["Быстрые действия", "Открыть документ в редакторе", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace", "Встречи Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "project_card",
         "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=21-1",
-        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace", "Встречи Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "request_card",
         "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=23-1",
-        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace", "Встречи Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "documents_listing",
         "url": f"{GATEWAY_BASE}/index.php?module=items/items&path=25",
-        "contains": ["Открыть рабочий документ", "Открыть NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["Открыть рабочий документ", "Открыть NauDoc", "Открыть DocSpace", "Открыть Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "document_base_card",
         "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=26-1",
-        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "document_base_listing",
         "url": f"{GATEWAY_BASE}/index.php?module=items/items&path=26",
-        "contains": ["База документов", "Открыть NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["База документов", "Открыть NauDoc", "Открыть DocSpace", "Открыть Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "mts_card",
         "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=27-1",
-        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["Быстрые действия", "Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "mts_listing",
         "url": f"{GATEWAY_BASE}/index.php?module=items/items&path=27",
-        "contains": ["Заявки на МТЗ", "Открыть NauDoc", "Открыть DocSpace", "Открыть Workspace"],
+        "contains": ["Заявки на МТЗ", "Открыть NauDoc", "Открыть DocSpace", "Открыть Workspace", "Создать встречу"],
         "not_contains": [],
     },
     {
         "name": "docspace_shell",
-        "url": f"{GATEWAY_BASE}/docspace/?entity_id=25&item_id=1",
+        "url": f"{GATEWAY_BASE}/index.php?module=dashboard/ecosystem&service=docspace&entity_id=25&item_id=1",
         "contains": ["ONLYOFFICE DocSpace", "Единая точка входа", "Встроенный режим активен"],
         "not_contains": [],
     },
     {
         "name": "workspace_shell",
-        "url": f"{GATEWAY_BASE}/workspace/?entity_id=25&item_id=1",
-        "contains": ["ONLYOFFICE Workspace", "Единая точка входа", "Встроенный сервисный вход готов"],
+        "url": f"{GATEWAY_BASE}/index.php?module=dashboard/ecosystem&service=workspace&entity_id=25&item_id=1",
+        "contains": ["ONLYOFFICE Workspace", "Единая точка входа", "Календарь и встречи", "Создать встречу"],
         "not_contains": [],
     },
     {
@@ -85,6 +85,27 @@ EXPECTED_PAGES = [
         "url": f"{BRIDGE_BASE}/",
         "contains": ["Каталог пользователей", "Источники идентификации", "Hospital-роли", "Маршруты документов", "Маппинг полей"],
         "not_contains": [],
+    },
+]
+
+ROLE_VISIBILITY_CASES = [
+    {
+        "role_key": "employee",
+        "name": "employee_dashboard",
+        "url": f"{GATEWAY_BASE}/",
+        "contains": ["Встречи Workspace", "Создать встречу"],
+    },
+    {
+        "role_key": "employee",
+        "name": "employee_document_card",
+        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-1",
+        "contains": ["Встречи Workspace", "Открыть Workspace", "Создать встречу"],
+    },
+    {
+        "role_key": "nurse",
+        "name": "nurse_document_card",
+        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-1",
+        "contains": ["Встречи Workspace", "Открыть Workspace", "Создать встречу"],
     },
 ]
 
@@ -227,7 +248,7 @@ def fetch_naudoc_object_status(url):
 
 def main():
     opener, _, _ = login_rukovoditel(ROLE_USERS["admin"]["username"], ROLE_USERS["admin"]["password"])
-    results = {"pages": [], "bridge_metadata": [], "failures": []}
+    results = {"pages": [], "role_pages": [], "bridge_metadata": [], "failures": []}
 
     for page in EXPECTED_PAGES:
         response, body = http_get(page["url"], opener=opener)
@@ -252,6 +273,35 @@ def main():
 
         for needle in unexpected:
             results["failures"].append(f"{page['name']}: unexpected text '{needle}'")
+
+    role_openers = {}
+    for role_case in ROLE_VISIBILITY_CASES:
+        role_key = role_case["role_key"]
+        if role_key not in role_openers:
+            config = ROLE_USERS[role_key]
+            role_openers[role_key], _, _ = login_rukovoditel(config["username"], config["password"])
+
+        response, body = http_get(role_case["url"], opener=role_openers[role_key])
+        html = decode_html(body)
+        missing = [needle for needle in role_case["contains"] if needle not in html]
+        role_result = {
+            "role_key": role_key,
+            "name": role_case["name"],
+            "url": role_case["url"],
+            "status": response.status,
+            "missing": missing,
+        }
+        results["role_pages"].append(role_result)
+
+        if response.status != 200:
+            results["failures"].append(
+                f"{role_case['name']}: unexpected status {response.status}"
+            )
+
+        for needle in missing:
+            results["failures"].append(
+                f"{role_case['name']}: missing text '{needle}'"
+            )
 
     for bridge_case in EXPECTED_BRIDGE_METADATA:
         status, payload = fetch_bridge_link(

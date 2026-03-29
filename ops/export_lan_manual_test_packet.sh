@@ -14,6 +14,11 @@ if [[ -z "${PRIMARY_IP}" ]]; then
   PRIMARY_IP="$(ip route get 1.1.1.1 2>/dev/null | awk '/src/ {for (i = 1; i <= NF; i++) if ($i == "src") {print $(i+1); exit}}')"
 fi
 PUBLIC_HOST="$(printf '%s' "${DOCFLOW_PUBLIC_BASE}" | sed -E 's#https?://([^/]+)/?.*#\1#')"
+HOSTS_ALIAS="${PUBLIC_HOST}"
+
+if [[ "${HOSTS_ALIAS}" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+  HOSTS_ALIAS="docflow.hospital.local"
+fi
 
 mkdir -p "${OUT_DIR}"
 
@@ -34,16 +39,16 @@ cat > "${OUT_FILE}" <<EOF
 
 - Предпочтительно: настроить локальный DNS на имя из URL выше
 - Быстрый временный вариант: добавить на рабочие станции hosts-запись
-- Пример: ${PRIMARY_IP:-<LAN_IP>} ${PUBLIC_HOST}
+- Пример: ${PRIMARY_IP:-<LAN_IP>} ${HOSTS_ALIAS}
 
 ## Учетные записи для ручной проверки
 
-- admin / ${DOCFLOW_ADMIN_PASSWORD}
-- ${DOCFLOW_MANAGER_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD}
-- ${DOCFLOW_EMPLOYEE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD}
-- ${DOCFLOW_NURSE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD}
-- ${DOCFLOW_REQUESTER_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD}
-- ${DOCFLOW_OFFICE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD}
+- admin / ${DOCFLOW_ADMIN_PASSWORD} - администратор платформы
+- ${DOCFLOW_MANAGER_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD} - заведующий отделением
+- ${DOCFLOW_EMPLOYEE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD} - врач / сотрудник
+- ${DOCFLOW_NURSE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD} - старшая медсестра / координатор
+- ${DOCFLOW_REQUESTER_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD} - регистратура
+- ${DOCFLOW_OFFICE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD} - канцелярия
 
 ## Что проверить руками
 
@@ -65,7 +70,19 @@ cat > "${OUT_FILE}" <<EOF
 5. Убедиться, что открылся ONLYOFFICE редактор таблиц
 6. Изменить одно из значений и сохранить
 
-### 3. Проверка ролей
+### 3. DocSpace и Workspace
+
+1. Под ${DOCFLOW_EMPLOYEE_USERNAME} открыть ${DOCSPACE_PUBLIC_URL}
+2. Проверить, что открывается страница ONLYOFFICE DocSpace без ошибки и виден встроенный режим первой волны
+3. Перейти на:
+   - ${DOCSPACE_PUBLIC_URL}?room_type=collaboration_room
+   - ${DOCSPACE_PUBLIC_URL}?room_type=public_room
+   - ${DOCSPACE_PUBLIC_URL}?room_type=form_filling_room
+4. Убедиться, что каждая точка входа открывается корректно и не выбрасывает из контура
+5. Под ${DOCFLOW_EMPLOYEE_USERNAME} открыть ${WORKSPACE_PUBLIC_URL}?module=calendar
+6. Проверить, что открывается Workspace и в тексте/маршруте виден сценарий Календарь и встречи
+
+### 4. Проверка ролей
 
 1. Под ${DOCFLOW_REQUESTER_USERNAME} убедиться, что карточки открываются без ошибок
 2. Под ${DOCFLOW_OFFICE_USERNAME} проверить открытие карточки и связанных документов
@@ -78,6 +95,7 @@ cat > "${OUT_FILE}" <<EOF
 - ONLYOFFICE открывает и Word, и Excel
 - после сохранения редактор не показывает ошибок загрузки
 - повторное открытие того же файла работает
+- DocSpace и Workspace открываются без ошибок по своим frontdoor URL
 - NauDoc и Bridge продолжают открываться
 EOF
 

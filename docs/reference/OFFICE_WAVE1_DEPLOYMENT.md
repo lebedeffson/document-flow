@@ -13,10 +13,59 @@
 3. в `.env` заданы реальные `DOCSPACE_TARGET_URL` и `WORKSPACE_TARGET_URL`
 4. включен `DOCFLOW_OFFICE_WAVE1_REQUIRE_LIVE_TARGETS=1`
 5. `prod_readiness_audit.py` проходит без office-warning
+6. `Workspace` в первой волне зафиксирован в lean-mode: `Calendar` всегда доступен, `Community` включается только отдельным флагом `DOCFLOW_WORKSPACE_WAVE1_ENABLE_COMMUNITY=1`
+7. при необходимости можно задать и отдельные deep-link URL:
+   - `DOCSPACE_COLLABORATION_ROOM_TARGET_URL`
+   - `DOCSPACE_PUBLIC_ROOM_TARGET_URL`
+   - `DOCSPACE_FORM_FILLING_ROOM_TARGET_URL`
+   - `WORKSPACE_CALENDAR_TARGET_URL`
+   - `WORKSPACE_COMMUNITY_TARGET_URL`
+
+Зафиксированный минимальный scope первой волны:
+
+1. `DocSpace`:
+   - `Collaboration rooms`
+   - `Public rooms`
+   - при необходимости `Form filling rooms`
+2. `Workspace`:
+   - `Calendar`
+   - опционально `Community`
+
+Что не включаем в первую волну:
+
+1. `Workspace Mail`
+2. `Workspace CRM`
+3. `Workspace Projects`
+4. `Workspace Documents`
 
 ## 2. Рекомендуемая production-топология
 
-Для первой боевой волны лучше считать `DocSpace` и `Workspace` отдельными office-hosts, а не пытаться запихнуть их в тот же хост, где уже живут:
+Для первой боевой волны есть два допустимых production-варианта:
+
+1. отдельные office-hosts
+2. тот же server/IP, но через `same-host reverse proxy` под тем же gateway
+
+Отдельные office-hosts проще масштабировать, а same-host схема удобнее для закрытой локальной сети: один IP, один сертификат, один внешний адрес для пользователей.
+
+Если идти по same-host схеме, пользователи заходят так:
+
+1. `https://<server-ip>/` -> основной контур
+2. `https://<server-ip>/docspace/` -> live `DocSpace` через gateway reverse proxy
+3. `https://<server-ip>/workspace/` -> live `Workspace` через gateway reverse proxy
+
+В этом случае `DOCSPACE_TARGET_URL` и `WORKSPACE_TARGET_URL` можно задавать как внутренние target URL на том же сервере, например:
+
+```env
+DOCSPACE_TARGET_URL=http://host.docker.internal:19001/
+WORKSPACE_TARGET_URL=http://host.docker.internal:19002/
+DOCFLOW_OFFICE_WAVE1_REQUIRE_LIVE_TARGETS=1
+```
+
+Gateway будет держать единый внешний адрес, а live office-сервисы останутся внутренними.
+
+Если же инфраструктура позволяет, отдельные office-hosts по-прежнему остаются хорошим вариантом, особенно если не хочется держать весь office-layer на одной машине.
+
+Для отдельной схемы лучше считать `DocSpace` и `Workspace` отдельными office-hosts, а не пытаться запихнуть их в тот же хост, где уже живут:
 
 1. `gateway`
 2. `Rukovoditel`
@@ -78,6 +127,8 @@ sudo bash docspace-install.sh docker
 2. поставить TLS
 3. развернуть `ONLYOFFICE Workspace` по официальной инструкции ONLYOFFICE
 4. убедиться, что сервис открывается по `https://workspace.hospital.local/`
+5. в первой волне включить только `Calendar`, а `Community` оставить опциональным легким дополнением
+6. не включать `Mail/CRM/Projects/Documents`, чтобы не раздувать внедрение и не дублировать `Rukovoditel`
 
 Базовая official-команда:
 
@@ -102,6 +153,7 @@ cd /home/lebedeffson/Code/Документооборот
 bash ops/configure_office_wave1.sh \
   --docspace-target https://docspace.hospital.local/ \
   --workspace-target https://workspace.hospital.local/ \
+  --workspace-calendar-only \
   --require-live-targets
 ```
 
@@ -109,7 +161,59 @@ bash ops/configure_office_wave1.sh \
 
 1. записывает target URL в `.env`
 2. включает жесткий production-режим для office-wave1
-3. обновляет baseline-ссылки в проектах, заявках, документах, базе документов и МТЗ
+3. оставляет в `Workspace` только `Calendar`, если явно не включать `Community`
+4. если отдельные module/room target URL не заданы, модульные кнопки все равно ведут в live frontdoor соответствующего сервиса
+5. обновляет baseline-ссылки в проектах, заявках, документах, базе документов и МТЗ
+
+Для same-host reverse proxy можно задавать внутренние URL/порты того же сервера вместо отдельных DNS-имен. Пользователь все равно будет работать только через основной адрес gateway.
+
+Для этого варианта есть и единый cutover-сценарий:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/cutover_closed_lan_prod.sh --auto-host
+```
+
+Он по умолчанию включает:
+
+1. `DOCSPACE_TARGET_URL=http://host.docker.internal:19001/`
+2. `WORKSPACE_TARGET_URL=http://host.docker.internal:19002/`
+3. `DOCFLOW_OFFICE_WAVE1_REQUIRE_LIVE_TARGETS=1`
+4. `Workspace` в `Calendar`-only режиме
+
+Если внутренние порты отличаются, их можно передать явно:
+
+```bash
+bash ops/cutover_closed_lan_prod.sh \
+  --host 172.16.10.20 \
+  --docspace-port 29001 \
+  --workspace-port 29002
+```
+
+Если `Community` все-таки нужен в первой волне:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/configure_office_wave1.sh \
+  --docspace-target https://docspace.hospital.local/ \
+  --workspace-target https://workspace.hospital.local/ \
+  --workspace-with-community \
+  --require-live-targets
+```
+
+### 4.4 Что проверять по факту
+
+Для `DocSpace` достаточно подтвердить:
+
+1. открывается `Collaboration room`
+2. открывается `Public room`
+3. при необходимости открывается `Form filling room`
+
+Для `Workspace` достаточно подтвердить:
+
+1. открывается `Calendar`
+2. при необходимости открывается `Community`
+3. пользователю не торчат `Mail/CRM/Projects/Documents` как обязательный сценарий первой волны
 
 ## 5. Финальный release gate
 

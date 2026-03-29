@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - ../.env
+      - ${DOCFLOW_ENV_FILE:-../.env}
     container_name: "${GATEWAY_CONTAINER_NAME:-naudoc_gateway_test}"
     environment:
       SERVER_NAME: "${GATEWAY_SERVER_NAME:-localhost}"

@@ -74,6 +74,21 @@ def fetch_text(url: str):
         return None, str(exc)
 
 
+def fetch_direct_text(url: str):
+    parsed = urlparse(url)
+    if parsed.hostname in {"host.docker.internal", "localhost"} or (parsed.hostname or "").startswith("127."):
+        request = build_probe_request(url)
+    else:
+        request = urllib.request.Request(url)
+    try:
+        with NO_REDIRECT_OPENER.open(request, timeout=10) as response:
+            return response.status, response.read().decode("utf-8", "ignore")
+    except urllib.error.HTTPError as exc:
+        return exc.code, exc.read().decode("utf-8", "ignore")
+    except Exception as exc:
+        return None, str(exc)
+
+
 def fetch_json(url: str):
     status, body = fetch_text(url)
     if status is None:
@@ -82,6 +97,10 @@ def fetch_json(url: str):
         return status, json.loads(body)
     except Exception:
         return status, None
+
+
+def acceptable_remote_status(status: int | None):
+    return status in (200, 301, 302, 401, 403)
 
 
 def latest_backup_info():
@@ -117,14 +136,27 @@ def main():
     office_status, office_body = fetch_text(f"{OFFICE_BASE}/healthcheck")
     docspace_status, _ = fetch_text(f"{DOCSPACE_BASE}/")
     workspace_status, _ = fetch_text(f"{WORKSPACE_BASE}/")
+    docspace_target_status = None
+    workspace_target_status = None
+
+    if DOCSPACE_TARGET_URL:
+        docspace_target_status, _ = fetch_direct_text(DOCSPACE_TARGET_URL)
+
+    if WORKSPACE_TARGET_URL:
+        workspace_target_status, _ = fetch_direct_text(WORKSPACE_TARGET_URL)
+
     failures_status, failures_payload = fetch_json(f"{BRIDGE_BASE}/sync-failures?status=open")
     profiles_status, profiles_payload = fetch_json(f"{BRIDGE_BASE}/user-profiles")
 
     gateway_ok = gateway_status == 200 and gateway_body.strip().lower() == "ok"
     bridge_ok = bridge_status == 200 and isinstance(bridge_payload, dict) and bridge_payload.get("status") == "ok"
     office_ok = office_status == 200 and office_body.strip().lower() == "true"
-    docspace_ok = (not DOCSPACE_ENABLED) or docspace_status in (200, 301, 302)
-    workspace_ok = (not WORKSPACE_ENABLED) or workspace_status in (200, 301, 302)
+    docspace_ok = (not DOCSPACE_ENABLED) or (
+        acceptable_remote_status(docspace_status) and (not DOCSPACE_TARGET_URL or acceptable_remote_status(docspace_target_status))
+    )
+    workspace_ok = (not WORKSPACE_ENABLED) or (
+        acceptable_remote_status(workspace_status) and (not WORKSPACE_TARGET_URL or acceptable_remote_status(workspace_target_status))
+    )
 
     open_failures = len(failures_payload) if isinstance(failures_payload, list) else None
     unmatched_profiles = None
@@ -151,6 +183,8 @@ def main():
             "docspace": {
                 "enabled": DOCSPACE_ENABLED,
                 "status_code": docspace_status,
+                "frontdoor_status_code": docspace_status,
+                "target_status_code": docspace_target_status,
                 "ok": docspace_ok,
                 "target_configured": bool(DOCSPACE_TARGET_URL),
                 "mode": "live_target" if DOCSPACE_TARGET_URL else ("shell_only" if DOCSPACE_ENABLED else "disabled"),
@@ -158,6 +192,8 @@ def main():
             "workspace": {
                 "enabled": WORKSPACE_ENABLED,
                 "status_code": workspace_status,
+                "frontdoor_status_code": workspace_status,
+                "target_status_code": workspace_target_status,
                 "ok": workspace_ok,
                 "target_configured": bool(WORKSPACE_TARGET_URL),
                 "mode": "live_target" if WORKSPACE_TARGET_URL else ("shell_only" if WORKSPACE_ENABLED else "disabled"),

@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - ../.env
+      - ${DOCFLOW_ENV_FILE:-../.env}
     container_name: "${BRIDGE_CONTAINER:-naudoc_bridge_test}"
     environment:
       TZ: Europe/Moscow
@@ -24,6 +24,10 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "${BRIDGE_BIND_PORT:-18082}:8000"
+    command:
+      - /bin/sh
+      - -lc
+      - exec gunicorn --bind 0.0.0.0:8000 --workers "${BRIDGE_GUNICORN_WORKERS:-1}" --threads "${BRIDGE_GUNICORN_THREADS:-2}" --timeout "${BRIDGE_GUNICORN_TIMEOUT:-60}" app:app
     volumes:
       - bridge_data:/data
     restart: unless-stopped
@@ -33,7 +37,7 @@ services:
     profiles:
       - identity
     env_file:
-      - ../.env
+      - ${DOCFLOW_ENV_FILE:-../.env}
     container_name: "${LDAP_CONTAINER_NAME:-docflow_hospital_ldap}"
     environment:
       LDAP_ORGANISATION: "${LDAP_ORGANISATION:-Hospital_DocFlow}"

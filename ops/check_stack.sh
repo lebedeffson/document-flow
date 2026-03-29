@@ -13,6 +13,17 @@ fail() {
   exit 1
 }
 
+acceptable_remote_status() {
+  local status="${1:-}"
+  [[ "${status}" == "200" || "${status}" == "301" || "${status}" == "302" || "${status}" == "401" || "${status}" == "403" ]]
+}
+
+target_host_requires_local_probe() {
+  local host="${1:-}"
+
+  [[ "${host}" == "host.docker.internal" || "${host}" == "localhost" || "${host}" == 127.* ]]
+}
+
 curl_docflow() {
   local url="${1:-}"
   shift || true
@@ -30,6 +41,23 @@ curl_docflow() {
   fi
 
   curl --resolve "${host}:${port}:${probe_ip}" "$@" "${scheme}://${host}:${port}${path}"
+}
+
+curl_target() {
+  local url="${1:-}"
+  shift || true
+
+  local host port probe_ip
+  host="$(docflow_url_field "${url}" host)"
+  port="$(docflow_url_field "${url}" port)"
+  probe_ip="$(docflow_local_probe_ip)"
+
+  if target_host_requires_local_probe "${host}"; then
+    curl --resolve "${host}:${port}:${probe_ip}" "$@" "${url}"
+    return 0
+  fi
+
+  curl "$@" "${url}"
 }
 
 echo "[check] containers"
@@ -89,7 +117,7 @@ docspace_headers="$(mktemp)"
 curl_docflow "${DOCFLOW_DOCSPACE_PUBLIC_BASE}/" -k -sS -I --max-time 10 -D "${docspace_headers}" -o /dev/null || fail "docspace frontdoor is unavailable"
 cat "${docspace_headers}"
 docspace_status="$(awk 'NR==1 {print $2}' "${docspace_headers}")"
-if [[ "${docspace_status}" != "200" && "${docspace_status}" != "301" && "${docspace_status}" != "302" ]]; then
+if ! acceptable_remote_status "${docspace_status}"; then
   fail "docspace frontdoor returned unexpected status ${docspace_status:-unknown}"
 fi
 
@@ -99,6 +127,55 @@ workspace_headers="$(mktemp)"
 curl_docflow "${DOCFLOW_WORKSPACE_PUBLIC_BASE}/" -k -sS -I --max-time 10 -D "${workspace_headers}" -o /dev/null || fail "workspace frontdoor is unavailable"
 cat "${workspace_headers}"
 workspace_status="$(awk 'NR==1 {print $2}' "${workspace_headers}")"
-if [[ "${workspace_status}" != "200" && "${workspace_status}" != "301" && "${workspace_status}" != "302" ]]; then
+if ! acceptable_remote_status "${workspace_status}"; then
   fail "workspace frontdoor returned unexpected status ${workspace_status:-unknown}"
 fi
+
+if [[ -n "${DOCSPACE_TARGET_URL:-}" ]]; then
+  echo
+  echo "[check] docspace live target"
+  docspace_target_headers="$(mktemp)"
+  curl_target "${DOCSPACE_TARGET_URL}" -k -sS -I --max-time 10 -D "${docspace_target_headers}" -o /dev/null || fail "docspace live target is unavailable"
+  cat "${docspace_target_headers}"
+  docspace_target_status="$(awk 'NR==1 {print $2}' "${docspace_target_headers}")"
+  if ! acceptable_remote_status "${docspace_target_status}"; then
+    fail "docspace live target returned unexpected status ${docspace_target_status:-unknown}"
+  fi
+fi
+
+if [[ -n "${WORKSPACE_TARGET_URL:-}" ]]; then
+  echo
+  echo "[check] workspace live target"
+  workspace_target_headers="$(mktemp)"
+  curl_target "${WORKSPACE_TARGET_URL}" -k -sS -I --max-time 10 -D "${workspace_target_headers}" -o /dev/null || fail "workspace live target is unavailable"
+  cat "${workspace_target_headers}"
+  workspace_target_status="$(awk 'NR==1 {print $2}' "${workspace_target_headers}")"
+  if ! acceptable_remote_status "${workspace_target_status}"; then
+    fail "workspace live target returned unexpected status ${workspace_target_status:-unknown}"
+  fi
+fi
+
+check_optional_remote_target() {
+  local label="${1:-}"
+  local url="${2:-}"
+  local headers=""
+  local status=""
+
+  [[ -n "${label}" && -n "${url}" ]] || return 0
+
+  echo
+  echo "[check] ${label}"
+  headers="$(mktemp)"
+  curl_target "${url}" -k -sS -I --max-time 10 -D "${headers}" -o /dev/null || fail "${label} is unavailable"
+  cat "${headers}"
+  status="$(awk 'NR==1 {print $2}' "${headers}")"
+  if ! acceptable_remote_status "${status}"; then
+    fail "${label} returned unexpected status ${status:-unknown}"
+  fi
+}
+
+check_optional_remote_target "docspace collaboration target" "${DOCSPACE_COLLABORATION_ROOM_TARGET_URL:-}"
+check_optional_remote_target "docspace public target" "${DOCSPACE_PUBLIC_ROOM_TARGET_URL:-}"
+check_optional_remote_target "docspace form filling target" "${DOCSPACE_FORM_FILLING_ROOM_TARGET_URL:-}"
+check_optional_remote_target "workspace calendar target" "${WORKSPACE_CALENDAR_TARGET_URL:-}"
+check_optional_remote_target "workspace community target" "${WORKSPACE_COMMUNITY_TARGET_URL:-}"

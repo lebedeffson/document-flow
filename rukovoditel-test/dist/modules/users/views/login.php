@@ -27,6 +27,13 @@ function docflow_login_env_value($key, $default = '')
 }
 
 $show_demo_login_modes = docflow_login_env_value('DOCFLOW_SHOW_DEMO_LOGIN_MODES', '0') === '1';
+$restore_password_url = url_for('users/restore_password');
+$directory_access_note = CFG_LDAP_USE == 1
+    ? 'Доступ выдает администратор или корпоративный каталог'
+    : 'Доступ выдает администратор';
+$directory_access_hint = CFG_LDAP_USE == 1
+    ? 'Самостоятельная регистрация отключена. Учетная запись создается администратором или выдается через LDAP/AD.'
+    : 'Самостоятельная регистрация отключена. Учетная запись создается администратором.';
 $login_modes = array(
     array(
         'title' => 'Администратор',
@@ -58,22 +65,24 @@ $login_modes = array(
                     <div class="login-mode-eyebrow"><?php echo $mode['eyebrow'] ?></div>
                     <h4><?php echo $mode['title'] ?></h4>
                     <p><?php echo $mode['description'] ?></p>
-                    <?php if($show_demo_login_modes): ?>
-                        <div class="login-mode-credentials">
-                            <span><?php echo $mode['username'] ?></span>
-                            <span><?php echo $mode['password'] ?></span>
-                        </div>
-                        <button
-                            type="button"
-                            class="btn btn-default btn-sm login-mode-fill"
-                            data-username="<?php echo $mode['username'] ?>"
-                            data-password="<?php echo $mode['password'] ?>"
-                        >Заполнить вход</button>
-                    <?php else: ?>
-                        <div class="login-mode-credentials">
-                            <span>Используйте персональную учетную запись</span>
-                        </div>
-                    <?php endif; ?>
+                    <div class="login-mode-footer">
+                        <?php if($show_demo_login_modes): ?>
+                            <div class="login-mode-credentials">
+                                <span><?php echo $mode['username'] ?></span>
+                                <span><?php echo $mode['password'] ?></span>
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-default btn-sm login-mode-fill"
+                                data-username="<?php echo $mode['username'] ?>"
+                                data-password="<?php echo $mode['password'] ?>"
+                            >Заполнить вход</button>
+                        <?php else: ?>
+                            <div class="login-mode-credentials">
+                                <span>Используйте персональную учетную запись</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -84,6 +93,10 @@ $login_modes = array(
             <div class="platform-login-form-kicker">Вход в систему</div>
             <h4>Начать работу</h4>
             <p><?php echo $show_demo_login_modes ? 'Введите свой логин или выберите один из двух подготовленных режимов.' : 'Введите персональные учетные данные, выданные администратором или корпоративным каталогом.' ?></p>
+            <div class="platform-login-head-actions">
+                <a class="platform-login-head-link" href="<?php echo $restore_password_url ?>"><?php echo TEXT_PASSWORD_FORGOTTEN ?></a>
+                <span class="platform-login-head-link is-disabled" aria-disabled="true" title="<?php echo htmlspecialchars($directory_access_hint) ?>"><?php echo $directory_access_note ?></span>
+            </div>
         </div>
 
         <?php echo maintenance_mode::login_message() ?>
@@ -128,13 +141,6 @@ if(CFG_ENABLE_SOCIAL_LOGIN != 2)
     </div>
 
     </form>
-
-    <div class="forget-password platform-login-secondary-actions">
-        <div class="platform-login-links">
-            <a href="<?php echo url_for('users/restore_password') ?>"><?php echo TEXT_PASSWORD_FORGOTTEN ?></a>
-            <?php if(CFG_USE_PUBLIC_REGISTRATION == 1) echo '<a class="platform-login-register" href="' . url_for('users/registration') . '">' . (strlen(CFG_REGISTRATION_BUTTON_TITLE) ? CFG_REGISTRATION_BUTTON_TITLE : TEXT_BUTTON_REGISTRATCION) . '</a>' ?>
-        </div>
-    </div>
 
 <?php
 }

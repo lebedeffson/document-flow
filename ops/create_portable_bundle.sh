@@ -60,6 +60,9 @@ fi
 echo "[bundle] env: ${ENV_FILE}"
 echo "[bundle] root: ${ROOT_DIR}"
 
+echo "[bundle] download official onlyoffice installers"
+bash "${ROOT_DIR}/ops/download_onlyoffice_installers.sh"
+
 echo "[bundle] build local images"
 docker compose --project-directory "${ROOT_DIR}/gateway" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/gateway/docker-compose.yml" build gateway
 docker compose --project-directory "${ROOT_DIR}/middleware" -p "${MIDDLEWARE_COMPOSE_PROJECT_NAME}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/middleware/docker-compose.yml" build middleware
@@ -96,6 +99,7 @@ tar -C "${ROOT_DIR}" -czf "${OUTPUT_DIR}/artifacts/project.tar.gz" \
   --exclude='.env' \
   --exclude='.env.*' \
   --exclude='.tmp_e2e' \
+  --exclude='.tmp_onlyoffice_installers' \
   --exclude='backups' \
   --exclude='runtime/portable-bundles' \
   --exclude='runtime/monitoring' \
@@ -116,6 +120,39 @@ install -m 600 "${ENV_FILE}" "${OUTPUT_DIR}/config/.env"
 
 echo "[bundle] copy installer"
 install -m 755 "${ROOT_DIR}/ops/install_from_bundle.sh" "${OUTPUT_DIR}/install_from_bundle.sh"
+install -m 755 "${ROOT_DIR}/ops/install_everything.sh" "${OUTPUT_DIR}/install_everything.sh"
+
+cat > "${OUTPUT_DIR}/START_HERE.txt" <<'EOF'
+Offline install quick start
+==========================
+
+1. Copy this whole bundle directory to the target Linux server.
+2. Open a terminal in this bundle directory.
+3. Run:
+
+   bash install_everything.sh /opt/docflow
+
+What this does:
+- installs the full project from the bundle
+- loads Docker images locally without internet
+- restores the bundled data snapshot
+- enables Office Wave 1 in the ready-to-use mode
+- prints the access URLs for the local network
+
+After install:
+- open runtime/monitoring/access_points.txt on the target server
+- give users the printed URL or server IP
+
+Optional live Office layer on the same host:
+- official ONLYOFFICE installers are included in the project tarball
+- to install live DocSpace + Workspace right away on the target server, run:
+
+  sudo bash install_everything.sh --with-live-office --office-auto-host /opt/docflow
+
+- or later from the deployed project:
+
+  sudo bash /opt/docflow/ops/install_office_live_same_host.sh --auto-host
+EOF
 
 if [ "${WITH_LOCAL_LDAP}" = "1" ]; then
   printf 'WITH_LOCAL_LDAP=1\n' > "${OUTPUT_DIR}/config/bundle.flags"
@@ -134,6 +171,8 @@ artifacts=
   artifacts/docker-images.tar
   config/.env
   install_from_bundle.sh
+  install_everything.sh
+  START_HERE.txt
 images=
 $(printf '  %s\n' "${REQUIRED_IMAGES[@]}")
 EOF
@@ -141,9 +180,9 @@ EOF
 if command -v sha256sum >/dev/null 2>&1; then
   (
     cd "${OUTPUT_DIR}"
-    sha256sum artifacts/project.tar.gz artifacts/backup.tar.gz artifacts/docker-images.tar config/.env install_from_bundle.sh > SHA256SUMS
+    sha256sum artifacts/project.tar.gz artifacts/backup.tar.gz artifacts/docker-images.tar config/.env install_from_bundle.sh install_everything.sh START_HERE.txt > SHA256SUMS
   )
 fi
 
 echo "[bundle] ready: ${OUTPUT_DIR}"
-echo "[bundle] install on target: bash install_from_bundle.sh /opt/docflow"
+echo "[bundle] install on target: bash install_everything.sh /opt/docflow"

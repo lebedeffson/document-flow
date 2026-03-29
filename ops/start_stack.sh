@@ -9,9 +9,6 @@ source "${SCRIPT_DIR}/lib/runtime_env.sh"
 # shellcheck source=lib/compose_stack.sh
 source "${SCRIPT_DIR}/lib/compose_stack.sh"
 
-docflow_load_env "${ROOT_DIR}"
-docflow_export_runtime
-
 ENV_FILE="$(docflow_env_file_path "${ROOT_DIR}")"
 WITH_LOCAL_LDAP=0
 BUILD_MODE="build"
@@ -36,6 +33,11 @@ if [ ! -f "${ENV_FILE}" ]; then
   exit 1
 fi
 
+DOCFLOW_ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/ops/configure_access_host.sh"
+
+docflow_load_env "${ROOT_DIR}"
+docflow_export_runtime
+
 docflow_stack_up "${ROOT_DIR}" "${ENV_FILE}" "${BUILD_MODE}" "${WITH_LOCAL_LDAP}"
 
 if [ "${WITH_LOCAL_LDAP}" = "1" ]; then
@@ -43,6 +45,7 @@ if [ "${WITH_LOCAL_LDAP}" = "1" ]; then
 fi
 
 bash "${ROOT_DIR}/ops/check_stack.sh"
+DOCFLOW_ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/ops/show_access_points.sh"
 
 echo "[start-stack] done"
 echo "[start-stack] platform: ${DOCFLOW_PUBLIC_BASE}/"

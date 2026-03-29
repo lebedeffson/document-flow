@@ -1,5 +1,6 @@
 .tmp_e2e/
 .tmp_lan_manual_test/
+.tmp_onlyoffice_installers/
 ops/node_modules/
 .env
 .env.local

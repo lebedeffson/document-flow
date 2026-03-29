@@ -94,6 +94,24 @@ bash ops/generate_staging_env.sh
 
 Для `DocSpace/Workspace` первой волны теперь есть отдельный конфигурационный сценарий.
 
+Минимальный рекомендуемый scope первой волны:
+
+1. `DocSpace`:
+   - `Collaboration rooms`
+   - `Public rooms`
+   - при необходимости `Form filling rooms`
+2. `Workspace`:
+   - `Calendar`
+   - опционально `Community`
+   - для lean-включения первой волны `Community` лучше держать выключенным до отдельного решения
+
+Что не стоит включать в первую волну:
+
+1. `Workspace Mail`
+2. `Workspace CRM`
+3. `Workspace Projects`
+4. `Workspace Documents`
+
 Перевести оба сервиса в рабочий `shell-only` режим и обновить baseline-ссылки:
 
 ```bash
@@ -110,12 +128,56 @@ bash ops/configure_office_wave1.sh \
   --workspace-target https://workspace.hospital.local/
 ```
 
+Для закрытой локальной сети preferred production-вариант такой:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/configure_office_wave1.sh \
+  --docspace-target http://host.docker.internal:19001/ \
+  --workspace-target http://host.docker.internal:19002/ \
+  --workspace-calendar-only \
+  --require-live-targets
+```
+
+В этой схеме:
+
+1. пользователи по-прежнему заходят только через основной gateway
+2. `DocSpace` открывается через `https://<server>/docspace/`
+3. `Workspace` открывается через `https://<server>/workspace/`
+4. отдельные workstation aliases для office-layer не нужны
+
 Что делает скрипт:
 
 1. обновляет `DOCSPACE/WORKSPACE` настройки в `.env`
 2. фиксирует public URLs первой волны
 3. при необходимости включает `shell-only` или `live_target` режим
 4. по умолчанию перезаполняет baseline-ссылки в карточках, проектах, заявках и МТЗ
+5. в `live_target` режиме `/docspace/` и `/workspace/` становятся реальными frontdoor-точками входа, а shell остается доступен через `?shell=1`
+6. `live_target` может быть как external-host mode, так и same-host reverse proxy mode
+
+Для финального closed-LAN cutover теперь есть единый сценарий:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/cutover_closed_lan_prod.sh --auto-host
+```
+
+Он делает:
+
+1. нормализует основной публичный host/IP
+2. включает same-host office proxy на `host.docker.internal:19001/19002`
+3. оставляет `Workspace` в `Calendar`-only режиме, если явно не включать `Community`
+4. включает `DOCFLOW_OFFICE_WAVE1_REQUIRE_LIVE_TARGETS=1`
+5. перезапускает стек и сразу прогоняет readiness/monitoring
+
+Если внутренние office-порты другие:
+
+```bash
+bash ops/cutover_closed_lan_prod.sh \
+  --host 172.16.10.20 \
+  --docspace-port 29001 \
+  --workspace-port 29002
+```
 
 Проверить, хватает ли текущего host под vendor-развертывание:
 
@@ -153,9 +215,25 @@ cd /path/to/bundle
 bash install_from_bundle.sh /opt/docflow
 ```
 
+`install_from_bundle.sh` теперь делает production readiness preflight по целевому `.env` и не продолжает установку, если в конфиге остались blockers.
+
+Для one-click сценария:
+
+```bash
+cd /path/to/bundle
+bash install_everything.sh /opt/docflow
+```
+
+После него сохраняется readiness-отчет:
+
+```bash
+cat /opt/docflow/runtime/monitoring/install_prod_readiness.json
+```
+
 Подробный сценарий:
 
 - [OFFLINE_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFLINE_INSTALL_RUNBOOK.md)
+- [CLOSED_LAN_GO_LIVE_CHECKLIST.md](/home/lebedeffson/Code/Документооборот/docs/reference/CLOSED_LAN_GO_LIVE_CHECKLIST.md)
 
 ## Pilot Package
 
@@ -240,6 +318,58 @@ cd /home/lebedeffson/Code/Документооборот/ops
 ```
 
 Скрипт теперь умеет честно проверять и основной контур, и staging даже без прописанного DNS, если gateway опубликован на локальные bind-порты.
+
+## Access Host Auto-Config
+
+Для полевого/offline запуска теперь можно опираться на один `.env`.
+
+Базовая схема:
+
+```env
+DOCFLOW_ACCESS_HOST=
+DOCFLOW_ACCESS_HOST_AUTO=1
+DOCSPACE_TARGET_URL=
+WORKSPACE_TARGET_URL=
+DOCFLOW_WORKSPACE_WAVE1_ENABLE_COMMUNITY=0
+```
+
+При необходимости точных deep-link входов можно задать и отдельные URL:
+
+```env
+DOCSPACE_COLLABORATION_ROOM_TARGET_URL=
+DOCSPACE_PUBLIC_ROOM_TARGET_URL=
+DOCSPACE_FORM_FILLING_ROOM_TARGET_URL=
+WORKSPACE_CALENDAR_TARGET_URL=
+WORKSPACE_COMMUNITY_TARGET_URL=
+```
+
+Что это дает:
+
+1. при старте `ops/start_stack.sh` и `install_from_bundle.sh` автоматически определяют основной IPv4 сервера
+2. переписывают публичные URL в этом же `.env`
+3. печатают готовые адреса входа
+4. сохраняют их в `runtime/monitoring/access_points.txt`
+
+Ручной запуск:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/configure_access_host.sh
+bash ops/show_access_points.sh
+```
+
+Если позже выдали нормальный alias, достаточно сменить только `.env`:
+
+```env
+DOCFLOW_ACCESS_HOST=docflow.hospital.local
+DOCFLOW_ACCESS_HOST_AUTO=0
+```
+
+После этого перезапустить стек:
+
+```bash
+bash ops/start_stack.sh --no-build
+```
 
 ## Smoke Test
 
@@ -593,3 +723,9 @@ cd /home/lebedeffson/Code/Документооборот/ops
 3. для локального стенда gateway работает с self-signed сертификатом
 4. для production переменные и секреты нужно брать из `.env`, шаблон лежит в [`.env.example`](/home/lebedeffson/Code/Документооборот/.env.example)
 5. первый успешный локальный restore drill зафиксирован в [RESTORE_DRILL_REPORT.md](/home/lebedeffson/Code/Документооборот/docs/reference/RESTORE_DRILL_REPORT.md)
+Live Office same-host helpers:
+- `bash ops/download_onlyoffice_installers.sh`
+- `sudo bash ops/install_docspace_same_host.sh --host <ip-or-dns>`
+- `sudo bash ops/install_workspace_same_host.sh`
+- `sudo bash ops/install_office_live_same_host.sh --auto-host`
+- `sudo bash install_everything.sh --with-live-office --office-auto-host /opt/docflow`

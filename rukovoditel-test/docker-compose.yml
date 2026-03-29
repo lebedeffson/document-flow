@@ -2,7 +2,7 @@ services:
   rukovoditel_db:
     image: "${MARIADB_IMAGE:-mariadb:10.11}"
     env_file:
-      - ../.env
+      - ${DOCFLOW_ENV_FILE:-../.env}
     container_name: "${RUKOVODITEL_DB_CONTAINER:-rukovoditel_db_test}"
     environment:
       MARIADB_DATABASE: "${RUKOVODITEL_DB_NAME:-rukovoditel}"
@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     env_file:
-      - ../.env
+      - ${DOCFLOW_ENV_FILE:-../.env}
     container_name: "${RUKOVODITEL_CONTAINER_NAME:-rukovoditel_test}"
     depends_on:
       - rukovoditel_db
@@ -53,7 +53,7 @@ services:
   onlyoffice_docs:
     image: "${ONLYOFFICE_IMAGE:-onlyoffice/documentserver:latest}"
     env_file:
-      - ../.env
+      - ${DOCFLOW_ENV_FILE:-../.env}
     container_name: "${ONLYOFFICE_CONTAINER_NAME:-onlyoffice_docs_test}"
     environment:
       TZ: Europe/Moscow
@@ -75,7 +75,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     env_file:
-      - ../.env
+      - ${DOCFLOW_ENV_FILE:-../.env}
     container_name: "${RUKOVODITEL_SYNC_WORKER_CONTAINER_NAME:-rukovoditel_sync_worker_test}"
     depends_on:
       - rukovoditel_db

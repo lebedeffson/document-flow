@@ -15,13 +15,75 @@ PROJECT_ARCHIVE="${ARTIFACTS_DIR}/project.tar.gz"
 BACKUP_ARCHIVE="${ARTIFACTS_DIR}/backup.tar.gz"
 IMAGES_ARCHIVE="${ARTIFACTS_DIR}/docker-images.tar"
 ENV_SOURCE="${SCRIPT_DIR}/config/.env"
+CHECKSUM_FILE="${SCRIPT_DIR}/SHA256SUMS"
+
+fail() {
+  echo "[install] ERROR: $*" >&2
+  exit 1
+}
+
+require_command() {
+  local command_name="${1:-}"
+  command -v "${command_name}" >/dev/null 2>&1 || fail "required command is missing: ${command_name}"
+}
+
+run_prod_readiness_preflight() {
+  local target_root="${1:-}"
+  local env_file="${2:-}"
+  local output_file="${3:-}"
+
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "[install] python3 not found, skipping production readiness preflight"
+    return 0
+  fi
+
+  echo "[install] production readiness preflight"
+  DOCFLOW_ENV_FILE="${env_file}" python3 "${target_root}/ops/prod_readiness_audit.py" | tee "${output_file}"
+
+  python3 - "${output_file}" <<'PY'
+import json
+import pathlib
+import sys
+
+report_path = pathlib.Path(sys.argv[1])
+report = json.loads(report_path.read_text(encoding="utf-8"))
+blocker_count = int(report.get("blocker_count", 0))
+warning_count = int(report.get("warning_count", 0))
+
+if blocker_count:
+    print(f"[install] production readiness blockers: {blocker_count}", file=sys.stderr)
+    for item in report.get("blockers", []):
+        print(f"[install] blocker: {item}", file=sys.stderr)
+    sys.exit(1)
+
+print("[install] production readiness blockers: 0")
+if warning_count:
+    print(f"[install] production readiness warnings: {warning_count}")
+    for item in report.get("warnings", []):
+        print(f"[install] warning: {item}")
+else:
+    print("[install] production readiness warnings: 0")
+PY
+}
 
 for required in "${PROJECT_ARCHIVE}" "${BACKUP_ARCHIVE}" "${IMAGES_ARCHIVE}" "${ENV_SOURCE}"; do
   if [ ! -f "${required}" ]; then
-    echo "[install] missing bundle file: ${required}" >&2
-    exit 1
+    fail "missing bundle file: ${required}"
   fi
 done
+
+require_command docker
+docker compose version >/dev/null 2>&1 || fail "docker compose is required"
+require_command tar
+require_command bash
+
+if [ -f "${CHECKSUM_FILE}" ] && command -v sha256sum >/dev/null 2>&1; then
+  echo "[install] verify bundle checksums"
+  (
+    cd "${SCRIPT_DIR}"
+    sha256sum -c SHA256SUMS
+  )
+fi
 
 if [ -d "${TARGET_ROOT}" ] && [ -n "$(find "${TARGET_ROOT}" -mindepth 1 -maxdepth 1 2>/dev/null | head -n 1)" ]; then
   echo "[install] target directory is not empty: ${TARGET_ROOT}" >&2
@@ -36,6 +98,12 @@ tar -xzf "${PROJECT_ARCHIVE}" -C "${TARGET_ROOT}"
 
 echo "[install] install env"
 install -m 600 "${ENV_SOURCE}" "${TARGET_ROOT}/.env"
+
+echo "[install] detect access host and normalize public URLs"
+DOCFLOW_ENV_FILE="${TARGET_ROOT}/.env" bash "${TARGET_ROOT}/ops/configure_access_host.sh"
+
+mkdir -p "${TARGET_ROOT}/runtime/install-bundle"
+run_prod_readiness_preflight "${TARGET_ROOT}" "${TARGET_ROOT}/.env" "${TARGET_ROOT}/runtime/install-bundle/preinstall_prod_readiness.json"
 
 echo "[install] load docker images"
 docker load -i "${IMAGES_ARCHIVE}"
@@ -63,7 +131,8 @@ fi
 
 echo "[install] post-install check"
 bash ops/check_stack.sh
+DOCFLOW_ENV_FILE="${TARGET_ROOT}/.env" bash ops/show_access_points.sh
 
 echo "[install] done"
-echo "[install] platform: https://$(grep '^GATEWAY_SERVER_NAME=' .env | cut -d= -f2-)/"
+echo "[install] platform: $(grep '^RUKOVODITEL_PUBLIC_URL=' .env | cut -d= -f2-)/"
 echo "[install] next step: bash ops/smoke_test_stack.sh"

@@ -11,6 +11,47 @@ docflow_trim_trailing_slash() {
   printf '%s\n' "${value}"
 }
 
+docflow_is_ipv4_literal() {
+  local value="${1:-}"
+  [[ "${value}" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]
+}
+
+docflow_is_internal_gateway_target_host() {
+  local value="${1:-}"
+  [[ "${value}" == "host.docker.internal" || "${value}" == "localhost" || "${value}" == 127.* ]]
+}
+
+docflow_list_non_loopback_ipv4s() {
+  if command -v ip >/dev/null 2>&1; then
+    ip -4 -o addr show scope global up 2>/dev/null | awk '$2 !~ /^(docker|br-|veth|virbr|lo)/ {print $4}' | cut -d/ -f1 | awk '!seen[$0]++'
+    return 0
+  fi
+
+  if command -v hostname >/dev/null 2>&1; then
+    hostname -I 2>/dev/null | tr ' ' '\n' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | grep -v '^127\.' | awk '!seen[$0]++'
+    return 0
+  fi
+}
+
+docflow_detect_primary_ipv4() {
+  local candidate=""
+
+  if command -v ip >/dev/null 2>&1; then
+    candidate="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '/src / {for (i = 1; i <= NF; ++i) if ($i == "src") {print $(i+1); exit}}')"
+  fi
+
+  if [ -z "${candidate}" ]; then
+    candidate="$(docflow_list_non_loopback_ipv4s | head -n 1)"
+  fi
+
+  if [ -n "${candidate}" ]; then
+    printf '%s\n' "${candidate}"
+    return 0
+  fi
+
+  return 1
+}
+
 docflow_build_url() {
   local scheme="${1:-https}"
   local host="${2:-localhost}"
@@ -31,6 +72,11 @@ docflow_build_url() {
 }
 
 docflow_public_host() {
+  if [ -n "${DOCFLOW_ACCESS_HOST:-}" ]; then
+    printf '%s\n' "${DOCFLOW_ACCESS_HOST}"
+    return 0
+  fi
+
   printf '%s\n' "${GATEWAY_SERVER_NAME:-localhost}"
 }
 
@@ -243,6 +289,11 @@ docflow_export_runtime() {
   export DOCFLOW_REQUESTER_USERNAME="${DOCFLOW_REQUESTER_USERNAME:-registry.operator}"
   export DOCFLOW_OFFICE_USERNAME="${DOCFLOW_OFFICE_USERNAME:-records.office}"
   export DOCFLOW_NURSE_USERNAME="${DOCFLOW_NURSE_USERNAME:-nurse.coordinator}"
+  export SYNC_INTERVAL_SECONDS="${SYNC_INTERVAL_SECONDS:-180}"
+  export BRIDGE_REQUEST_TIMEOUT="${BRIDGE_REQUEST_TIMEOUT:-8}"
+  export BRIDGE_GUNICORN_WORKERS="${BRIDGE_GUNICORN_WORKERS:-1}"
+  export BRIDGE_GUNICORN_THREADS="${BRIDGE_GUNICORN_THREADS:-2}"
+  export BRIDGE_GUNICORN_TIMEOUT="${BRIDGE_GUNICORN_TIMEOUT:-60}"
   export LDAP_CONTAINER_NAME="${LDAP_CONTAINER_NAME:-docflow_hospital_ldap}"
   export GATEWAY_IMAGE="${GATEWAY_IMAGE:-docflow/gateway:local}"
   export BRIDGE_IMAGE="${BRIDGE_IMAGE:-docflow/bridge:local}"

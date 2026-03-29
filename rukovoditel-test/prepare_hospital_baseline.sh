@@ -7,6 +7,9 @@ source "${ROOT_DIR}/../ops/lib/runtime_env.sh"
 docflow_load_env "${ROOT_DIR}/.."
 docflow_export_runtime
 
+echo "[baseline] refresh process model to sync env-bound field configuration..."
+docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/provision_process_model.php
+
 docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/prepare_hospital_baseline.php
 
 DB_CONTAINER="${RUKOVODITEL_DB_CONTAINER}"
@@ -74,6 +77,9 @@ bash "$ROOT_DIR/sync_service_requests.sh"
 bash "$ROOT_DIR/sync_project_documents.sh"
 bash "$ROOT_DIR/sync_document_cards.sh" --force-all
 bash "$ROOT_DIR/pull_bridge_updates.sh" --only-linked
+
+echo "[baseline] reapplying ecosystem models after bridge pull..."
+docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/prepare_hospital_baseline.php
 
 echo
 echo "Hospital baseline prepared."

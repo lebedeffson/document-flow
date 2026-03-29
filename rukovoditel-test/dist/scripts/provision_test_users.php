@@ -223,7 +223,7 @@ $users = [
         'first_name' => 'Мария',
         'last_name' => 'Заведующая',
         'email' => 'department.head@hospital.local',
-        'legacy_usernames' => ['manager.test'],
+        'legacy_usernames' => ['manager.test', 'department.head'],
     ],
     [
         'username' => env_value('DOCFLOW_EMPLOYEE_USERNAME', 'clinician.primary'),
@@ -231,7 +231,7 @@ $users = [
         'first_name' => 'Илья',
         'last_name' => 'Врач',
         'email' => 'clinician.primary@hospital.local',
-        'legacy_usernames' => ['employee.test', 'user.demo'],
+        'legacy_usernames' => ['employee.test', 'user.demo', 'clinician.primary'],
     ],
     [
         'username' => env_value('DOCFLOW_NURSE_USERNAME', 'nurse.coordinator'),
@@ -239,7 +239,7 @@ $users = [
         'first_name' => 'Наталья',
         'last_name' => 'Старшая медсестра',
         'email' => 'nurse.coordinator@hospital.local',
-        'legacy_usernames' => ['nurse.test'],
+        'legacy_usernames' => ['nurse.test', 'nurse.coordinator'],
     ],
     [
         'username' => env_value('DOCFLOW_REQUESTER_USERNAME', 'registry.operator'),
@@ -247,7 +247,7 @@ $users = [
         'first_name' => 'Ольга',
         'last_name' => 'Регистратор',
         'email' => 'registry.operator@hospital.local',
-        'legacy_usernames' => ['requester.test'],
+        'legacy_usernames' => ['requester.test', 'registry.operator'],
     ],
     [
         'username' => env_value('DOCFLOW_OFFICE_USERNAME', 'records.office'),
@@ -255,7 +255,7 @@ $users = [
         'first_name' => 'Анна',
         'last_name' => 'Делопроизводитель',
         'email' => 'records.office@hospital.local',
-        'legacy_usernames' => ['office.test'],
+        'legacy_usernames' => ['office.test', 'records.office'],
     ],
 ];
 

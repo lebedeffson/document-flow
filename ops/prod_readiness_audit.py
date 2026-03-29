@@ -3,6 +3,7 @@ import json
 import os
 import pathlib
 import sys
+from urllib.parse import urlparse
 
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parents[1]
@@ -66,6 +67,16 @@ def is_local_value(value: str):
     return any(marker in lowered for marker in ("localhost", "127.0.0.1", "host.docker.internal"))
 
 
+def is_unusable_proxy_target(value: str):
+    try:
+        parsed = urlparse(value.strip())
+    except Exception:
+        return True
+
+    hostname = (parsed.hostname or "").strip().lower()
+    return hostname in ("", "localhost") or hostname.startswith("127.")
+
+
 def is_truthy(value: str):
     return value.strip().lower() in ("1", "true", "yes", "on")
 
@@ -81,6 +92,26 @@ def looks_like_demo_username(value: str):
         return True
 
     return any(marker in lowered for marker in ("demo", ".test", "test.", "_test"))
+
+
+def check_optional_target_url(env_values: dict, checks: list, blockers: list, key: str):
+    value = effective_value(key, env_values)
+    if not value:
+        return
+
+    invalid = not looks_like_http_url(value)
+    unusable = is_unusable_proxy_target(value) if not invalid else False
+    checks.append(
+        {
+            "name": key,
+            "status": "ok" if not (invalid or unusable) else "blocker",
+            "details": value,
+        }
+    )
+    if invalid:
+        blockers.append(f"{key} is not a valid http(s) URL: {value}")
+    if unusable:
+        blockers.append(f"{key} points to an unusable loopback target for gateway proxying: {value}")
 
 
 def main():
@@ -214,22 +245,31 @@ def main():
             if require_live_targets:
                 blockers.append(f"{service_name} is required in live-target mode, but {target_key} is empty.")
             else:
-                warnings.append(f"{service_name} runs in shell-only mode. Set {target_key} to embed the external service.")
+                warnings.append(f"{service_name} runs in shell-only mode. Set {target_key} to route the live service through the gateway.")
             continue
 
-        target_local = is_local_value(target_url)
         target_invalid = not looks_like_http_url(target_url)
+        target_unusable = is_unusable_proxy_target(target_url) if not target_invalid else False
         checks.append(
             {
                 "name": target_key,
-                "status": "ok" if not (target_local or target_invalid) else "blocker",
+                "status": "ok" if not (target_invalid or target_unusable) else "blocker",
                 "details": target_url,
             }
         )
-        if target_local:
-            blockers.append(f"{target_key} still points to local/demo value: {target_url}")
         if target_invalid:
             blockers.append(f"{target_key} is not a valid http(s) URL: {target_url}")
+        if target_unusable:
+            blockers.append(f"{target_key} points to an unusable loopback target for gateway proxying: {target_url}")
+
+    for key in (
+        "DOCSPACE_COLLABORATION_ROOM_TARGET_URL",
+        "DOCSPACE_PUBLIC_ROOM_TARGET_URL",
+        "DOCSPACE_FORM_FILLING_ROOM_TARGET_URL",
+        "WORKSPACE_CALENDAR_TARGET_URL",
+        "WORKSPACE_COMMUNITY_TARGET_URL",
+    ):
+        check_optional_target_url(env_values, checks, blockers, key)
 
     checks.append(
         {

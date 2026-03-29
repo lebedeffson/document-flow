@@ -1,3 +1,8 @@
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
 server {
     listen 80;
     server_name ${SERVER_NAME};
@@ -55,13 +60,8 @@ server {
         return 301 /workspace/;
     }
 
-    location = /docspace/ {
-        rewrite ^ /index.php?module=dashboard/ecosystem&service=docspace last;
-    }
-
-    location = /workspace/ {
-        rewrite ^ /index.php?module=dashboard/ecosystem&service=workspace last;
-    }
+    include /etc/nginx/snippets/docspace_frontdoor.conf;
+    include /etc/nginx/snippets/workspace_frontdoor.conf;
 
     location /bridge/ {
         proxy_set_header X-Forwarded-Prefix /bridge;

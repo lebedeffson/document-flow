@@ -880,24 +880,32 @@ $project_docspace_link_id = ensure_custom_field(21, 'Комната DocSpace', '
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть комнату']),
     'sort_order' => 3,
 ]);
+$project_docspace_model_id = ensure_custom_field(21, 'Сценарий DocSpace', 'fieldtype_dropdown', $project_control_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 4,
+]);
 $project_workspace_link_id = ensure_custom_field(21, 'Сервис Workspace', 'fieldtype_input_url', $project_control_tab, [
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть сервис']),
-    'sort_order' => 4,
+    'sort_order' => 5,
+]);
+$project_workspace_model_id = ensure_custom_field(21, 'Модуль Workspace', 'fieldtype_dropdown', $project_control_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 6,
 ]);
 $project_doc_card_link_id = ensure_custom_field(21, 'Связанная карточка документа', 'fieldtype_entity', $project_control_tab, [
     'configuration' => config_json(['entity_id' => 25, 'display_as' => 'dropdown', 'width' => 'input-large', 'allow_search' => '1', 'display_as_link' => '1']),
-    'sort_order' => 5,
+    'sort_order' => 7,
     'listing_status' => 1,
     'listing_sort_order' => 13,
 ]);
 $project_doc_sync_status_id = ensure_custom_field(21, 'Статус документа / интеграции', 'fieldtype_dropdown', $project_control_tab, [
     'configuration' => config_json(['width' => 'input-large']),
-    'sort_order' => 6,
+    'sort_order' => 8,
     'listing_status' => 1,
     'listing_sort_order' => 14,
 ]);
 $project_manager_note_id = ensure_custom_field(21, 'Комментарий руководителя', 'fieldtype_textarea', $project_control_tab, [
-    'sort_order' => 7,
+    'sort_order' => 9,
 ]);
 
 sync_field_choices(21, $project_priority_id, [
@@ -913,6 +921,15 @@ sync_field_choices(21, $project_stage_id, [
     ['name' => 'На паузе', 'sort_order' => 4, 'bg_color' => '#adb5bd'],
     ['name' => 'Завершен', 'sort_order' => 5, 'bg_color' => '#95d5b2'],
     ['name' => 'В архиве', 'sort_order' => 6, 'bg_color' => '#ced4da'],
+]);
+sync_field_choices(21, $project_docspace_model_id, [
+    ['name' => 'Collaboration room', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#bde0fe'],
+    ['name' => 'Public room', 'sort_order' => 2, 'bg_color' => '#d8f3dc'],
+    ['name' => 'Form filling room', 'sort_order' => 3, 'bg_color' => '#ffe5b4'],
+]);
+sync_field_choices(21, $project_workspace_model_id, [
+    ['name' => 'Calendar', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#cdb4db'],
+    ['name' => 'Community', 'sort_order' => 2, 'bg_color' => '#bee1e6'],
 ]);
 sync_field_choices(21, $project_department_id, [
     ['name' => 'Администрация', 'sort_order' => 1, 'bg_color' => '#d8e2dc'],
@@ -1152,18 +1169,26 @@ $request_docspace_link_id = ensure_custom_field(23, 'Комната DocSpace', '
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть комнату']),
     'sort_order' => 7,
 ]);
+$request_docspace_model_id = ensure_custom_field(23, 'Сценарий DocSpace', 'fieldtype_dropdown', $request_execution_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 8,
+]);
 $request_workspace_link_id = ensure_custom_field(23, 'Сервис Workspace', 'fieldtype_input_url', $request_execution_tab, [
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть сервис']),
-    'sort_order' => 8,
+    'sort_order' => 9,
+]);
+$request_workspace_model_id = ensure_custom_field(23, 'Модуль Workspace', 'fieldtype_dropdown', $request_execution_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 10,
 ]);
 $request_doc_sync_status_id = ensure_custom_field(23, 'Статус документа / интеграции', 'fieldtype_dropdown', $request_execution_tab, [
     'configuration' => config_json(['width' => 'input-large']),
-    'sort_order' => 9,
+    'sort_order' => 11,
     'listing_status' => 1,
     'listing_sort_order' => 12,
 ]);
 $request_resolution_id = ensure_custom_field(23, 'Результат исполнения', 'fieldtype_textarea', $request_execution_tab, [
-    'sort_order' => 10,
+    'sort_order' => 12,
 ], ['Решение']);
 
 sync_field_choices(23, $request_type_id, [
@@ -1173,6 +1198,15 @@ sync_field_choices(23, $request_type_id, [
     ['name' => 'Документооборот', 'sort_order' => 4, 'bg_color' => '#ffd6a5', 'legacy_names' => ['Техническая поддержка']],
     ['name' => 'Доступ / учетная запись', 'sort_order' => 5, 'bg_color' => '#d8f3dc'],
     ['name' => 'Кадровый вопрос', 'sort_order' => 6, 'bg_color' => '#f8edeb'],
+]);
+sync_field_choices(23, $request_docspace_model_id, [
+    ['name' => 'Collaboration room', 'sort_order' => 1, 'bg_color' => '#bde0fe'],
+    ['name' => 'Public room', 'sort_order' => 2, 'bg_color' => '#d8f3dc'],
+    ['name' => 'Form filling room', 'sort_order' => 3, 'is_default' => 1, 'bg_color' => '#ffe5b4'],
+]);
+sync_field_choices(23, $request_workspace_model_id, [
+    ['name' => 'Calendar', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#cdb4db'],
+    ['name' => 'Community', 'sort_order' => 2, 'bg_color' => '#bee1e6'],
 ]);
 sync_field_choices(23, $request_group_id, [
     ['name' => 'Администрация', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#d8e2dc', 'users' => '1'],
@@ -1350,19 +1384,27 @@ $doc_docspace_link_id = ensure_custom_field(25, 'Комната DocSpace', 'fiel
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть комнату']),
     'sort_order' => 4,
 ]);
+$doc_docspace_model_id = ensure_custom_field(25, 'Сценарий DocSpace', 'fieldtype_dropdown', $doc_flow_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 5,
+]);
 $doc_workspace_link_id = ensure_custom_field(25, 'Сервис Workspace', 'fieldtype_input_url', $doc_flow_tab, [
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть сервис']),
-    'sort_order' => 5,
+    'sort_order' => 6,
+]);
+$doc_workspace_model_id = ensure_custom_field(25, 'Модуль Workspace', 'fieldtype_dropdown', $doc_flow_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 7,
 ]);
 $doc_project_link_id = ensure_custom_field(25, 'Связанный проект', 'fieldtype_entity', $doc_flow_tab, [
     'configuration' => config_json(['entity_id' => 21, 'display_as' => 'dropdown', 'width' => 'input-large', 'allow_search' => '1', 'display_as_link' => '1']),
-    'sort_order' => 6,
+    'sort_order' => 8,
     'listing_status' => 1,
     'listing_sort_order' => 11,
 ]);
 $doc_request_link_id = ensure_custom_field(25, 'Связанная заявка', 'fieldtype_entity', $doc_flow_tab, [
     'configuration' => config_json(['entity_id' => 23, 'display_as' => 'dropdown', 'width' => 'input-large', 'allow_search' => '1', 'display_as_link' => '1']),
-    'sort_order' => 7,
+    'sort_order' => 9,
     'listing_status' => 1,
     'listing_sort_order' => 12,
 ]);
@@ -1387,6 +1429,15 @@ sync_field_choices(25, $doc_type_id, [
     ['name' => 'Регламент', 'sort_order' => 9, 'bg_color' => '#ffcad4'],
     ['name' => 'Заявление', 'sort_order' => 10, 'bg_color' => '#ffddd2'],
     ['name' => 'Иное', 'sort_order' => 11, 'bg_color' => '#adb5bd'],
+]);
+sync_field_choices(25, $doc_docspace_model_id, [
+    ['name' => 'Collaboration room', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#bde0fe'],
+    ['name' => 'Public room', 'sort_order' => 2, 'bg_color' => '#d8f3dc'],
+    ['name' => 'Form filling room', 'sort_order' => 3, 'bg_color' => '#ffe5b4'],
+]);
+sync_field_choices(25, $doc_workspace_model_id, [
+    ['name' => 'Calendar', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#cdb4db'],
+    ['name' => 'Community', 'sort_order' => 2, 'bg_color' => '#bee1e6'],
 ]);
 sync_field_choices(25, $doc_route_id, [
     ['name' => 'Входящая регистрация', 'sort_order' => 1, 'bg_color' => '#d8f3dc'],
@@ -1464,9 +1515,17 @@ $doc_base_docspace_link_id = ensure_custom_field(26, 'Комната DocSpace', 
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть комнату']),
     'sort_order' => 5,
 ]);
+$doc_base_docspace_model_id = ensure_custom_field(26, 'Сценарий DocSpace', 'fieldtype_dropdown', $doc_base_review_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 6,
+]);
 $doc_base_workspace_link_id = ensure_custom_field(26, 'Сервис Workspace', 'fieldtype_input_url', $doc_base_review_tab, [
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть сервис']),
-    'sort_order' => 6,
+    'sort_order' => 7,
+]);
+$doc_base_workspace_model_id = ensure_custom_field(26, 'Модуль Workspace', 'fieldtype_dropdown', $doc_base_review_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 8,
 ]);
 $doc_base_tags_id = ensure_custom_field(26, 'Теги', 'fieldtype_tags', $doc_base_tab, [
     'sort_order' => 2,
@@ -1485,6 +1544,15 @@ sync_field_choices(26, $doc_base_category_id, [
     ['name' => 'Инструкция', 'sort_order' => 3, 'bg_color' => '#ffd6a5'],
     ['name' => 'Методический материал', 'sort_order' => 4, 'bg_color' => '#d8f3dc'],
     ['name' => 'Архивный материал', 'sort_order' => 5, 'bg_color' => '#dee2e6'],
+]);
+sync_field_choices(26, $doc_base_docspace_model_id, [
+    ['name' => 'Collaboration room', 'sort_order' => 1, 'bg_color' => '#bde0fe'],
+    ['name' => 'Public room', 'sort_order' => 2, 'is_default' => 1, 'bg_color' => '#d8f3dc'],
+    ['name' => 'Form filling room', 'sort_order' => 3, 'bg_color' => '#ffe5b4'],
+]);
+sync_field_choices(26, $doc_base_workspace_model_id, [
+    ['name' => 'Calendar', 'sort_order' => 1, 'bg_color' => '#cdb4db'],
+    ['name' => 'Community', 'sort_order' => 2, 'is_default' => 1, 'bg_color' => '#bee1e6'],
 ]);
 sync_field_choices(26, $doc_base_status_id, [
     ['name' => 'Действует', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#95d5b2'],
@@ -1567,9 +1635,17 @@ $mts_docspace_link_id = ensure_custom_field(27, 'Комната DocSpace', 'fiel
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть комнату']),
     'sort_order' => 5,
 ]);
+$mts_docspace_model_id = ensure_custom_field(27, 'Сценарий DocSpace', 'fieldtype_dropdown', $mts_supply_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 6,
+]);
 $mts_workspace_link_id = ensure_custom_field(27, 'Сервис Workspace', 'fieldtype_input_url', $mts_supply_tab, [
     'configuration' => config_json(['width' => 'input-xlarge', 'target' => '_blank', 'preview_text' => 'Открыть сервис']),
-    'sort_order' => 6,
+    'sort_order' => 7,
+]);
+$mts_workspace_model_id = ensure_custom_field(27, 'Модуль Workspace', 'fieldtype_dropdown', $mts_supply_tab, [
+    'configuration' => config_json(['width' => 'input-large']),
+    'sort_order' => 8,
 ]);
 $mts_reason_id = ensure_custom_field(27, 'Обоснование', 'fieldtype_textarea_wysiwyg', $mts_tab, [
     'configuration' => config_json(['allow_search' => '1']),
@@ -1586,6 +1662,15 @@ sync_field_choices(27, $mts_category_id, [
     ['name' => 'Расходные материалы', 'sort_order' => 4, 'bg_color' => '#ffd6a5'],
     ['name' => 'Программное обеспечение', 'sort_order' => 5, 'bg_color' => '#cdb4db'],
     ['name' => 'Иное', 'sort_order' => 6, 'bg_color' => '#dee2e6'],
+]);
+sync_field_choices(27, $mts_docspace_model_id, [
+    ['name' => 'Collaboration room', 'sort_order' => 1, 'bg_color' => '#bde0fe'],
+    ['name' => 'Public room', 'sort_order' => 2, 'is_default' => 1, 'bg_color' => '#d8f3dc'],
+    ['name' => 'Form filling room', 'sort_order' => 3, 'bg_color' => '#ffe5b4'],
+]);
+sync_field_choices(27, $mts_workspace_model_id, [
+    ['name' => 'Calendar', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#cdb4db'],
+    ['name' => 'Community', 'sort_order' => 2, 'bg_color' => '#bee1e6'],
 ]);
 sync_field_choices(27, $mts_requester_id, [
     ['name' => 'Администрация', 'sort_order' => 1, 'is_default' => 1, 'bg_color' => '#d8e2dc', 'users' => '1'],

@@ -214,8 +214,13 @@ echo $forms_fields_rules->apply();
                     $naudoc_url = $ecosystem_links['naudoc_url'] ?? '';
                     $docspace_entry_url = $ecosystem_links['docspace_entry_url'] ?? '';
                     $workspace_entry_url = $ecosystem_links['workspace_entry_url'] ?? '';
+                    $docspace_room_label = trim((string) ($ecosystem_links['docspace_room_label'] ?? ''));
+                    $workspace_module_label = trim((string) ($ecosystem_links['workspace_module_label'] ?? ''));
+                    $workspace_calendar_url = $ecosystem_links['workspace_calendar_url'] ?? '';
+                    $workspace_create_meeting_url = $ecosystem_links['workspace_create_meeting_url'] ?? '';
+                    $workspace_community_url = $ecosystem_links['workspace_community_url'] ?? '';
 
-                    if(strlen($onlyoffice_url) || strlen($onlyoffice_create_doc_url) || strlen($onlyoffice_create_sheet_url) || strlen($naudoc_url) || strlen($docspace_entry_url) || strlen($workspace_entry_url))
+                    if(strlen($onlyoffice_url) || strlen($onlyoffice_create_doc_url) || strlen($onlyoffice_create_sheet_url) || strlen($naudoc_url) || strlen($docspace_entry_url) || strlen($workspace_entry_url) || strlen($workspace_calendar_url) || strlen($workspace_create_meeting_url))
                     {
                         echo '<div class="document-primary-actions">';
                         echo '<div class="document-primary-actions-title">Быстрые действия</div>';
@@ -259,8 +264,9 @@ echo $forms_fields_rules->apply();
 
                         if(strlen($docspace_entry_url))
                         {
+                            $docspace_button_label = strlen($docspace_room_label) ? ('Открыть DocSpace: ' . $docspace_room_label) : 'Открыть DocSpace';
                             echo link_to(
-                                '<i class="fa fa-users"></i> Открыть DocSpace',
+                                '<i class="fa fa-users"></i> ' . $docspace_button_label,
                                 $docspace_entry_url,
                                 ['class' => 'btn btn-default document-primary-btn']
                             );
@@ -268,9 +274,37 @@ echo $forms_fields_rules->apply();
 
                         if(strlen($workspace_entry_url))
                         {
+                            $workspace_button_label = strlen($workspace_module_label) ? ('Открыть Workspace: ' . $workspace_module_label) : 'Открыть Workspace';
                             echo link_to(
-                                '<i class="fa fa-briefcase"></i> Открыть Workspace',
+                                '<i class="fa fa-briefcase"></i> ' . $workspace_button_label,
                                 $workspace_entry_url,
+                                ['class' => 'btn btn-default document-primary-btn']
+                            );
+                        }
+
+                        if(strlen($workspace_calendar_url))
+                        {
+                            echo link_to(
+                                '<i class="fa fa-calendar"></i> Встречи Workspace',
+                                $workspace_calendar_url,
+                                ['class' => 'btn btn-default document-primary-btn']
+                            );
+                        }
+
+                        if(strlen($workspace_create_meeting_url))
+                        {
+                            echo link_to(
+                                '<i class="fa fa-calendar-plus-o"></i> Создать встречу',
+                                $workspace_create_meeting_url,
+                                ['class' => 'btn btn-default document-primary-btn']
+                            );
+                        }
+
+                        if(strlen($workspace_community_url) && strcasecmp($workspace_module_label, 'Community') === 0)
+                        {
+                            echo link_to(
+                                '<i class="fa fa-book"></i> Workspace Community',
+                                $workspace_community_url,
                                 ['class' => 'btn btn-default document-primary-btn']
                             );
                         }

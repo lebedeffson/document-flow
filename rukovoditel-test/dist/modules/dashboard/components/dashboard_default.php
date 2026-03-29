@@ -201,8 +201,11 @@ $doc_approval_url = ($is_admin || $is_manager)
     : platform_home_entity_url(25);
 $onlyoffice_demo_item_url = platform_home_entity_url(25);
 $onlyoffice_demo_editor_url = '';
-$docspace_entry_url = platform_service_enabled('docspace') ? platform_ecosystem_url('docspace') : '';
-$workspace_entry_url = platform_service_enabled('workspace') ? platform_ecosystem_url('workspace') : '';
+$docspace_entry_url = platform_service_entry_url('docspace');
+$workspace_entry_url = platform_service_entry_url('workspace');
+$workspace_calendar_url = platform_service_module_entry_url('workspace', 'calendar');
+$workspace_create_meeting_url = platform_workspace_create_meeting_url();
+$workspace_community_url = platform_service_module_entry_url('workspace', 'community');
 $naudoc_profile = platform_home_current_naudoc_profile($username);
 
 $doc_field_id = 250;
@@ -220,11 +223,14 @@ if ($onlyoffice_demo['item_id'] > 0)
     $onlyoffice_demo_item_url = url_for('items/info', 'path=25-' . $onlyoffice_demo['item_id']);
     if (platform_service_enabled('docspace'))
     {
-        $docspace_entry_url = platform_ecosystem_url('docspace', 25, $onlyoffice_demo['item_id']);
+        $docspace_entry_url = platform_service_entry_url('docspace', 25, $onlyoffice_demo['item_id']);
     }
     if (platform_service_enabled('workspace'))
     {
-        $workspace_entry_url = platform_ecosystem_url('workspace', 25, $onlyoffice_demo['item_id']);
+        $workspace_entry_url = platform_service_entry_url('workspace', 25, $onlyoffice_demo['item_id']);
+        $workspace_calendar_url = platform_service_module_entry_url('workspace', 'calendar', 25, $onlyoffice_demo['item_id']);
+        $workspace_create_meeting_url = platform_workspace_create_meeting_url(25, $onlyoffice_demo['item_id']);
+        $workspace_community_url = platform_service_module_entry_url('workspace', 'community', 25, $onlyoffice_demo['item_id']);
     }
 
     if ((int) $onlyoffice_demo['field_id'] > 0 && (int) $onlyoffice_demo['file_id'] > 0)
@@ -268,6 +274,21 @@ if (strlen($workspace_entry_url))
     $admin_system_links[] = ['title' => 'Workspace', 'description' => 'Встроенный сервисный слой первой волны.', 'url' => $workspace_entry_url];
 }
 
+if (strlen($workspace_calendar_url))
+{
+    $admin_system_links[] = ['title' => 'Встречи Workspace', 'description' => 'Календарь и встречи доступны всем пользователям первой волны.', 'url' => $workspace_calendar_url];
+}
+
+if (strlen($workspace_create_meeting_url))
+{
+    $admin_system_links[] = ['title' => 'Создать встречу', 'description' => 'Быстрый вход в сценарий создания календарной встречи.', 'url' => $workspace_create_meeting_url];
+}
+
+if (strlen($workspace_community_url))
+{
+    $admin_system_links[] = ['title' => 'Workspace Community', 'description' => 'Легкие новости и база знаний без запуска тяжелых модулей.', 'url' => $workspace_community_url];
+}
+
 $user_work_links = [
     ['title' => 'Заявки', 'description' => 'Создание и сопровождение обращений.', 'url' => platform_home_entity_url(23)],
 ];
@@ -302,6 +323,21 @@ if (strlen($workspace_entry_url))
     $user_document_links[] = ['title' => 'Workspace', 'description' => 'Встроенный сервисный слой для сопутствующей работы.', 'url' => $workspace_entry_url];
 }
 
+if (strlen($workspace_calendar_url))
+{
+    $user_document_links[] = ['title' => 'Встречи Workspace', 'description' => 'Календарь и встречи доступны всем пользователям.', 'url' => $workspace_calendar_url];
+}
+
+if (strlen($workspace_create_meeting_url))
+{
+    $user_document_links[] = ['title' => 'Создать встречу', 'description' => 'Быстрый переход к созданию календарной встречи.', 'url' => $workspace_create_meeting_url];
+}
+
+if (strlen($workspace_community_url))
+{
+    $user_document_links[] = ['title' => 'Workspace Community', 'description' => 'Новости и база знаний первой волны.', 'url' => $workspace_community_url];
+}
+
 if ($onlyoffice_demo['item_id'] > 0)
 {
     $user_document_links[] = ['title' => 'ONLYOFFICE', 'description' => 'Открыть рабочий документ через карточку.', 'url' => $onlyoffice_demo_item_url];
@@ -323,6 +359,8 @@ if ($is_admin)
                     ' . platform_home_button('Создать пользователя', url_for('items/form', 'path=1'), 'secondary') . '
                     ' . (strlen($docspace_entry_url) ? platform_home_button('DocSpace', $docspace_entry_url, 'secondary') : '') . '
                     ' . (strlen($workspace_entry_url) ? platform_home_button('Workspace', $workspace_entry_url, 'secondary') : '') . '
+                    ' . (strlen($workspace_calendar_url) ? platform_home_button('Встречи', $workspace_calendar_url, 'secondary') : '') . '
+                    ' . (strlen($workspace_create_meeting_url) ? platform_home_button('Создать встречу', $workspace_create_meeting_url, 'secondary') : '') . '
                     ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
                     ' . platform_home_button('Bridge', '/bridge/', 'secondary', true) . '
                 </div>
@@ -395,6 +433,8 @@ else
                     ' . (strlen($onlyoffice_demo_editor_url) ? platform_home_button('ONLYOFFICE', $onlyoffice_demo_editor_url, 'secondary', true) : '') . '
                     ' . (strlen($docspace_entry_url) ? platform_home_button('DocSpace', $docspace_entry_url, 'secondary') : '') . '
                     ' . (strlen($workspace_entry_url) ? platform_home_button('Workspace', $workspace_entry_url, 'secondary') : '') . '
+                    ' . (strlen($workspace_calendar_url) ? platform_home_button('Встречи', $workspace_calendar_url, 'secondary') : '') . '
+                    ' . (strlen($workspace_create_meeting_url) ? platform_home_button('Создать встречу', $workspace_create_meeting_url, 'secondary') : '') . '
                     ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
                 </div>
             </div>

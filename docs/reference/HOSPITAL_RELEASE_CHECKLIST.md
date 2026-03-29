@@ -19,6 +19,23 @@
 2. бизнес-процессы, роли, заявки и карточки документов остаются в `Rukovoditel`
 3. `Workspace` должен закрывать только те функции, которых реально нет в `Rukovoditel`
 
+Зафиксированный scope первой волны:
+
+1. `DocSpace`:
+   - `Collaboration rooms`
+   - `Public rooms`
+   - при необходимости `Form filling rooms`
+2. `Workspace`:
+   - `Calendar`
+   - опционально `Community`
+
+Что сознательно не входит в первую волну:
+
+1. `Workspace Mail`
+2. `Workspace CRM`
+3. `Workspace Projects`
+4. `Workspace Documents`
+
 ## 2. Release Gate перед hospital production
 
 До первого реального релиза должны быть закрыты все пункты ниже.
@@ -57,7 +74,9 @@
 1. `DocSpace` поднят и открывается по production/staging URL
 2. `Workspace` поднят и открывается по production/staging URL
 3. Для карточек или проектов зафиксированы понятные ссылки/точки входа
-4. Подтверждено, что `DocSpace/Workspace` не дублируют основной сценарий работы в `Rukovoditel`
+4. Подтверждено, что `DocSpace` используется как collaboration/public/form room-контур, а не как второй основной кабинет
+5. Подтверждено, что `Workspace` в первой волне ограничен `Calendar` и опциональным `Community`
+6. Подтверждено, что `Workspace Mail/CRM/Projects/Documents` не включены в первую волну и не дублируют `Rukovoditel`
 
 ### 2.6 Staging gate
 
