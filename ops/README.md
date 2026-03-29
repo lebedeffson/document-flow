@@ -235,6 +235,28 @@ cat /opt/docflow/runtime/monitoring/install_prod_readiness.json
 - [OFFLINE_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFLINE_INSTALL_RUNBOOK.md)
 - [CLOSED_LAN_GO_LIVE_CHECKLIST.md](/home/lebedeffson/Code/Документооборот/docs/reference/CLOSED_LAN_GO_LIVE_CHECKLIST.md)
 
+## Git Bootstrap Install
+
+Если у целевого сервера есть интернет и нужен сценарий "клонировали репозиторий и нажали одну кнопку", теперь есть git-bootstrap installer:
+
+```bash
+git clone https://github.com/lebedeffson/document-flow.git
+cd document-flow
+bash install_from_git.sh
+```
+
+Он:
+
+1. генерирует `.env`
+2. поднимает стек из текущего checkout
+3. восстанавливает встроенный baseline snapshot из репозитория
+4. перепривязывает пользователей и baseline
+5. создает LAN packet с адресами и логинами
+
+Опорный документ:
+
+- [GIT_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/GIT_INSTALL_RUNBOOK.md)
+
 ## Pilot Package
 
 Для пилота на одном подразделении теперь можно собрать отдельный пакет документов и скриншотов:

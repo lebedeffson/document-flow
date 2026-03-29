@@ -22,6 +22,7 @@ runtime/pilot-packages/
 middleware/runtime/
 naudoc_project/var/Data.fs.before-restore.*
 rukovoditel-test/dist/uploads.before-restore.*/
+runtime/install-bundle/
 
 rukovoditel-test/dist/cache/
 rukovoditel-test/dist/log/*.log

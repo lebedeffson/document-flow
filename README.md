@@ -228,6 +228,10 @@
 
 - [CLOSED_LAN_GO_LIVE_CHECKLIST.md](/home/lebedeffson/Code/Документооборот/docs/reference/CLOSED_LAN_GO_LIVE_CHECKLIST.md)
 
+Если на сервере есть интернет и нужен сценарий "установить прямо из git checkout", есть отдельный runbook:
+
+- [GIT_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/GIT_INSTALL_RUNBOOK.md)
+
 ---
 
 ## 8. Где нужен Bridge
