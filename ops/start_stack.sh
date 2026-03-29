@@ -12,6 +12,8 @@ source "${SCRIPT_DIR}/lib/compose_stack.sh"
 ENV_FILE="$(docflow_env_file_path "${ROOT_DIR}")"
 WITH_LOCAL_LDAP=0
 BUILD_MODE="build"
+CHECK_ATTEMPTS="${DOCFLOW_START_STACK_CHECK_ATTEMPTS:-12}"
+CHECK_SLEEP_SECONDS="${DOCFLOW_START_STACK_CHECK_SLEEP_SECONDS:-5}"
 
 for arg in "$@"; do
   case "${arg}" in
@@ -44,7 +46,22 @@ if [ "${WITH_LOCAL_LDAP}" = "1" ]; then
   DOCFLOW_ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/ops/bootstrap_local_ldap.sh"
 fi
 
-bash "${ROOT_DIR}/ops/check_stack.sh"
+attempt=1
+while true; do
+  if bash "${ROOT_DIR}/ops/check_stack.sh"; then
+    break
+  fi
+
+  if [ "${attempt}" -ge "${CHECK_ATTEMPTS}" ]; then
+    echo "[start-stack] check_stack failed after ${attempt} attempts" >&2
+    exit 1
+  fi
+
+  echo "[start-stack] check_stack not ready yet, retry ${attempt}/${CHECK_ATTEMPTS} after ${CHECK_SLEEP_SECONDS}s" >&2
+  sleep "${CHECK_SLEEP_SECONDS}"
+  attempt=$((attempt + 1))
+done
+
 DOCFLOW_ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/ops/show_access_points.sh"
 
 echo "[start-stack] done"

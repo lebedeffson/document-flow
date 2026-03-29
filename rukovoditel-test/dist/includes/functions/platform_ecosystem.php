@@ -584,7 +584,7 @@ if(!function_exists('platform_service_module_entry_url'))
 
         $service = strtolower(trim((string) $service));
         $module = strtolower(trim((string) $module));
-        $extra_params = ['module' => $module];
+        $extra_params = ['workspace_module' => $module];
 
         if($service === 'docspace')
         {
@@ -622,7 +622,7 @@ if(!function_exists('platform_workspace_create_meeting_url'))
         }
 
         $extra_params = [
-            'module' => 'calendar',
+            'workspace_module' => 'calendar',
             'intent' => 'create_meeting',
         ];
 

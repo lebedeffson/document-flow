@@ -117,9 +117,9 @@ fi
   echo "DocSpace Public entry: ${DOCFLOW_DOCSPACE_PUBLIC_BASE}/?room_type=public_room"
   echo "DocSpace Form filling entry: ${DOCFLOW_DOCSPACE_PUBLIC_BASE}/?room_type=form_filling_room"
   echo "Workspace frontdoor: ${DOCFLOW_WORKSPACE_PUBLIC_BASE}/"
-  echo "Workspace Calendar entry: ${DOCFLOW_WORKSPACE_PUBLIC_BASE}/?module=calendar"
+  echo "Workspace Calendar entry: ${DOCFLOW_WORKSPACE_PUBLIC_BASE}/?workspace_module=calendar"
   if [ "${workspace_community_enabled}" = "1" ]; then
-    echo "Workspace Community entry: ${DOCFLOW_WORKSPACE_PUBLIC_BASE}/?module=community"
+    echo "Workspace Community entry: ${DOCFLOW_WORKSPACE_PUBLIC_BASE}/?workspace_module=community"
   fi
   echo
   echo "DocSpace mode: ${docspace_mode}"

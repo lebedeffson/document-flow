@@ -3,7 +3,7 @@
 $service = $_GET['service'] ?? 'docspace';
 $entity_id = (int) ($_GET['entity_id'] ?? 0);
 $item_id = (int) ($_GET['item_id'] ?? 0);
-$requested_module = strtolower(trim((string) ($_GET['module'] ?? '')));
+$requested_module = strtolower(trim((string) ($_GET['workspace_module'] ?? '')));
 $requested_room_type = strtolower(trim((string) ($_GET['room_type'] ?? '')));
 $requested_intent = strtolower(trim((string) ($_GET['intent'] ?? '')));
 
