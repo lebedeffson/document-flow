@@ -94,18 +94,42 @@ ROLE_VISIBILITY_CASES = [
         "name": "employee_dashboard",
         "url": f"{GATEWAY_BASE}/",
         "contains": ["Встречи Workspace", "Создать встречу"],
+        "not_contains": ["Workspace Community"],
     },
     {
         "role_key": "employee",
         "name": "employee_document_card",
-        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-1",
-        "contains": ["Встречи Workspace", "Открыть Workspace", "Создать встречу"],
+        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-15",
+        "contains": ["Встречи Workspace", "Открыть Workspace", "Создать встречу", "Боевой маршрут первой волны"],
+        "not_contains": ["Открыть в NauDoc", "Workspace Community"],
     },
     {
         "role_key": "nurse",
         "name": "nurse_document_card",
-        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-1",
-        "contains": ["Встречи Workspace", "Открыть Workspace", "Создать встречу"],
+        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-15",
+        "contains": ["Встречи Workspace", "Открыть Workspace", "Создать встречу", "Боевой маршрут первой волны"],
+        "not_contains": ["Открыть в NauDoc", "Workspace Community"],
+    },
+    {
+        "role_key": "requester",
+        "name": "requester_dashboard",
+        "url": f"{GATEWAY_BASE}/",
+        "contains": ["Встречи Workspace", "Создать встречу", "Пациентские и клинические документы"],
+        "not_contains": ["DocSpace", "Workspace Community"],
+    },
+    {
+        "role_key": "manager",
+        "name": "manager_document_card",
+        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-15",
+        "contains": ["Открыть DocSpace", "Открыть Workspace", "Встречи Workspace", "Создать встречу", "Боевой маршрут первой волны"],
+        "not_contains": ["Открыть в NauDoc", "Workspace Community"],
+    },
+    {
+        "role_key": "office",
+        "name": "office_document_card",
+        "url": f"{GATEWAY_BASE}/index.php?module=items/info&path=25-15",
+        "contains": ["Открыть в NauDoc", "Открыть DocSpace", "Открыть Workspace", "Встречи Workspace", "Создать встречу", "Боевой маршрут первой волны"],
+        "not_contains": ["Workspace Community"],
     },
 ]
 
@@ -284,12 +308,14 @@ def main():
         response, body = http_get(role_case["url"], opener=role_openers[role_key])
         html = decode_html(body)
         missing = [needle for needle in role_case["contains"] if needle not in html]
+        unexpected = [needle for needle in role_case.get("not_contains", []) if needle in html]
         role_result = {
             "role_key": role_key,
             "name": role_case["name"],
             "url": role_case["url"],
             "status": response.status,
             "missing": missing,
+            "unexpected": unexpected,
         }
         results["role_pages"].append(role_result)
 
@@ -301,6 +327,11 @@ def main():
         for needle in missing:
             results["failures"].append(
                 f"{role_case['name']}: missing text '{needle}'"
+            )
+
+        for needle in unexpected:
+            results["failures"].append(
+                f"{role_case['name']}: unexpected text '{needle}'"
             )
 
     for bridge_case in EXPECTED_BRIDGE_METADATA:

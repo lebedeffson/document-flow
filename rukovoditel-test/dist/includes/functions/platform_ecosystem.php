@@ -29,6 +29,104 @@ if(!function_exists('platform_env_truthy'))
     }
 }
 
+if(!function_exists('platform_current_user_group_id'))
+{
+    function platform_current_user_group_id()
+    {
+        if((defined('IS_CRON') && IS_CRON) || PHP_SAPI === 'cli')
+        {
+            return 0;
+        }
+
+        global $app_user;
+
+        if(!isset($app_user) || !is_array($app_user))
+        {
+            return 0;
+        }
+
+        return (int) ($app_user['group_id'] ?? 0);
+    }
+}
+
+if(!function_exists('platform_user_has_group_access'))
+{
+    function platform_user_has_group_access($allowed_groups)
+    {
+        if((defined('IS_CRON') && IS_CRON) || PHP_SAPI === 'cli')
+        {
+            return true;
+        }
+
+        if(!is_array($allowed_groups) || !count($allowed_groups))
+        {
+            return false;
+        }
+
+        $group_id = platform_current_user_group_id();
+        $normalized = array_map('intval', $allowed_groups);
+
+        return in_array($group_id, $normalized, true);
+    }
+}
+
+if(!function_exists('platform_user_can_open_naudoc'))
+{
+    function platform_user_can_open_naudoc()
+    {
+        return platform_user_has_group_access([0, 7]);
+    }
+}
+
+if(!function_exists('platform_user_can_open_docspace'))
+{
+    function platform_user_can_open_docspace()
+    {
+        return platform_user_has_group_access([0, 4, 5, 7, 8]);
+    }
+}
+
+if(!function_exists('platform_user_can_open_workspace'))
+{
+    function platform_user_can_open_workspace()
+    {
+        return platform_user_has_group_access([0, 4, 5, 6, 7, 8]);
+    }
+}
+
+if(!function_exists('platform_user_can_open_workspace_module'))
+{
+    function platform_user_can_open_workspace_module($module)
+    {
+        $module = strtolower(trim((string) $module));
+
+        if(!platform_user_can_open_workspace())
+        {
+            return false;
+        }
+
+        if($module === 'community')
+        {
+            return platform_workspace_module_enabled('community') && platform_user_has_group_access([0, 4, 7]);
+        }
+
+        if($module === 'calendar' || !strlen($module))
+        {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+if(!function_exists('platform_user_can_create_meeting'))
+{
+    function platform_user_can_create_meeting()
+    {
+        return platform_user_can_open_workspace_module('calendar');
+    }
+}
+
 if(!function_exists('platform_service_enabled'))
 {
     function platform_service_enabled($service)
@@ -514,6 +612,18 @@ if(!function_exists('platform_service_entry_url'))
             return '';
         }
 
+        $service = strtolower(trim((string) $service));
+
+        if($service === 'docspace' && !platform_user_can_open_docspace())
+        {
+            return '';
+        }
+
+        if($service === 'workspace' && !platform_user_can_open_workspace())
+        {
+            return '';
+        }
+
         if(strlen(platform_service_target_url($service)))
         {
             $params = [];
@@ -591,7 +701,17 @@ if(!function_exists('platform_service_module_entry_url'))
             $extra_params = ['room_type' => $module];
         }
 
+        if($service === 'docspace' && !platform_user_can_open_docspace())
+        {
+            return '';
+        }
+
         if($service === 'workspace' && !platform_workspace_module_enabled($module))
+        {
+            return '';
+        }
+
+        if($service === 'workspace' && !platform_user_can_open_workspace_module($module))
         {
             return '';
         }
@@ -616,7 +736,7 @@ if(!function_exists('platform_workspace_create_meeting_url'))
 {
     function platform_workspace_create_meeting_url($entity_id = 0, $item_id = 0)
     {
-        if(!platform_service_enabled('workspace'))
+        if(!platform_service_enabled('workspace') || !platform_user_can_create_meeting())
         {
             return '';
         }
@@ -658,6 +778,95 @@ if(!function_exists('platform_service_is_shell_url'))
     }
 }
 
+if(!function_exists('platform_document_route_specs'))
+{
+    function platform_document_route_specs()
+    {
+        return [
+            'Входящая регистрация' => [
+                'wave_label' => 'Боевой маршрут первой волны',
+                'summary' => 'Канцелярский маршрут для входящих документов и первичного учета.',
+                'creator_roles' => 'Канцелярия или регистратура',
+                'approval_roles' => 'Формальное согласование не требуется',
+                'registration_roles' => 'Канцелярия',
+                'draft_system' => 'Rukovoditel + ONLYOFFICE Docs',
+                'official_system' => 'NauDoc',
+                'status_flow' => 'Черновик -> На регистрации -> Зарегистрирован -> На ознакомлении -> Архивирован',
+            ],
+            'Внутренний приказ / распоряжение' => [
+                'wave_label' => 'Боевой маршрут первой волны',
+                'summary' => 'Внутренний приказ подразделения с согласованием, утверждением и ознакомлением.',
+                'creator_roles' => 'Заведующий отделением или уполномоченный сотрудник',
+                'approval_roles' => 'Заведующий отделением / руководитель подразделения',
+                'registration_roles' => 'Канцелярия при обязательной регистрации',
+                'draft_system' => 'Rukovoditel + ONLYOFFICE Docs',
+                'official_system' => 'NauDoc',
+                'status_flow' => 'Черновик -> На согласовании -> На утверждении -> Подписан -> На ознакомлении -> Архивирован',
+            ],
+            'Пациент / направление / выписка' => [
+                'wave_label' => 'Боевой маршрут первой волны',
+                'summary' => 'Пациентский документ с участием врача, координатора отделения и регистрационного контура.',
+                'creator_roles' => 'Врач или старшая медсестра / координатор',
+                'approval_roles' => 'Заведующий отделением',
+                'registration_roles' => 'Регистратура и канцелярия',
+                'draft_system' => 'Rukovoditel + ONLYOFFICE Docs',
+                'official_system' => 'NauDoc',
+                'status_flow' => 'Черновик -> На согласовании -> На утверждении -> Подписан -> На регистрации -> Зарегистрирован -> Архивирован',
+            ],
+            'Медицинская документация отделения' => [
+                'wave_label' => 'Боевой маршрут первой волны',
+                'summary' => 'Клинический документ отделения с рабочим черновиком в контуре подразделения и официальным статусом в NauDoc.',
+                'creator_roles' => 'Врач или старшая медсестра / координатор',
+                'approval_roles' => 'Заведующий отделением',
+                'registration_roles' => 'Канцелярия при обязательной регистрации',
+                'draft_system' => 'Rukovoditel + ONLYOFFICE Docs',
+                'official_system' => 'NauDoc',
+                'status_flow' => 'Черновик -> На согласовании -> На утверждении -> Подписан -> На регистрации -> Зарегистрирован -> Архивирован',
+            ],
+        ];
+    }
+}
+
+if(!function_exists('platform_document_route_spec'))
+{
+    function platform_document_route_spec($route_label)
+    {
+        $route_label = trim((string) $route_label);
+        $specs = platform_document_route_specs();
+
+        return $specs[$route_label] ?? [];
+    }
+}
+
+if(!function_exists('platform_document_route_summary'))
+{
+    function platform_document_route_summary($entity_id, $item)
+    {
+        if((int) $entity_id !== 25 || !is_array($item))
+        {
+            return [];
+        }
+
+        $route_label = platform_item_dropdown_choice_name($entity_id, $item, 'Маршрут документа');
+        if(!strlen($route_label))
+        {
+            return [];
+        }
+
+        $spec = platform_document_route_spec($route_label);
+        if(!count($spec))
+        {
+            return [];
+        }
+
+        return array_merge([
+            'route_label' => $route_label,
+            'status_label' => platform_item_dropdown_choice_name($entity_id, $item, 'Статус документа'),
+            'registration_number' => trim((string) ($item['field_' . platform_field_id_by_name($entity_id, 'Регистрационный номер', 'fieldtype_input')] ?? '')),
+        ], $spec);
+    }
+}
+
 if(!function_exists('platform_item_ecosystem_links'))
 {
     function platform_item_ecosystem_links($entity_id, $item)
@@ -694,7 +903,7 @@ if(!function_exists('platform_item_ecosystem_links'))
             'onlyoffice_url' => platform_item_onlyoffice_url($entity_id, $item),
             'onlyoffice_create_doc_url' => platform_item_onlyoffice_create_url($entity_id, $item, 'docx'),
             'onlyoffice_create_sheet_url' => platform_item_onlyoffice_create_url($entity_id, $item, 'xlsx'),
-            'naudoc_url' => platform_item_naudoc_url($entity_id, $item),
+            'naudoc_url' => platform_user_can_open_naudoc() ? platform_item_naudoc_url($entity_id, $item) : '',
             'docspace_url' => $docspace_url,
             'workspace_url' => $workspace_url,
             'docspace_room_type' => $docspace_room_type,

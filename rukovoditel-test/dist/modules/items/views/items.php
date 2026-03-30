@@ -202,7 +202,10 @@ if(in_array($current_entity_id, [1, 25, 26, 27]))
         echo link_to('<i class="fa fa-book"></i> Workspace Community', $workspace_community_url, ['class' => 'btn btn-default']);
     }
 
-    echo link_to('<i class="fa fa-archive"></i> Открыть NauDoc', '/docs/', ['class' => 'btn btn-default', 'target' => '_blank']);
+    if(platform_user_can_open_naudoc())
+    {
+        echo link_to('<i class="fa fa-archive"></i> Открыть NauDoc', '/docs/', ['class' => 'btn btn-default', 'target' => '_blank']);
+    }
 
     echo '</div>';
     echo '</div>';

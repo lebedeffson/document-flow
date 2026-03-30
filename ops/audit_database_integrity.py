@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from runtime_config import DB_CONTAINER, DB_NAME, DB_PASS, DB_USER, ROOT_DIR
+from runtime_config import DB_CONTAINER, DB_NAME, DB_PASS, DB_USER, NAUDOC_BASE, ROOT_DIR
 
 
 BRIDGE_CONTAINER = os.environ.get("BRIDGE_CONTAINER", "docflow_bridge")
@@ -165,8 +165,10 @@ def collect_findings():
             findings.append(f"{message} Найдено: {count}.")
 
     doc_total = single_int("select count(*) from app_entity_25")
+    naudoc_storage_prefix = sql_quote(NAUDOC_BASE.rstrip("/") + "/storage/")
     docs_with_specific_naudoc = single_int(
-        "select count(*) from app_entity_25 where field_250 like 'https://docflow.hospital.local/docs/storage/%'"
+        "select count(*) from app_entity_25 "
+        f"where trim(field_250)<>'' and field_250 like '{naudoc_storage_prefix}%'"
     )
     notes.append(
         f"Карточек документов: {doc_total}, с конкретной ссылкой NauDoc: {docs_with_specific_naudoc}."

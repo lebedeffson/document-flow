@@ -1892,6 +1892,79 @@ sync_report_filters($office_documents_report, [
     ])],
 ]);
 
+$incoming_registration_report = ensure_common_report(25, 'Входящие и регистрация', [
+    'description' => 'Боевой маршрут первой волны для входящих документов, первичного учета и регистрации.',
+    'users_groups' => '0,' . $requester_group_id . ',' . $office_group_id,
+    'in_dashboard' => 1,
+    'in_dashboard_counter' => 1,
+    'dashboard_sort_order' => 41,
+    'dashboard_counter_sort_order' => 41,
+    'menu_icon' => 'fa fa-inbox',
+    'displays_assigned_only' => 0,
+]);
+sync_report_filters($incoming_registration_report, [
+    ['fields_id' => $doc_route_id, 'values' => array_filter([
+        get_choice_id_by_name($doc_route_id, 'Входящая регистрация'),
+    ])],
+    ['fields_id' => $doc_status_id, 'values' => array_filter([
+        get_choice_id_by_name($doc_status_id, 'Черновик'),
+        get_choice_id_by_name($doc_status_id, 'Подписан'),
+        get_choice_id_by_name($doc_status_id, 'На ознакомлении'),
+        get_choice_id_by_name($doc_status_id, 'На регистрации'),
+        get_choice_id_by_name($doc_status_id, 'Зарегистрирован'),
+    ])],
+]);
+
+$internal_orders_report = ensure_common_report(25, 'Внутренние приказы', [
+    'description' => 'Боевой маршрут первой волны для внутренних приказов и распоряжений подразделения.',
+    'users_groups' => '0,' . $manager_group_id,
+    'in_dashboard' => 1,
+    'in_dashboard_counter' => 1,
+    'dashboard_sort_order' => 42,
+    'dashboard_counter_sort_order' => 42,
+    'menu_icon' => 'fa fa-gavel',
+    'displays_assigned_only' => 0,
+]);
+sync_report_filters($internal_orders_report, [
+    ['fields_id' => $doc_route_id, 'values' => array_filter([
+        get_choice_id_by_name($doc_route_id, 'Внутренний приказ / распоряжение'),
+    ])],
+    ['fields_id' => $doc_status_id, 'values' => array_filter([
+        get_choice_id_by_name($doc_status_id, 'Черновик'),
+        get_choice_id_by_name($doc_status_id, 'На согласовании'),
+        get_choice_id_by_name($doc_status_id, 'На утверждении'),
+        get_choice_id_by_name($doc_status_id, 'Подписан'),
+        get_choice_id_by_name($doc_status_id, 'На ознакомлении'),
+        get_choice_id_by_name($doc_status_id, 'На регистрации'),
+    ])],
+]);
+
+$patient_clinical_report = ensure_common_report(25, 'Пациентские и клинические документы', [
+    'description' => 'Боевой hospital-маршрут первой волны для пациентских направлений, выписок и медицинских документов отделения.',
+    'users_groups' => '0,' . $manager_group_id . ',' . $employee_group_id . ',' . $nurse_group_id . ',' . $requester_group_id . ',' . $office_group_id,
+    'in_dashboard' => 1,
+    'in_dashboard_counter' => 1,
+    'dashboard_sort_order' => 43,
+    'dashboard_counter_sort_order' => 43,
+    'menu_icon' => 'fa fa-medkit',
+    'displays_assigned_only' => 0,
+]);
+sync_report_filters($patient_clinical_report, [
+    ['fields_id' => $doc_route_id, 'values' => array_filter([
+        get_choice_id_by_name($doc_route_id, 'Пациент / направление / выписка'),
+        get_choice_id_by_name($doc_route_id, 'Медицинская документация отделения'),
+    ])],
+    ['fields_id' => $doc_status_id, 'values' => array_filter([
+        get_choice_id_by_name($doc_status_id, 'Черновик'),
+        get_choice_id_by_name($doc_status_id, 'На согласовании'),
+        get_choice_id_by_name($doc_status_id, 'На утверждении'),
+        get_choice_id_by_name($doc_status_id, 'Подписан'),
+        get_choice_id_by_name($doc_status_id, 'На ознакомлении'),
+        get_choice_id_by_name($doc_status_id, 'На регистрации'),
+        get_choice_id_by_name($doc_status_id, 'Зарегистрирован'),
+    ])],
+]);
+
 // Role-based UX: keep daily forms focused while preserving the shared data model.
 sync_fields_access(21, $employee_group_id, [
     $project_manager_note_id => 'view_inform',

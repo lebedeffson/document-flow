@@ -187,8 +187,12 @@ elseif ($is_requester)
 }
 
 $documents_note = 'Чтобы начать работу, откройте карточку документа и используйте кнопки "Создать пустой документ", "Создать пустую таблицу" или "Открыть документ в редакторе".';
+$official_status_note = 'Официальный статус и регистрационный номер живут в карточке документа и служебном контуре NauDoc.';
 $tasks_url = platform_home_named_report_url(22, 'Мои задачи в работе', platform_home_entity_url(21));
 $discussions_url = platform_home_named_report_url(24, 'Рабочие обсуждения', '');
+$incoming_registration_url = platform_home_named_report_url(25, 'Входящие и регистрация', platform_home_entity_url(25));
+$internal_orders_url = platform_home_named_report_url(25, 'Внутренние приказы', platform_home_entity_url(25));
+$patient_clinical_url = platform_home_named_report_url(25, 'Пациентские и клинические документы', platform_home_entity_url(25));
 $onlyoffice_demo = platform_first_onlyoffice_demo(25);
 $linked_requests_url = ($is_admin || $is_manager)
     ? platform_home_named_report_url(23, 'Заявки без финального документа', platform_home_entity_url(23))
@@ -207,6 +211,7 @@ $workspace_calendar_url = platform_service_module_entry_url('workspace', 'calend
 $workspace_create_meeting_url = platform_workspace_create_meeting_url();
 $workspace_community_url = platform_service_module_entry_url('workspace', 'community');
 $naudoc_profile = platform_home_current_naudoc_profile($username);
+$can_open_naudoc = platform_user_can_open_naudoc();
 
 $doc_field_id = 250;
 $request_field_id = 241;
@@ -250,6 +255,8 @@ $admin_work_links = [
     ['title' => 'Карточки документов', 'description' => 'Основная точка работы с документом.', 'url' => platform_home_entity_url(25)],
     ['title' => 'База документов', 'description' => 'Шаблоны, инструкции и материалы.', 'url' => platform_home_entity_url(26)],
     ['title' => 'МТЗ', 'description' => 'Материально-техническое обеспечение.', 'url' => platform_home_entity_url(27)],
+    ['title' => 'Внутренние приказы', 'description' => 'Боевой маршрут первой волны для приказов и распоряжений.', 'url' => $internal_orders_url],
+    ['title' => 'Пациентские и клинические документы', 'description' => 'Ключевой hospital-маршрут для отделения и пациента.', 'url' => $patient_clinical_url],
 ];
 
 $admin_system_links = [
@@ -260,9 +267,13 @@ $admin_system_links = [
     ['title' => 'Сущности приложения', 'description' => 'Структура модулей и форм.', 'url' => url_for('entities/entities')],
     ['title' => 'Логи', 'description' => 'HTTP, PHP, MySQL и почта.', 'url' => url_for('logs/settings')],
     ['title' => 'Резервные копии', 'description' => 'Ручные и автоматические бэкапы.', 'url' => url_for('tools/db_backup')],
-    ['title' => 'NauDoc', 'description' => 'Официальный документный контур.', 'url' => '/docs/', 'external' => true],
     ['title' => 'Bridge', 'description' => 'Интеграционный слой и контроль связей.', 'url' => '/bridge/', 'external' => true],
 ];
+
+if ($can_open_naudoc)
+{
+    $admin_system_links[] = ['title' => 'NauDoc', 'description' => 'Официальный документный контур.', 'url' => '/docs/', 'external' => true];
+}
 
 if (strlen($docspace_entry_url))
 {
@@ -303,15 +314,34 @@ $user_work_links[] = ['title' => 'Карточки документов', 'descr
 $user_work_links[] = ['title' => 'База документов', 'description' => 'Шаблоны, инструкции и регламенты.', 'url' => platform_home_entity_url(26)];
 $user_work_links[] = ['title' => 'МТЗ', 'description' => 'Заявки на обеспечение и снабжение.', 'url' => platform_home_entity_url(27)];
 
+if ($is_office || $is_requester)
+{
+    $user_work_links[] = ['title' => 'Входящие и регистрация', 'description' => 'Маршрут входящих документов и первичного учета.', 'url' => $incoming_registration_url];
+}
+
+if ($is_manager)
+{
+    $user_work_links[] = ['title' => 'Внутренние приказы', 'description' => 'Маршрут приказов и распоряжений подразделения.', 'url' => $internal_orders_url];
+}
+
+if ($is_manager || $is_employee || $group_id === 8 || $is_office || $is_requester)
+{
+    $user_work_links[] = ['title' => 'Пациентские и клинические документы', 'description' => 'Рабочая точка входа в ключевой hospital-маршрут первой волны.', 'url' => $patient_clinical_url];
+}
+
 if ($is_manager)
 {
     $user_work_links[] = ['title' => 'Контроль руководителя', 'description' => 'Ключевые отчеты по контролю и согласованию.', 'url' => platform_home_named_report_url(21, 'Проекты на контроле', platform_home_entity_url(21))];
 }
 
 $user_document_links = [
-    ['title' => 'NauDoc', 'description' => 'Регистрация, архив и официальный документ.', 'url' => '/docs/', 'external' => true],
     ['title' => 'Карточки документов', 'description' => 'Рабочая карточка и запуск редактора.', 'url' => platform_home_entity_url(25)],
 ];
+
+if ($can_open_naudoc)
+{
+    $user_document_links[] = ['title' => 'NauDoc', 'description' => 'Регистрация, архив и официальный документ.', 'url' => '/docs/', 'external' => true];
+}
 
 if (strlen($docspace_entry_url))
 {
@@ -361,7 +391,7 @@ if ($is_admin)
                     ' . (strlen($workspace_entry_url) ? platform_home_button('Workspace', $workspace_entry_url, 'secondary') : '') . '
                     ' . (strlen($workspace_calendar_url) ? platform_home_button('Встречи', $workspace_calendar_url, 'secondary') : '') . '
                     ' . (strlen($workspace_create_meeting_url) ? platform_home_button('Создать встречу', $workspace_create_meeting_url, 'secondary') : '') . '
-                    ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
+                    ' . ($can_open_naudoc ? platform_home_button('NauDoc', '/docs/', 'secondary', true) : '') . '
                     ' . platform_home_button('Bridge', '/bridge/', 'secondary', true) . '
                 </div>
             </div>
@@ -409,7 +439,10 @@ else
 
     if (count($naudoc_profile))
     {
-    $user_document_links[] = ['title' => 'Профиль в NauDoc', 'description' => 'Связанный официальный профиль пользователя.', 'url' => $naudoc_profile['profile_url'], 'external' => true];
+        if ($can_open_naudoc)
+        {
+            $user_document_links[] = ['title' => 'Профиль в NauDoc', 'description' => 'Связанный официальный профиль пользователя.', 'url' => $naudoc_profile['profile_url'], 'external' => true];
+        }
         $document_panel_note = 'Связанный профиль: ' . htmlspecialchars($naudoc_profile['display_name']) . '. ' . $documents_note;
     }
 
@@ -435,7 +468,7 @@ else
                     ' . (strlen($workspace_entry_url) ? platform_home_button('Workspace', $workspace_entry_url, 'secondary') : '') . '
                     ' . (strlen($workspace_calendar_url) ? platform_home_button('Встречи', $workspace_calendar_url, 'secondary') : '') . '
                     ' . (strlen($workspace_create_meeting_url) ? platform_home_button('Создать встречу', $workspace_create_meeting_url, 'secondary') : '') . '
-                    ' . platform_home_button('NauDoc', '/docs/', 'secondary', true) . '
+                    ' . ($can_open_naudoc ? platform_home_button('NauDoc', '/docs/', 'secondary', true) : '') . '
                 </div>
             </div>
         </section>
@@ -458,7 +491,7 @@ else
                 <div class="platform-home-links">
                     ' . platform_home_links_group($user_document_links) . '
                 </div>
-                <div class="platform-home-inline-note">' . $document_panel_note . ' Найти документ можно через поиск в списке карточек, а загрузить файл — через кнопку создания карточки и поле "Вложения".</div>
+                <div class="platform-home-inline-note">' . $document_panel_note . ' ' . (!$can_open_naudoc ? $official_status_note . ' ' : '') . 'Найти документ можно через поиск в списке карточек, а загрузить файл — через кнопку создания карточки и поле "Вложения".</div>
             </div>
         </section>
     </div>

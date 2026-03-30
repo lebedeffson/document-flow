@@ -204,6 +204,7 @@ echo $forms_fields_rules->apply();
                 if(in_array($current_entity_id, [21, 23, 25, 26, 27]))
                 {
                     $ecosystem_links = platform_item_ecosystem_links($current_entity_id, $item_info);
+                    $route_summary = $current_entity_id == 25 ? platform_document_route_summary($current_entity_id, $item_info) : [];
                     $onlyoffice_field_id = platform_onlyoffice_field_id($current_entity_id);
                     $onlyoffice_helper = new onlyoffice($current_entity_id);
                     $can_create_blank_doc = $onlyoffice_field_id > 0 && $onlyoffice_helper->can_create_blank($onlyoffice_field_id, $item_info, 'docx');
@@ -310,6 +311,30 @@ echo $forms_fields_rules->apply();
                         }
 
                         echo '</div>';
+                        echo '</div>';
+                    }
+
+                    if(count($route_summary))
+                    {
+                        echo '<div class="document-route-summary">';
+                        echo '<div class="document-route-summary-head">';
+                        echo '<div class="document-route-summary-kicker">' . htmlspecialchars($route_summary['wave_label']) . '</div>';
+                        echo '<h4>' . htmlspecialchars($route_summary['route_label']) . '</h4>';
+                        echo '<p>' . htmlspecialchars($route_summary['summary']) . '</p>';
+                        echo '</div>';
+                        echo '<div class="document-route-summary-grid">';
+                        echo '<div><span>Текущий статус</span><strong>' . htmlspecialchars($route_summary['status_label'] ?: 'Не задан') . '</strong></div>';
+                        echo '<div><span>Кто создает</span><strong>' . htmlspecialchars($route_summary['creator_roles']) . '</strong></div>';
+                        echo '<div><span>Кто согласует</span><strong>' . htmlspecialchars($route_summary['approval_roles']) . '</strong></div>';
+                        echo '<div><span>Кто регистрирует</span><strong>' . htmlspecialchars($route_summary['registration_roles']) . '</strong></div>';
+                        echo '<div><span>Где живет черновик</span><strong>' . htmlspecialchars($route_summary['draft_system']) . '</strong></div>';
+                        echo '<div><span>Где живет официальный статус</span><strong>' . htmlspecialchars($route_summary['official_system']) . '</strong></div>';
+                        echo '</div>';
+                        echo '<div class="document-route-summary-flow">Маршрут: ' . htmlspecialchars($route_summary['status_flow']) . '</div>';
+                        if(strlen($route_summary['registration_number'] ?? ''))
+                        {
+                            echo '<div class="document-route-summary-flow">Регистрационный номер: ' . htmlspecialchars($route_summary['registration_number']) . '</div>';
+                        }
                         echo '</div>';
                     }
                 }

@@ -61,6 +61,8 @@
 3. Подтвержден каталог пользователей:
    `LDAP/AD` или переходная согласованная схема
 4. Для каждой роли подтвержден свой UI без лишней demo-семантики
+5. Если `LDAP/AD` еще не подключен, пользователи первой волны импортируются из согласованного CSV:
+   `bash rukovoditel-test/import_hospital_users.sh docs/reference/pilot_users_template.csv`
 
 ### 2.4 Document routes
 
