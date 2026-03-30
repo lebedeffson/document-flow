@@ -2,6 +2,10 @@
 
 Дата актуальности: `2026-03-27`
 
+Быстрый документ, если нужен целостный обзор проекта без догадок:
+
+- [PROJECT_SYSTEM_PASSPORT.md](/home/lebedeffson/Code/Документооборот/docs/reference/PROJECT_SYSTEM_PASSPORT.md)
+
 ## 1. С чего начинать
 
 Главный адрес платформы:
@@ -202,7 +206,12 @@
 4. `Bridge` как интеграционный слой
 
 `DocSpace` и `Workspace` теперь входят в scope первой production-волны, но ограниченно.
-При этом в текущем стенде они еще не подняты как живые отдельные сервисы, поэтому до релиза их нужно развернуть и проверить отдельно.
+В текущем production-like стенде они уже подняты как live same-host сервисы под тем же адресом:
+
+1. `https://<server>/docspace/`
+2. `https://<server>/workspace/`
+
+При этом они по-прежнему не заменяют основной рабочий кабинет.
 
 Зафиксированный минимальный scope первой волны такой:
 
@@ -265,7 +274,40 @@ bash ops/run_full_verification.sh
 
 ---
 
-## 10. Как перенести платформу на сервер с флешки
+## 10. Как поставить платформу одной кнопкой на Linux-сервер
+
+Если у целевого сервера есть доступ в интернет к GitHub и Docker Registry, используйте внешний bootstrap-файл:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lebedeffson/document-flow/main/install_server.sh -o install_server.sh
+sudo bash install_server.sh
+```
+
+Что он делает:
+
+1. при необходимости ставит prerequisites на apt/dnf/yum-based Linux
+2. берет или обновляет git checkout проекта
+3. запускает полноценную установку через `install_from_git.sh`
+4. восстанавливает встроенный baseline
+5. печатает адреса входа и итоговую summary
+
+Если нужен локальный тест с простыми стартовыми паролями:
+
+```bash
+sudo bash install_server.sh --simple-passwords
+```
+
+Если нужен live office слой на более мощном сервере:
+
+```bash
+sudo bash install_server.sh --with-live-office --office-auto-host
+```
+
+Подробный runbook:
+
+- [GIT_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/GIT_INSTALL_RUNBOOK.md)
+
+## 11. Как перенести платформу на сервер с флешки
 
 Если нужно один раз собрать платформу на рабочей машине и потом перенести ее на Linux-сервер без сложной установки из интернета, используйте offline bundle:
 
@@ -340,7 +382,7 @@ bash sync_project_documents.sh --force-all
 
 ---
 
-## 10. Какие файлы сейчас основные
+## 12. Какие файлы сейчас основные
 
 Рабочие документы в корне проекта:
 

@@ -89,6 +89,8 @@ sudo bash install_everything.sh --with-live-office --office-auto-host /opt/docfl
 cd /opt/docflow
 bash ops/check_stack.sh
 bash ops/smoke_test_stack.sh
+bash ops/day1_week1_acceptance.sh --skip-deep-audit
+python3 ops/audit_live_office_frontdoors.py
 python3 ops/monitoring_snapshot.py
 python3 ops/prod_readiness_audit.py
 ```
@@ -140,9 +142,14 @@ cat /opt/docflow/runtime/monitoring/access_points.txt
 
 1. `check_stack` зеленый
 2. `prod_readiness_audit.py` дает `0 blockers`
-3. Word и Excel сохраняются в существующий файл
-4. пользователи заходят по локальному адресу
-5. `DocSpace/Workspace` открываются корректно хотя бы в frontdoor-режиме
+3. `day1_week1_acceptance.sh --skip-deep-audit` проходит
+4. Word и Excel сохраняются в существующий файл
+5. пользователи заходят по локальному адресу
+6. `DocSpace/Workspace` открываются корректно хотя бы в frontdoor-режиме
+
+Подробный сценарный runbook:
+
+1. [PRODUCTION_DAY1_WEEK1_SCENARIOS.md](/home/lebedeffson/Code/Документооборот/docs/reference/PRODUCTION_DAY1_WEEK1_SCENARIOS.md)
 
 ## 9. Что делать, если live office слой не взлетел
 
@@ -178,4 +185,3 @@ Repo-side считаем готовым, когда:
 2. локальный адрес доступен пользователям
 3. роли и пользователи подтверждены
 4. выбран хотя бы один пилотный маршрут документов
-

@@ -230,14 +230,36 @@ bash install_everything.sh /opt/docflow
 cat /opt/docflow/runtime/monitoring/install_prod_readiness.json
 ```
 
+Сценарная приемка первого дня и первой недели:
+
+```bash
+cd /opt/docflow
+bash ops/day1_week1_acceptance.sh --skip-deep-audit
+```
+
+Отдельная быстрая проверка live frontdoor'ов `DocSpace/Workspace`:
+
+```bash
+cd /opt/docflow
+python3 ops/audit_live_office_frontdoors.py
+```
+
 Подробный сценарий:
 
 - [OFFLINE_INSTALL_RUNBOOK.md](/home/lebedeffson/Code/Документооборот/docs/reference/OFFLINE_INSTALL_RUNBOOK.md)
 - [CLOSED_LAN_GO_LIVE_CHECKLIST.md](/home/lebedeffson/Code/Документооборот/docs/reference/CLOSED_LAN_GO_LIVE_CHECKLIST.md)
+- [PRODUCTION_DAY1_WEEK1_SCENARIOS.md](/home/lebedeffson/Code/Документооборот/docs/reference/PRODUCTION_DAY1_WEEK1_SCENARIOS.md)
 
 ## Git Bootstrap Install
 
-Если у целевого сервера есть интернет и нужен сценарий "клонировали репозиторий и нажали одну кнопку", теперь есть git-bootstrap installer:
+Если у целевого сервера есть интернет и нужен сценарий "один установочный файл и одна команда", теперь есть внешний bootstrap:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lebedeffson/document-flow/main/install_server.sh -o install_server.sh
+sudo bash install_server.sh
+```
+
+Если репозиторий уже клонирован и нужен сценарий "клонировали репозиторий и нажали одну кнопку", остается и git-bootstrap installer:
 
 ```bash
 git clone https://github.com/lebedeffson/document-flow.git

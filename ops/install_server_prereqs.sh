@@ -8,8 +8,9 @@ Usage:
 
 Что делает:
 1. ставит базовые пакеты для bootstrap-сценария
-2. ставит Docker через get.docker.com, если Docker еще не установлен
-3. включает docker.service
+2. поддерживает apt/dnf/yum-based Linux серверы
+3. ставит Docker через get.docker.com, если Docker еще не установлен
+4. включает docker.service
 EOF
 }
 
@@ -29,23 +30,64 @@ fi
 
 require_root
 
-command -v apt-get >/dev/null 2>&1 || fail "only apt-based Debian/Ubuntu servers are supported by this bootstrap helper"
-
 export DEBIAN_FRONTEND=noninteractive
 
-echo "[server-prereqs] apt update"
-apt-get update
+PKG_MANAGER=""
+BASE_PACKAGES=()
 
-echo "[server-prereqs] install base packages"
-apt-get install -y --no-install-recommends \
-  ca-certificates \
-  curl \
-  git \
-  tar \
-  python3 \
-  python3-venv \
-  gnupg \
-  lsb-release
+if command -v apt-get >/dev/null 2>&1; then
+  PKG_MANAGER="apt"
+  BASE_PACKAGES=(
+    ca-certificates
+    curl
+    git
+    tar
+    python3
+    python3-venv
+    gnupg
+    lsb-release
+  )
+elif command -v dnf >/dev/null 2>&1; then
+  PKG_MANAGER="dnf"
+  BASE_PACKAGES=(
+    ca-certificates
+    curl
+    git
+    tar
+    python3
+    shadow-utils
+  )
+elif command -v yum >/dev/null 2>&1; then
+  PKG_MANAGER="yum"
+  BASE_PACKAGES=(
+    ca-certificates
+    curl
+    git
+    tar
+    python3
+    shadow-utils
+  )
+else
+  fail "supported package manager not found; expected apt-get, dnf, or yum"
+fi
+
+case "${PKG_MANAGER}" in
+  apt)
+    echo "[server-prereqs] apt update"
+    apt-get update
+
+    echo "[server-prereqs] install base packages"
+    apt-get install -y --no-install-recommends "${BASE_PACKAGES[@]}"
+    ;;
+  dnf)
+    echo "[server-prereqs] dnf install base packages"
+    dnf install -y "${BASE_PACKAGES[@]}"
+    ;;
+  yum)
+    echo "[server-prereqs] yum install base packages"
+    yum install -y "${BASE_PACKAGES[@]}"
+    ;;
+esac
 
 if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
   echo "[server-prereqs] install docker"

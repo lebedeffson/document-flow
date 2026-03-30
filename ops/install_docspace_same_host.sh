@@ -106,3 +106,38 @@ bash ./docspace-install.sh docker \
   -js "${JWT_SECRET}" \
   -eh "${EXTRA_HOSTS}" \
   -skiphc "${SKIP_HARDWARE_CHECK}"
+
+RUNTIME_DIR="${INSTALLER_DIR}/runtime"
+if [ -f "${RUNTIME_DIR}/.env" ]; then
+  python3 - "${RUNTIME_DIR}/.env" "${HOST}" "${PORT}" <<'PY'
+from pathlib import Path
+import sys
+
+env_path = Path(sys.argv[1])
+host = sys.argv[2].strip()
+port = sys.argv[3].strip()
+text = env_path.read_text()
+
+lines = []
+replaced_base = False
+replaced_portal = False
+for line in text.splitlines():
+    stripped = line.lstrip()
+    if stripped.startswith("APP_CORE_BASE_DOMAIN="):
+        indent = line[: len(line) - len(stripped)]
+        line = f"{indent}APP_CORE_BASE_DOMAIN={host}"
+        replaced_base = True
+    elif stripped.startswith("APP_URL_PORTAL="):
+        indent = line[: len(line) - len(stripped)]
+        line = f"{indent}APP_URL_PORTAL=http://{host}:{port}"
+        replaced_portal = True
+    lines.append(line)
+
+if not replaced_base:
+    lines.append(f"APP_CORE_BASE_DOMAIN={host}")
+if not replaced_portal:
+    lines.append(f"APP_URL_PORTAL=http://{host}:{port}")
+
+env_path.write_text("\n".join(lines) + "\n")
+PY
+fi

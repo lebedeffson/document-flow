@@ -1,13 +1,42 @@
 # Git Install Runbook
 
-Цель: дать сценарий, при котором локальный администратор больницы может клонировать репозиторий и запустить установку одной командой без участия разработчика.
+Цель: дать сценарий, при котором локальный администратор больницы может скачать один bootstrap-файл, а дальше установка пройдет одной командой без участия разработчика.
 
 Важно:
 
 1. этот сценарий требует доступа сервера в интернет к GitHub и Docker Registry
 2. если интернета на сервере нет, использовать нужно portable bundle, а не git bootstrap
 
-## 1. Что должно быть на сервере
+## 1. Самый короткий путь
+
+Если сервер видит GitHub и Docker Registry, достаточно:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lebedeffson/document-flow/main/install_server.sh -o install_server.sh
+sudo bash install_server.sh
+```
+
+Этот bootstrap:
+
+1. при необходимости ставит prerequisites на apt/dnf/yum-based Linux
+2. клонирует или обновляет git checkout
+3. запускает `install_from_git.sh`
+4. восстанавливает встроенный baseline
+5. выводит адреса входа и summary
+
+Для локального теста с простыми паролями:
+
+```bash
+sudo bash install_server.sh --simple-passwords
+```
+
+Для live office слоя:
+
+```bash
+sudo bash install_server.sh --with-live-office --office-auto-host
+```
+
+## 2. Что должно быть на сервере
 
 Минимум:
 
@@ -23,7 +52,7 @@
 sudo bash ops/install_server_prereqs.sh
 ```
 
-## 2. Быстрый запуск
+## 3. Быстрый запуск из уже клонированного репозитория
 
 Клонировать репозиторий:
 
@@ -53,7 +82,7 @@ bash install_from_git.sh --verify-only
 5. печатает локальные адреса и создает LAN packet
 6. прогоняет базовые проверки
 
-## 3. Если нужны простые стартовые пароли
+## 4. Если нужны простые стартовые пароли
 
 ```bash
 bash install_from_git.sh --simple-passwords
@@ -70,7 +99,7 @@ bash install_from_git.sh --simple-passwords
 
 Это допустимо только для первичного локального теста. Потом пароли нужно ротировать.
 
-## 4. Если нужен local LDAP baseline
+## 5. Если нужен local LDAP baseline
 
 По умолчанию он уже включен.
 
@@ -80,7 +109,7 @@ bash install_from_git.sh --simple-passwords
 bash install_from_git.sh --without-local-ldap
 ```
 
-## 5. Если нужен live DocSpace + Workspace
+## 6. Если нужен live DocSpace + Workspace
 
 Только на достаточно мощном сервере и только под `sudo`:
 
@@ -94,13 +123,13 @@ sudo bash install_from_git.sh --with-live-office --office-auto-host
 python3 ops/office_wave1_host_audit.py
 ```
 
-## 6. Что смотреть после установки
+## 7. Что смотреть после установки
 
 1. `runtime/monitoring/access_points.txt`
 2. `.tmp_lan_manual_test/LAN_MANUAL_TEST_PACKET.md`
 3. `runtime/monitoring/git_install_summary.txt`
 
-## 7. Когда этот сценарий не подходит
+## 8. Когда этот сценарий не подходит
 
 Не подходит, если:
 
