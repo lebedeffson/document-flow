@@ -45,6 +45,17 @@ render_frontdoor() {
     target_netloc="$(parse_url_field "${target_url}" netloc)"
 
     cat > "${snippet_path}" <<EOF
+EOF
+    if [ "${service}" = "workspace" ]; then
+      cat >> "${snippet_path}" <<EOF
+location = /Wizard.aspx {
+    return 302 /workspace/Wizard.aspx;
+}
+
+EOF
+    fi
+
+    cat >> "${snippet_path}" <<EOF
 location /${service}/ {
     if (\$arg_shell = "1") {
         rewrite ^ /index.php?module=dashboard/ecosystem&service=${service}&\$args last;
@@ -66,21 +77,30 @@ location /${service}/ {
     proxy_redirect https://${target_netloc}/ /${service}/;
     proxy_redirect http://${target_hostname}/ /${service}/;
     proxy_redirect https://${target_hostname}/ /${service}/;
+    proxy_redirect / /${service}/;
+    proxy_redirect ~^(/.+)\$ /${service}\$1;
     proxy_buffering off;
     proxy_pass ${target_url}/;
 
     sub_filter_once off;
     sub_filter_types text/html text/css application/javascript application/x-javascript text/javascript application/json;
     sub_filter 'href="/' 'href="/${service}/';
+    sub_filter "href='/" "href='/${service}/";
     sub_filter 'src="/' 'src="/${service}/';
+    sub_filter "src='/" "src='/${service}/";
     sub_filter 'action="/' 'action="/${service}/';
+    sub_filter "action='/" "action='/${service}/";
     sub_filter 'content="/' 'content="/${service}/';
+    sub_filter "content='/" "content='/${service}/";
     sub_filter 'url(/' 'url(/${service}/';
     sub_filter 'url("/' 'url("/${service}/';
     sub_filter "url('/" "url('/${service}/";
     sub_filter '${target_url}/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/${service}/';
     sub_filter '${target_scheme}://${target_netloc}/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/${service}/';
     sub_filter '${target_scheme}://${target_hostname}/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/${service}/';
+    sub_filter 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/${service}/';
+    sub_filter 'http://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/${service}/';
+    sub_filter 'http://${SERVER_NAME}/' 'https://${SERVER_NAME}${EXTERNAL_HTTPS_SUFFIX}/${service}/';
 }
 EOF
     return 0
