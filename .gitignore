@@ -2,6 +2,7 @@
 .tmp_lan_manual_test/
 .tmp_onlyoffice_installers/
 ops/node_modules/
+runtime/
 .env
 .env.local
 .env.*.local
