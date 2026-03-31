@@ -81,6 +81,7 @@
 
 1. сервер должен видеть `GitHub`
 2. сервер должен видеть `Docker Registry`
+3. `Docker`, `docker compose` и `git` заранее ставить не обязательно: bootstrap-установщик поставит их сам
 
 Если интернета не будет:
 
@@ -98,15 +99,25 @@ curl -fsSL https://raw.githubusercontent.com/lebedeffson/document-flow/main/inst
 sudo bash install_server.sh --with-live-office --office-auto-host --simple-passwords
 ```
 
+Если на сервере только чистая `Ubuntu` и даже `curl` еще не установлен:
+
+```bash
+sudo apt update
+sudo apt install -y curl
+curl -fsSL https://raw.githubusercontent.com/lebedeffson/document-flow/main/install_server.sh -o install_server.sh
+sudo bash install_server.sh --with-live-office --office-auto-host --simple-passwords
+```
+
 Что делает эта команда:
 
 1. ставит зависимости при необходимости
-2. скачивает проект
-3. поднимает основной контур
-4. поднимает `DocSpace`
-5. поднимает `Workspace`
-6. на сервере с `16 GB` автоматически включает low-memory режим
-7. создает текстовый файл с адресами и логинами
+2. если нужно, ставит `git`, `docker`, `docker compose`, `python3`, `tar`
+3. скачивает проект
+4. поднимает основной контур
+5. поднимает `DocSpace`
+6. поднимает `Workspace`
+7. на сервере с `16 GB` автоматически включает low-memory режим
+8. создает текстовый файл с адресами и логинами
 
 ### Вариант B. Сервер в закрытой сети
 

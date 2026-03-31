@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 TARGET_ROOT="${1:-/opt/docflow}"
 WITH_LOCAL_LDAP="${DOCFLOW_WITH_LOCAL_LDAP:-0}"
+VERIFY_ONLY="${DOCFLOW_VERIFY_ONLY:-0}"
 
 if [ -f "${SCRIPT_DIR}/config/bundle.flags" ] && grep -q '^WITH_LOCAL_LDAP=1$' "${SCRIPT_DIR}/config/bundle.flags"; then
   WITH_LOCAL_LDAP=1
@@ -110,6 +111,11 @@ DOCFLOW_ENV_FILE="${TARGET_ROOT}/.env" bash "${TARGET_ROOT}/ops/configure_access
 
 mkdir -p "${TARGET_ROOT}/runtime/install-bundle"
 run_prod_readiness_preflight "${TARGET_ROOT}" "${TARGET_ROOT}/.env" "${TARGET_ROOT}/runtime/install-bundle/preinstall_prod_readiness.json"
+
+if [ "${VERIFY_ONLY}" = "1" ]; then
+  echo "[install] verify-only complete; bundle, env, extraction and readiness preflight passed"
+  exit 0
+fi
 
 echo "[install] load docker images"
 docker load -i "${IMAGES_ARCHIVE}"

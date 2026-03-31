@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_ROOT="/opt/docflow"
 WORKSPACE_SCOPE=""
 SKIP_VERIFY=0
+VERIFY_ONLY=0
 WITH_LIVE_OFFICE=0
 OFFICE_AUTO_HOST=0
 OFFICE_HOST=""
@@ -27,6 +28,7 @@ Options:
   --workspace-with-community   Keep Calendar and expose Community
   --workspace-calendar-only    Keep only Calendar in Workspace Wave 1
   --skip-office-hardware-check Pass through skip flag to official live office installers
+  --verify-only               Verify bundle/env/installability only; do not load images or start containers
   --skip-verify                Skip post-install Python audits
   -h, --help                   Show this help
 
@@ -155,6 +157,9 @@ while [ $# -gt 0 ]; do
     --skip-office-hardware-check)
       SKIP_OFFICE_HARDWARE_CHECK=1
       ;;
+    --verify-only)
+      VERIFY_ONLY=1
+      ;;
     --skip-verify)
       SKIP_VERIFY=1
       ;;
@@ -183,6 +188,13 @@ verify_bundle_checksums
 
 echo "[install-everything] target root: ${TARGET_ROOT}"
 echo "[install-everything] bundle dir: ${SCRIPT_DIR}"
+
+if [ "${VERIFY_ONLY}" = "1" ]; then
+  echo "[install-everything] verify-only mode"
+  DOCFLOW_VERIFY_ONLY=1 bash "${SCRIPT_DIR}/install_from_bundle.sh" "${TARGET_ROOT}"
+  echo "[install-everything] verify-only complete"
+  exit 0
+fi
 
 bash "${SCRIPT_DIR}/install_from_bundle.sh" "${TARGET_ROOT}"
 

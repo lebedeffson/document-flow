@@ -186,7 +186,7 @@ function detect_group_id(array $row)
     $map = [
         0 => ['admin', 'администратор'],
         4 => ['завед', 'руковод', 'manager', 'head'],
-        5 => ['врач', 'clinician', 'employee', 'сотрудник'],
+        5 => ['врач', 'doctor', 'clinician', 'employee', 'сотрудник'],
         6 => ['регистрат', 'requester', 'registry', 'заявител'],
         7 => ['канцел', 'office', 'records'],
         8 => ['медсестр', 'nurse', 'координатор'],
