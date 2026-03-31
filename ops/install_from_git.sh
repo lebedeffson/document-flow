@@ -66,29 +66,41 @@ prepare_env() {
 
   if [ -f "${env_file}" ] && [ "${REGENERATE_ENV}" != "1" ]; then
     echo "[install-from-git] using existing .env"
-    return 0
+  else
+    if [ -f "${env_file}" ]; then
+      cp "${env_file}" "${env_file}.before-git-bootstrap.$(date +%Y%m%d-%H%M%S)"
+    fi
+
+    rm -f "${env_file}"
+
+    DOCFLOW_PROJECT_ROOT="${ROOT_DIR}" \
+    DOCFLOW_DOMAIN="docflow.hospital.local" \
+    DOCFLOW_OFFICE_DEPLOYMENT_MODE="shell_only" \
+    bash "${ROOT_DIR}/ops/generate_prod_env.sh" "${env_file}"
   fi
-
-  if [ -f "${env_file}" ]; then
-    cp "${env_file}" "${env_file}.before-git-bootstrap.$(date +%Y%m%d-%H%M%S)"
-  fi
-
-  rm -f "${env_file}"
-
-  DOCFLOW_PROJECT_ROOT="${ROOT_DIR}" \
-  DOCFLOW_DOMAIN="docflow.hospital.local" \
-  DOCFLOW_OFFICE_DEPLOYMENT_MODE="shell_only" \
-  DOCFLOW_MANAGER_USERNAME="head" \
-  DOCFLOW_EMPLOYEE_USERNAME="doctor" \
-  DOCFLOW_REQUESTER_USERNAME="registry" \
-  DOCFLOW_OFFICE_USERNAME="office" \
-  DOCFLOW_NURSE_USERNAME="nurse" \
-  bash "${ROOT_DIR}/ops/generate_prod_env.sh" "${env_file}"
 
   if [ "${GENERATE_SIMPLE_PASSWORDS}" = "1" ]; then
     docflow_set_env_value "${env_file}" "DOCFLOW_ADMIN_PASSWORD" "admin2026"
     docflow_set_env_value "${env_file}" "DOCFLOW_ROLE_DEFAULT_PASSWORD" "test2026"
+    docflow_set_env_value "${env_file}" "DOCFLOW_MANAGER_USERNAME" "head"
+    docflow_set_env_value "${env_file}" "DOCFLOW_EMPLOYEE_USERNAME" "doctor"
+    docflow_set_env_value "${env_file}" "DOCFLOW_REQUESTER_USERNAME" "registry"
+    docflow_set_env_value "${env_file}" "DOCFLOW_OFFICE_USERNAME" "office"
+    docflow_set_env_value "${env_file}" "DOCFLOW_NURSE_USERNAME" "nurse"
   fi
+}
+
+write_install_summary() {
+  mkdir -p "${ROOT_DIR}/runtime/monitoring"
+  cat > "${ROOT_DIR}/runtime/monitoring/install_from_git_summary.txt" <<EOF
+installed_at=$(date -Iseconds)
+root_dir=${ROOT_DIR}
+with_local_ldap=${WITH_LOCAL_LDAP}
+with_live_office=${WITH_LIVE_OFFICE}
+workspace_scope=${WORKSPACE_SCOPE}
+simple_passwords=${GENERATE_SIMPLE_PASSWORDS}
+regenerate_env=${REGENERATE_ENV}
+EOF
 }
 
 create_bootstrap_seed_dir() {
@@ -230,6 +242,9 @@ bash "${ROOT_DIR}/rukovoditel-test/prepare_hospital_baseline.sh"
 
 echo "[install-from-git] export LAN packet"
 bash "${ROOT_DIR}/ops/export_lan_manual_test_packet.sh"
+
+echo "[install-from-git] write install summary"
+write_install_summary
 
 echo "[install-from-git] export quick start"
 bash "${ROOT_DIR}/ops/export_server_quickstart.sh"

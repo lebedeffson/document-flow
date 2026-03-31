@@ -82,7 +82,13 @@ import pathlib
 import sys
 
 report_path = pathlib.Path(sys.argv[1])
-report = json.loads(report_path.read_text(encoding="utf-8"))
+raw = report_path.read_text(encoding="utf-8")
+start = raw.find("{")
+end = raw.rfind("}")
+if start == -1 or end == -1 or end < start:
+    print("[install-everything] could not parse production readiness report", file=sys.stderr)
+    sys.exit(1)
+report = json.loads(raw[start:end + 1])
 blocker_count = int(report.get("blocker_count", 0))
 warning_count = int(report.get("warning_count", 0))
 

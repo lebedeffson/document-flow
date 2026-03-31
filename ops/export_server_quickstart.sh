@@ -10,6 +10,13 @@ docflow_export_runtime
 OUT_DIR="${ROOT_DIR}/runtime/monitoring"
 OUT_FILE="${OUT_DIR}/START_HERE.txt"
 PRIMARY_IP="$(docflow_detect_primary_ipv4 || true)"
+SUMMARY_FILE="${ROOT_DIR}/runtime/monitoring/install_everything_summary.txt"
+
+if [ -f "${ROOT_DIR}/runtime/monitoring/install_server_summary.txt" ]; then
+  SUMMARY_FILE="${ROOT_DIR}/runtime/monitoring/install_server_summary.txt"
+elif [ -f "${ROOT_DIR}/runtime/monitoring/install_from_git_summary.txt" ]; then
+  SUMMARY_FILE="${ROOT_DIR}/runtime/monitoring/install_from_git_summary.txt"
+fi
 
 mkdir -p "${OUT_DIR}"
 
@@ -50,7 +57,7 @@ ${DOCFLOW_OFFICE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD}
 6. USEFUL FILES ON SERVER
 Access points: ${ROOT_DIR}/runtime/monitoring/access_points.txt
 LAN test packet: ${ROOT_DIR}/.tmp_lan_manual_test/LAN_MANUAL_TEST_PACKET.md
-Install summary: ${ROOT_DIR}/runtime/monitoring/install_everything_summary.txt
+Install summary: ${SUMMARY_FILE}
 
 7. QUICK COMMANDS
 cat ${ROOT_DIR}/runtime/monitoring/START_HERE.txt

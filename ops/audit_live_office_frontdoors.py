@@ -6,7 +6,15 @@ import sys
 import urllib.request
 from urllib.error import HTTPError, URLError
 
-from runtime_config import DOCSPACE_BASE, WORKSPACE_BASE, DOCSPACE_ENABLED, WORKSPACE_ENABLED
+from runtime_config import (
+    DOCSPACE_BASE,
+    WORKSPACE_BASE,
+    GATEWAY_BASE,
+    DOCSPACE_ENABLED,
+    WORKSPACE_ENABLED,
+    DOCSPACE_TARGET_URL,
+    WORKSPACE_TARGET_URL,
+)
 
 
 CTX = ssl._create_unverified_context()
@@ -49,12 +57,24 @@ def audit_docspace():
     if not result["status"] or result["status"] >= 400:
         failures.append(f"DocSpace frontdoor returned bad status: {result['status']}")
 
-    if not result["final_url"].startswith(f"{DOCSPACE_BASE}/"):
+    shell_only = not DOCSPACE_TARGET_URL
+    expected_prefixes = [f"{DOCSPACE_BASE}/"]
+    if shell_only:
+        expected_prefixes.append(f"{GATEWAY_BASE}/index.php?module=users/login")
+    if not any(result["final_url"].startswith(prefix) for prefix in expected_prefixes):
         failures.append(f"DocSpace final url escaped frontdoor: {result['final_url']}")
 
     body = result.get("body", "")
-    if "logo.ashx" not in body and "DocSpace" not in body and "/docspace/" not in body:
-        failures.append("DocSpace body does not look like a DocSpace page")
+    if shell_only:
+        if (
+            "Единая платформа документооборота" not in body
+            and "Рабочий контур платформы документооборота" not in body
+            and "<title>Документооборот</title>" not in body
+        ):
+            failures.append("DocSpace shell-only frontdoor does not look like the platform login page")
+    else:
+        if "logo.ashx" not in body and "DocSpace" not in body and "/docspace/" not in body:
+            failures.append("DocSpace body does not look like a DocSpace page")
 
     return {
         "name": "docspace_frontdoor",
@@ -73,13 +93,24 @@ def audit_workspace():
     if not result["status"] or result["status"] >= 400:
         failures.append(f"Workspace frontdoor returned bad status: {result['status']}")
 
+    shell_only = not WORKSPACE_TARGET_URL
     expected_prefixes = [f"{WORKSPACE_BASE}/", f"{WORKSPACE_BASE}/Wizard.aspx"]
+    if shell_only:
+        expected_prefixes.append(f"{GATEWAY_BASE}/index.php?module=users/login")
     if not any(result["final_url"].startswith(prefix) for prefix in expected_prefixes):
         failures.append(f"Workspace final url escaped frontdoor: {result['final_url']}")
 
     body = result.get("body", "")
-    if not re.search(r"Portal Setup|ONLYOFFICE|/workspace/", body, re.I):
-        failures.append("Workspace body does not look like a Workspace page")
+    if shell_only:
+        if (
+            "Единая платформа документооборота" not in body
+            and "Рабочий контур платформы документооборота" not in body
+            and "<title>Документооборот</title>" not in body
+        ):
+            failures.append("Workspace shell-only frontdoor does not look like the platform login page")
+    else:
+        if not re.search(r"Portal Setup|ONLYOFFICE|/workspace/", body, re.I):
+            failures.append("Workspace body does not look like a Workspace page")
 
     return {
         "name": "workspace_frontdoor",
