@@ -334,3 +334,7 @@ write_summary "${CHECKOUT_DIR}"
 
 log "completed"
 log "checkout: ${CHECKOUT_DIR}"
+if [ -f "${CHECKOUT_DIR}/runtime/monitoring/START_HERE.txt" ]; then
+  log "quick start: ${CHECKOUT_DIR}/runtime/monitoring/START_HERE.txt"
+  cat "${CHECKOUT_DIR}/runtime/monitoring/START_HERE.txt"
+fi

@@ -231,6 +231,9 @@ bash "${ROOT_DIR}/rukovoditel-test/prepare_hospital_baseline.sh"
 echo "[install-from-git] export LAN packet"
 bash "${ROOT_DIR}/ops/export_lan_manual_test_packet.sh"
 
+echo "[install-from-git] export quick start"
+bash "${ROOT_DIR}/ops/export_server_quickstart.sh"
+
 if [ "${WITH_LIVE_OFFICE}" = "1" ]; then
   LIVE_OFFICE_ARGS=()
 
@@ -269,6 +272,9 @@ python3 "${ROOT_DIR}/ops/prod_readiness_audit.py" | tee "${ROOT_DIR}/runtime/mon
 python3 "${ROOT_DIR}/ops/monitoring_snapshot.py" | tee "${ROOT_DIR}/runtime/monitoring/git_install_monitoring_snapshot.json"
 python3 "${ROOT_DIR}/ops/audit_ecosystem_integration.py" | tee "${ROOT_DIR}/runtime/monitoring/git_install_ecosystem_audit.json"
 python3 "${ROOT_DIR}/ops/audit_onlyoffice_integration.py" | tee "${ROOT_DIR}/runtime/monitoring/git_install_onlyoffice_audit.json"
+if [ "${WITH_LIVE_OFFICE}" = "1" ] && command -v node >/dev/null 2>&1; then
+  node "${ROOT_DIR}/ops/audit_live_office_auth.mjs" | tee "${ROOT_DIR}/runtime/monitoring/git_install_live_office_auth.json"
+fi
 
 cat > "${ROOT_DIR}/runtime/monitoring/git_install_summary.txt" <<EOF
 installed_at=$(date -Iseconds)
@@ -278,8 +284,11 @@ with_live_office=${WITH_LIVE_OFFICE}
 simple_passwords=${GENERATE_SIMPLE_PASSWORDS}
 access_points=${ROOT_DIR}/runtime/monitoring/access_points.txt
 lan_manual_packet=${ROOT_DIR}/.tmp_lan_manual_test/LAN_MANUAL_TEST_PACKET.md
+quick_start=${ROOT_DIR}/runtime/monitoring/START_HERE.txt
 EOF
 
 echo "[install-from-git] done"
 echo "[install-from-git] platform: $(grep '^RUKOVODITEL_PUBLIC_URL=' "${ROOT_DIR}/.env" | cut -d= -f2-)"
 echo "[install-from-git] access packet: ${ROOT_DIR}/.tmp_lan_manual_test/LAN_MANUAL_TEST_PACKET.md"
+echo "[install-from-git] quick start: ${ROOT_DIR}/runtime/monitoring/START_HERE.txt"
+cat "${ROOT_DIR}/runtime/monitoring/START_HERE.txt"

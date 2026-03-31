@@ -141,3 +141,6 @@ if not replaced_portal:
 env_path.write_text("\n".join(lines) + "\n")
 PY
 fi
+
+echo "[docspace-install] repair tenant quota/bootstrap state"
+bash "${ROOT_DIR}/ops/repair_docspace_same_host.sh"

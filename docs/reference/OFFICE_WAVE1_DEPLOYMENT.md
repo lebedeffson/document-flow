@@ -63,6 +63,26 @@ DOCFLOW_OFFICE_WAVE1_REQUIRE_LIVE_TARGETS=1
 
 Gateway будет держать единый внешний адрес, а live office-сервисы останутся внутренними.
 
+### 2.1 Допустимый low-memory режим для `16 GB`
+
+Для первого hospital-внедрения с малой нагрузкой допустим и упрощенный same-host вариант:
+
+1. `DocFlow + ONLYOFFICE Docs + DocSpace + Workspace` живут на одном сервере
+2. `DocSpace` работает в live-режиме под `/docspace/`
+3. `Workspace` работает в live-режиме под `/workspace/`
+4. после первичного bootstrap отключается `Workspace Elasticsearch`
+5. в `Workspace` остаются рабочими логин, портал и `Calendar`
+6. полнотекстовый поиск `Workspace` в этом профиле считается временно отключенным
+
+Этот режим годится только для:
+
+1. первой production-выкладки в больнице
+2. малой нагрузки
+3. небольшого числа пользователей и документов
+4. сервера уровня `~16 GB RAM / 6+ GB swap`
+
+Это не полноценный capacity-profile под длительную активную эксплуатацию, а безопасный стартовый режим до расширения памяти.
+
 Если же инфраструктура позволяет, отдельные office-hosts по-прежнему остаются хорошим вариантом, особенно если не хочется держать весь office-layer на одной машине.
 
 Для отдельной схемы лучше считать `DocSpace` и `Workspace` отдельными office-hosts, а не пытаться запихнуть их в тот же хост, где уже живут:
@@ -100,6 +120,7 @@ python3 ops/office_wave1_host_audit.py
 1. готов ли хост под `Workspace`
 2. готов ли хост под `DocSpace`
 3. можно ли поднимать их вместе на одном сервере
+4. можно ли идти в `low_memory_same_host_pilot`
 
 ## 4. Практический порядок для полного production
 
@@ -190,6 +211,21 @@ bash ops/cutover_closed_lan_prod.sh \
   --workspace-port 29002
 ```
 
+Для low-memory same-host развертывания на сервере около `16 GB` используйте:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+sudo bash ops/install_office_live_same_host.sh --auto-host --low-memory-profile
+```
+
+Этот сценарий:
+
+1. ставит live `DocSpace`
+2. ставит live `Workspace`
+3. подтверждает живой вход в оба сервиса
+4. отключает `Workspace Elasticsearch`
+5. оставляет рабочими `Calendar` и базовый портал `Workspace`
+
 Если `Community` все-таки нужен в первой волне:
 
 ```bash
@@ -214,6 +250,12 @@ bash ops/configure_office_wave1.sh \
 1. открывается `Calendar`
 2. при необходимости открывается `Community`
 3. пользователю не торчат `Mail/CRM/Projects/Documents` как обязательный сценарий первой волны
+
+Для low-memory режима дополнительно подтвердить:
+
+1. вход в `Workspace` проходит без `Elasticsearch`
+2. `Calendar` открывается
+3. известно и принято, что полнотекстовый поиск временно выключен
 
 ## 5. Финальный release gate
 

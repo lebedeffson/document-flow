@@ -14,6 +14,7 @@ DOCS_HOST="host.docker.internal:${ONLYOFFICE_BIND_PORT:-18083}"
 JWT_SECRET="${ONLYOFFICE_JWT_SECRET:-}"
 JWT_HEADER="Authorization"
 SKIP_HARDWARE_CHECK="false"
+LOW_MEMORY_PROFILE="false"
 INSTALLER_DIR="${ROOT_DIR}/ops/vendor/onlyoffice-installers/workspace"
 
 usage() {
@@ -27,6 +28,7 @@ Options:
   --jwt-secret <secret>       Existing ONLYOFFICE Docs JWT secret
   --jwt-header <header>       JWT header for existing ONLYOFFICE Docs (default: Authorization)
   --skip-hardware-check       Skip official installer hardware guard
+  --low-memory-profile        Recreate Elasticsearch in a reduced profile for ~16 GB hosts
   --installer-dir <path>      Directory with downloaded official installer scripts
   -h, --help                  Show help
 EOF
@@ -65,6 +67,10 @@ while [ "$#" -gt 0 ]; do
       ;;
     --skip-hardware-check)
       SKIP_HARDWARE_CHECK="true"
+      shift
+      ;;
+    --low-memory-profile)
+      LOW_MEMORY_PROFILE="true"
       shift
       ;;
     -h|--help)
@@ -106,3 +112,11 @@ bash ./workspace-install.sh \
   -jh "${JWT_HEADER}" \
   -js "${JWT_SECRET}" \
   -skiphc "${SKIP_HARDWARE_CHECK}"
+
+TUNE_ARGS=()
+if [ "${LOW_MEMORY_PROFILE}" = "true" ]; then
+  TUNE_ARGS+=(--low-memory-profile)
+fi
+
+echo "[workspace-install] tune Elasticsearch/runtime profile"
+bash "${ROOT_DIR}/ops/tune_workspace_same_host.sh" "${TUNE_ARGS[@]}"

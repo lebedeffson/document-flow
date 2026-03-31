@@ -68,6 +68,9 @@ run_step "prod_readiness" python3 "${ROOT_DIR}/ops/prod_readiness_audit.py"
 run_step "monitoring_snapshot" python3 "${ROOT_DIR}/ops/monitoring_snapshot.py"
 run_step "ecosystem_audit" python3 "${ROOT_DIR}/ops/audit_ecosystem_integration.py"
 run_step "live_office_frontdoors" python3 "${ROOT_DIR}/ops/audit_live_office_frontdoors.py"
+if [ -n "${DOCSPACE_TARGET_URL:-}" ] || [ -n "${WORKSPACE_TARGET_URL:-}" ]; then
+  run_step "live_office_auth" node "${ROOT_DIR}/ops/audit_live_office_auth.mjs"
+fi
 run_step "onlyoffice_backend" python3 "${ROOT_DIR}/ops/audit_onlyoffice_integration.py"
 run_step "word_doctor_browser" env \
   PLAYWRIGHT_BROWSER="${PLAYWRIGHT_BROWSER}" \

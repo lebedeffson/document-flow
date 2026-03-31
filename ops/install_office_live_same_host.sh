@@ -15,6 +15,7 @@ DOCSPACE_PORT="${DOCFLOW_DOCSPACE_INTERNAL_PORT:-19001}"
 WORKSPACE_PORT="${DOCFLOW_WORKSPACE_INTERNAL_PORT:-19002}"
 WORKSPACE_SCOPE="calendar_only"
 SKIP_HARDWARE_CHECK=0
+LOW_MEMORY_PROFILE=0
 
 usage() {
   cat <<'EOF'
@@ -29,6 +30,7 @@ Options:
   --workspace-with-community  Expose Workspace Community after cutover
   --workspace-calendar-only   Keep only Calendar in Workspace Wave 1 (default)
   --skip-hardware-check       Pass through skip flag to official ONLYOFFICE installers
+  --low-memory-profile        Allow a reduced same-host profile for ~16 GB / low-load hospital servers
   -h, --help                  Show help
 EOF
 }
@@ -40,6 +42,25 @@ fail() {
 
 require_root() {
   [ "$(id -u)" -eq 0 ] || fail "root is required; run with sudo"
+}
+
+detect_low_memory_profile() {
+  local total_mem_mb
+  local total_swap_mb
+
+  total_mem_mb="$(free -m | awk '/^Mem:/ {print $2}')"
+  total_swap_mb="$(free -m | awk '/^Swap:/ {print $2}')"
+
+  if [ "${LOW_MEMORY_PROFILE}" = "1" ]; then
+    return 0
+  fi
+
+  if [ -n "${total_mem_mb}" ] && [ -n "${total_swap_mb}" ] \
+     && [ "${total_mem_mb}" -ge 14000 ] && [ "${total_mem_mb}" -lt 20000 ] \
+     && [ "${total_swap_mb}" -ge 6000 ]; then
+    LOW_MEMORY_PROFILE=1
+    echo "[office-live-install] auto-enable low-memory profile for ${total_mem_mb} MB RAM / ${total_swap_mb} MB swap"
+  fi
 }
 
 run_host_preflight() {
@@ -60,8 +81,11 @@ run_host_preflight() {
 
   cat "${report_path}"
 
-  if [ "${SKIP_HARDWARE_CHECK}" = "1" ]; then
-    echo "[office-live-install] continuing despite host preflight failure because --skip-hardware-check is enabled"
+  if [ "${SKIP_HARDWARE_CHECK}" = "1" ] || [ "${LOW_MEMORY_PROFILE}" = "1" ]; then
+    if [ "${LOW_MEMORY_PROFILE}" = "1" ]; then
+      echo "[office-live-install] continuing with low-memory same-host profile; treat this as low-load pilot hardware, not full-capacity office host"
+    fi
+    echo "[office-live-install] continuing despite host preflight failure because an explicit degraded profile is enabled"
     rm -f "${report_path}"
     return 0
   fi
@@ -100,6 +124,10 @@ while [ "$#" -gt 0 ]; do
       SKIP_HARDWARE_CHECK=1
       shift
       ;;
+    --low-memory-profile)
+      LOW_MEMORY_PROFILE=1
+      shift
+      ;;
     -h|--help)
       usage
       exit 0
@@ -120,6 +148,7 @@ fi
 [[ "${DOCSPACE_PORT}" =~ ^[0-9]+$ ]] || fail "invalid docspace port: ${DOCSPACE_PORT}"
 [[ "${WORKSPACE_PORT}" =~ ^[0-9]+$ ]] || fail "invalid workspace port: ${WORKSPACE_PORT}"
 
+detect_low_memory_profile
 run_host_preflight
 
 bash "${ROOT_DIR}/ops/download_onlyoffice_installers.sh"
@@ -129,6 +158,9 @@ WORKSPACE_ARGS=(--port "${WORKSPACE_PORT}")
 if [ "${SKIP_HARDWARE_CHECK}" = "1" ]; then
   DOCSPACE_ARGS+=(--skip-hardware-check)
   WORKSPACE_ARGS+=(--skip-hardware-check)
+fi
+if [ "${LOW_MEMORY_PROFILE}" = "1" ]; then
+  WORKSPACE_ARGS+=(--low-memory-profile)
 fi
 
 echo "[office-live-install] install DocSpace"
@@ -146,3 +178,18 @@ fi
 
 echo "[office-live-install] cutover DocFlow"
 bash "${ROOT_DIR}/ops/cutover_closed_lan_prod.sh" "${CUTOVER_ARGS[@]}"
+
+if command -v node >/dev/null 2>&1; then
+  echo "[office-live-install] verify live office auth"
+  node "${ROOT_DIR}/ops/audit_live_office_auth.mjs"
+fi
+
+if [ "${LOW_MEMORY_PROFILE}" = "1" ]; then
+  echo "[office-live-install] low-memory mode: disable Workspace full-text search and keep calendar/basic portal alive"
+  bash "${ROOT_DIR}/ops/disable_workspace_search_same_host.sh"
+
+  if command -v node >/dev/null 2>&1; then
+    echo "[office-live-install] verify live office auth after low-memory Workspace downgrade"
+    node "${ROOT_DIR}/ops/audit_live_office_auth.mjs"
+  fi
+fi

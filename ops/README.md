@@ -773,3 +773,5 @@ Live Office same-host helpers:
 - `sudo bash ops/install_workspace_same_host.sh`
 - `sudo bash ops/install_office_live_same_host.sh --auto-host`
 - `sudo bash install_everything.sh --with-live-office --office-auto-host /opt/docflow`
+
+Для сервера около `16 GB RAM` и малой нагрузки это допустимо: installer сам попробует low-memory профиль и оставит `Workspace` в рабочем состоянии без полнотекстового поиска.

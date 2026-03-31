@@ -32,14 +32,23 @@ bash ops/create_portable_bundle.sh --with-local-ldap
 3. есть ли `docker` и `docker compose`, или их надо поставить
 4. хватит ли ресурсов сервера под same-host live office слой
 
-Если планируется live `DocSpace + Workspace` на том же сервере, ориентир по минимуму:
+Если планируется live `DocSpace + Workspace` на том же сервере, ориентир для полного same-host режима такой:
 
 1. `6+ CPU`
 2. `20 GiB RAM`
 3. `12 GiB swap`
 4. `80 GiB` свободного диска только под office-layer и его данные
 
-Если этого нет, первая выкладка должна идти в `shell_only`, без финального live office cutover.
+Если сервер слабее, но в больнице нагрузка маленькая, допустим low-memory режим:
+
+1. около `16 GiB RAM`
+2. `6+ GiB swap`
+3. live `DocSpace` включается
+4. live `Workspace` включается
+5. после bootstrap отключается `Workspace Elasticsearch`
+6. `Workspace Calendar` остается рабочим
+
+Если даже этого нет, первая выкладка должна идти в `shell_only`, без финального live office cutover.
 
 ## 3. Безопасный первый запуск
 
@@ -67,12 +76,21 @@ bash install_everything.sh /opt/docflow
 2. есть `root` или `sudo`
 3. основной контур уже поднялся и прошел `check_stack`
 
-Тогда cutover:
+Тогда full-capacity cutover:
 
 ```bash
 cd /opt/docflow
 sudo bash ops/install_office_live_same_host.sh --auto-host
 ```
+
+Для `16 GB` low-memory сервера:
+
+```bash
+cd /opt/docflow
+sudo bash ops/install_office_live_same_host.sh --auto-host --low-memory-profile
+```
+
+В этом режиме `Workspace` остается живым, но поиск временно отключается.
 
 Если нужен one-shot путь сразу при установке:
 
@@ -80,6 +98,8 @@ sudo bash ops/install_office_live_same_host.sh --auto-host
 cd /path/to/bundle
 sudo bash install_everything.sh --with-live-office --office-auto-host /opt/docflow
 ```
+
+Для low-memory same-host first deployment используется та же команда: installer сам попытается включить low-memory профиль на хостах около `14-20 GB RAM`.
 
 ## 5. Что проверить сразу после установки
 
@@ -103,6 +123,7 @@ python3 ops/office_wave1_host_audit.py
 python3 ops/audit_ecosystem_integration.py
 python3 ops/audit_onlyoffice_integration.py
 python3 ops/full_contour_audit.py
+node ops/audit_live_office_auth.mjs
 ```
 
 ## 6. Что дать пользователям
@@ -146,6 +167,7 @@ cat /opt/docflow/runtime/monitoring/access_points.txt
 4. Word и Excel сохраняются в существующий файл
 5. пользователи заходят по локальному адресу
 6. `DocSpace/Workspace` открываются корректно хотя бы в frontdoor-режиме
+7. если включен low-memory live office режим, `Workspace Calendar` открывается даже без `Elasticsearch`
 
 Подробный сценарный runbook:
 

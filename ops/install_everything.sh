@@ -299,6 +299,14 @@ else
   echo "[install-everything] python3 not found or verification skipped, skipping Python audits"
 fi
 
+if [ "${WITH_LIVE_OFFICE}" = "1" ] && [ "${SKIP_VERIFY}" != "1" ] && command -v node >/dev/null 2>&1; then
+  echo "[install-everything] live office auth"
+  node ops/audit_live_office_auth.mjs | tee runtime/monitoring/install_live_office_auth.txt
+fi
+
+echo "[install-everything] export quick start"
+bash ops/export_server_quickstart.sh >/dev/null
+
 cat > runtime/monitoring/install_everything_summary.txt <<EOF
 installed_at=$(date -Iseconds)
 target_root=${TARGET_ROOT}
@@ -318,10 +326,13 @@ workspace_calendar_target_url=$(env_value WORKSPACE_CALENDAR_TARGET_URL .env)
 workspace_community_target_url=$(env_value WORKSPACE_COMMUNITY_TARGET_URL .env)
 docflow_public_url=$(env_value RUKOVODITEL_PUBLIC_URL .env)
 access_points_file=${TARGET_ROOT}/runtime/monitoring/access_points.txt
+quick_start_file=${TARGET_ROOT}/runtime/monitoring/START_HERE.txt
 EOF
 
 echo
 echo "[install-everything] completed"
 echo "[install-everything] open: $(env_value RUKOVODITEL_PUBLIC_URL .env)/"
 echo "[install-everything] access points: ${TARGET_ROOT}/runtime/monitoring/access_points.txt"
+echo "[install-everything] quick start: ${TARGET_ROOT}/runtime/monitoring/START_HERE.txt"
 echo "[install-everything] summary: ${TARGET_ROOT}/runtime/monitoring/install_everything_summary.txt"
+cat "${TARGET_ROOT}/runtime/monitoring/START_HERE.txt"

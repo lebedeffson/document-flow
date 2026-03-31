@@ -5,6 +5,7 @@
 Быстрый документ, если нужен целостный обзор проекта без догадок:
 
 - [PROJECT_SYSTEM_PASSPORT.md](/home/lebedeffson/Code/Документооборот/docs/reference/PROJECT_SYSTEM_PASSPORT.md)
+- [HOSPITAL_SERVER_PREPARATION.md](/home/lebedeffson/Code/Документооборот/docs/reference/HOSPITAL_SERVER_PREPARATION.md)
 
 ## 1. С чего начинать
 

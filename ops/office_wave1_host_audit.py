@@ -28,6 +28,21 @@ SERVICES = {
     },
 }
 
+LOW_MEMORY_PROFILE = {
+    "label": "Same-host low-memory profile",
+    "requirements": {
+        "cpu_cores": 6,
+        "ram_gib": 14,
+        "swap_gib": 6,
+        "disk_gib": 80,
+    },
+    "notes": [
+        "Allowed only for low-load first deployment / pilot operation",
+        "Workspace full-text search should be disabled after initial bootstrap",
+        "Calendar/basic portal remain available; this is not a full-capacity office host",
+    ],
+}
+
 
 def bytes_to_gib(value: int) -> float:
     return round(value / (1024 ** 3), 2)
@@ -96,6 +111,7 @@ def main():
         "disk_gib": SERVICES["workspace"]["requirements"]["disk_gib"] + SERVICES["docspace"]["requirements"]["disk_gib"],
     }
     combined_failures = evaluate(combined_requirements, host)
+    low_memory_failures = evaluate(LOW_MEMORY_PROFILE["requirements"], host)
 
     payload = {
         "host": host,
@@ -104,6 +120,12 @@ def main():
             "status": "ready" if not combined_failures else "not_ready",
             "requirements": combined_requirements,
             "failures": combined_failures,
+        },
+        "low_memory_same_host_pilot": {
+            "status": "ready" if not low_memory_failures else "not_ready",
+            "requirements": LOW_MEMORY_PROFILE["requirements"],
+            "failures": low_memory_failures,
+            "notes": LOW_MEMORY_PROFILE["notes"],
         },
     }
 
