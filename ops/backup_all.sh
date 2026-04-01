@@ -22,12 +22,12 @@ mkdir -p "${TARGET_DIR}/mariadb" "${TARGET_DIR}/bridge" "${TARGET_DIR}/naudoc" "
 echo "[backup] target: ${TARGET_DIR}"
 
 echo "[backup] dumping MariaDB"
-docker exec "${DB_CONTAINER}" sh -lc \
+docflow_docker_exec "${DB_CONTAINER}" sh -lc \
   "exec mariadb-dump -u\"${DB_USER}\" -p\"${DB_PASSWORD}\" --single-transaction --routines --events \"${DB_NAME}\"" \
   > "${TARGET_DIR}/mariadb/rukovoditel.sql"
 
 echo "[backup] copying bridge.db"
-docker cp "${BRIDGE_CONTAINER}:/data/bridge.db" "${TARGET_DIR}/bridge/bridge.db"
+docflow_docker_cp_from_container "${BRIDGE_CONTAINER}:/data/bridge.db" "${TARGET_DIR}/bridge/bridge.db"
 
 echo "[backup] copying NauDoc Data.fs"
 cp "${ROOT_DIR}/naudoc_project/var/Data.fs" "${TARGET_DIR}/naudoc/Data.fs"

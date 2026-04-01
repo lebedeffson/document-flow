@@ -87,13 +87,15 @@ fi
 
 echo
 echo "[check] middleware health through gateway"
-bridge_health="$(curl_docflow "${DOCFLOW_BRIDGE_PUBLIC_BASE}/health" -k -sS -f --max-time 10)" || fail "bridge /health failed"
-printf '%s\n' "${bridge_health}"
-python3 - "${bridge_health}" <<'PY'
+bridge_health_file="$(mktemp)"
+curl_docflow "${DOCFLOW_BRIDGE_PUBLIC_BASE}/health" -k -sS -f --max-time 10 > "${bridge_health_file}" || fail "bridge /health failed"
+cat "${bridge_health_file}"
+python3 - "${bridge_health_file}" <<'PY'
 import json
+from pathlib import Path
 import sys
 
-payload = json.loads(sys.argv[1])
+payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 if payload.get("status") != "ok":
     raise SystemExit("bridge status is not ok")
 systems = payload.get("systems", {})

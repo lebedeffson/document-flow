@@ -81,6 +81,10 @@ else
   AUTO_DETECT="0"
 fi
 
+if [ -n "${ACCESS_HOST_ARG}" ] && [ -z "${AUTO_OVERRIDE}" ]; then
+  AUTO_DETECT="0"
+fi
+
 ACCESS_HOST="${ACCESS_HOST_ARG:-${EXISTING_HOST}}"
 
 if [ -z "${ACCESS_HOST_ARG}" ] && [ "${AUTO_DETECT}" = "1" ]; then

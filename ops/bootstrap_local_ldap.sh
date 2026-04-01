@@ -155,17 +155,17 @@ sys.exit(1)
 PY
 
 for dn in "${LDAP_USERS_DN}" "${LDAP_GROUPS_DN}" "${LDAP_SERVICE_ACCOUNTS_DN}"; do
-  docker exec "${LDAP_CONTAINER_NAME}" sh -lc \
+  docflow_docker_exec "${LDAP_CONTAINER_NAME}" sh -lc \
     "ldapdelete -r -x -H ldap://127.0.0.1:389 -D '${LDAP_SYNC_BIND_DN}' -w '${LDAP_ADMIN_PASSWORD}' '${dn}' >/tmp/ldapdelete.log 2>&1 || true"
 done
 echo "[ldap-bootstrap] cleared previous local LDAP baseline entries"
 
-docker cp "${GENERATED_LDIF}" "${LDAP_CONTAINER_NAME}:/tmp/50-hospital-users.ldif" >/dev/null
-docker exec "${LDAP_CONTAINER_NAME}" sh -lc \
+docflow_docker_cp_to_container "${GENERATED_LDIF}" "${LDAP_CONTAINER_NAME}:/tmp/50-hospital-users.ldif" >/dev/null
+docflow_docker_exec "${LDAP_CONTAINER_NAME}" sh -lc \
   "ldapadd -c -x -H ldap://127.0.0.1:389 -D '${LDAP_SYNC_BIND_DN}' -w '${LDAP_ADMIN_PASSWORD}' -f /tmp/50-hospital-users.ldif >/tmp/ldapadd.log 2>&1 || true"
-docker exec "${LDAP_CONTAINER_NAME}" sh -lc \
+docflow_docker_exec "${LDAP_CONTAINER_NAME}" sh -lc \
   "ldappasswd -x -H ldap://127.0.0.1:389 -D '${LDAP_SYNC_BIND_DN}' -w '${LDAP_ADMIN_PASSWORD}' -s '${LDAP_BIND_PASSWORD}' '${LDAP_BIND_DN}' >/tmp/ldappasswd.log 2>&1"
-docker exec "${LDAP_CONTAINER_NAME}" sh -lc "rm -f /tmp/50-hospital-users.ldif /tmp/ldapadd.log /tmp/ldappasswd.log" >/dev/null
+docflow_docker_exec "${LDAP_CONTAINER_NAME}" sh -lc "rm -f /tmp/50-hospital-users.ldif /tmp/ldapadd.log /tmp/ldappasswd.log" >/dev/null
 echo "[ldap-bootstrap] service account ensured: ${LDAP_BIND_DN}"
 
 BRIDGE_PORT_VALUE="${BRIDGE_BIND_PORT:-18082}"
@@ -229,7 +229,7 @@ sync_payload = request_json(f"{bridge_base}/identity-sources/{source['id']}/sync
 print("[ldap-bootstrap] sync:", sync_payload)
 PY
 
-docker exec -i "${BRIDGE_CONTAINER}" python3 - \
+docflow_docker_exec -i "${BRIDGE_CONTAINER}" python3 - \
   "${DOCFLOW_ADMIN_USERNAME}" \
   "${DOCFLOW_MANAGER_USERNAME}" \
   "${DOCFLOW_EMPLOYEE_USERNAME}" \

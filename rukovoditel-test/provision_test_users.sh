@@ -7,7 +7,7 @@ source "${ROOT_DIR}/ops/lib/runtime_env.sh"
 docflow_load_env "${ROOT_DIR}"
 docflow_export_runtime
 
-docker exec \
+docflow_docker_exec \
   -e DOCFLOW_ADMIN_USERNAME="${DOCFLOW_ADMIN_USERNAME}" \
   -e DOCFLOW_ADMIN_PASSWORD="${DOCFLOW_ADMIN_PASSWORD}" \
   -e DOCFLOW_ROLE_DEFAULT_PASSWORD="${DOCFLOW_ROLE_DEFAULT_PASSWORD}" \

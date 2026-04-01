@@ -8,8 +8,16 @@
 
 Важно для standalone-сборки подпроектов:
 
-1. корневой `.env` должен существовать
-2. при ручном `docker compose up` для отдельных каталогов лучше явно передавать:
+1. `Docker` здесь использовать как локальный test/dev контур, а не как основной production-деплой на Linux
+2. для полного локального ручного запуска из корня репозитория preferred-путь такой:
+
+```bash
+docker compose --env-file /home/lebedeffson/Code/Документооборот/.env up -d --build
+```
+
+3. корневой `compose.yaml` собирает весь full stack через `include`
+4. корневой `.env` должен существовать
+5. если поднимается не весь стек, а только отдельный подпроект, лучше явно передавать:
 
 ```bash
 docker compose --env-file /home/lebedeffson/Code/Документооборот/.env -f middleware/docker-compose.yml up -d --build

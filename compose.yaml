@@ -1,0 +1,11 @@
+# Local workstation test stack.
+# Keep Linux production installation and runtime decisions separate from this file.
+include:
+  - path: ./docker-compose.legacy.yml
+    project_directory: .
+  - path: ./rukovoditel-test/docker-compose.yml
+    project_directory: ./rukovoditel-test
+  - path: ./middleware/docker-compose.yml
+    project_directory: ./middleware
+  - path: ./gateway/docker-compose.yml
+    project_directory: ./gateway

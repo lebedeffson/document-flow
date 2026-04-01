@@ -217,11 +217,7 @@ fi
 prepare_env
 
 echo "[install-from-git] start base stack"
-if [ "${WITH_LOCAL_LDAP}" = "1" ]; then
-  bash "${ROOT_DIR}/ops/start_stack.sh" --with-local-ldap
-else
-  bash "${ROOT_DIR}/ops/start_stack.sh"
-fi
+bash "${ROOT_DIR}/ops/start_stack.sh"
 
 BOOTSTRAP_SEED_DIR="$(create_bootstrap_seed_dir)"
 trap 'rm -rf "${BOOTSTRAP_SEED_DIR}"' EXIT

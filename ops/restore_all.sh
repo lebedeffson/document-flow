@@ -78,16 +78,16 @@ start_naudoc_legacy() {
 }
 
 echo "[restore] restoring MariaDB"
-docker exec "${DB_CONTAINER}" sh -lc \
+docflow_docker_exec "${DB_CONTAINER}" sh -lc \
   "mariadb -uroot -p\"${DB_ROOT_PASSWORD}\" -e 'DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO \"${DB_USER}\"@\"%\"; FLUSH PRIVILEGES;'"
-docker exec -i "${DB_CONTAINER}" sh -lc \
+docflow_docker_exec -i "${DB_CONTAINER}" sh -lc \
   "exec mariadb -u\"${DB_USER}\" -p\"${DB_PASSWORD}\" \"${DB_NAME}\"" \
   < "${SQL_FILE}"
 
 echo "[restore] restoring bridge.db"
-docker exec "${BRIDGE_CONTAINER}" sh -lc \
+docflow_docker_exec "${BRIDGE_CONTAINER}" sh -lc \
   "if [ -f /data/bridge.db ]; then cp /data/bridge.db /data/bridge.db.before-restore.${RESTORE_STAMP}; fi"
-docker cp "${BRIDGE_FILE}" "${BRIDGE_CONTAINER}:/data/bridge.db"
+docflow_docker_cp_to_container "${BRIDGE_FILE}" "${BRIDGE_CONTAINER}:/data/bridge.db"
 
 echo "[restore] restoring NauDoc Data.fs"
 stop_naudoc_legacy
@@ -103,7 +103,7 @@ if [ -d "${ROOT_DIR}/rukovoditel-test/dist/uploads" ]; then
 fi
 mkdir -p "${ROOT_DIR}/rukovoditel-test/dist"
 tar -xzf "${UPLOADS_ARCHIVE}" -C "${ROOT_DIR}/rukovoditel-test/dist"
-docker exec "${RUKOVODITEL_CONTAINER_NAME}" sh -lc \
+docflow_docker_exec "${RUKOVODITEL_CONTAINER_NAME}" sh -lc \
   "chown -R www-data:www-data /var/www/html/uploads && chmod -R ug+rwX /var/www/html/uploads"
 
 echo "[restore] done"

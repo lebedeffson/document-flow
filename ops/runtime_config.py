@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import shutil
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
@@ -58,6 +59,35 @@ def _normalize_host_runtime_url(value: str) -> str:
     )
 
 
+def _looks_like_wsl_bash(path: str) -> bool:
+    normalized = path.replace("/", "\\").lower()
+    return normalized.endswith("\\windows\\system32\\bash.exe")
+
+
+def _find_bash_bin() -> str:
+    if os.name != "nt":
+        return shutil.which("bash") or "bash"
+
+    candidates = [
+        Path(r"C:\Program Files\Git\bin\bash.exe"),
+        Path(r"C:\Program Files\Git\usr\bin\bash.exe"),
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+
+    discovered = shutil.which("bash")
+    if discovered and not _looks_like_wsl_bash(discovered):
+        return discovered
+
+    return "bash"
+
+
+def bash_script_command(script_path, *args) -> list[str]:
+    path = Path(script_path)
+    return [BASH_BIN, path.as_posix(), *(str(arg) for arg in args)]
+
+
 GATEWAY_BASE = _strip(os.environ.get('DOCFLOW_PUBLIC_BASE') or os.environ.get('RUKOVODITEL_PUBLIC_URL', 'https://localhost:18443'))
 NAUDOC_BASE = _strip(os.environ.get('DOCFLOW_DOCS_BASE') or os.environ.get('NAUDOC_PUBLIC_URL', f'{GATEWAY_BASE}/docs'))
 BRIDGE_BASE = _strip(os.environ.get('DOCFLOW_BRIDGE_PUBLIC_BASE') or f'{GATEWAY_BASE}/bridge')
@@ -78,6 +108,7 @@ RUKOVODITEL_DIRECT = _strip(
 
 PUBLIC_NETLOC = urlparse(GATEWAY_BASE).netloc
 DOCS_NETLOC = urlparse(NAUDOC_BASE).netloc
+BASH_BIN = _find_bash_bin()
 
 NAUDOC_USERNAME = os.environ.get('NAUDOC_USERNAME', 'admin')
 NAUDOC_PASSWORD = os.environ.get('NAUDOC_PASSWORD', 'admin')

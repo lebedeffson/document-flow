@@ -22,10 +22,10 @@ fi
 
 CONTAINER_CSV_PATH="/tmp/docflow_hospital_users_import.csv"
 
-docker cp "${CSV_PATH}" "${RUKOVODITEL_CONTAINER_NAME}:${CONTAINER_CSV_PATH}"
-trap 'docker exec "${RUKOVODITEL_CONTAINER_NAME}" rm -f "'"${CONTAINER_CSV_PATH}"'" >/dev/null 2>&1 || true' EXIT
+docflow_docker_cp_to_container "${CSV_PATH}" "${RUKOVODITEL_CONTAINER_NAME}:${CONTAINER_CSV_PATH}"
+trap 'docflow_docker_exec "${RUKOVODITEL_CONTAINER_NAME}" rm -f "'"${CONTAINER_CSV_PATH}"'" >/dev/null 2>&1 || true' EXIT
 
-docker exec \
+docflow_docker_exec \
   -e DOCFLOW_ADMIN_PASSWORD="${DOCFLOW_ADMIN_PASSWORD}" \
   -e DOCFLOW_ROLE_DEFAULT_PASSWORD="${DOCFLOW_ROLE_DEFAULT_PASSWORD}" \
   -e DOCFLOW_HOSPITAL_USER_DEFAULT_PASSWORD="${DOCFLOW_HOSPITAL_USER_DEFAULT_PASSWORD:-${DOCFLOW_ROLE_DEFAULT_PASSWORD}}" \

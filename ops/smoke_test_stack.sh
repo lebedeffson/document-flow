@@ -158,7 +158,7 @@ PY
 
 echo
 echo "[smoke] rukovoditel data consistency"
-docker exec "${RUKOVODITEL_DB_CONTAINER}" mariadb -N -u"${RUKOVODITEL_DB_USER}" -p"${RUKOVODITEL_DB_PASSWORD}" "${RUKOVODITEL_DB_NAME}" <<SQL
+docflow_docker_exec "${RUKOVODITEL_DB_CONTAINER}" mariadb -N -u"${RUKOVODITEL_DB_USER}" -p"${RUKOVODITEL_DB_PASSWORD}" "${RUKOVODITEL_DB_NAME}" <<SQL
 SELECT 'requests', COUNT(*) FROM app_entity_23;
 SELECT 'projects', COUNT(*) FROM app_entity_21;
 SELECT 'doc_cards', COUNT(*) FROM app_entity_25;

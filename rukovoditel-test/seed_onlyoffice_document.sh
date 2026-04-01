@@ -31,7 +31,7 @@ case "${FILE_EXTENSION}" in
 esac
 
 sql_value() {
-  docker exec "$DB_CONTAINER" mariadb -N -s -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "$1" | tr -d '\r'
+  docflow_docker_exec "$DB_CONTAINER" mariadb -N -s -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "$1" | tr -d '\r'
 }
 
 FIELD_ID="$(sql_value "select id from app_fields where entities_id=${ENTITY_ID} and type='fieldtype_onlyoffice' order by case when name='Совместное редактирование' then 0 when name='Рабочий черновик' then 1 else 2 end, id limit 1;")"
@@ -44,13 +44,25 @@ FILE_ID="$(sql_value "select f.id from app_onlyoffice_files f join app_entity_${
 DATE_ADDED="$(date +%s)"
 
 if [[ -z "$FILE_ID" ]]; then
-  docker exec "$DB_CONTAINER" mariadb -N -s -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "insert into app_onlyoffice_files (entity_id, field_id, form_token, filename, sort_order, folder, filekey, download_token, date_added, created_by) values (${ENTITY_ID}, ${FIELD_ID}, '', '${FILE_NAME}', 0, '', '', '', ${DATE_ADDED}, 1); select last_insert_id();" >/tmp/onlyoffice_seed_insert.txt
+  docflow_docker_exec "$DB_CONTAINER" mariadb -N -s -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "insert into app_onlyoffice_files (entity_id, field_id, form_token, filename, sort_order, folder, filekey, download_token, date_added, created_by) values (${ENTITY_ID}, ${FIELD_ID}, '', '${FILE_NAME}', 0, '', '', '', ${DATE_ADDED}, 1); select last_insert_id();" >/tmp/onlyoffice_seed_insert.txt
   FILE_ID="$(tail -n1 /tmp/onlyoffice_seed_insert.txt | tr -d '\r')"
   rm -f /tmp/onlyoffice_seed_insert.txt
 fi
 
-TMPFILE="$(mktemp "/tmp/onlyoffice-reference-XXXXXX.${FILE_EXTENSION}")"
-export TMPFILE
+TMPFILE_POSIX="$(mktemp "/tmp/onlyoffice-reference-XXXXXX.${FILE_EXTENSION}")"
+TMPFILE_PY="${TMPFILE_POSIX}"
+TMPFILE_DOCKER_SRC="${TMPFILE_POSIX}"
+
+case "${OSTYPE:-}" in
+  msys*|cygwin*)
+    if command -v cygpath >/dev/null 2>&1; then
+      TMPFILE_PY="$(cygpath -w "${TMPFILE_POSIX}")"
+      TMPFILE_DOCKER_SRC="$(cygpath -w "${TMPFILE_POSIX}")"
+    fi
+    ;;
+esac
+
+export TMPFILE="${TMPFILE_PY}"
 export DOC_LINE_1
 export DOC_LINE_2
 export DOC_LINE_3
@@ -227,13 +239,13 @@ with ZipFile(outfile, 'w', compression=ZIP_DEFLATED) as zf:
 PY
 
 FOLDER="${ENTITY_ID}/$(date +%Y)/$(date +%m)/$(date +%d)/${FILE_ID}"
-docker exec -u 0 "$APP_CONTAINER" sh -lc "mkdir -p /var/www/html/uploads/onlyoffice/${FOLDER}"
-docker cp "$TMPFILE" "$APP_CONTAINER:/var/www/html/uploads/onlyoffice/${FOLDER}/${FILE_NAME}"
-docker exec -u 0 "$APP_CONTAINER" sh -lc "chown -R www-data:www-data /var/www/html/uploads/onlyoffice/${ENTITY_ID} && chmod 755 /var/www/html/uploads/onlyoffice/${ENTITY_ID} /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y) /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y)/$(date +%m) /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y)/$(date +%m)/$(date +%d) /var/www/html/uploads/onlyoffice/${FOLDER} && chmod 644 /var/www/html/uploads/onlyoffice/${FOLDER}/${FILE_NAME}"
-rm -f "$TMPFILE"
+docflow_docker_exec -u 0 "$APP_CONTAINER" sh -lc "mkdir -p /var/www/html/uploads/onlyoffice/${FOLDER}"
+docflow_docker_cp_to_container "$TMPFILE_DOCKER_SRC" "$APP_CONTAINER:/var/www/html/uploads/onlyoffice/${FOLDER}/${FILE_NAME}"
+docflow_docker_exec -u 0 "$APP_CONTAINER" sh -lc "chown -R www-data:www-data /var/www/html/uploads/onlyoffice/${ENTITY_ID} && chmod 755 /var/www/html/uploads/onlyoffice/${ENTITY_ID} /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y) /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y)/$(date +%m) /var/www/html/uploads/onlyoffice/${ENTITY_ID}/$(date +%Y)/$(date +%m)/$(date +%d) /var/www/html/uploads/onlyoffice/${FOLDER} && chmod 644 /var/www/html/uploads/onlyoffice/${FOLDER}/${FILE_NAME}"
+rm -f "$TMPFILE_POSIX"
 
 FILEKEY="${DOCFLOW_PUBLIC_HOST}-${FILE_ID}-$(date +%s)"
-docker exec "$DB_CONTAINER" mariadb -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "update app_onlyoffice_files set folder='${FOLDER}', filekey='${FILEKEY}', filename='${FILE_NAME}' where id=${FILE_ID}; update app_entity_${ENTITY_ID} set field_${FIELD_ID}='${FILE_ID}' where id=${ITEM_ID};"
+docflow_docker_exec "$DB_CONTAINER" mariadb -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "update app_onlyoffice_files set folder='${FOLDER}', filekey='${FILEKEY}', filename='${FILE_NAME}' where id=${FILE_ID}; update app_entity_${ENTITY_ID} set field_${FIELD_ID}='${FILE_ID}' where id=${ITEM_ID};"
 
 echo "field_id=${FIELD_ID}"
 echo "file_id=${FILE_ID}"

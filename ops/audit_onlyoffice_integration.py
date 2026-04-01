@@ -13,6 +13,7 @@ from runtime_config import (
     ADMIN_PASSWORD,
     ADMIN_USERNAME,
     APP_CONTAINER,
+    bash_script_command,
     DB_CONTAINER,
     DB_NAME,
     DB_PASS,
@@ -56,11 +57,11 @@ SCENARIOS = [
 
 
 def run_cmd(args):
-    return subprocess.check_output(args, cwd=ROOT_DIR, text=True).strip()
+    return subprocess.check_output(args, cwd=ROOT_DIR, text=True, encoding='utf-8', errors='replace').strip()
 
 
 def seed_pilot(item_id, file_name, lines):
-    output = run_cmd([str(SEED_SCRIPT), str(item_id), file_name, *lines])
+    output = run_cmd(bash_script_command(SEED_SCRIPT, item_id, file_name, *lines))
     data = {}
     for line in output.splitlines():
         if '=' in line:

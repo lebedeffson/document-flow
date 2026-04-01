@@ -7,6 +7,29 @@
 - [PROJECT_SYSTEM_PASSPORT.md](/home/lebedeffson/Code/Документооборот/docs/reference/PROJECT_SYSTEM_PASSPORT.md)
 - [HOSPITAL_SERVER_PREPARATION.md](/home/lebedeffson/Code/Документооборот/docs/reference/HOSPITAL_SERVER_PREPARATION.md)
 
+## Локальный Docker Стенд
+
+`Docker` в этом репозитории нужен как локальный тестовый стенд на рабочем компьютере.
+Это не основной production-путь установки для Linux-сервера.
+
+Для локального full-stack теста из корня репозитория есть единый `compose.yaml`:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/generate_staging_env.sh .env
+docker compose up -d --build
+```
+
+Если нужен тот же локальный стенд, но с `LDAP` baseline:
+
+```bash
+cd /home/lebedeffson/Code/Документооборот
+bash ops/generate_staging_env.sh .env
+docker compose --profile identity up -d --build
+```
+
+Использовать этот путь стоит именно для локальной проверки интеграций, регрессий и smoke/e2e-сценариев.
+
 ## 1. С чего начинать
 
 Главный адрес платформы:

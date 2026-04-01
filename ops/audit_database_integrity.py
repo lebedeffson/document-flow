@@ -31,7 +31,7 @@ EXPECTED_FIELDS = {
 
 
 def run(args):
-    return subprocess.run(args, capture_output=True, text=True, check=False)
+    return subprocess.run(args, capture_output=True, text=True, encoding='utf-8', errors='replace', check=False)
 
 
 def sql_quote(value: str) -> str:

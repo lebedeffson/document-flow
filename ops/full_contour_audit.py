@@ -17,6 +17,7 @@ from runtime_config import (
     ADMIN_USERNAME,
     APP_CONTAINER,
     BRIDGE_BASE,
+    bash_script_command,
     DB_CONTAINER,
     EMPLOYEE_USERNAME,
     GATEWAY_BASE,
@@ -188,6 +189,8 @@ def run_cmd(args):
         args,
         cwd=ROOT_DIR,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         check=True,
     )
@@ -427,11 +430,11 @@ def check_bridge():
 
 def run_sync_cycle():
     outputs = {}
-    outputs["check_stack"] = run_cmd(["bash", "ops/check_stack.sh"])
-    outputs["provision_test_users"] = run_cmd(["bash", "rukovoditel-test/provision_test_users.sh"])
-    outputs["sync_requests"] = run_cmd(["bash", "rukovoditel-test/sync_service_requests.sh"])
-    outputs["sync_projects"] = run_cmd(["bash", "rukovoditel-test/sync_project_documents.sh"])
-    outputs["pull_bridge"] = run_cmd(["bash", "rukovoditel-test/pull_bridge_updates.sh", "--only-linked"])
+    outputs["check_stack"] = run_cmd(bash_script_command("ops/check_stack.sh"))
+    outputs["provision_test_users"] = run_cmd(bash_script_command("rukovoditel-test/provision_test_users.sh"))
+    outputs["sync_requests"] = run_cmd(bash_script_command("rukovoditel-test/sync_service_requests.sh"))
+    outputs["sync_projects"] = run_cmd(bash_script_command("rukovoditel-test/sync_project_documents.sh"))
+    outputs["pull_bridge"] = run_cmd(bash_script_command("rukovoditel-test/pull_bridge_updates.sh", "--only-linked"))
     return outputs
 
 

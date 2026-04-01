@@ -5,6 +5,92 @@ docflow_default_root() {
   (cd "${caller_dir}/.." && pwd)
 }
 
+docflow_is_msys_shell() {
+  case "${OSTYPE:-}" in
+    msys*|cygwin*)
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
+if docflow_is_msys_shell && command -v python >/dev/null 2>&1; then
+  python3() {
+    command python "$@"
+  }
+fi
+
+docflow_enable_msys_docker_compat() {
+  if docflow_is_msys_shell; then
+    export MSYS_NO_PATHCONV=1
+    export MSYS2_ARG_CONV_EXCL="*"
+  fi
+}
+
+docflow_host_path_for_docker() {
+  local path="${1:-}"
+
+  if [ -z "${path}" ]; then
+    printf '\n'
+    return 0
+  fi
+
+  if docflow_is_msys_shell && command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "${path}"
+    return 0
+  fi
+
+  printf '%s\n' "${path}"
+}
+
+docflow_docker_exec() {
+  if docflow_is_msys_shell; then
+    MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL="*" docker exec "$@"
+    return $?
+  fi
+
+  docker exec "$@"
+}
+
+docflow_docker_cp_to_container() {
+  local host_path="${1:-}"
+  local container_path="${2:-}"
+  local docker_host_path="${host_path}"
+
+  if [ -z "${host_path}" ] || [ -z "${container_path}" ]; then
+    echo "[docker] usage: docflow_docker_cp_to_container <host-path> <container:path>" >&2
+    return 1
+  fi
+
+  if docflow_is_msys_shell; then
+    docker_host_path="$(docflow_host_path_for_docker "${host_path}")"
+    MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL="*" docker cp "${docker_host_path}" "${container_path}"
+    return $?
+  fi
+
+  docker cp "${docker_host_path}" "${container_path}"
+}
+
+docflow_docker_cp_from_container() {
+  local container_path="${1:-}"
+  local host_path="${2:-}"
+  local docker_host_path="${host_path}"
+
+  if [ -z "${container_path}" ] || [ -z "${host_path}" ]; then
+    echo "[docker] usage: docflow_docker_cp_from_container <container:path> <host-path>" >&2
+    return 1
+  fi
+
+  if docflow_is_msys_shell; then
+    docker_host_path="$(docflow_host_path_for_docker "${host_path}")"
+    MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL="*" docker cp "${container_path}" "${docker_host_path}"
+    return $?
+  fi
+
+  docker cp "${container_path}" "${docker_host_path}"
+}
+
 docflow_trim_trailing_slash() {
   local value="${1:-}"
   value="${value%/}"

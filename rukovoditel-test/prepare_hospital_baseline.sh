@@ -8,9 +8,9 @@ docflow_load_env "${ROOT_DIR}/.."
 docflow_export_runtime
 
 echo "[baseline] refresh process model to sync env-bound field configuration..."
-docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/provision_process_model.php
+docflow_docker_exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/provision_process_model.php
 
-docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/prepare_hospital_baseline.php
+docflow_docker_exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/prepare_hospital_baseline.php
 
 DB_CONTAINER="${RUKOVODITEL_DB_CONTAINER}"
 DB_NAME="${RUKOVODITEL_DB_NAME}"
@@ -18,7 +18,7 @@ DB_USER="${RUKOVODITEL_DB_USER}"
 DB_PASS="${RUKOVODITEL_DB_PASSWORD}"
 
 sql_value() {
-  docker exec "${DB_CONTAINER}" mariadb -N -s -u"${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "$1" | tr -d '\r'
+  docflow_docker_exec "${DB_CONTAINER}" mariadb -N -s -u"${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "$1" | tr -d '\r'
 }
 
 seed_reference_onlyoffice() {
@@ -79,7 +79,7 @@ bash "$ROOT_DIR/sync_document_cards.sh" --force-all
 bash "$ROOT_DIR/pull_bridge_updates.sh" --only-linked
 
 echo "[baseline] reapplying ecosystem models after bridge pull..."
-docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/prepare_hospital_baseline.php
+docflow_docker_exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/prepare_hospital_baseline.php
 
 echo
 echo "Hospital baseline prepared."

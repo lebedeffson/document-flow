@@ -7,4 +7,4 @@ source "${ROOT_DIR}/ops/lib/runtime_env.sh"
 docflow_load_env "${ROOT_DIR}"
 docflow_export_runtime
 
-docker exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/sync_project_documents.php "$@"
+docflow_docker_exec "${RUKOVODITEL_CONTAINER_NAME}" php /var/www/html/scripts/sync_project_documents.php "$@"
