@@ -146,10 +146,17 @@ clone_or_update_checkout() {
   local checkout_dir="${1:-}"
   local repo_url="${2:-}"
   local branch="${3:-}"
+  local backup_dir=""
 
   ensure_git_for_clone
 
   mkdir -p "$(dirname "${checkout_dir}")"
+
+  if [ "${FORCE_CLONE}" = "1" ] && [ -e "${checkout_dir}" ]; then
+    backup_dir="${checkout_dir}.before-force-clone.$(date +%Y%m%d-%H%M%S)"
+    log "force-clone: move existing checkout aside: ${checkout_dir} -> ${backup_dir}"
+    mv "${checkout_dir}" "${backup_dir}"
+  fi
 
   if [ -d "${checkout_dir}/.git" ]; then
     if [ "${SKIP_UPDATE}" = "1" ]; then
@@ -159,9 +166,12 @@ clone_or_update_checkout() {
     fi
 
     log "update checkout: ${checkout_dir}"
-    git -C "${checkout_dir}" fetch origin "${branch}" --depth 1
-    git -C "${checkout_dir}" checkout "${branch}"
-    git -C "${checkout_dir}" pull --ff-only origin "${branch}"
+    git -C "${checkout_dir}" fetch origin "${branch}" --depth 1 >&2 || \
+      fail "git fetch failed for ${checkout_dir}; rerun with --force-clone if this checkout is disposable"
+    git -C "${checkout_dir}" checkout "${branch}" >&2 || \
+      fail "git checkout ${branch} failed in ${checkout_dir}; rerun with --force-clone if this checkout is disposable"
+    git -C "${checkout_dir}" pull --ff-only origin "${branch}" >&2 || \
+      fail "git fast-forward update failed for ${checkout_dir}; the local checkout diverged from origin/${branch}. Rerun with --force-clone or remove ${checkout_dir}"
     printf '%s\n' "${checkout_dir}"
     return 0
   fi
@@ -171,7 +181,8 @@ clone_or_update_checkout() {
   fi
 
   log "clone repo: ${repo_url} -> ${checkout_dir}"
-  git clone --branch "${branch}" --depth 1 "${repo_url}" "${checkout_dir}"
+  git clone --branch "${branch}" --depth 1 "${repo_url}" "${checkout_dir}" >&2 || \
+    fail "git clone failed for ${repo_url}"
   printf '%s\n' "${checkout_dir}"
 }
 

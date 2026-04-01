@@ -296,7 +296,7 @@ ensure_command tar
 if [ "${VERIFY_ONLY}" = "1" ]; then
   tmp_seed_dir="$(create_bootstrap_seed_dir)"
   mkdir -p "${ROOT_DIR}/runtime/monitoring"
-  verify_env_file="$(mktemp "${ROOT_DIR}/runtime/monitoring/install-from-git-verify-env.XXXXXX")"
+  verify_env_file="$(mktemp -u "${ROOT_DIR}/runtime/monitoring/install-from-git-verify-env.XXXXXX")"
   trap 'rm -rf "${tmp_seed_dir}"; rm -f "${verify_env_file}"' EXIT
   prepare_verify_env "${verify_env_file}"
   verify_compose_with_env "${verify_env_file}"
