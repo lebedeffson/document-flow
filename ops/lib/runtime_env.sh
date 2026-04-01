@@ -331,6 +331,23 @@ docflow_is_absolute_path() {
   [[ "${value}" = /* ]]
 }
 
+docflow_resolve_path() {
+  local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
+  local value="${2:-}"
+
+  if [ -z "${value}" ]; then
+    printf '\n'
+    return 0
+  fi
+
+  if docflow_is_absolute_path "${value}"; then
+    printf '%s\n' "${value}"
+    return 0
+  fi
+
+  printf '%s\n' "${root_dir%/}/${value#./}"
+}
+
 docflow_find_mount_target() {
   local path="${1:-}"
 
@@ -421,6 +438,7 @@ docflow_configure_data_root_env() {
   mkdir -p \
     "${data_root}/mariadb" \
     "${data_root}/bridge" \
+    "${data_root}/naudoc-var" \
     "${data_root}/onlyoffice-data" \
     "${data_root}/onlyoffice-logs" \
     "${data_root}/onlyoffice-lib" \
@@ -432,6 +450,7 @@ docflow_configure_data_root_env() {
   docflow_set_env_value "${env_file}" "DOCFLOW_DATA_ROOT" "${data_root}"
   docflow_set_env_value "${env_file}" "RUKOVODITEL_DB_DATA_MOUNT" "${data_root}/mariadb"
   docflow_set_env_value "${env_file}" "BRIDGE_DATA_MOUNT" "${data_root}/bridge"
+  docflow_set_env_value "${env_file}" "NAUDOC_VAR_MOUNT" "${data_root}/naudoc-var"
   docflow_set_env_value "${env_file}" "ONLYOFFICE_DATA_MOUNT" "${data_root}/onlyoffice-data"
   docflow_set_env_value "${env_file}" "ONLYOFFICE_LOGS_MOUNT" "${data_root}/onlyoffice-logs"
   docflow_set_env_value "${env_file}" "ONLYOFFICE_LIB_MOUNT" "${data_root}/onlyoffice-lib"
@@ -453,6 +472,7 @@ docflow_prepare_host_storage() {
   for mount_path in \
     "${RUKOVODITEL_DB_DATA_MOUNT:-}" \
     "${BRIDGE_DATA_MOUNT:-}" \
+    "${NAUDOC_VAR_MOUNT:-}" \
     "${ONLYOFFICE_DATA_MOUNT:-}" \
     "${ONLYOFFICE_LOGS_MOUNT:-}" \
     "${ONLYOFFICE_LIB_MOUNT:-}" \
@@ -464,6 +484,62 @@ docflow_prepare_host_storage() {
       mkdir -p "${mount_path}"
     fi
   done
+
+  local office_live_root=""
+  office_live_root="$(docflow_office_live_root "${reference_path}")"
+  if [ -n "${office_live_root}" ] && docflow_is_absolute_path "${office_live_root}"; then
+    mkdir -p \
+      "${office_live_root}" \
+      "$(docflow_docspace_volumes_dir "${reference_path}")" \
+      "$(docflow_workspace_base_dir "${reference_path}")"
+  fi
+}
+
+docflow_office_live_root() {
+  local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
+
+  if [ -z "${DOCFLOW_DATA_ROOT:-}" ] || ! docflow_is_absolute_path "${DOCFLOW_DATA_ROOT}"; then
+    printf '\n'
+    return 0
+  fi
+
+  printf '%s/office-live\n' "${DOCFLOW_DATA_ROOT}"
+}
+
+docflow_docspace_volumes_dir() {
+  local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
+  local office_live_root=""
+  office_live_root="$(docflow_office_live_root "${root_dir}")"
+
+  if [ -z "${office_live_root}" ]; then
+    printf '\n'
+    return 0
+  fi
+
+  printf '%s/docspace-volumes\n' "${office_live_root}"
+}
+
+docflow_workspace_base_dir() {
+  local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
+  local office_live_root=""
+  office_live_root="$(docflow_office_live_root "${root_dir}")"
+
+  if [ -z "${office_live_root}" ]; then
+    printf '\n'
+    return 0
+  fi
+
+  printf '%s/workspace\n' "${office_live_root}"
+}
+
+docflow_naudoc_var_path() {
+  local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
+  docflow_resolve_path "${root_dir}" "${NAUDOC_VAR_MOUNT:-./naudoc_project/var}"
+}
+
+docflow_naudoc_data_file() {
+  local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
+  printf '%s/Data.fs\n' "$(docflow_naudoc_var_path "${root_dir}")"
 }
 
 docflow_export_runtime() {

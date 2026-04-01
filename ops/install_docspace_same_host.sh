@@ -16,6 +16,7 @@ JWT_SECRET="${ONLYOFFICE_JWT_SECRET:-}"
 EXTRA_HOSTS="host.docker.internal:host-gateway"
 SKIP_HARDWARE_CHECK="false"
 INSTALLER_DIR="${ROOT_DIR}/ops/vendor/onlyoffice-installers/docspace"
+DOCSPACE_VOLUMES_DIR="$(docflow_docspace_volumes_dir "${ROOT_DIR}")"
 
 usage() {
   cat <<'EOF'
@@ -93,19 +94,30 @@ echo "[docspace-install] host=${HOST}"
 echo "[docspace-install] port=${PORT}"
 echo "[docspace-install] docs_url=${DOCS_URL}"
 echo "[docspace-install] installer_dir=${INSTALLER_DIR}"
+if [ -n "${DOCSPACE_VOLUMES_DIR}" ]; then
+  mkdir -p "${DOCSPACE_VOLUMES_DIR}"
+  echo "[docspace-install] data_root volumes_dir=${DOCSPACE_VOLUMES_DIR}"
+fi
 
 cd "${INSTALLER_DIR}"
-bash ./docspace-install.sh docker \
-  -ls true \
-  -noni true \
-  -it community \
-  -dsh "${HOST}" \
-  -ep "${PORT}" \
-  -idocs false \
-  -docsurl "${DOCS_URL}" \
-  -js "${JWT_SECRET}" \
-  -eh "${EXTRA_HOSTS}" \
+INSTALL_ARGS=(
+  docker
+  -ls true
+  -noni true
+  -it community
+  -dsh "${HOST}"
+  -ep "${PORT}"
+  -idocs false
+  -docsurl "${DOCS_URL}"
+  -js "${JWT_SECRET}"
+  -eh "${EXTRA_HOSTS}"
   -skiphc "${SKIP_HARDWARE_CHECK}"
+)
+if [ -n "${DOCSPACE_VOLUMES_DIR}" ]; then
+  INSTALL_ARGS+=(-vd "${DOCSPACE_VOLUMES_DIR}")
+fi
+
+bash ./docspace-install.sh "${INSTALL_ARGS[@]}"
 
 RUNTIME_DIR="${INSTALLER_DIR}/runtime"
 if [ -f "${RUNTIME_DIR}/.env" ]; then

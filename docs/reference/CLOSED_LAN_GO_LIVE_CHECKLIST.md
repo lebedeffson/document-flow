@@ -39,6 +39,8 @@ bash ops/create_portable_bundle.sh --with-local-ldap
 3. `12 GiB swap`
 4. `80 GiB` свободного диска только под office-layer и его данные
 
+Если при установке используется `--data-root /srv/docflow-data`, persistent-данные основного контура и same-host office-layer должны уходить именно под этот корень, а не оставаться в каталоге checkout.
+
 Если сервер слабее, но в больнице нагрузка маленькая, допустим low-memory режим:
 
 1. около `16 GiB RAM`

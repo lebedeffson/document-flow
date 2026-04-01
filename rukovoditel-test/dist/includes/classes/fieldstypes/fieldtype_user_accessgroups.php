@@ -65,8 +65,11 @@ class fieldtype_user_accessgroups
             }
             elseif (!$choices = self::get_choices_by_rules())
             {
-                $include_administrator = ($app_user['group_id'] > 0 ? false : true);
-                $choices = access_groups::get_choices($include_administrator);
+                if (!$choices = self::get_non_admin_assignable_choices())
+                {
+                    $include_administrator = ($app_user['group_id'] > 0 ? false : true);
+                    $choices = access_groups::get_choices($include_administrator);
+                }
             }
         }
 
@@ -108,11 +111,14 @@ class fieldtype_user_accessgroups
         //check allowed group
         if($app_user['group_id']>0)
         {  
-             //get allowed groups
+            //get allowed groups
             if (!$choices = self::get_choices_by_rules())
             {
-                $include_administrator = ($app_user['group_id'] > 0 ? false : true);
-                $choices = access_groups::get_choices($include_administrator);
+                if (!$choices = self::get_non_admin_assignable_choices())
+                {
+                    $include_administrator = ($app_user['group_id'] > 0 ? false : true);
+                    $choices = access_groups::get_choices($include_administrator);
+                }
             }
         
             if(is_array($options['value']))
@@ -307,6 +313,30 @@ class fieldtype_user_accessgroups
         }
 
         return false;
+    }
+
+    static function get_non_admin_assignable_choices()
+    {
+        global $app_user, $app_module_path;
+
+        if($app_module_path == 'users/registration')
+        {
+            return false;
+        }
+
+        if(($app_user['group_id'] ?? 0) <= 0)
+        {
+            return false;
+        }
+
+        $choices = [];
+        $groups_query = db_query("select id,name from app_access_groups where id='" . db_input($app_user['group_id']) . "' limit 1");
+        while($groups = db_fetch_array($groups_query))
+        {
+            $choices[$groups['id']] = $groups['name'];
+        }
+
+        return count($choices) ? $choices : false;
     }
 
 }

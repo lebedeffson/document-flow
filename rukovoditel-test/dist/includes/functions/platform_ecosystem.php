@@ -723,12 +723,30 @@ if(!function_exists('platform_service_module_entry_url'))
             return $module_target;
         }
 
+        if($service === 'workspace' && $module === 'calendar' && strlen($calendar_live_url = platform_workspace_calendar_live_url()))
+        {
+            return $calendar_live_url;
+        }
+
         if(strlen(platform_service_target_url($service)))
         {
             return platform_service_entry_url($service, $entity_id, $item_id, $extra_params);
         }
 
         return platform_ecosystem_url($service, $entity_id, $item_id, false, $extra_params);
+    }
+}
+
+if(!function_exists('platform_workspace_calendar_live_url'))
+{
+    function platform_workspace_calendar_live_url()
+    {
+        if(!platform_service_enabled('workspace') || !strlen(platform_service_target_url('workspace')))
+        {
+            return '';
+        }
+
+        return rtrim(platform_service_public_url('workspace'), '/') . '/addons/calendar/';
     }
 }
 
@@ -750,7 +768,12 @@ if(!function_exists('platform_workspace_create_meeting_url'))
 
         if(strlen($calendar_target))
         {
-            return platform_url_with_query($calendar_target, ['intent' => 'create_meeting']);
+            return $calendar_target;
+        }
+
+        if(strlen($calendar_live_url = platform_workspace_calendar_live_url()))
+        {
+            return $calendar_live_url;
         }
 
         if(strlen(platform_service_target_url('workspace')))

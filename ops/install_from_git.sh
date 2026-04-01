@@ -96,6 +96,82 @@ prepare_env() {
   fi
 }
 
+prepare_verify_env() {
+  local env_file="${1:-}"
+
+  [ -n "${env_file}" ] || fail "prepare_verify_env requires a target env file"
+
+  if [ -f "${ROOT_DIR}/.env" ] && [ "${REGENERATE_ENV}" != "1" ]; then
+    cp "${ROOT_DIR}/.env" "${env_file}"
+  else
+    DOCFLOW_PROJECT_ROOT="${ROOT_DIR}" \
+    DOCFLOW_DOMAIN="docflow.hospital.local" \
+    DOCFLOW_OFFICE_DEPLOYMENT_MODE="shell_only" \
+    bash "${ROOT_DIR}/ops/generate_prod_env.sh" "${env_file}"
+  fi
+
+  if [ "${GENERATE_SIMPLE_PASSWORDS}" = "1" ]; then
+    docflow_set_env_value "${env_file}" "DOCFLOW_ADMIN_PASSWORD" "admin2026"
+    docflow_set_env_value "${env_file}" "DOCFLOW_ROLE_DEFAULT_PASSWORD" "test2026"
+    docflow_set_env_value "${env_file}" "DOCFLOW_MANAGER_USERNAME" "head"
+    docflow_set_env_value "${env_file}" "DOCFLOW_EMPLOYEE_USERNAME" "doctor"
+    docflow_set_env_value "${env_file}" "DOCFLOW_REQUESTER_USERNAME" "registry"
+    docflow_set_env_value "${env_file}" "DOCFLOW_OFFICE_USERNAME" "office"
+    docflow_set_env_value "${env_file}" "DOCFLOW_NURSE_USERNAME" "nurse"
+  fi
+
+  if [ -n "${DATA_ROOT}" ]; then
+    docflow_configure_data_root_env "${env_file}" "${DATA_ROOT}"
+  fi
+
+  DOCFLOW_ENV_FILE="${env_file}" bash "${ROOT_DIR}/ops/configure_access_host.sh"
+
+  (
+    export DOCFLOW_ENV_FILE="${env_file}"
+    docflow_load_env "${ROOT_DIR}"
+    docflow_prepare_host_storage
+  )
+}
+
+verify_compose_with_env() {
+  local env_file="${1:-}"
+
+  [ -n "${env_file}" ] || fail "verify_compose_with_env requires a target env file"
+
+  (
+    export DOCFLOW_ENV_FILE="${env_file}"
+    docflow_load_env "${ROOT_DIR}"
+
+    docker compose \
+      --project-directory "${ROOT_DIR}/rukovoditel-test" \
+      -p "${RUKOVODITEL_COMPOSE_PROJECT_NAME:-docflow_rukovoditel}" \
+      --env-file "${env_file}" \
+      -f "${ROOT_DIR}/rukovoditel-test/docker-compose.yml" \
+      config >/dev/null
+
+    docker compose \
+      --project-directory "${ROOT_DIR}/middleware" \
+      -p "${MIDDLEWARE_COMPOSE_PROJECT_NAME:-docflow_middleware}" \
+      --env-file "${env_file}" \
+      -f "${ROOT_DIR}/middleware/docker-compose.yml" \
+      config >/dev/null
+
+    docker compose \
+      --project-directory "${ROOT_DIR}" \
+      -p "${NAUDOC_LEGACY_COMPOSE_PROJECT:-docflow_legacy}" \
+      --env-file "${env_file}" \
+      -f "${ROOT_DIR}/docker-compose.legacy.yml" \
+      config >/dev/null
+
+    docker compose \
+      --project-directory "${ROOT_DIR}/gateway" \
+      -p "${GATEWAY_COMPOSE_PROJECT_NAME:-docflow_gateway}" \
+      --env-file "${env_file}" \
+      -f "${ROOT_DIR}/gateway/docker-compose.yml" \
+      config >/dev/null
+  )
+}
+
 write_install_summary() {
   mkdir -p "${ROOT_DIR}/runtime/monitoring"
   cat > "${ROOT_DIR}/runtime/monitoring/install_from_git_summary.txt" <<EOF
@@ -219,9 +295,13 @@ ensure_command tar
 
 if [ "${VERIFY_ONLY}" = "1" ]; then
   tmp_seed_dir="$(create_bootstrap_seed_dir)"
-  trap 'rm -rf "${tmp_seed_dir}"' EXIT
+  mkdir -p "${ROOT_DIR}/runtime/monitoring"
+  verify_env_file="$(mktemp "${ROOT_DIR}/runtime/monitoring/install-from-git-verify-env.XXXXXX")"
+  trap 'rm -rf "${tmp_seed_dir}"; rm -f "${verify_env_file}"' EXIT
+  prepare_verify_env "${verify_env_file}"
+  verify_compose_with_env "${verify_env_file}"
   bash "${ROOT_DIR}/ops/restore_all.sh" "${tmp_seed_dir}" --verify-only
-  echo "[install-from-git] verify-only: git bootstrap prerequisites are ready"
+  echo "[install-from-git] verify-only: git bootstrap prerequisites, compose config and data-root preflight are ready"
   exit 0
 fi
 

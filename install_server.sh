@@ -342,13 +342,13 @@ log "delegate install: ${CHECKOUT_DIR}/install_from_git.sh"
 
 write_summary "${CHECKOUT_DIR}"
 
-if [ -f "${CHECKOUT_DIR}/ops/export_server_quickstart.sh" ]; then
+if [ "${VERIFY_ONLY}" != "1" ] && [ -f "${CHECKOUT_DIR}/ops/export_server_quickstart.sh" ]; then
   bash "${CHECKOUT_DIR}/ops/export_server_quickstart.sh" >/dev/null || true
 fi
 
 log "completed"
 log "checkout: ${CHECKOUT_DIR}"
-if [ -f "${CHECKOUT_DIR}/runtime/monitoring/START_HERE.txt" ]; then
+if [ "${VERIFY_ONLY}" != "1" ] && [ -f "${CHECKOUT_DIR}/runtime/monitoring/START_HERE.txt" ]; then
   log "quick start: ${CHECKOUT_DIR}/runtime/monitoring/START_HERE.txt"
   cat "${CHECKOUT_DIR}/runtime/monitoring/START_HERE.txt"
 fi

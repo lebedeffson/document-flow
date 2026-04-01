@@ -144,6 +144,7 @@ BRIDGE_DB_PATH=/data/bridge.db
 DOCFLOW_DATA_ROOT=
 RUKOVODITEL_DB_DATA_MOUNT=rukovoditel_db_data
 BRIDGE_DATA_MOUNT=bridge_data
+NAUDOC_VAR_MOUNT=./naudoc_project/var
 ONLYOFFICE_DATA_MOUNT=onlyoffice_data
 ONLYOFFICE_LOGS_MOUNT=onlyoffice_logs
 ONLYOFFICE_LIB_MOUNT=onlyoffice_lib

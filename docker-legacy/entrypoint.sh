@@ -21,8 +21,10 @@ if [ -d /mnt/naudoc/zopeedit ]; then
   rsync -a /mnt/naudoc/zopeedit/ "${INSTANCE_HOME}/lib/python/zopeedit/"
 fi
 
-if [ -f /mnt/naudoc/var/Data.fs ]; then
-  echo "[entrypoint] Installing Data.fs"
+mkdir -p "${INSTANCE_HOME}/var"
+
+if [ ! -f "${INSTANCE_HOME}/var/Data.fs" ] && [ -f /mnt/naudoc/var/Data.fs ]; then
+  echo "[entrypoint] Seeding Data.fs"
   cp /mnt/naudoc/var/Data.fs "${INSTANCE_HOME}/var/Data.fs"
 fi
 

@@ -8,6 +8,7 @@ source "${SCRIPT_DIR}/lib/runtime_env.sh"
 ROOT_DIR="${PROJECT_ROOT:-$(docflow_default_root "${SCRIPT_DIR}")}"
 docflow_load_env "${ROOT_DIR}"
 ROOT_DIR="${PROJECT_ROOT:-${ROOT_DIR}}"
+NAUDOC_DATA_FILE="$(docflow_naudoc_data_file "${ROOT_DIR}")"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 TARGET_DIR="${1:-${ROOT_DIR}/backups/${STAMP}}"
 DB_CONTAINER="${RUKOVODITEL_DB_CONTAINER:-rukovoditel_db_test}"
@@ -30,7 +31,7 @@ echo "[backup] copying bridge.db"
 docflow_docker_cp_from_container "${BRIDGE_CONTAINER}:/data/bridge.db" "${TARGET_DIR}/bridge/bridge.db"
 
 echo "[backup] copying NauDoc Data.fs"
-cp "${ROOT_DIR}/naudoc_project/var/Data.fs" "${TARGET_DIR}/naudoc/Data.fs"
+cp "${NAUDOC_DATA_FILE}" "${TARGET_DIR}/naudoc/Data.fs"
 
 echo "[backup] archiving Rukovoditel uploads"
 tar -C "${ROOT_DIR}/rukovoditel-test/dist" -czf "${TARGET_DIR}/uploads/rukovoditel_uploads.tar.gz" uploads

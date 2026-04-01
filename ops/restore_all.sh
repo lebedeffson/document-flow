@@ -8,6 +8,7 @@ source "${SCRIPT_DIR}/lib/runtime_env.sh"
 ROOT_DIR="${PROJECT_ROOT:-$(docflow_default_root "${SCRIPT_DIR}")}"
 docflow_load_env "${ROOT_DIR}"
 ROOT_DIR="${PROJECT_ROOT:-${ROOT_DIR}}"
+NAUDOC_DATA_FILE="$(docflow_naudoc_data_file "${ROOT_DIR}")"
 
 VERIFY_ONLY=0
 BACKUP_DIR=""
@@ -91,10 +92,11 @@ docflow_docker_cp_to_container "${BRIDGE_FILE}" "${BRIDGE_CONTAINER}:/data/bridg
 
 echo "[restore] restoring NauDoc Data.fs"
 stop_naudoc_legacy
-if [ -f "${ROOT_DIR}/naudoc_project/var/Data.fs" ]; then
-  cp "${ROOT_DIR}/naudoc_project/var/Data.fs" "${ROOT_DIR}/naudoc_project/var/Data.fs.before-restore.${RESTORE_STAMP}"
+mkdir -p "$(dirname "${NAUDOC_DATA_FILE}")"
+if [ -f "${NAUDOC_DATA_FILE}" ]; then
+  cp "${NAUDOC_DATA_FILE}" "${NAUDOC_DATA_FILE}.before-restore.${RESTORE_STAMP}"
 fi
-cp "${DATA_FS_FILE}" "${ROOT_DIR}/naudoc_project/var/Data.fs"
+cp "${DATA_FS_FILE}" "${NAUDOC_DATA_FILE}"
 start_naudoc_legacy
 
 echo "[restore] restoring Rukovoditel uploads"

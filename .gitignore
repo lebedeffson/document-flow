@@ -22,6 +22,11 @@ runtime/portable-bundles/
 runtime/pilot-packages/
 middleware/runtime/
 naudoc_project/var/Data.fs.before-restore.*
+naudoc_project/var/Data.fs.index
+naudoc_project/var/Data.fs.lock
+naudoc_project/var/Data.fs.tmp
+naudoc_project/var/Z2.lock
+naudoc_project/var/Z2.pid
 rukovoditel-test/dist/uploads.before-restore.*/
 runtime/install-bundle/
 

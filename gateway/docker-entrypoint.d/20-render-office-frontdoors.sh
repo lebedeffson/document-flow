@@ -57,13 +57,12 @@ render_frontdoor() {
       cookie_path="/"
     fi
 
-    if [ "${service}" = "docspace" ]; then
-      proxy_host_header="${SERVER_NAME}"
-      if [ -n "${target_port}" ]; then
-        proxy_host_header="${SERVER_NAME}:${target_port}"
-      fi
-      forwarded_proto_line=""
-      forwarded_host_line=""
+    if [ "${service}" = "docspace" ] && [ -n "${target_port}" ]; then
+      case "${target_hostname}" in
+        host.docker.internal|127.0.0.1|localhost)
+          proxy_host_header="localhost:${target_port}"
+          ;;
+      esac
     fi
 
     cat > "${snippet_path}" <<EOF

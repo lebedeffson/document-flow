@@ -16,6 +16,9 @@ JWT_HEADER="Authorization"
 SKIP_HARDWARE_CHECK="false"
 LOW_MEMORY_PROFILE="false"
 INSTALLER_DIR="${ROOT_DIR}/ops/vendor/onlyoffice-installers/workspace"
+WORKSPACE_BASE_DIR="$(docflow_workspace_base_dir "${ROOT_DIR}")"
+INSTALLER_RUN_DIR=""
+TEMP_INSTALLER_DIR=""
 
 usage() {
   cat <<'EOF'
@@ -41,6 +44,38 @@ fail() {
 
 require_root() {
   [ "$(id -u)" -eq 0 ] || fail "root is required; run with sudo"
+}
+
+prepare_workspace_installer_dir() {
+  local source_dir="${1:-}"
+
+  [ -d "${source_dir}" ] || fail "workspace installer dir not found: ${source_dir}"
+
+  if [ -z "${WORKSPACE_BASE_DIR}" ]; then
+    printf '%s\n' "${source_dir}"
+    return 0
+  fi
+
+  mkdir -p "${WORKSPACE_BASE_DIR}"
+  TEMP_INSTALLER_DIR="$(mktemp -d)"
+  cp -a "${source_dir}/." "${TEMP_INSTALLER_DIR}/"
+
+  python3 - "${TEMP_INSTALLER_DIR}/install.sh" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+needle = 'BASE_DIR="/app/$PRODUCT";'
+replacement = 'BASE_DIR="${WORKSPACE_BASE_DIR:-/app/$PRODUCT}";'
+
+if needle not in text:
+    raise SystemExit(f"workspace installer patch target not found in {path}")
+
+path.write_text(text.replace(needle, replacement, 1), encoding="utf-8")
+PY
+
+  printf '%s\n' "${TEMP_INSTALLER_DIR}"
 }
 
 while [ "$#" -gt 0 ]; do
@@ -94,12 +129,18 @@ if [ ! -x "${INSTALLER_DIR}/workspace-install.sh" ] || [ ! -x "${INSTALLER_DIR}/
   bash "${ROOT_DIR}/ops/download_onlyoffice_installers.sh"
 fi
 
+trap 'if [ -n "${TEMP_INSTALLER_DIR}" ] && [ -d "${TEMP_INSTALLER_DIR}" ]; then rm -rf "${TEMP_INSTALLER_DIR}"; fi' EXIT
+INSTALLER_RUN_DIR="$(prepare_workspace_installer_dir "${INSTALLER_DIR}")"
+
 echo "[workspace-install] port=${PORT}"
 echo "[workspace-install] docs_host=${DOCS_HOST}"
 echo "[workspace-install] installer_dir=${INSTALLER_DIR}"
+if [ -n "${WORKSPACE_BASE_DIR}" ]; then
+  echo "[workspace-install] data_root workspace_base_dir=${WORKSPACE_BASE_DIR}"
+fi
 
-cd "${INSTALLER_DIR}"
-bash ./workspace-install.sh \
+cd "${INSTALLER_RUN_DIR}"
+WORKSPACE_BASE_DIR="${WORKSPACE_BASE_DIR}" bash ./workspace-install.sh \
   -ls true \
   -ics true \
   -icp true \

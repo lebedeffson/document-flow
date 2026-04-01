@@ -12,5 +12,6 @@ services:
       - "${NAUDOC_BIND_PORT:-18080}:8080"
     user: "1000:1000"
     volumes:
-      - ./naudoc_project:/mnt/naudoc
+      - ./naudoc_project:/mnt/naudoc:ro
+      - "${NAUDOC_VAR_MOUNT:-./naudoc_project/var}:/opt/naudoc/var"
     restart: unless-stopped

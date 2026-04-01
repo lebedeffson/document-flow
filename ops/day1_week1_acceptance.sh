@@ -3,6 +3,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+# shellcheck source=lib/runtime_env.sh
+source "${ROOT_DIR}/ops/lib/runtime_env.sh"
+docflow_load_env "${ROOT_DIR}"
 
 OUT_DIR="${ROOT_DIR}/runtime/monitoring/day1-week1-acceptance"
 PLAYWRIGHT_BROWSER="${PLAYWRIGHT_BROWSER:-firefox}"
@@ -112,6 +115,11 @@ if have_playwright_runtime; then
   run_step "sidebar_ui_audit" env \
     PLAYWRIGHT_BROWSER="${PLAYWRIGHT_BROWSER}" \
     node "${ROOT_DIR}/ops/sidebar_ui_audit.mjs"
+  if [ "${WORKSPACE_ENABLED:-1}" = "1" ]; then
+    run_step "workspace_calendar_entry" env \
+      PLAYWRIGHT_BROWSER=chromium \
+      node "${ROOT_DIR}/ops/audit_workspace_calendar_entry.mjs"
+  fi
 
   if [ "${RUN_DEEP_AUDIT}" = "1" ]; then
     run_step "deep_module_browser_audit" env \
