@@ -9,7 +9,7 @@ Usage:
 Что делает:
 1. ставит базовые пакеты для bootstrap-сценария
 2. поддерживает apt/dnf/yum-based Linux серверы
-3. ставит Docker через get.docker.com, если Docker еще не установлен
+3. ставит Docker через get.docker.com, а для apt-систем умеет откатываться на distro packages
 4. включает docker.service
 EOF
 }
@@ -34,6 +34,58 @@ export DEBIAN_FRONTEND=noninteractive
 
 PKG_MANAGER=""
 BASE_PACKAGES=()
+
+have_docker_compose() {
+  command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1
+}
+
+install_docker_via_apt_repo_packages() {
+  echo "[server-prereqs] fallback: install docker from apt packages"
+
+  if apt-get install -y docker.io docker-compose-v2; then
+    return 0
+  fi
+
+  if apt-get install -y docker.io docker-compose-plugin; then
+    return 0
+  fi
+
+  if apt-get install -y docker.io; then
+    if have_docker_compose; then
+      return 0
+    fi
+  fi
+
+  fail "docker installation via apt fallback failed; install docker + docker compose manually"
+}
+
+install_docker_if_needed() {
+  if have_docker_compose; then
+    return 0
+  fi
+
+  echo "[server-prereqs] install docker"
+
+  if curl -fsSL https://get.docker.com | sh; then
+    if have_docker_compose; then
+      return 0
+    fi
+    echo "[server-prereqs] get.docker.com finished, but docker compose is still unavailable"
+  else
+    echo "[server-prereqs] get.docker.com is unavailable; trying distro packages"
+  fi
+
+  case "${PKG_MANAGER}" in
+    apt)
+      install_docker_via_apt_repo_packages
+      ;;
+    *)
+      fail "docker bootstrap failed via get.docker.com on ${PKG_MANAGER}; install docker manually or provide outbound DNS/access to get.docker.com"
+      ;;
+  esac
+
+  have_docker_compose || fail "docker is installed, but docker compose is still unavailable"
+}
 
 if command -v apt-get >/dev/null 2>&1; then
   PKG_MANAGER="apt"
@@ -89,10 +141,7 @@ case "${PKG_MANAGER}" in
     ;;
 esac
 
-if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
-  echo "[server-prereqs] install docker"
-  curl -fsSL https://get.docker.com | sh
-fi
+install_docker_if_needed
 
 if command -v systemctl >/dev/null 2>&1; then
   systemctl enable --now docker || true
