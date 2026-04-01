@@ -21,6 +21,7 @@ SIMPLE_PASSWORDS=0
 VERIFY_ONLY=0
 FORCE_CLONE=0
 SKIP_UPDATE=0
+DATA_ROOT=""
 
 usage() {
   cat <<'EOF'
@@ -51,6 +52,7 @@ Options:
   --workspace-calendar-only    Keep only Calendar in Workspace Wave 1
   --skip-office-hardware-check Skip host guard for live office
   --simple-passwords           Use admin2026 / test2026 for bootstrap users
+  --data-root <path>           Store persistent container data under a mounted host path
   --verify-only                Clone/update and validate install prerequisites without installing
   -h, --help                   Show help
 
@@ -185,6 +187,7 @@ with_local_ldap=${WITH_LOCAL_LDAP}
 with_live_office=${WITH_LIVE_OFFICE}
 workspace_scope=${WORKSPACE_SCOPE}
 simple_passwords=${SIMPLE_PASSWORDS}
+data_root=${DATA_ROOT}
 verify_only=${VERIFY_ONLY}
 force_clone=${FORCE_CLONE}
 skip_update=${SKIP_UPDATE}
@@ -262,6 +265,10 @@ while [ "$#" -gt 0 ]; do
       SIMPLE_PASSWORDS=1
       shift
       ;;
+    --data-root)
+      DATA_ROOT="${2:-}"
+      shift 2
+      ;;
     --verify-only)
       VERIFY_ONLY=1
       shift
@@ -319,6 +326,9 @@ if [ "${SKIP_OFFICE_HARDWARE_CHECK}" = "1" ]; then
 fi
 if [ "${SIMPLE_PASSWORDS}" = "1" ]; then
   INSTALL_ARGS+=(--simple-passwords)
+fi
+if [ -n "${DATA_ROOT}" ]; then
+  INSTALL_ARGS+=(--data-root "${DATA_ROOT}")
 fi
 if [ "${VERIFY_ONLY}" = "1" ]; then
   INSTALL_ARGS+=(--verify-only)

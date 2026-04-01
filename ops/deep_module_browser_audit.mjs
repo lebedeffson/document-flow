@@ -213,7 +213,9 @@ async function auditOnlyoffice(role, issues, visited) {
 
     const bodyText = await popup.locator('body').innerText().catch(() => '');
     const frameUrls = popup.frames().map((frame) => frame.url());
-    const editorFrameLoaded = frameUrls.some((url) => url.includes('/office/') && url.includes('/documenteditor/'));
+    const editorFrameLoaded = frameUrls.some((url) =>
+      url.includes('/office/') && /(documenteditor|spreadsheeteditor|presentationeditor)/.test(url)
+    );
     const hasFailureText = textErrorPatterns.some((pattern) => pattern.test(bodyText));
 
     if (!editorFrameLoaded || hasFailureText) {

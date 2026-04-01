@@ -13,6 +13,7 @@ OFFICE_HOST=""
 DOCSPACE_PORT=""
 WORKSPACE_PORT=""
 SKIP_OFFICE_HARDWARE_CHECK=0
+DATA_ROOT=""
 
 usage() {
   cat <<'EOF'
@@ -28,6 +29,7 @@ Options:
   --workspace-with-community   Keep Calendar and expose Community
   --workspace-calendar-only    Keep only Calendar in Workspace Wave 1
   --skip-office-hardware-check Pass through skip flag to official live office installers
+  --data-root <path>           Store persistent container data under a mounted host path
   --verify-only               Verify bundle/env/installability only; do not load images or start containers
   --skip-verify                Skip post-install Python audits
   -h, --help                   Show this help
@@ -157,6 +159,10 @@ while [ $# -gt 0 ]; do
     --skip-office-hardware-check)
       SKIP_OFFICE_HARDWARE_CHECK=1
       ;;
+    --data-root)
+      DATA_ROOT="${2:-}"
+      shift
+      ;;
     --verify-only)
       VERIFY_ONLY=1
       ;;
@@ -189,14 +195,19 @@ verify_bundle_checksums
 echo "[install-everything] target root: ${TARGET_ROOT}"
 echo "[install-everything] bundle dir: ${SCRIPT_DIR}"
 
+BUNDLE_INSTALL_ARGS=("${TARGET_ROOT}")
+if [ -n "${DATA_ROOT}" ]; then
+  BUNDLE_INSTALL_ARGS=(--data-root "${DATA_ROOT}" "${TARGET_ROOT}")
+fi
+
 if [ "${VERIFY_ONLY}" = "1" ]; then
   echo "[install-everything] verify-only mode"
-  DOCFLOW_VERIFY_ONLY=1 bash "${SCRIPT_DIR}/install_from_bundle.sh" "${TARGET_ROOT}"
+  DOCFLOW_VERIFY_ONLY=1 bash "${SCRIPT_DIR}/install_from_bundle.sh" "${BUNDLE_INSTALL_ARGS[@]}"
   echo "[install-everything] verify-only complete"
   exit 0
 fi
 
-bash "${SCRIPT_DIR}/install_from_bundle.sh" "${TARGET_ROOT}"
+bash "${SCRIPT_DIR}/install_from_bundle.sh" "${BUNDLE_INSTALL_ARGS[@]}"
 
 cd "${TARGET_ROOT}"
 
@@ -335,6 +346,7 @@ office_auto_host=${OFFICE_AUTO_HOST}
 docspace_port=${DOCSPACE_PORT}
 workspace_port=${WORKSPACE_PORT}
 skip_office_hardware_check=${SKIP_OFFICE_HARDWARE_CHECK}
+data_root=${DATA_ROOT}
 docspace_target_url=$(env_value DOCSPACE_TARGET_URL .env)
 workspace_target_url=$(env_value WORKSPACE_TARGET_URL .env)
 docspace_collaboration_target_url=$(env_value DOCSPACE_COLLABORATION_ROOM_TARGET_URL .env)

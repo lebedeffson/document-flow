@@ -25,7 +25,7 @@ services:
       - "${GATEWAY_BIND_HTTP_PORT:-18090}:80"
       - "${GATEWAY_BIND_HTTPS_PORT:-18443}:443"
     volumes:
-      - gateway_certs:/etc/nginx/certs
+      - "${GATEWAY_CERTS_MOUNT:-gateway_certs}:/etc/nginx/certs"
     restart: unless-stopped
 
 volumes:

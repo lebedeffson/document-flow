@@ -2,8 +2,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/runtime_env.sh
+source "${SCRIPT_DIR}/lib/runtime_env.sh"
 
-TARGET_ROOT="${1:-/opt/docflow}"
+TARGET_ROOT="/opt/docflow"
+DATA_ROOT="${DOCFLOW_DATA_ROOT:-}"
 WITH_LOCAL_LDAP="${DOCFLOW_WITH_LOCAL_LDAP:-0}"
 VERIFY_ONLY="${DOCFLOW_VERIFY_ONLY:-0}"
 
@@ -17,6 +20,19 @@ BACKUP_ARCHIVE="${ARTIFACTS_DIR}/backup.tar.gz"
 IMAGES_ARCHIVE="${ARTIFACTS_DIR}/docker-images.tar"
 ENV_SOURCE="${SCRIPT_DIR}/config/.env"
 CHECKSUM_FILE="${SCRIPT_DIR}/SHA256SUMS"
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --data-root)
+      DATA_ROOT="${2:-}"
+      shift 2
+      ;;
+    *)
+      TARGET_ROOT="$1"
+      shift
+      ;;
+  esac
+done
 
 fail() {
   echo "[install] ERROR: $*" >&2
@@ -106,8 +122,15 @@ tar -xzf "${PROJECT_ARCHIVE}" -C "${TARGET_ROOT}"
 echo "[install] install env"
 install -m 600 "${ENV_SOURCE}" "${TARGET_ROOT}/.env"
 
+if [ -n "${DATA_ROOT}" ]; then
+  docflow_configure_data_root_env "${TARGET_ROOT}/.env" "${DATA_ROOT}"
+fi
+
 echo "[install] detect access host and normalize public URLs"
 DOCFLOW_ENV_FILE="${TARGET_ROOT}/.env" bash "${TARGET_ROOT}/ops/configure_access_host.sh"
+
+docflow_load_env "${TARGET_ROOT}"
+docflow_prepare_host_storage
 
 mkdir -p "${TARGET_ROOT}/runtime/install-bundle"
 run_prod_readiness_preflight "${TARGET_ROOT}" "${TARGET_ROOT}/.env" "${TARGET_ROOT}/runtime/install-bundle/preinstall_prod_readiness.json"

@@ -1707,6 +1707,8 @@ $access_map = [
     27 => [$manager_group_id => 'view,create,update,delete,reports', $employee_group_id => 'view,create,update,reports', $nurse_group_id => 'view,create,update,reports', $requester_group_id => 'create,view_assigned,update,reports', $office_group_id => 'view,reports'],
 ];
 
+ensure_access_schema(1, $employee_group_id, 'view,create,update,update_creator,delete,delete_creator');
+
 foreach ($access_map as $entity_id => $groups)
 {
     foreach ($groups as $group_id => $schema)

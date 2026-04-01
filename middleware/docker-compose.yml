@@ -29,7 +29,7 @@ services:
       - -lc
       - exec gunicorn --bind 0.0.0.0:8000 --workers "${BRIDGE_GUNICORN_WORKERS:-1}" --threads "${BRIDGE_GUNICORN_THREADS:-2}" --timeout "${BRIDGE_GUNICORN_TIMEOUT:-60}" app:app
     volumes:
-      - bridge_data:/data
+      - "${BRIDGE_DATA_MOUNT:-bridge_data}:/data"
     restart: unless-stopped
 
   hospital_ldap:
@@ -48,8 +48,8 @@ services:
       KEEP_EXISTING_CONFIG: "false"
     command: --copy-service --loglevel info
     volumes:
-      - bridge_ldap_data:/var/lib/ldap
-      - bridge_ldap_config:/etc/ldap/slapd.d
+      - "${LDAP_DATA_MOUNT:-bridge_ldap_data}:/var/lib/ldap"
+      - "${LDAP_CONFIG_MOUNT:-bridge_ldap_config}:/etc/ldap/slapd.d"
       - ./runtime/ldap/bootstrap:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
     networks:
       default:

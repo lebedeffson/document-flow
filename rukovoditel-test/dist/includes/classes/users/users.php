@@ -414,6 +414,21 @@ class users
             return true;
         }
 
+        if(
+            !empty($options['skip_if_mailer_unavailable'])
+            and CFG_EMAIL_USE_SMTP != 1
+            and !self::is_php_mailer_transport_available()
+        )
+        {
+            app_logs::email_log(
+                $options['to'],
+                $options['subject'],
+                'Local mail transport is unavailable; email skipped'
+            );
+
+            return false;
+        }
+
         $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
         try
@@ -516,8 +531,8 @@ class users
         catch(Exception $e)
         {
             app_logs::email_log($options['to'],$options['subject'], $mail->ErrorInfo);
-            
-            if(is_object($alerts))
+
+            if(is_object($alerts) and empty($options['suppress_delivery_errors']))
             {
                 $alerts->add(sprintf(TEXT_MAILER_ERROR, $options['to']) . ': ' . $mail->ErrorInfo . (CFG_EMAIL_SMTP_DEBUG ? '<br>' . TEXT_MORE_INFO . ': log/smtp_log.txt':''), 'error');
             }
@@ -535,6 +550,31 @@ class users
         }                
 
         return true;
+    }
+
+    static protected function is_php_mailer_transport_available()
+    {
+        if(defined('PHP_WINDOWS_VERSION_BUILD'))
+        {
+            return true;
+        }
+
+        $sendmail_path = trim((string) ini_get('sendmail_path'));
+
+        if($sendmail_path === '')
+        {
+            return false;
+        }
+
+        $parts = preg_split('/\s+/', $sendmail_path);
+        $binary = $parts[0] ?? '';
+
+        if($binary === '')
+        {
+            return false;
+        }
+
+        return is_executable($binary);
     }
 
     static function emails_on_schedule_prepare_attachments($attachments)

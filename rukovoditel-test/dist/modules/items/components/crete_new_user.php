@@ -51,6 +51,8 @@ $options = array('to' => $_POST['fields'][9],
                  'subject'=>((!is_null(CFG_REGISTRATION_EMAIL_SUBJECT) and strlen(CFG_REGISTRATION_EMAIL_SUBJECT))>0 ? CFG_REGISTRATION_EMAIL_SUBJECT :TEXT_NEW_USER_DEFAULT_EMAIL_SUBJECT),
                  'body'=> $body . $login_details,
                  'from'=> CFG_EMAIL_ADDRESS_FROM,
-                 'from_name'=> CFG_EMAIL_NAME_FROM );
+                 'from_name'=> CFG_EMAIL_NAME_FROM,
+                 'skip_if_mailer_unavailable' => true,
+                 'suppress_delivery_errors' => true);
                  
 users::send_email($options);

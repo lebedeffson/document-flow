@@ -19,6 +19,7 @@ SKIP_OFFICE_HARDWARE_CHECK=0
 GENERATE_SIMPLE_PASSWORDS=0
 REGENERATE_ENV=0
 VERIFY_ONLY=0
+DATA_ROOT=""
 
 usage() {
   cat <<'EOF'
@@ -39,6 +40,7 @@ Options:
   --workspace-calendar-only    Keep only Calendar in Workspace Wave 1
   --skip-office-hardware-check Skip host hardware guard for live office
   --simple-passwords           Use admin2026 / test2026 for the bootstrap users
+  --data-root <path>           Store persistent container data under a mounted host path
   --regenerate-env             Overwrite existing .env with a freshly generated baseline
   --verify-only                Validate bootstrap prerequisites without changing the system
   -h, --help                   Show help
@@ -88,6 +90,10 @@ prepare_env() {
     docflow_set_env_value "${env_file}" "DOCFLOW_OFFICE_USERNAME" "office"
     docflow_set_env_value "${env_file}" "DOCFLOW_NURSE_USERNAME" "nurse"
   fi
+
+  if [ -n "${DATA_ROOT}" ]; then
+    docflow_configure_data_root_env "${env_file}" "${DATA_ROOT}"
+  fi
 }
 
 write_install_summary() {
@@ -100,6 +106,7 @@ with_live_office=${WITH_LIVE_OFFICE}
 workspace_scope=${WORKSPACE_SCOPE}
 simple_passwords=${GENERATE_SIMPLE_PASSWORDS}
 regenerate_env=${REGENERATE_ENV}
+data_root=${DATA_ROOT}
 EOF
 }
 
@@ -166,6 +173,10 @@ while [ "$#" -gt 0 ]; do
     --simple-passwords)
       GENERATE_SIMPLE_PASSWORDS=1
       shift
+      ;;
+    --data-root)
+      DATA_ROOT="${2:-}"
+      shift 2
       ;;
     --regenerate-env)
       REGENERATE_ENV=1
@@ -293,6 +304,7 @@ root_dir=${ROOT_DIR}
 with_local_ldap=${WITH_LOCAL_LDAP}
 with_live_office=${WITH_LIVE_OFFICE}
 simple_passwords=${GENERATE_SIMPLE_PASSWORDS}
+data_root=${DATA_ROOT}
 access_points=${ROOT_DIR}/runtime/monitoring/access_points.txt
 lan_manual_packet=${ROOT_DIR}/.tmp_lan_manual_test/LAN_MANUAL_TEST_PACKET.md
 quick_start=${ROOT_DIR}/runtime/monitoring/START_HERE.txt

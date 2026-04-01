@@ -121,6 +121,14 @@ docflow_list_non_loopback_ipv4s() {
 
 docflow_detect_primary_ipv4() {
   local candidate=""
+  local preferred_host="${DOCFLOW_ACCESS_HOST:-${GATEWAY_SERVER_NAME:-}}"
+
+  if docflow_is_ipv4_literal "${preferred_host}"; then
+    if docflow_list_non_loopback_ipv4s | grep -Fxq "${preferred_host}"; then
+      printf '%s\n' "${preferred_host}"
+      return 0
+    fi
+  fi
 
   if command -v ip >/dev/null 2>&1; then
     candidate="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '/src / {for (i = 1; i <= NF; ++i) if ($i == "src") {print $(i+1); exit}}')"
@@ -316,6 +324,146 @@ if not found:
 content = "\n".join(updated).rstrip("\n") + "\n"
 env_path.write_text(content, encoding="utf-8")
 PY
+}
+
+docflow_is_absolute_path() {
+  local value="${1:-}"
+  [[ "${value}" = /* ]]
+}
+
+docflow_find_mount_target() {
+  local path="${1:-}"
+
+  if [ -z "${path}" ]; then
+    return 1
+  fi
+
+  if command -v findmnt >/dev/null 2>&1; then
+    findmnt -T "${path}" -n -o TARGET 2>/dev/null
+    return $?
+  fi
+
+  return 1
+}
+
+docflow_find_mount_source() {
+  local path="${1:-}"
+
+  if [ -z "${path}" ]; then
+    return 1
+  fi
+
+  if command -v findmnt >/dev/null 2>&1; then
+    findmnt -T "${path}" -n -o SOURCE 2>/dev/null
+    return $?
+  fi
+
+  return 1
+}
+
+docflow_assert_data_root_is_mounted() {
+  local data_root="${1:-}"
+  local reference_path="${2:-${PROJECT_ROOT:-${PWD}}}"
+
+  if [ -z "${data_root}" ]; then
+    echo "[env] data root path is empty" >&2
+    return 1
+  fi
+
+  if ! docflow_is_absolute_path "${data_root}"; then
+    echo "[env] data root must be an absolute path: ${data_root}" >&2
+    return 1
+  fi
+
+  if [ ! -d "${data_root}" ]; then
+    if ! mkdir -p "${data_root}"; then
+      echo "[env] cannot create data root path: ${data_root}" >&2
+      return 1
+    fi
+  fi
+
+  local mount_target=""
+  mount_target="$(docflow_find_mount_target "${data_root}" || true)"
+  local mount_source=""
+  mount_source="$(docflow_find_mount_source "${data_root}" || true)"
+
+  if [ -z "${mount_target}" ]; then
+    echo "[env] could not verify mountpoint for ${data_root}; install findmnt/util-linux or omit --data-root" >&2
+    return 1
+  fi
+
+  if [ "${mount_target}" = "/" ]; then
+    echo "[env] ${data_root} resolves to the system filesystem (/); mount the separate disk first or omit --data-root" >&2
+    return 1
+  fi
+
+  if [ -n "${reference_path}" ]; then
+    local reference_source=""
+    reference_source="$(docflow_find_mount_source "${reference_path}" || true)"
+    if [ -n "${reference_source}" ] && [ -n "${mount_source}" ] && [ "${reference_source}" = "${mount_source}" ]; then
+      echo "[env] ${data_root} is on the same filesystem as ${reference_path}; mount the separate disk first or omit --data-root" >&2
+      return 1
+    fi
+  fi
+}
+
+docflow_configure_data_root_env() {
+  local env_file="${1:-}"
+  local data_root="${2:-}"
+
+  if [ -z "${env_file}" ] || [ -z "${data_root}" ]; then
+    echo "[env] usage: docflow_configure_data_root_env <env-file> <data-root>" >&2
+    return 1
+  fi
+
+  docflow_assert_data_root_is_mounted "${data_root}" "$(dirname "${env_file}")" || return 1
+
+  mkdir -p \
+    "${data_root}/mariadb" \
+    "${data_root}/bridge" \
+    "${data_root}/onlyoffice-data" \
+    "${data_root}/onlyoffice-logs" \
+    "${data_root}/onlyoffice-lib" \
+    "${data_root}/onlyoffice-db" \
+    "${data_root}/ldap-data" \
+    "${data_root}/ldap-config" \
+    "${data_root}/gateway-certs"
+
+  docflow_set_env_value "${env_file}" "DOCFLOW_DATA_ROOT" "${data_root}"
+  docflow_set_env_value "${env_file}" "RUKOVODITEL_DB_DATA_MOUNT" "${data_root}/mariadb"
+  docflow_set_env_value "${env_file}" "BRIDGE_DATA_MOUNT" "${data_root}/bridge"
+  docflow_set_env_value "${env_file}" "ONLYOFFICE_DATA_MOUNT" "${data_root}/onlyoffice-data"
+  docflow_set_env_value "${env_file}" "ONLYOFFICE_LOGS_MOUNT" "${data_root}/onlyoffice-logs"
+  docflow_set_env_value "${env_file}" "ONLYOFFICE_LIB_MOUNT" "${data_root}/onlyoffice-lib"
+  docflow_set_env_value "${env_file}" "ONLYOFFICE_DB_MOUNT" "${data_root}/onlyoffice-db"
+  docflow_set_env_value "${env_file}" "LDAP_DATA_MOUNT" "${data_root}/ldap-data"
+  docflow_set_env_value "${env_file}" "LDAP_CONFIG_MOUNT" "${data_root}/ldap-config"
+  docflow_set_env_value "${env_file}" "GATEWAY_CERTS_MOUNT" "${data_root}/gateway-certs"
+}
+
+docflow_prepare_host_storage() {
+  local data_root="${DOCFLOW_DATA_ROOT:-}"
+  local reference_path="${PROJECT_ROOT:-${PWD}}"
+
+  if [ -n "${data_root}" ]; then
+    docflow_assert_data_root_is_mounted "${data_root}" "${reference_path}" || return 1
+  fi
+
+  local mount_path=""
+  for mount_path in \
+    "${RUKOVODITEL_DB_DATA_MOUNT:-}" \
+    "${BRIDGE_DATA_MOUNT:-}" \
+    "${ONLYOFFICE_DATA_MOUNT:-}" \
+    "${ONLYOFFICE_LOGS_MOUNT:-}" \
+    "${ONLYOFFICE_LIB_MOUNT:-}" \
+    "${ONLYOFFICE_DB_MOUNT:-}" \
+    "${LDAP_DATA_MOUNT:-}" \
+    "${LDAP_CONFIG_MOUNT:-}" \
+    "${GATEWAY_CERTS_MOUNT:-}"; do
+    if docflow_is_absolute_path "${mount_path}"; then
+      mkdir -p "${mount_path}"
+    fi
+  done
 }
 
 docflow_export_runtime() {

@@ -13,7 +13,7 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - rukovoditel_db_data:/var/lib/mysql
+      - "${RUKOVODITEL_DB_DATA_MOUNT:-rukovoditel_db_data}:/var/lib/mysql"
     restart: unless-stopped
 
   rukovoditel:
@@ -62,10 +62,10 @@ services:
     ports:
       - "${ONLYOFFICE_BIND_PORT:-18083}:80"
     volumes:
-      - onlyoffice_data:/var/www/onlyoffice/Data
-      - onlyoffice_logs:/var/log/onlyoffice
-      - onlyoffice_lib:/var/lib/onlyoffice
-      - onlyoffice_db:/var/lib/postgresql
+      - "${ONLYOFFICE_DATA_MOUNT:-onlyoffice_data}:/var/www/onlyoffice/Data"
+      - "${ONLYOFFICE_LOGS_MOUNT:-onlyoffice_logs}:/var/log/onlyoffice"
+      - "${ONLYOFFICE_LIB_MOUNT:-onlyoffice_lib}:/var/lib/onlyoffice"
+      - "${ONLYOFFICE_DB_MOUNT:-onlyoffice_db}:/var/lib/postgresql"
     shm_size: "1gb"
     restart: unless-stopped
 

@@ -39,6 +39,7 @@ DOCFLOW_ENV_FILE="${ENV_FILE}" bash "${ROOT_DIR}/ops/configure_access_host.sh"
 
 docflow_load_env "${ROOT_DIR}"
 docflow_export_runtime
+docflow_prepare_host_storage
 
 docflow_stack_up "${ROOT_DIR}" "${ENV_FILE}" "${BUILD_MODE}" "${WITH_LOCAL_LDAP}"
 
