@@ -493,6 +493,8 @@ docflow_prepare_host_storage() {
       "$(docflow_docspace_volumes_dir "${reference_path}")" \
       "$(docflow_workspace_base_dir "${reference_path}")"
   fi
+
+  docflow_prepare_naudoc_var_permissions "${reference_path}"
 }
 
 docflow_office_live_root() {
@@ -540,6 +542,24 @@ docflow_naudoc_var_path() {
 docflow_naudoc_data_file() {
   local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
   printf '%s/Data.fs\n' "$(docflow_naudoc_var_path "${root_dir}")"
+}
+
+docflow_prepare_naudoc_var_permissions() {
+  local root_dir="${1:-${PROJECT_ROOT:-${PWD}}}"
+  local naudoc_var_path=""
+
+  naudoc_var_path="$(docflow_naudoc_var_path "${root_dir}")"
+  if [ -z "${naudoc_var_path}" ]; then
+    return 0
+  fi
+
+  mkdir -p "${naudoc_var_path}"
+
+  if [ "$(id -u)" -eq 0 ]; then
+    chown -R 1000:1000 "${naudoc_var_path}" 2>/dev/null || true
+  fi
+
+  chmod -R u+rwX,go+rX "${naudoc_var_path}" 2>/dev/null || true
 }
 
 docflow_export_runtime() {

@@ -97,6 +97,7 @@ if [ -f "${NAUDOC_DATA_FILE}" ]; then
   cp "${NAUDOC_DATA_FILE}" "${NAUDOC_DATA_FILE}.before-restore.${RESTORE_STAMP}"
 fi
 cp "${DATA_FS_FILE}" "${NAUDOC_DATA_FILE}"
+docflow_prepare_naudoc_var_permissions "${ROOT_DIR}"
 start_naudoc_legacy
 
 echo "[restore] restoring Rukovoditel uploads"
