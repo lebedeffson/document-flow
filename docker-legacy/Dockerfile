@@ -1,8 +1,8 @@
 FROM debian:bullseye-slim
 
 ARG PY24_SOURCE_URL=https://www.python.org/ftp/python/2.4.6/Python-2.4.6.tgz
-ARG ZOPE_SOURCE_URL=https://old.zope.dev/Products/Zope/2.9.10/Zope-2.9.10-final.tgz
-ARG ZOPE_SOURCE_FALLBACK_URL=https://codeload.github.com/zopefoundation/Zope/tar.gz/refs/tags/2.9.10
+ARG ZOPE_SOURCE_URL=https://codeload.github.com/zopefoundation/Zope/tar.gz/refs/tags/2.9.10
+ARG ZOPE_SOURCE_FALLBACK_URL=https://old.zope.dev/Products/Zope/2.9.10/Zope-2.9.10-final.tgz
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
