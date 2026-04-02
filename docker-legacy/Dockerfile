@@ -1,5 +1,9 @@
 FROM debian:bullseye-slim
 
+ARG PY24_SOURCE_URL=https://www.python.org/ftp/python/2.4.6/Python-2.4.6.tgz
+ARG ZOPE_SOURCE_URL=https://old.zope.dev/Products/Zope/2.9.10/Zope-2.9.10-final.tgz
+ARG ZOPE_SOURCE_FALLBACK_URL=https://codeload.github.com/zopefoundation/Zope/tar.gz/refs/tags/2.9.10
+
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -32,7 +36,10 @@ RUN apt-get update \
 
 RUN mkdir -p /tmp/build \
  && cd /tmp/build \
- && curl -fsSLO https://www.python.org/ftp/python/2.4.6/Python-2.4.6.tgz \
+ && curl --fail --show-error --location \
+      --retry 6 --retry-delay 5 --retry-all-errors \
+      --connect-timeout 30 --max-time 1800 \
+      -o Python-2.4.6.tgz "${PY24_SOURCE_URL}" \
  && tar -xzf Python-2.4.6.tgz \
  && cd Python-2.4.6 \
  && ./configure --prefix=${PY24_PREFIX} \
@@ -42,9 +49,19 @@ RUN mkdir -p /tmp/build \
  && ln -sf python2.4 ${PY24_PREFIX}/bin/python
 
 RUN cd /tmp/build \
- && curl -fsSLO https://old.zope.dev/Products/Zope/2.9.10/Zope-2.9.10-final.tgz \
+ && rm -f Zope-2.9.10-final.tgz \
+ && if ! curl --fail --show-error --location \
+      --retry 6 --retry-delay 5 --retry-all-errors \
+      --connect-timeout 30 --max-time 1800 \
+      -o Zope-2.9.10-final.tgz "${ZOPE_SOURCE_URL}"; then \
+      echo "Primary Zope source failed, falling back to GitHub tag archive" >&2; \
+      curl --fail --show-error --location \
+        --retry 6 --retry-delay 5 --retry-all-errors \
+        --connect-timeout 30 --max-time 1800 \
+        -o Zope-2.9.10-final.tgz "${ZOPE_SOURCE_FALLBACK_URL}"; \
+    fi \
  && tar -xzf Zope-2.9.10-final.tgz \
- && cd Zope-2.9.10-final \
+ && if [ -d Zope-2.9.10-final ]; then cd Zope-2.9.10-final; else cd Zope-2.9.10; fi \
  && ./configure --prefix=${ZOPE_PREFIX} --with-python=${PY24_PREFIX}/bin/python2.4 \
  && make -j"$(nproc)" \
  && make install
