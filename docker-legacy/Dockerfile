@@ -1,8 +1,8 @@
 FROM debian:bullseye-slim
 
 ARG PY24_SOURCE_URL=https://www.python.org/ftp/python/2.4.6/Python-2.4.6.tgz
-ARG ZOPE_SOURCE_URL=https://codeload.github.com/zopefoundation/Zope/tar.gz/refs/tags/2.9.10
-ARG ZOPE_SOURCE_FALLBACK_URL=https://old.zope.dev/Products/Zope/2.9.10/Zope-2.9.10-final.tgz
+ARG ZOPE_SOURCE_URL=https://old.zope.dev/Products/Zope/2.9.10/Zope-2.9.10-final.tgz
+ARG ZOPE_SOURCE_FALLBACK_URL=https://codeload.github.com/zopefoundation/Zope/tar.gz/refs/tags/2.9.10
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
@@ -62,6 +62,7 @@ RUN cd /tmp/build \
     fi \
  && tar -xzf Zope-2.9.10-final.tgz \
  && if [ -d Zope-2.9.10-final ]; then cd Zope-2.9.10-final; else cd Zope-2.9.10; fi \
+ && test -f lib/python/BTrees/_OOBTree.c \
  && ./configure --prefix=${ZOPE_PREFIX} --with-python=${PY24_PREFIX}/bin/python2.4 \
  && make -j"$(nproc)" \
  && make install
