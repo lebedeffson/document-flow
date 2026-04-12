@@ -2976,6 +2976,31 @@ def mark_identity_source_sync_result(conn, source_id, status, message, synced_co
     )
 
 
+def persist_identity_source_metadata(conn, source_id, metadata):
+    return update_identity_source_runtime_fields(
+        conn,
+        source_id,
+        {
+            "metadata_json": json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True),
+            "updated_at": utcnow_iso(),
+        },
+    )
+
+
+def mark_identity_source_plan_result(conn, source_id, status, message, plan_payload=None):
+    source = fetch_table_row_by_id(conn, "identity_sources", source_id)
+    if source is None:
+        return None
+
+    metadata = identity_source_metadata(source)
+    plan = dict(plan_payload) if isinstance(plan_payload, dict) else {}
+    plan["status"] = normalize_text(status) or normalize_text(plan.get("status")) or "ok"
+    plan["message"] = normalize_text(message) or normalize_text(plan.get("message"))
+    plan["generated_at"] = normalize_text(plan.get("generated_at")) or utcnow_iso()
+    metadata["naudoc_staff_sync_plan"] = plan
+    return persist_identity_source_metadata(conn, source_id, metadata)
+
+
 def first_directory_value(payload, attribute_name):
     if not attribute_name:
         return ""
@@ -3772,13 +3797,21 @@ def update_field_mapping(conn, mapping_id, payload):
 
 
 def update_identity_source(conn, source_id, payload):
+    existing = fetch_table_row_by_id(conn, "identity_sources", source_id)
+    if existing is None:
+        return None
+
+    merged_payload = dict(payload)
+    if "metadata" not in merged_payload:
+        merged_payload["metadata"] = identity_source_metadata(existing)
+
     return update_configured_row(
         conn,
         "identity_sources",
         source_id,
         IDENTITY_SOURCE_DB_FIELDS,
         build_identity_source_payload,
-        payload,
+        merged_payload,
         unique_default_field="is_default",
     )
 
@@ -4218,6 +4251,413 @@ def resolve_hospital_role_subgroup(
             return hospital_role_subgroup_row_to_dict(row, hospital_role_label_lookup)
 
     return None
+
+
+def list_naudoc_role_mapping_candidates(role_mapping_rows, hospital_role_key):
+    hospital_role_key_normalized = normalize_lower(hospital_role_key)
+    candidates = []
+    seen = set()
+
+    for row in role_mapping_rows:
+        if normalize_lower(row["source_system"]) != "naudoc":
+            continue
+        if normalize_lower(row["hospital_role_key"]) != hospital_role_key_normalized:
+            continue
+
+        item = hospital_role_mapping_row_to_dict(row)
+        dedupe_key = (
+            normalize_lower(item.get("source_role_key")),
+            normalize_lower(item.get("source_role_label")),
+        )
+        if dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
+        candidates.append(item)
+
+    return candidates
+
+
+def list_naudoc_subgroup_candidates(subgroup_rows, hospital_role_key, hospital_role_label_lookup):
+    hospital_role_key_normalized = normalize_lower(hospital_role_key)
+    candidates = []
+    seen = set()
+
+    for row in subgroup_rows:
+        if normalize_lower(row["source_system"]) != "naudoc":
+            continue
+        if normalize_lower(row["parent_hospital_role_key"]) != hospital_role_key_normalized:
+            continue
+
+        item = hospital_role_subgroup_row_to_dict(row, hospital_role_label_lookup)
+        dedupe_key = (
+            normalize_lower(item.get("subgroup_key")),
+            normalize_lower(item.get("subgroup_label")),
+            normalize_lower(item.get("source_role_key")),
+            normalize_lower(item.get("source_role_label")),
+        )
+        if dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
+        candidates.append(item)
+
+    return candidates
+
+
+def match_naudoc_subgroup_candidate(candidates, subgroup):
+    subgroup_key_normalized = normalize_lower(subgroup.get("subgroup_key"))
+    subgroup_label_normalized = normalize_lower(subgroup.get("subgroup_label"))
+
+    for candidate in candidates:
+        if subgroup_key_normalized and normalize_lower(candidate.get("subgroup_key")) == subgroup_key_normalized:
+            return candidate
+        if subgroup_label_normalized and normalize_lower(candidate.get("subgroup_label")) == subgroup_label_normalized:
+            return candidate
+
+    return None
+
+
+def build_naudoc_staff_plan_issue(code, message):
+    return {
+        "code": normalize_text(code),
+        "message": normalize_text(message),
+    }
+
+
+def build_naudoc_staff_plan_change(field, scope, current_value, desired_value, note=""):
+    return {
+        "field": normalize_text(field),
+        "scope": normalize_text(scope),
+        "current": normalize_text(current_value),
+        "desired": normalize_text(desired_value),
+        "note": normalize_text(note),
+    }
+
+
+def determine_naudoc_staff_target(profile, role_mapping_rows, subgroup_rows, hospital_role_label_lookup):
+    issues = []
+    notes = []
+    desired_role = profile.get("linked_hospital_role") or profile.get("source_hospital_role") or {}
+    desired_role_key = normalize_text(desired_role.get("hospital_role_key"))
+    desired_role_label = normalize_text(desired_role.get("hospital_role_label"))
+    current_role = profile.get("source_hospital_role") or {}
+    current_subgroup = profile.get("source_hospital_subgroup") or {}
+
+    if not desired_role_key:
+        issues.append(
+            build_naudoc_staff_plan_issue(
+                "missing_platform_role_mapping",
+                "У профиля нет hospital-роля платформы, поэтому целевую позицию NauDoc вывести нельзя.",
+            )
+        )
+        return None, issues, notes
+
+    role_candidates = list_naudoc_role_mapping_candidates(role_mapping_rows, desired_role_key)
+    subgroup_candidates = list_naudoc_subgroup_candidates(subgroup_rows, desired_role_key, hospital_role_label_lookup)
+
+    if current_subgroup and normalize_lower(current_subgroup.get("parent_hospital_role_key")) == normalize_lower(desired_role_key):
+        matched_candidate = match_naudoc_subgroup_candidate(subgroup_candidates, current_subgroup)
+        if matched_candidate is not None:
+            return {
+                "mode": "subgroup",
+                "hospital_role_key": desired_role_key,
+                "hospital_role_label": desired_role_label,
+                "source_role_key": normalize_text(matched_candidate.get("source_role_key")),
+                "source_role_label": normalize_text(matched_candidate.get("source_role_label")),
+                "subgroup_key": normalize_text(matched_candidate.get("subgroup_key")),
+                "subgroup_label": normalize_text(matched_candidate.get("subgroup_label")),
+            }, issues, notes
+
+        return {
+            "mode": "current_subgroup",
+            "hospital_role_key": desired_role_key,
+            "hospital_role_label": desired_role_label,
+            "source_role_key": normalize_text(profile.get("source_role_key")),
+            "source_role_label": normalize_text(profile.get("source_role_label")),
+            "subgroup_key": normalize_text(current_subgroup.get("subgroup_key")),
+            "subgroup_label": normalize_text(current_subgroup.get("subgroup_label")),
+        }, issues, notes
+
+    if current_role and normalize_lower(current_role.get("hospital_role_key")) == normalize_lower(desired_role_key):
+        if normalize_text(profile.get("source_role_label")):
+            return {
+                "mode": "current_role",
+                "hospital_role_key": desired_role_key,
+                "hospital_role_label": desired_role_label,
+                "source_role_key": normalize_text(profile.get("source_role_key")),
+                "source_role_label": normalize_text(profile.get("source_role_label")),
+                "subgroup_key": normalize_text(current_subgroup.get("subgroup_key")),
+                "subgroup_label": normalize_text(current_subgroup.get("subgroup_label")),
+            }, issues, notes
+
+    if current_subgroup:
+        matched_candidate = match_naudoc_subgroup_candidate(subgroup_candidates, current_subgroup)
+        if matched_candidate is not None:
+            notes.append("Подгруппа NauDoc переиспользована по совпадающему subgroup_key/subgroup_label.")
+            return {
+                "mode": "subgroup_remap",
+                "hospital_role_key": desired_role_key,
+                "hospital_role_label": desired_role_label,
+                "source_role_key": normalize_text(matched_candidate.get("source_role_key")),
+                "source_role_label": normalize_text(matched_candidate.get("source_role_label")),
+                "subgroup_key": normalize_text(matched_candidate.get("subgroup_key")),
+                "subgroup_label": normalize_text(matched_candidate.get("subgroup_label")),
+            }, issues, notes
+
+    if len(subgroup_candidates) == 1:
+        candidate = subgroup_candidates[0]
+        notes.append("Целевая подгруппа NauDoc выведена автоматически: для hospital-роли доступен единственный активный вариант.")
+        return {
+            "mode": "single_subgroup_candidate",
+            "hospital_role_key": desired_role_key,
+            "hospital_role_label": desired_role_label,
+            "source_role_key": normalize_text(candidate.get("source_role_key")),
+            "source_role_label": normalize_text(candidate.get("source_role_label")),
+            "subgroup_key": normalize_text(candidate.get("subgroup_key")),
+            "subgroup_label": normalize_text(candidate.get("subgroup_label")),
+        }, issues, notes
+
+    if len(subgroup_candidates) > 1:
+        issues.append(
+            build_naudoc_staff_plan_issue(
+                "multiple_naudoc_subgroup_candidates",
+                "Для hospital-роли найдено несколько подгрупп NauDoc. Нужен явный выбор администратора.",
+            )
+        )
+        return None, issues, notes
+
+    if len(role_candidates) == 1:
+        candidate = role_candidates[0]
+        notes.append("Для NauDoc найдено только role-level соответствие без подгруппы; этого достаточно для предварительного dry-run.")
+        return {
+            "mode": "single_role_candidate",
+            "hospital_role_key": desired_role_key,
+            "hospital_role_label": desired_role_label,
+            "source_role_key": normalize_text(candidate.get("source_role_key")),
+            "source_role_label": normalize_text(candidate.get("source_role_label")),
+            "subgroup_key": "",
+            "subgroup_label": "",
+        }, issues, notes
+
+    if len(role_candidates) > 1:
+        issues.append(
+            build_naudoc_staff_plan_issue(
+                "multiple_naudoc_role_candidates",
+                "Для hospital-роли найдено несколько role-level соответствий NauDoc. Нужен явный выбор роли/подгруппы.",
+            )
+        )
+        return None, issues, notes
+
+    issues.append(
+        build_naudoc_staff_plan_issue(
+            "missing_naudoc_role_mapping",
+            "Для hospital-роли нет активного соответствия в маппингах NauDoc.",
+        )
+    )
+    return None, issues, notes
+
+
+def build_naudoc_staff_sync_plan_item(profile, role_mapping_rows, subgroup_rows, hospital_role_label_lookup):
+    current_company = normalize_text(profile.get("source_department"))
+    current_position = normalize_text(profile.get("source_role_label"))
+    current_role = profile.get("source_hospital_role") or {}
+    current_subgroup = profile.get("source_hospital_subgroup") or {}
+    desired_role = profile.get("linked_hospital_role") or profile.get("source_hospital_role") or {}
+    desired_company = normalize_text(profile.get("linked_department")) or current_company
+
+    item = {
+        "source_username": normalize_text(profile.get("source_username")),
+        "source_display_name": normalize_text(profile.get("source_display_name")),
+        "linked_username": normalize_text(profile.get("linked_username")),
+        "linked_display_name": normalize_text(profile.get("linked_display_name")),
+        "linked_system": normalize_text(profile.get("linked_system")),
+        "sync_status": normalize_text(profile.get("sync_status")),
+        "current": {
+            "company": current_company,
+            "position": current_position,
+            "hospital_role_label": normalize_text(current_role.get("hospital_role_label")),
+            "subgroup_label": normalize_text(current_subgroup.get("subgroup_label")),
+        },
+        "desired": {
+            "company": desired_company,
+            "position": current_position,
+            "hospital_role_label": normalize_text(desired_role.get("hospital_role_label")) or normalize_text(current_role.get("hospital_role_label")),
+            "subgroup_label": normalize_text(current_subgroup.get("subgroup_label")),
+        },
+        "changes": [],
+        "issues": [],
+        "notes": [],
+        "status": "already_synced",
+    }
+
+    if item["sync_status"] not in {"matched", "manual_match"} or not normalize_text(profile.get("linked_username")):
+        item["issues"].append(
+            build_naudoc_staff_plan_issue(
+                "profile_not_matched",
+                "Профиль NauDoc еще не сопоставлен с платформенным пользователем, поэтому write-back пока невозможен.",
+            )
+        )
+        item["status"] = "needs_match"
+        return item
+
+    if item["linked_system"] and normalize_lower(item["linked_system"]) != "rukovoditel":
+        item["issues"].append(
+            build_naudoc_staff_plan_issue(
+                "unsupported_linked_system",
+                "Dry-run сейчас поддерживает только связку NauDoc -> Rukovoditel.",
+            )
+        )
+        item["status"] = "blocked"
+        return item
+
+    target, target_issues, target_notes = determine_naudoc_staff_target(
+        profile,
+        role_mapping_rows,
+        subgroup_rows,
+        hospital_role_label_lookup,
+    )
+    item["issues"].extend(target_issues)
+    item["notes"].extend(normalize_text_list(target_notes))
+
+    if target is not None:
+        desired_position = normalize_text(target.get("source_role_label")) or current_position
+        desired_subgroup_label = normalize_text(target.get("subgroup_label")) or normalize_text(current_subgroup.get("subgroup_label"))
+        item["desired"]["position"] = desired_position
+        item["desired"]["subgroup_label"] = desired_subgroup_label
+
+        if desired_position and normalize_lower(desired_position) != normalize_lower(current_position):
+            item["changes"].append(
+                build_naudoc_staff_plan_change(
+                    "position",
+                    "staff_list",
+                    current_position,
+                    desired_position,
+                    "Целевая позиция выведена из hospital-роли/подгруппы и потребует отдельного write-back в staff-list NauDoc.",
+                )
+            )
+
+    if desired_company and normalize_lower(desired_company) != normalize_lower(current_company):
+        item["changes"].append(
+            build_naudoc_staff_plan_change(
+                "company",
+                "profile",
+                current_company,
+                desired_company,
+                "Подразделение платформы сейчас проецируется в поле Company профиля NauDoc. Это не меняет staff-list division.",
+            )
+        )
+
+    if item["status"] == "needs_match":
+        return item
+
+    if item["issues"]:
+        item["status"] = "blocked"
+    elif item["changes"]:
+        item["status"] = "ready"
+    else:
+        item["status"] = "already_synced"
+
+    return item
+
+
+def build_naudoc_staff_sync_plan(conn, source):
+    if normalize_lower(source["source_system"]) != "naudoc":
+        return None, {"error": "NauDoc dry-run is supported only for identity sources with source_system=naudoc"}
+
+    user_profile_rows = conn.execute(
+        """
+        SELECT *
+        FROM user_directory_profiles
+        ORDER BY source_system ASC, source_username ASC
+        """
+    ).fetchall()
+    role_mapping_rows = fetch_active_hospital_role_mappings(conn)
+    subgroup_rows = fetch_active_hospital_role_subgroups(conn)
+    hospital_role_catalog = build_hospital_role_catalog(role_mapping_rows)
+    hospital_role_label_lookup = build_hospital_role_label_lookup(hospital_role_catalog)
+    user_profiles = build_enriched_user_profiles(
+        user_profile_rows,
+        role_mapping_rows,
+        subgroup_rows,
+        hospital_role_label_lookup,
+    )
+
+    naudoc_profiles = [
+        profile
+        for profile in user_profiles
+        if normalize_lower(profile.get("source_system")) == "naudoc"
+    ]
+    platform_profiles = [
+        profile
+        for profile in user_profiles
+        if normalize_lower(profile.get("source_system")) == "rukovoditel"
+    ]
+
+    items = [
+        build_naudoc_staff_sync_plan_item(profile, role_mapping_rows, subgroup_rows, hospital_role_label_lookup)
+        for profile in naudoc_profiles
+    ]
+
+    status_counts = {
+        "ready": 0,
+        "already_synced": 0,
+        "blocked": 0,
+        "needs_match": 0,
+    }
+    change_counts = {
+        "profile": 0,
+        "staff_list": 0,
+    }
+    for item in items:
+        status_counts[item["status"]] = status_counts.get(item["status"], 0) + 1
+        for change in item["changes"]:
+            scope = normalize_text(change.get("scope"))
+            change_counts[scope] = change_counts.get(scope, 0) + 1
+
+    linked_platform_usernames = {
+        normalize_text(profile.get("linked_username"))
+        for profile in naudoc_profiles
+        if normalize_text(profile.get("linked_username"))
+    }
+    platform_without_naudoc = sorted(
+        {
+            normalize_text(profile.get("source_username"))
+            for profile in platform_profiles
+            if normalize_text(profile.get("source_username"))
+            and normalize_text(profile.get("source_username")) not in linked_platform_usernames
+        }
+    )
+
+    summary = {
+        "profiles_total": len(items),
+        "ready_count": status_counts.get("ready", 0),
+        "already_synced_count": status_counts.get("already_synced", 0),
+        "blocked_count": status_counts.get("blocked", 0),
+        "needs_match_count": status_counts.get("needs_match", 0),
+        "profile_change_count": change_counts.get("profile", 0),
+        "staff_list_change_count": change_counts.get("staff_list", 0),
+        "platform_profiles_total": len(platform_profiles),
+        "platform_without_naudoc_count": len(platform_without_naudoc),
+        "platform_without_naudoc": platform_without_naudoc,
+    }
+
+    message = (
+        f"NauDoc dry-run: профилей {summary['profiles_total']}, "
+        f"ready {summary['ready_count']}, "
+        f"already synced {summary['already_synced_count']}, "
+        f"blocked {summary['blocked_count']}, "
+        f"needs match {summary['needs_match_count']}."
+    )
+
+    return {
+        "status": "ok",
+        "generated_at": utcnow_iso(),
+        "source_id": normalize_int(source["id"]),
+        "source_key": normalize_text(source["source_key"]),
+        "source_label": normalize_text(source["source_label"]),
+        "summary": summary,
+        "message": message,
+        "items": items,
+    }, None
 
 
 def fetch_active_document_route_definitions(conn):
@@ -5173,6 +5613,29 @@ def sync_identity_source_route(source_id):
     if request.form:
         return redirect(url_for("index"))
     return jsonify({"status": "ok", **summary})
+
+
+@app.post("/identity-sources/<int:source_id>/naudoc-staff-dry-run")
+def dry_run_naudoc_staff_sync_route(source_id):
+    with closing(db_connection()) as conn:
+        source = fetch_table_row_by_id(conn, "identity_sources", source_id)
+        if source is None:
+            return jsonify({"error": "Identity source not found"}), 404
+
+        plan, error = build_naudoc_staff_sync_plan(conn, source)
+        if error is not None:
+            mark_identity_source_plan_result(conn, source_id, "error", error["error"], {"items": [], "summary": {}})
+            conn.commit()
+            if request.form:
+                return redirect(url_for("index"))
+            return jsonify(error), 400
+
+        mark_identity_source_plan_result(conn, source_id, "ok", plan["message"], plan)
+        conn.commit()
+
+    if request.form:
+        return redirect(url_for("index"))
+    return jsonify(plan)
 
 
 @app.post("/status-mappings/<int:mapping_id>/delete")

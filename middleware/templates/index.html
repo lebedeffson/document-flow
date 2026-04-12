@@ -870,7 +870,80 @@
                   <form action="{{ url_for('sync_identity_source_route', source_id=source.id) }}" method="post">
                     <button type="submit" class="secondary-button">Синхронизировать</button>
                   </form>
+                  {% if source.source_system == 'naudoc' %}
+                  <form action="{{ url_for('dry_run_naudoc_staff_sync_route', source_id=source.id) }}" method="post">
+                    <button type="submit" class="secondary-button">Dry-run NauDoc</button>
+                  </form>
+                  {% endif %}
                 </div>
+                {% if source.metadata.get('naudoc_staff_sync_plan') %}
+                {% set naudoc_plan = source.metadata.get('naudoc_staff_sync_plan') %}
+                <details style="margin-bottom: 10px;">
+                  <summary>Dry-run staff-list</summary>
+                  <div class="profile-meta" style="margin-top: 8px;">
+                    {% if naudoc_plan.get('generated_at') %}<small>Сформировано: {{ naudoc_plan.get('generated_at') }}</small>{% endif %}
+                    {% if naudoc_plan.get('message') %}<small>{{ naudoc_plan.get('message') }}</small>{% endif %}
+                    {% if naudoc_plan.get('summary') %}
+                    <small>
+                      Профилей: {{ naudoc_plan.get('summary', {}).get('profiles_total', 0) }},
+                      ready: {{ naudoc_plan.get('summary', {}).get('ready_count', 0) }},
+                      synced: {{ naudoc_plan.get('summary', {}).get('already_synced_count', 0) }},
+                      blocked: {{ naudoc_plan.get('summary', {}).get('blocked_count', 0) }},
+                      needs match: {{ naudoc_plan.get('summary', {}).get('needs_match_count', 0) }}
+                    </small>
+                    <small>
+                      Profile changes: {{ naudoc_plan.get('summary', {}).get('profile_change_count', 0) }},
+                      staff-list changes: {{ naudoc_plan.get('summary', {}).get('staff_list_change_count', 0) }}
+                    </small>
+                    {% if naudoc_plan.get('summary', {}).get('platform_without_naudoc_count', 0) %}
+                    <small>Пользователей платформы без профиля NauDoc: {{ naudoc_plan.get('summary', {}).get('platform_without_naudoc_count', 0) }}</small>
+                    {% endif %}
+                    {% endif %}
+                  </div>
+                  {% if naudoc_plan.get('items') %}
+                  <div style="margin-top: 10px;">
+                    {% for item in naudoc_plan.get('items', []) %}
+                    <div class="suggestion-box" style="margin-top: 8px;">
+                      <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline;">
+                        <strong>{{ item.source_username }}{% if item.source_display_name %} — {{ item.source_display_name }}{% endif %}</strong>
+                        <span class="status {% if item.status == 'blocked' %}pending{% elif item.status == 'needs_match' %}review{% endif %}">{{ item.status }}</span>
+                      </div>
+                      {% if item.linked_username %}
+                      <div style="margin-top: 4px; color: var(--muted);">Платформа: {{ item.linked_username }}{% if item.linked_display_name %} — {{ item.linked_display_name }}{% endif %}</div>
+                      {% endif %}
+                      <div class="profile-meta" style="margin-top: 6px;">
+                        <small>Company: {{ item.current.company or '—' }} -> {{ item.desired.company or '—' }}</small>
+                        <small>Position: {{ item.current.position or '—' }} -> {{ item.desired.position or '—' }}</small>
+                        <small>Role: {{ item.current.hospital_role_label or '—' }} -> {{ item.desired.hospital_role_label or '—' }}</small>
+                        <small>Subgroup: {{ item.current.subgroup_label or '—' }} -> {{ item.desired.subgroup_label or '—' }}</small>
+                      </div>
+                      {% if item.changes %}
+                      <div style="margin-top: 6px;">
+                        {% for change in item.changes %}
+                        <small>{{ change.scope }} / {{ change.field }}: {{ change.current or '—' }} -> {{ change.desired or '—' }}{% if change.note %} — {{ change.note }}{% endif %}</small>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                      {% if item.issues %}
+                      <div style="margin-top: 6px;">
+                        {% for issue in item.issues %}
+                        <small>{{ issue.code }}: {{ issue.message }}</small>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                      {% if item.notes %}
+                      <div style="margin-top: 6px;">
+                        {% for note in item.notes %}
+                        <small>{{ note }}</small>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </details>
+                {% endif %}
                 <details>
                   <summary>Изменить</summary>
                   <form class="inline-form" action="{{ url_for('update_identity_source_route', source_id=source.id) }}" method="post">
