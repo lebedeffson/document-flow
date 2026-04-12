@@ -79,7 +79,7 @@ cat > "${OUT_FILE}" <<EOF
    - ${DOCSPACE_PUBLIC_URL}?room_type=public_room
    - ${DOCSPACE_PUBLIC_URL}?room_type=form_filling_room
 4. Убедиться, что каждая точка входа открывается корректно и не выбрасывает из контура
-5. Под ${DOCFLOW_EMPLOYEE_USERNAME} открыть ${WORKSPACE_PUBLIC_URL}?workspace_module=calendar
+5. Под ${DOCFLOW_EMPLOYEE_USERNAME} открыть ${WORKSPACE_PUBLIC_URL}/addons/calendar/
 6. Проверить, что открывается Workspace и в тексте/маршруте виден сценарий Календарь и встречи
 
 ### 4. Проверка ролей

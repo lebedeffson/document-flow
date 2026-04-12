@@ -52,7 +52,7 @@ ${DOCFLOW_OFFICE_USERNAME} / ${DOCFLOW_ROLE_DEFAULT_PASSWORD}
 4. Login as ${DOCFLOW_MANAGER_USERNAME} or ${DOCFLOW_NURSE_USERNAME}
 5. Open an Excel table and save changes
 6. Open ${DOCSPACE_PUBLIC_URL}
-7. Open ${WORKSPACE_PUBLIC_URL}?workspace_module=calendar
+7. Open ${WORKSPACE_PUBLIC_URL}/addons/calendar/
 
 6. USEFUL FILES ON SERVER
 Access points: ${ROOT_DIR}/runtime/monitoring/access_points.txt
