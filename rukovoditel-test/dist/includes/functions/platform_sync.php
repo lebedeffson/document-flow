@@ -143,14 +143,20 @@ if (!function_exists('platform_sync_infer_request_doc_route_label'))
             return 'Архив / закрытие';
         }
 
-        if (platform_sync_contains_any($haystack, ['пациент', 'направлен', 'выписк']))
+        if (
+            $request_type_name === 'Нормативный документ' ||
+            platform_sync_contains_any($haystack, ['регламент', 'инструкц', 'положен', 'норматив'])
+        )
         {
-            return 'Пациент / направление / выписка';
+            return 'Регламенты и документы подразделения';
         }
 
-        if ($request_type_name === 'Медицинская документация' || platform_sync_contains_any($haystack, ['медицин']))
+        if (
+            $request_type_name === 'Административный документ' ||
+            platform_sync_contains_any($haystack, ['служебн', 'приказ', 'распоряжен', 'локальн', 'записк'])
+        )
         {
-            return 'Медицинская документация отделения';
+            return 'Служебная записка / приказ / локальный акт';
         }
 
         if (

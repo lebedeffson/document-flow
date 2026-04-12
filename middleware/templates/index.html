@@ -472,6 +472,10 @@
         <strong>{{ hospital_role_summary.hospital_role_count }}</strong>
         <span>Hospital-ролей в маппинге</span>
       </section>
+      <section class="stat">
+        <strong>{{ hospital_role_subgroup_summary.active_count }}</strong>
+        <span>Подгруппы ролей / должности</span>
+      </section>
     </div>
 
     <div class="filters">
@@ -643,7 +647,7 @@
 
     <section class="card" style="margin-top: 22px;">
       <h2>Каталог пользователей</h2>
-      <p>Это groundwork для единого каталога пользователей. Сейчас сюда собираются профили из `NauDoc` и их соответствие пользователям `Rukovoditel`. Администратор уже может вручную зафиксировать соответствие и статус сопоставления.</p>
+      <p>Это единый каталог пользователей `Bridge`. Сюда подтягиваются профили из `NauDoc`, `Rukovoditel` и при необходимости `LDAP`, а администратор через GUI может проверить источник, запустить синхронизацию и вручную зафиксировать соответствие.</p>
       {% if user_profiles %}
       <table>
         <thead>
@@ -702,7 +706,7 @@
               {% if profile.notes %}
               <div style="margin-top: 6px; color: var(--muted);">{{ profile.notes }}</div>
               {% endif %}
-              {% if profile.source_hospital_role or profile.linked_hospital_role %}
+              {% if profile.source_hospital_role or profile.linked_hospital_role or profile.source_hospital_subgroup or profile.linked_hospital_subgroup %}
               <div class="suggestion-box" style="margin-top: 10px;">
                 <strong>Hospital-роль</strong>
                 {% if profile.source_hospital_role %}
@@ -711,6 +715,20 @@
                 {% if profile.linked_hospital_role %}
                 <div>Платформа: {{ profile.linked_hospital_role.hospital_role_label }}</div>
                 <div style="margin-top: 4px; color: var(--muted);">Scope: {{ profile.linked_hospital_role.access_scope }}</div>
+                {% endif %}
+                {% if profile.source_hospital_subgroup %}
+                <div style="margin-top: 6px;">
+                  Подгруппа источника:
+                  {{ profile.source_hospital_subgroup.parent_hospital_role_label or profile.source_hospital_subgroup.parent_hospital_role_key }}
+                  -> {{ profile.source_hospital_subgroup.subgroup_label }}
+                </div>
+                {% endif %}
+                {% if profile.linked_hospital_subgroup %}
+                <div style="margin-top: 4px;">
+                  Подгруппа платформы:
+                  {{ profile.linked_hospital_subgroup.parent_hospital_role_label or profile.linked_hospital_subgroup.parent_hospital_role_key }}
+                  -> {{ profile.linked_hospital_subgroup.subgroup_label }}
+                </div>
                 {% endif %}
               </div>
               {% endif %}
@@ -780,14 +798,14 @@
         </tbody>
       </table>
       {% else %}
-      <div class="empty">Каталог пользователей пока пуст. После синхронизации профилей из `NauDoc` здесь появятся matched и unmatched профили.</div>
+        <div class="empty">Каталог пользователей пока пуст. После синхронизации профилей из `NauDoc`, `Rukovoditel` или `LDAP` здесь появятся matched и unmatched профили.</div>
       {% endif %}
     </section>
 
     <div class="mapping-grid">
       <section class="card" style="margin-top: 22px;">
         <h2>Источники идентификации</h2>
-        <p>Здесь администратор задает, из каких каталогов платформа берет пользователей. Это база для `LDAP-first`: сами секреты остаются в `.env`, а структура источников и атрибутов управляется через GUI.</p>
+        <p>Здесь администратор задает, из каких каталогов платформа берет пользователей. Через GUI можно проверить источник и запустить pull-sync для `Rukovoditel local`, `NauDoc external` и `LDAP`, а сами секреты по-прежнему остаются только в `.env`.</p>
         {% if identity_sources %}
         <table>
           <thead>
@@ -1186,6 +1204,165 @@
         {% else %}
         <div class="empty">Hospital-роли пока не настроены.</div>
         {% endif %}
+      </section>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Подгруппы ролей / должности</h2>
+        <p>Здесь администратор связывает должности и локальные роли источников с подгруппами внутри групп `Rukovoditel`. Так можно держать схему вида “группа платформы -> подгруппа/должность NauDoc” без ручной правки БД.</p>
+        {% if hospital_role_subgroups %}
+        <table>
+          <thead>
+            <tr>
+              <th>Источник</th>
+              <th>Группа платформы</th>
+              <th>Подгруппа</th>
+              <th>Порядок</th>
+              <th>Состояние</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subgroup in hospital_role_subgroups %}
+            <tr>
+              <td class="mapping-cell">
+                <strong>{{ subgroup.source_system }}</strong>
+                <small>{{ subgroup.source_role_key or '—' }}{% if subgroup.source_role_label %} / {{ subgroup.source_role_label }}{% endif %}</small>
+              </td>
+              <td class="mapping-cell">
+                <small>{{ subgroup.parent_hospital_role_key }}</small>
+                <small>{{ subgroup.parent_hospital_role_label or 'Роль будет подтянута по ключу' }}</small>
+              </td>
+              <td class="mapping-cell">
+                <small>{{ subgroup.subgroup_key }}</small>
+                <small>{{ subgroup.subgroup_label }}</small>
+                {% if subgroup.notes %}
+                <small>{{ subgroup.notes }}</small>
+                {% endif %}
+              </td>
+              <td>{{ subgroup.sort_order }}</td>
+              <td>
+                <span class="status {% if not subgroup.is_active %}inactive{% endif %}">
+                  {{ 'включено' if subgroup.is_active else 'выключено' }}
+                </span>
+              </td>
+              <td>
+                <details>
+                  <summary>Изменить</summary>
+                  <form class="inline-form" action="{{ url_for('update_hospital_role_subgroup_route', subgroup_id=subgroup.id) }}" method="post">
+                    <label>
+                      Source system
+                      <select name="source_system">
+                        <option value="naudoc" {% if subgroup.source_system == 'naudoc' %}selected{% endif %}>naudoc</option>
+                        <option value="rukovoditel" {% if subgroup.source_system == 'rukovoditel' %}selected{% endif %}>rukovoditel</option>
+                        <option value="ldap" {% if subgroup.source_system == 'ldap' %}selected{% endif %}>ldap</option>
+                      </select>
+                    </label>
+                    <label>
+                      Source role key
+                      <input name="source_role_key" value="{{ subgroup.source_role_key }}">
+                    </label>
+                    <label>
+                      Source role label
+                      <input name="source_role_label" value="{{ subgroup.source_role_label }}">
+                    </label>
+                    <label>
+                      Группа платформы
+                      <select name="parent_hospital_role_key">
+                        <option value="">выберите группу</option>
+                        {% for role in hospital_role_catalog %}
+                        <option value="{{ role.hospital_role_key }}" {% if subgroup.parent_hospital_role_key == role.hospital_role_key %}selected{% endif %}>{{ role.hospital_role_label }} ({{ role.hospital_role_key }})</option>
+                        {% endfor %}
+                      </select>
+                    </label>
+                    <label>
+                      Subgroup key
+                      <input name="subgroup_key" value="{{ subgroup.subgroup_key }}">
+                    </label>
+                    <label>
+                      Subgroup label
+                      <input name="subgroup_label" value="{{ subgroup.subgroup_label }}">
+                    </label>
+                    <label>
+                      Порядок
+                      <input name="sort_order" type="number" value="{{ subgroup.sort_order }}">
+                    </label>
+                    <label>
+                      Комментарий
+                      <textarea name="notes">{{ subgroup.notes }}</textarea>
+                    </label>
+                    <label>
+                      <input name="is_active" type="checkbox" value="1" {% if subgroup.is_active %}checked{% endif %}>
+                      Активно
+                    </label>
+                    <div class="inline-actions">
+                      <button type="submit">Сохранить</button>
+                    </div>
+                  </form>
+                  <form class="inline-form" action="{{ url_for('delete_hospital_role_subgroup_route', subgroup_id=subgroup.id) }}" method="post">
+                    <button type="submit" class="secondary-button">Удалить</button>
+                  </form>
+                </details>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Подгруппы ролей пока не настроены.</div>
+        {% endif %}
+      </section>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Добавить подгруппу роли</h2>
+        <p>Это нужно, когда роль `Rukovoditel` слишком крупная и внутри нее нужно сохранить должности или локальные позиции из `NauDoc`.</p>
+        <form action="{{ url_for('create_hospital_role_subgroup_route') }}" method="post">
+          <label>
+            Source system
+            <select name="source_system">
+              <option value="naudoc">naudoc</option>
+              <option value="rukovoditel">rukovoditel</option>
+              <option value="ldap">ldap</option>
+            </select>
+          </label>
+          <label>
+            Source role key
+            <input name="source_role_key" placeholder="department_head">
+          </label>
+          <label>
+            Source role label
+            <input name="source_role_label" placeholder="Заведующий отделением">
+          </label>
+          <label>
+            Группа платформы
+            <select name="parent_hospital_role_key">
+              <option value="">выберите группу</option>
+              {% for role in hospital_role_catalog %}
+              <option value="{{ role.hospital_role_key }}">{{ role.hospital_role_label }} ({{ role.hospital_role_key }})</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>
+            Subgroup key
+            <input name="subgroup_key" placeholder="department_head_position">
+          </label>
+          <label>
+            Subgroup label
+            <input name="subgroup_label" placeholder="Заведующий отделением">
+          </label>
+          <label>
+            Порядок
+            <input name="sort_order" type="number" value="100">
+          </label>
+          <label>
+            Комментарий
+            <textarea name="notes" placeholder="Как эта должность или подгруппа используется в связке NauDoc -> Rukovoditel"></textarea>
+          </label>
+          <label>
+            <input name="is_active" type="checkbox" value="1" checked>
+            Активно
+          </label>
+          <button type="submit">Добавить подгруппу</button>
+        </form>
       </section>
 
       <section class="card" style="margin-top: 22px;">

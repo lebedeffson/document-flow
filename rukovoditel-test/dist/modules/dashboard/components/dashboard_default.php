@@ -192,7 +192,11 @@ $tasks_url = platform_home_named_report_url(22, 'Мои задачи в рабо
 $discussions_url = platform_home_named_report_url(24, 'Рабочие обсуждения', '');
 $incoming_registration_url = platform_home_named_report_url(25, 'Входящие и регистрация', platform_home_entity_url(25));
 $internal_orders_url = platform_home_named_report_url(25, 'Внутренние приказы', platform_home_entity_url(25));
-$patient_clinical_url = platform_home_named_report_url(25, 'Пациентские и клинические документы', platform_home_entity_url(25));
+$patient_clinical_url = platform_home_named_report_url(
+    25,
+    'Нормативные и внутренние документы',
+    platform_home_named_report_url(25, 'Пациентские и клинические документы', platform_home_entity_url(25))
+);
 $onlyoffice_demo = platform_first_onlyoffice_demo(25);
 $linked_requests_url = ($is_admin || $is_manager)
     ? platform_home_named_report_url(23, 'Заявки без финального документа', platform_home_entity_url(23))
@@ -256,7 +260,7 @@ $admin_work_links = [
     ['title' => 'База документов', 'description' => 'Шаблоны, инструкции и материалы.', 'url' => platform_home_entity_url(26)],
     ['title' => 'МТЗ', 'description' => 'Материально-техническое обеспечение.', 'url' => platform_home_entity_url(27)],
     ['title' => 'Внутренние приказы', 'description' => 'Боевой маршрут первой волны для приказов и распоряжений.', 'url' => $internal_orders_url],
-    ['title' => 'Пациентские и клинические документы', 'description' => 'Ключевой hospital-маршрут для отделения и пациента.', 'url' => $patient_clinical_url],
+    ['title' => 'Нормативные и внутренние документы', 'description' => 'Ключевой маршрут регламентов, служебных записок и локальных актов.', 'url' => $patient_clinical_url],
 ];
 
 $admin_system_links = [
@@ -326,7 +330,7 @@ if ($is_manager)
 
 if ($is_manager || $is_employee || $group_id === 8 || $is_office || $is_requester)
 {
-    $user_work_links[] = ['title' => 'Пациентские и клинические документы', 'description' => 'Рабочая точка входа в ключевой hospital-маршрут первой волны.', 'url' => $patient_clinical_url];
+    $user_work_links[] = ['title' => 'Нормативные и внутренние документы', 'description' => 'Рабочая точка входа в нормативные и внутренние документы первой волны.', 'url' => $patient_clinical_url];
 }
 
 if ($is_manager)

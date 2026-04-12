@@ -114,7 +114,7 @@ ROLE_VISIBILITY_CASES = [
         "role_key": "requester",
         "name": "requester_dashboard",
         "url": f"{GATEWAY_BASE}/",
-        "contains": ["Встречи Workspace", "Создать встречу", "Пациентские и клинические документы"],
+        "contains": ["Встречи Workspace", "Создать встречу", "Нормативные и внутренние документы"],
         "not_contains": ["DocSpace", "Workspace Community"],
     },
     {

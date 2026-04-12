@@ -6,7 +6,7 @@ import ssl
 import urllib.parse
 from contextlib import closing
 from datetime import datetime, timezone
-from html import escape as html_escape
+from html import escape as html_escape, unescape as html_unescape
 
 import requests
 from flask import Flask, jsonify, redirect, render_template, request, url_for
@@ -26,6 +26,14 @@ except ImportError:
     Tls = None
     LDAP3_AVAILABLE = False
 
+try:
+    import pymysql
+
+    PYMYSQL_AVAILABLE = True
+except ImportError:
+    pymysql = None
+    PYMYSQL_AVAILABLE = False
+
 
 APP_TITLE = "NauDoc Bridge"
 DB_PATH = os.environ.get("BRIDGE_DB_PATH", "/data/bridge.db")
@@ -35,10 +43,24 @@ NAUDOC_USERNAME = os.environ.get("NAUDOC_USERNAME", "admin")
 NAUDOC_PASSWORD = os.environ.get("NAUDOC_PASSWORD", "admin")
 RUKOVODITEL_BASE_URL = os.environ.get("RUKOVODITEL_BASE_URL", "http://host.docker.internal:18081")
 RUKOVODITEL_PUBLIC_URL = os.environ.get("RUKOVODITEL_PUBLIC_URL", RUKOVODITEL_BASE_URL)
+RUKOVODITEL_DB_HOST = os.environ.get("RUKOVODITEL_DB_HOST", "rukovoditel_db")
+RUKOVODITEL_DB_PORT = int(os.environ.get("RUKOVODITEL_DB_PORT", "3306"))
+RUKOVODITEL_DB_NAME = os.environ.get("RUKOVODITEL_DB_NAME", "rukovoditel")
+RUKOVODITEL_DB_USER = os.environ.get("RUKOVODITEL_DB_USER", "rukovoditel")
+RUKOVODITEL_DB_PASSWORD = os.environ.get("RUKOVODITEL_DB_PASSWORD", "rukovoditel")
 SYNC_CONTROL_URL = os.environ.get("SYNC_CONTROL_URL", f"{RUKOVODITEL_BASE_URL.rstrip('/')}/run_sync_job.php")
 SYNC_CONTROL_TOKEN = os.environ.get("SYNC_CONTROL_TOKEN", "")
 REQUEST_TIMEOUT = float(os.environ.get("BRIDGE_REQUEST_TIMEOUT", "8"))
 LDAP_REQUEST_TIMEOUT = max(int(REQUEST_TIMEOUT), 1)
+
+RUKOVODITEL_ROLE_GROUP_MAP = {
+    0: {"role_key": "admin", "role_label": "Администратор платформы"},
+    4: {"role_key": "manager", "role_label": "Заведующий отделением / руководитель подразделения"},
+    5: {"role_key": "employee", "role_label": "Врач / сотрудник подразделения"},
+    6: {"role_key": "requester", "role_label": "Регистратура / заявитель"},
+    7: {"role_key": "office", "role_label": "Канцелярия / делопроизводство"},
+    8: {"role_key": "nurse_coordinator", "role_label": "Старшая медсестра / координатор отделения"},
+}
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
@@ -996,6 +1018,20 @@ HOSPITAL_ROLE_MAPPING_DB_FIELDS = (
     "updated_at",
 )
 
+HOSPITAL_ROLE_SUBGROUP_DB_FIELDS = (
+    "source_system",
+    "source_role_key",
+    "source_role_label",
+    "parent_hospital_role_key",
+    "subgroup_key",
+    "subgroup_label",
+    "notes",
+    "is_active",
+    "sort_order",
+    "created_at",
+    "updated_at",
+)
+
 DOCUMENT_ROUTE_DEFINITION_DB_FIELDS = (
     "route_key",
     "route_label",
@@ -1265,6 +1301,42 @@ def ensure_db():
         )
         conn.execute(
             """
+            CREATE TABLE IF NOT EXISTS hospital_role_subgroups (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_system TEXT NOT NULL DEFAULT 'naudoc',
+                source_role_key TEXT NOT NULL DEFAULT '',
+                source_role_label TEXT NOT NULL DEFAULT '',
+                parent_hospital_role_key TEXT NOT NULL,
+                subgroup_key TEXT NOT NULL,
+                subgroup_label TEXT NOT NULL,
+                notes TEXT NOT NULL DEFAULT '',
+                is_active INTEGER NOT NULL DEFAULT 1,
+                sort_order INTEGER NOT NULL DEFAULT 100,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_hospital_role_subgroups_unique
+            ON hospital_role_subgroups (
+                source_system,
+                source_role_key,
+                source_role_label,
+                parent_hospital_role_key,
+                subgroup_key
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_hospital_role_subgroups_active
+            ON hospital_role_subgroups (is_active, source_system, parent_hospital_role_key, sort_order, id)
+            """
+        )
+        conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS document_route_definitions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 route_key TEXT NOT NULL,
@@ -1374,6 +1446,18 @@ def hospital_role_mapping_row_to_dict(row):
     return item
 
 
+def hospital_role_subgroup_row_to_dict(row, hospital_role_label_lookup=None):
+    item = dict(row)
+    item["is_active"] = bool(item.get("is_active"))
+    item["parent_hospital_role_label"] = ""
+    if hospital_role_label_lookup:
+        item["parent_hospital_role_label"] = hospital_role_label_lookup.get(
+            normalize_lower(item.get("parent_hospital_role_key")),
+            "",
+        )
+    return item
+
+
 def document_route_definition_row_to_dict(row):
     item = dict(row)
     item["is_active"] = bool(item.get("is_active"))
@@ -1439,6 +1523,242 @@ def normalize_text_list(value):
         seen.add(key)
         result.append(normalized)
     return result
+
+
+def normalize_html_text(value):
+    value = normalize_text(value)
+    if not value:
+        return ""
+    value = re.sub(r"(?is)<script.*?</script>", " ", value)
+    value = re.sub(r"(?is)<style.*?</style>", " ", value)
+    value = re.sub(r"(?i)<br\s*/?>", ", ", value)
+    value = re.sub(r"(?s)<[^>]+>", " ", value)
+    value = html_unescape(value)
+    value = re.sub(r"\s+", " ", value)
+    return value.strip()
+
+
+def build_rukovoditel_display_name(first_name, last_name, username=""):
+    display_name = " ".join(part for part in (normalize_text(first_name), normalize_text(last_name)) if part)
+    return display_name or normalize_text(username)
+
+
+def build_rukovoditel_role_meta(group_id, group_name=""):
+    mapped = RUKOVODITEL_ROLE_GROUP_MAP.get(normalize_int(group_id))
+    if mapped:
+        return dict(mapped)
+
+    group_name = normalize_text(group_name)
+    if not group_name:
+        return {"role_key": "", "role_label": ""}
+    return {"role_key": group_name, "role_label": group_name}
+
+
+def build_rukovoditel_profile_url(user_id):
+    return f"{RUKOVODITEL_PUBLIC_URL.rstrip('/')}/index.php?module=items/info&path=1-{normalize_int(user_id)}"
+
+
+def build_rukovoditel_profile_folder_url():
+    return f"{RUKOVODITEL_PUBLIC_URL.rstrip('/')}/index.php?module=items/items&path=1"
+
+
+def connect_rukovoditel_db_source():
+    if not PYMYSQL_AVAILABLE:
+        return None, "PyMySQL is not installed"
+
+    try:
+        connection = pymysql.connect(
+            host=RUKOVODITEL_DB_HOST,
+            port=RUKOVODITEL_DB_PORT,
+            user=RUKOVODITEL_DB_USER,
+            password=RUKOVODITEL_DB_PASSWORD,
+            database=RUKOVODITEL_DB_NAME,
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.DictCursor,
+            autocommit=True,
+        )
+        return connection, None
+    except Exception as exc:
+        return None, str(exc)
+
+
+def test_rukovoditel_local_provider():
+    connection, error = connect_rukovoditel_db_source()
+    if error:
+        return {"ok": False, "status": "error", "message": error}
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) AS total FROM app_entity_1")
+            row = cursor.fetchone() or {}
+        total = normalize_int(row.get("total"))
+        return {
+            "ok": True,
+            "status": "ok",
+            "message": f"Rukovoditel DB connection successful, users: {total}",
+        }
+    except Exception as exc:
+        return {"ok": False, "status": "error", "message": str(exc)}
+    finally:
+        try:
+            connection.close()
+        except Exception:
+            pass
+
+
+def fetch_rukovoditel_local_profiles(source):
+    connection, error = connect_rukovoditel_db_source()
+    if error:
+        return None, error
+
+    sync_limit = 0
+    metadata = identity_source_metadata(source)
+    sync_limit = normalize_int(metadata.get("sync_limit"))
+
+    sql = """
+        SELECT
+            u.id,
+            u.field_5,
+            u.field_6,
+            u.field_7,
+            u.field_8,
+            u.field_9,
+            u.field_12,
+            ag.name AS group_name
+        FROM app_entity_1 u
+        LEFT JOIN app_access_groups ag ON ag.id = u.field_6
+        ORDER BY u.field_12 ASC, u.id ASC
+    """
+    if sync_limit > 0:
+        sql += " LIMIT %s"
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(sql, (sync_limit,)) if sync_limit > 0 else cursor.execute(sql)
+            rows = cursor.fetchall() or []
+    except Exception as exc:
+        return None, str(exc)
+    finally:
+        try:
+            connection.close()
+        except Exception:
+            pass
+
+    profiles = []
+    for row in rows:
+        username = normalize_text(row.get("field_12"))
+        if not username:
+            continue
+
+        group_name = normalize_text(row.get("group_name"))
+        role_meta = build_rukovoditel_role_meta(row.get("field_6"), group_name)
+        display_name = build_rukovoditel_display_name(row.get("field_7"), row.get("field_8"), username)
+        profiles.append(
+            {
+                "username": username,
+                "display_name": display_name,
+                "email": normalize_text(row.get("field_9")),
+                "department": "",
+                "role_key": role_meta["role_key"],
+                "role_label": role_meta["role_label"] or group_name,
+                "profile_url": build_rukovoditel_profile_url(row.get("id")),
+                "folder_url": build_rukovoditel_profile_folder_url(),
+                "entry_dn": "",
+                "metadata": {
+                    "source": "rukovoditel_local_sync",
+                    "user_id": normalize_int(row.get("id")),
+                    "group_id": normalize_int(row.get("field_6")),
+                    "group_name": group_name,
+                    "is_active": 1 if normalize_int(row.get("field_5")) == 1 else 0,
+                },
+            }
+        )
+    return profiles, None
+
+
+def build_naudoc_member_profile_urls(username):
+    username = normalize_text(username)
+    encoded_username = urllib.parse.quote(username)
+    return {
+        "profile_url": naudoc_public_url(f"storage/members/{encoded_username}/inFrame?link=view"),
+        "folder_url": naudoc_public_url(f"storage/members/{encoded_username}/folder_contents"),
+    }
+
+
+def parse_naudoc_manage_users_rows(html):
+    rows = []
+    for row_html in re.findall(r"<tr class=\"row_(?:odd|even)\".*?</tr>", html, flags=re.IGNORECASE | re.DOTALL):
+        username_match = re.search(r'href="personalize_form\?userid=([^"&]+)', row_html, flags=re.IGNORECASE)
+        if not username_match:
+            continue
+
+        username = normalize_text(html_unescape(username_match.group(1)))
+        if not username:
+            continue
+
+        cells = re.findall(r"<td\b[^>]*>(.*?)</td>", row_html, flags=re.IGNORECASE | re.DOTALL)
+        if len(cells) < 8:
+            continue
+
+        email_match = re.search(r"mailto:([^\"'>\s]+)", cells[3], flags=re.IGNORECASE)
+        email = normalize_text(html_unescape(email_match.group(1))) if email_match else normalize_html_text(cells[3])
+        company = normalize_html_text(cells[4])
+        positions = normalize_text_list(normalize_html_text(cells[5]))
+        urls = build_naudoc_member_profile_urls(username)
+
+        rows.append(
+            {
+                "username": username,
+                "display_name": normalize_html_text(cells[2]) or username,
+                "email": email,
+                "department": company,
+                "role_key": positions[0] if positions else "",
+                "role_label": positions[0] if positions else "",
+                "profile_url": urls["profile_url"],
+                "folder_url": urls["folder_url"],
+                "entry_dn": "",
+                "metadata": {
+                    "source": "naudoc_manage_users_form",
+                    "company": company,
+                    "positions": positions,
+                    "phone": normalize_html_text(cells[6]),
+                    "last_login": normalize_html_text(cells[7]),
+                },
+            }
+        )
+
+    return rows
+
+
+def test_naudoc_external_provider():
+    try:
+        html = naudoc_get_text(naudoc_internal_url("manage_users_form"))
+        profiles = parse_naudoc_manage_users_rows(html)
+    except requests.RequestException as exc:
+        return {"ok": False, "status": "error", "message": str(exc)}
+    except Exception as exc:
+        return {"ok": False, "status": "error", "message": str(exc)}
+
+    return {
+        "ok": True,
+        "status": "ok",
+        "message": f"NauDoc catalog is available, parsed users: {len(profiles)}",
+    }
+
+
+def fetch_naudoc_external_profiles(source):
+    metadata = identity_source_metadata(source)
+    sync_limit = normalize_int(metadata.get("sync_limit"))
+
+    try:
+        html = naudoc_get_text(naudoc_internal_url("manage_users_form"))
+        profiles = parse_naudoc_manage_users_rows(html)
+    except Exception as exc:
+        return None, str(exc)
+
+    if sync_limit > 0:
+        profiles = profiles[:sync_limit]
+    return profiles, None
 
 
 def ensure_column(conn, table_name, column_name, column_definition):
@@ -2569,6 +2889,18 @@ def fetch_hospital_role_mapping_summary(conn):
     ).fetchone()
 
 
+def fetch_hospital_role_subgroup_summary(conn):
+    return conn.execute(
+        """
+        SELECT
+            COUNT(*) AS total_count,
+            COALESCE(SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END), 0) AS active_count,
+            COALESCE(COUNT(DISTINCT CASE WHEN is_active = 1 THEN subgroup_key END), 0) AS subgroup_count
+        FROM hospital_role_subgroups
+        """
+    ).fetchone()
+
+
 def fetch_document_route_definition_summary(conn):
     return conn.execute(
         """
@@ -2695,11 +3027,19 @@ def connect_ldap_source(source):
 
 def test_identity_source_provider(source):
     provider_type = normalize_text(source["provider_type"])
+    source_system = normalize_lower(source["source_system"])
+
+    if provider_type == "local" and source_system == "rukovoditel":
+        return test_rukovoditel_local_provider()
+
+    if provider_type == "external" and source_system == "naudoc":
+        return test_naudoc_external_provider()
+
     if provider_type != "ldap":
         return {
             "ok": False,
             "status": "unsupported",
-            "message": f"Provider {provider_type or 'unknown'} is not supported for runtime checks",
+            "message": f"Provider {provider_type or 'unknown'} for {source_system or 'unknown'} is not supported for runtime checks",
         }
 
     connection, error = connect_ldap_source(source)
@@ -2734,9 +3074,10 @@ def unique_profile_match(rows):
     return rows[0] if len(rows) == 1 else None
 
 
-def lookup_profile_suggestion(conn, username, email, *, exclude_profile_id=None):
+def lookup_profile_suggestion(conn, username, email, display_name="", *, exclude_profile_id=None):
     username = normalize_text(username)
     email = normalize_lower(email)
+    display_name = normalize_text(display_name)
 
     if username:
         where = """
@@ -2781,6 +3122,28 @@ def lookup_profile_suggestion(conn, username, email, *, exclude_profile_id=None)
         matched_row = unique_profile_match(rows)
         if matched_row is not None:
             return matched_row, "email"
+
+    if display_name:
+        where = """
+            (source_display_name = ? OR linked_display_name = ?)
+        """
+        values = [display_name, display_name]
+        if exclude_profile_id is not None:
+            where += " AND id != ?"
+            values.append(exclude_profile_id)
+        rows = conn.execute(
+            f"""
+            SELECT *
+            FROM user_directory_profiles
+            WHERE {where}
+            ORDER BY id ASC
+            LIMIT 2
+            """,
+            tuple(values),
+        ).fetchall()
+        matched_row = unique_profile_match(rows)
+        if matched_row is not None:
+            return matched_row, "display_name"
 
     return None, ""
 
@@ -2827,8 +3190,16 @@ def build_directory_profile_url(source, username):
 
 def fetch_identity_source_profiles(source):
     provider_type = normalize_text(source["provider_type"])
+    source_system = normalize_lower(source["source_system"])
+
+    if provider_type == "local" and source_system == "rukovoditel":
+        return fetch_rukovoditel_local_profiles(source)
+
+    if provider_type == "external" and source_system == "naudoc":
+        return fetch_naudoc_external_profiles(source)
+
     if provider_type != "ldap":
-        return None, f"Provider {provider_type or 'unknown'} is not supported for sync"
+        return None, f"Provider {provider_type or 'unknown'} for {source_system or 'unknown'} is not supported for sync"
 
     connection, error = connect_ldap_source(source)
     if error:
@@ -2916,14 +3287,18 @@ def sync_identity_source_profiles(conn, source):
             conn,
             profile["username"],
             profile["email"],
+            profile["display_name"],
             exclude_profile_id=current_profile_id,
         )
         metadata = {
             "source": "identity_source_sync",
             "identity_source_key": normalize_text(source["source_key"]),
             "provider_type": normalize_text(source["provider_type"]),
-            "entry_dn": profile["entry_dn"],
+            "entry_dn": normalize_text(profile.get("entry_dn")),
         }
+        profile_metadata = profile.get("metadata")
+        if isinstance(profile_metadata, dict):
+            metadata.update(profile_metadata)
         link_payload = {
             "linked_system": "",
             "linked_user_id": "",
@@ -2935,7 +3310,7 @@ def sync_identity_source_profiles(conn, source):
             "linked_role_label": "",
         }
         sync_status = "unmatched"
-        notes = "Профиль импортирован из LDAP."
+        notes = f"Профиль импортирован из {normalize_text(source['source_label']) or normalize_text(source['source_system']) or 'каталога'}."
 
         if current_row is not None and (normalize_text(current_row["linked_username"]) or normalize_text(current_row["linked_user_id"])):
             link_payload = build_profile_link_payload_from_suggestion(current_row)
@@ -2944,9 +3319,41 @@ def sync_identity_source_profiles(conn, source):
             notes = normalize_text(current_row["notes"]) or "Профиль импортирован из LDAP."
             matched_count += 1
 
+        elif normalize_lower(source["source_system"]) == "rukovoditel" and normalize_text(source["provider_type"]) == "local":
+            local_user_id = normalize_int((profile_metadata or {}).get("user_id"))
+            link_payload = {
+                "linked_system": "rukovoditel",
+                "linked_user_id": str(local_user_id) if local_user_id else "",
+                "linked_username": profile["username"],
+                "linked_display_name": profile["display_name"],
+                "linked_email": profile["email"],
+                "linked_department": profile["department"],
+                "linked_role_key": profile["role_key"],
+                "linked_role_label": profile["role_label"],
+            }
+            sync_status = "matched"
+            matched_count += 1
+            metadata["match_method"] = "local_rukovoditel_profile"
+            notes = "Локальный профиль Rukovoditel синхронизирован из платформенной БД."
+
         elif suggestion_row is not None:
             suggestion = build_profile_link_payload_from_suggestion(suggestion_row)
-            if suggestion["linked_username"] or suggestion["linked_user_id"]:
+            if match_method == "display_name":
+                metadata.update(
+                    {
+                        "suggested_username": normalize_text(suggestion_row["source_username"]),
+                        "suggested_display_name": normalize_text(suggestion_row["source_display_name"]),
+                        "suggested_email": normalize_text(suggestion_row["source_email"]),
+                        "suggested_department": normalize_text(suggestion_row["source_department"]),
+                        "suggested_role_key": normalize_text(suggestion_row["source_role_key"]),
+                        "suggested_role_label": normalize_text(suggestion_row["source_role_label"]),
+                        "match_method": f"suggested_{match_method}",
+                    }
+                )
+                sync_status = "needs_review"
+                needs_review_count += 1
+                notes = "Найдена вероятная связка по отображаемому имени. Нужна проверка администратора."
+            elif suggestion["linked_username"] or suggestion["linked_user_id"]:
                 link_payload = suggestion
                 sync_status = "matched"
                 matched_count += 1
@@ -2978,6 +3385,7 @@ def sync_identity_source_profiles(conn, source):
                 "source_role_key": profile["role_key"],
                 "source_role_label": profile["role_label"],
                 "source_profile_url": profile["profile_url"],
+                "source_folder_url": normalize_text(profile.get("folder_url")),
                 "linked_system": link_payload["linked_system"],
                 "linked_user_id": link_payload["linked_user_id"],
                 "linked_username": link_payload["linked_username"],
@@ -3165,6 +3573,23 @@ def build_hospital_role_mapping_payload(payload):
     }
 
 
+def build_hospital_role_subgroup_payload(payload):
+    now = utcnow_iso()
+    return {
+        "source_system": normalize_text(payload.get("source_system")) or "naudoc",
+        "source_role_key": normalize_text(payload.get("source_role_key")),
+        "source_role_label": normalize_text(payload.get("source_role_label")),
+        "parent_hospital_role_key": normalize_text(payload.get("parent_hospital_role_key")),
+        "subgroup_key": normalize_text(payload.get("subgroup_key")),
+        "subgroup_label": normalize_text(payload.get("subgroup_label")),
+        "notes": normalize_text(payload.get("notes")),
+        "is_active": 1 if normalize_bool(payload.get("is_active"), True) else 0,
+        "sort_order": normalize_int(payload.get("sort_order")) or 100,
+        "created_at": now,
+        "updated_at": now,
+    }
+
+
 def build_document_route_definition_payload(payload):
     now = utcnow_iso()
     return {
@@ -3232,6 +3657,18 @@ def validate_hospital_role_mapping_payload(payload):
     return True, None
 
 
+def validate_hospital_role_subgroup_payload(payload):
+    missing = []
+    for key in ("source_system", "parent_hospital_role_key", "subgroup_key", "subgroup_label"):
+        if not normalize_text(payload.get(key)):
+            missing.append(key)
+    if missing:
+        return False, {"error": "Missing required fields", "fields": missing}
+    if not normalize_text(payload.get("source_role_key")) and not normalize_text(payload.get("source_role_label")):
+        return False, {"error": "source_role_key or source_role_label is required"}
+    return True, None
+
+
 def validate_document_route_definition_payload(payload):
     missing = []
     for key in ("route_key", "route_label"):
@@ -3292,6 +3729,16 @@ def create_hospital_role_mapping(conn, payload):
     )
 
 
+def create_hospital_role_subgroup(conn, payload):
+    return create_configured_row(
+        conn,
+        "hospital_role_subgroups",
+        HOSPITAL_ROLE_SUBGROUP_DB_FIELDS,
+        build_hospital_role_subgroup_payload,
+        payload,
+    )
+
+
 def create_document_route_definition(conn, payload):
     return create_configured_row(
         conn,
@@ -3347,6 +3794,17 @@ def update_hospital_role_mapping(conn, mapping_id, payload):
     )
 
 
+def update_hospital_role_subgroup(conn, subgroup_id, payload):
+    return update_configured_row(
+        conn,
+        "hospital_role_subgroups",
+        subgroup_id,
+        HOSPITAL_ROLE_SUBGROUP_DB_FIELDS,
+        build_hospital_role_subgroup_payload,
+        payload,
+    )
+
+
 def update_document_route_definition(conn, route_definition_id, payload):
     return update_configured_row(
         conn,
@@ -3358,7 +3816,7 @@ def update_document_route_definition(conn, route_definition_id, payload):
     )
 
 
-def enrich_user_profile_item(item, active_hospital_role_rows):
+def enrich_user_profile_item(item, active_hospital_role_rows, active_hospital_role_subgroup_rows, hospital_role_label_lookup):
     item["source_hospital_role"] = resolve_hospital_role_mapping(
         active_hospital_role_rows,
         item.get("source_system"),
@@ -3371,12 +3829,33 @@ def enrich_user_profile_item(item, active_hospital_role_rows):
         item.get("linked_role_key"),
         item.get("linked_role_label"),
     )
+    item["source_hospital_subgroup"] = resolve_hospital_role_subgroup(
+        active_hospital_role_subgroup_rows,
+        item.get("source_system"),
+        item.get("source_role_key"),
+        item.get("source_role_label"),
+        (item.get("source_hospital_role") or {}).get("hospital_role_key"),
+        hospital_role_label_lookup,
+    )
+    item["linked_hospital_subgroup"] = resolve_hospital_role_subgroup(
+        active_hospital_role_subgroup_rows,
+        item.get("linked_system"),
+        item.get("linked_role_key"),
+        item.get("linked_role_label"),
+        (item.get("linked_hospital_role") or {}).get("hospital_role_key"),
+        hospital_role_label_lookup,
+    )
     return item
 
 
-def build_enriched_user_profiles(rows, active_hospital_role_rows):
+def build_enriched_user_profiles(rows, active_hospital_role_rows, active_hospital_role_subgroup_rows, hospital_role_label_lookup):
     return [
-        enrich_user_profile_item(user_profile_row_to_dict(row), active_hospital_role_rows)
+        enrich_user_profile_item(
+            user_profile_row_to_dict(row),
+            active_hospital_role_rows,
+            active_hospital_role_subgroup_rows,
+            hospital_role_label_lookup,
+        )
         for row in rows
     ]
 
@@ -3525,6 +4004,17 @@ HOSPITAL_ROLE_MAPPING_ROUTE_SPEC = {
     "duplicate_error": "Hospital role mapping already exists",
 }
 
+HOSPITAL_ROLE_SUBGROUP_ROUTE_SPEC = {
+    "checkbox_fields": ("is_active",),
+    "validator": validate_hospital_role_subgroup_payload,
+    "create_func": create_hospital_role_subgroup,
+    "update_func": update_hospital_role_subgroup,
+    "serializer": hospital_role_subgroup_row_to_dict,
+    "response_key": "subgroup",
+    "not_found_error": "Hospital role subgroup not found",
+    "duplicate_error": "Hospital role subgroup already exists",
+}
+
 DOCUMENT_ROUTE_DEFINITION_ROUTE_SPEC = {
     "checkbox_fields": ("is_active", "requires_registration", "requires_approval"),
     "validator": validate_document_route_definition_payload,
@@ -3641,6 +4131,36 @@ def fetch_active_hospital_role_mappings(conn):
     ).fetchall()
 
 
+def build_hospital_role_catalog(role_mapping_rows):
+    catalog = []
+    seen = set()
+    for row in role_mapping_rows:
+        role_key = normalize_text(row["hospital_role_key"])
+        if not role_key:
+            continue
+
+        role_key_normalized = normalize_lower(role_key)
+        if role_key_normalized in seen:
+            continue
+
+        seen.add(role_key_normalized)
+        catalog.append(
+            {
+                "hospital_role_key": role_key,
+                "hospital_role_label": normalize_text(row["hospital_role_label"]) or role_key,
+            }
+        )
+    return catalog
+
+
+def build_hospital_role_label_lookup(role_catalog):
+    return {
+        normalize_lower(item.get("hospital_role_key")): normalize_text(item.get("hospital_role_label"))
+        for item in role_catalog
+        if normalize_text(item.get("hospital_role_key"))
+    }
+
+
 def resolve_hospital_role_mapping(role_mapping_rows, source_system, role_key, role_label):
     source_system_normalized = normalize_lower(source_system)
     role_key_normalized = normalize_lower(role_key)
@@ -3655,6 +4175,48 @@ def resolve_hospital_role_mapping(role_mapping_rows, source_system, role_key, ro
         label_matches = bool(mapping_label and mapping_label == role_label_normalized)
         if key_matches or label_matches:
             return hospital_role_mapping_row_to_dict(row)
+    return None
+
+
+def fetch_active_hospital_role_subgroups(conn):
+    return conn.execute(
+        """
+        SELECT *
+        FROM hospital_role_subgroups
+        WHERE is_active = 1
+        ORDER BY source_system ASC, parent_hospital_role_key ASC, sort_order ASC, id ASC
+        """
+    ).fetchall()
+
+
+def resolve_hospital_role_subgroup(
+    subgroup_rows,
+    source_system,
+    role_key,
+    role_label,
+    parent_hospital_role_key="",
+    hospital_role_label_lookup=None,
+):
+    source_system_normalized = normalize_lower(source_system)
+    role_key_normalized = normalize_lower(role_key)
+    role_label_normalized = normalize_lower(role_label)
+    parent_role_normalized = normalize_lower(parent_hospital_role_key)
+
+    for row in subgroup_rows:
+        if normalize_lower(row["source_system"]) != source_system_normalized:
+            continue
+
+        row_parent_role_key = normalize_lower(row["parent_hospital_role_key"])
+        if parent_role_normalized and row_parent_role_key and row_parent_role_key != parent_role_normalized:
+            continue
+
+        mapping_key = normalize_lower(row["source_role_key"])
+        mapping_label = normalize_lower(row["source_role_label"])
+        key_matches = bool(mapping_key and mapping_key == role_key_normalized)
+        label_matches = bool(mapping_label and mapping_label == role_label_normalized)
+        if key_matches or label_matches:
+            return hospital_role_subgroup_row_to_dict(row, hospital_role_label_lookup)
+
     return None
 
 
@@ -3985,6 +4547,14 @@ def index():
             """
         ).fetchall()
         hospital_role_summary = fetch_hospital_role_mapping_summary(conn)
+        hospital_role_subgroup_rows = conn.execute(
+            """
+            SELECT *
+            FROM hospital_role_subgroups
+            ORDER BY source_system ASC, parent_hospital_role_key ASC, sort_order ASC, id ASC
+            """
+        ).fetchall()
+        hospital_role_subgroup_summary = fetch_hospital_role_subgroup_summary(conn)
         document_route_definition_rows = conn.execute(
             """
             SELECT *
@@ -3994,8 +4564,16 @@ def index():
         ).fetchall()
         document_route_summary = fetch_document_route_definition_summary(conn)
         active_hospital_role_rows = [row for row in hospital_role_mapping_rows if row["is_active"]]
+        active_hospital_role_subgroup_rows = [row for row in hospital_role_subgroup_rows if row["is_active"]]
 
-    user_profiles = build_enriched_user_profiles(user_profile_rows, active_hospital_role_rows)
+    hospital_role_catalog = build_hospital_role_catalog(active_hospital_role_rows)
+    hospital_role_label_lookup = build_hospital_role_label_lookup(hospital_role_catalog)
+    user_profiles = build_enriched_user_profiles(
+        user_profile_rows,
+        active_hospital_role_rows,
+        active_hospital_role_subgroup_rows,
+        hospital_role_label_lookup,
+    )
     return render_template(
         "index.html",
         app_title=APP_TITLE,
@@ -4016,6 +4594,12 @@ def index():
         identity_source_summary=dict(identity_source_summary),
         hospital_role_mappings=[hospital_role_mapping_row_to_dict(row) for row in hospital_role_mapping_rows],
         hospital_role_summary=dict(hospital_role_summary),
+        hospital_role_subgroups=[
+            hospital_role_subgroup_row_to_dict(row, hospital_role_label_lookup)
+            for row in hospital_role_subgroup_rows
+        ],
+        hospital_role_subgroup_summary=dict(hospital_role_subgroup_summary),
+        hospital_role_catalog=hospital_role_catalog,
         document_route_definitions=[document_route_definition_row_to_dict(row) for row in document_route_definition_rows],
         document_route_summary=dict(document_route_summary),
     )
@@ -4436,6 +5020,38 @@ def list_hospital_role_mappings():
     return jsonify([hospital_role_mapping_row_to_dict(row) for row in rows])
 
 
+@app.get("/hospital-role-subgroups")
+def list_hospital_role_subgroups():
+    sql = "SELECT * FROM hospital_role_subgroups"
+    values = []
+    where = []
+
+    source_system = normalize_text(request.args.get("source_system"))
+    parent_hospital_role_key = normalize_text(request.args.get("parent_hospital_role_key"))
+    active_only = normalize_bool(request.args.get("active"), False)
+
+    if source_system:
+        where.append("source_system = ?")
+        values.append(source_system)
+    if parent_hospital_role_key:
+        where.append("parent_hospital_role_key = ?")
+        values.append(parent_hospital_role_key)
+    if active_only:
+        where.append("is_active = 1")
+
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+
+    sql += " ORDER BY source_system ASC, parent_hospital_role_key ASC, sort_order ASC, id ASC"
+
+    with closing(db_connection()) as conn:
+        rows = conn.execute(sql, values).fetchall()
+        hospital_role_catalog = build_hospital_role_catalog(fetch_active_hospital_role_mappings(conn))
+
+    hospital_role_label_lookup = build_hospital_role_label_lookup(hospital_role_catalog)
+    return jsonify([hospital_role_subgroup_row_to_dict(row, hospital_role_label_lookup) for row in rows])
+
+
 @app.get("/document-route-definitions")
 def list_document_route_definitions():
     sql = "SELECT * FROM document_route_definitions"
@@ -4481,6 +5097,11 @@ def create_hospital_role_mapping_route():
     return handle_create_model_route(HOSPITAL_ROLE_MAPPING_ROUTE_SPEC)
 
 
+@app.post("/hospital-role-subgroups")
+def create_hospital_role_subgroup_route():
+    return handle_create_model_route(HOSPITAL_ROLE_SUBGROUP_ROUTE_SPEC)
+
+
 @app.post("/document-route-definitions")
 def create_document_route_definition_route():
     return handle_create_model_route(DOCUMENT_ROUTE_DEFINITION_ROUTE_SPEC)
@@ -4504,6 +5125,11 @@ def update_identity_source_route(source_id):
 @app.post("/hospital-role-mappings/<int:mapping_id>/update")
 def update_hospital_role_mapping_route(mapping_id):
     return handle_update_model_route(mapping_id, HOSPITAL_ROLE_MAPPING_ROUTE_SPEC)
+
+
+@app.post("/hospital-role-subgroups/<int:subgroup_id>/update")
+def update_hospital_role_subgroup_route(subgroup_id):
+    return handle_update_model_route(subgroup_id, HOSPITAL_ROLE_SUBGROUP_ROUTE_SPEC)
 
 
 @app.post("/document-route-definitions/<int:route_definition_id>/update")
@@ -4601,6 +5227,19 @@ def delete_hospital_role_mapping_route(mapping_id):
     return jsonify({"status": "deleted", "id": mapping_id})
 
 
+@app.post("/hospital-role-subgroups/<int:subgroup_id>/delete")
+def delete_hospital_role_subgroup_route(subgroup_id):
+    with closing(db_connection()) as conn:
+        cursor = conn.execute("DELETE FROM hospital_role_subgroups WHERE id = ?", (subgroup_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Hospital role subgroup not found"}), 404
+
+    if request.form:
+        return redirect(url_for("index"))
+    return jsonify({"status": "deleted", "id": subgroup_id})
+
+
 @app.post("/document-route-definitions/<int:route_definition_id>/delete")
 def delete_document_route_definition_route(route_definition_id):
     with closing(db_connection()) as conn:
@@ -4660,8 +5299,16 @@ def list_user_profiles():
     with closing(db_connection()) as conn:
         rows = conn.execute(sql, values).fetchall()
         active_hospital_role_rows = fetch_active_hospital_role_mappings(conn)
+        active_hospital_role_subgroup_rows = fetch_active_hospital_role_subgroups(conn)
 
-    payload = build_enriched_user_profiles(rows, active_hospital_role_rows)
+    hospital_role_catalog = build_hospital_role_catalog(active_hospital_role_rows)
+    hospital_role_label_lookup = build_hospital_role_label_lookup(hospital_role_catalog)
+    payload = build_enriched_user_profiles(
+        rows,
+        active_hospital_role_rows,
+        active_hospital_role_subgroup_rows,
+        hospital_role_label_lookup,
+    )
     return jsonify(payload)
 
 
